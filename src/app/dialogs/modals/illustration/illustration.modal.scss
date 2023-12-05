@@ -1,0 +1,36 @@
+// Import general styles for modal with inner wrapper
+@import "src/theme/common/modal-inner-wrapper.scss";
+
+.modal-inner-wrapper {
+    .illustration-thumb {
+        cursor: zoom-in;
+
+        img {
+            display: block;
+            margin: 0 auto;
+        }
+
+        + .illustration-metadata {
+            padding-top: 1rem;
+        }
+    }
+
+    .illustration-metadata {
+        p {
+            font-size: 1.0625rem;
+            line-height: 1.5;
+            margin: 0;
+
+            &.media-collection-link {
+                margin-top: 0.5em;
+            }
+        }
+
+        ion-icon {
+            margin-right: 0.5em;
+            vertical-align: top;
+            height: 24px;
+            width: 24px;
+        }
+    }
+}

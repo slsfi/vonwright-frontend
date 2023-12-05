@@ -1,0 +1,543 @@
+/**
+ * TEI MANUSCRIPTS
+ * Styles for manuscripts.
+ */
+
+/* Size of the esh-symbol in manuscripts. */
+div.tei .teiManuscript.immediate_symbol img {
+  display: inline-block;
+  height: auto;
+  width: 0.9em; // default
+}
+
+.miniFontSize div.tei .teiManuscript.immediate_symbol img {
+  width: ceil(0.9 * $text-fontsize-mini);
+  height: ceil(0.9 * $text-fontsize-mini);
+}
+
+.tinyFontSize div.tei .teiManuscript.immediate_symbol img {
+  width: ceil(0.9 * $text-fontsize-tiny);
+  height: ceil(0.9 * $text-fontsize-tiny);
+}
+
+.xxxsmallFontSize div.tei .teiManuscript.immediate_symbol img {
+  width: ceil(0.9 * $text-fontsize-xxxsmall);
+  height: ceil(0.9 * $text-fontsize-xxxsmall);
+}
+
+.xxsmallFontSize div.tei .teiManuscript.immediate_symbol img {
+  width: ceil(0.9 * $text-fontsize-xxsmall);
+  height: ceil(0.9 * $text-fontsize-xxsmall);
+}
+
+.xsmallFontSize div.tei .teiManuscript.immediate_symbol img {
+  width: ceil(0.9 * $text-fontsize-xsmall);
+  height: ceil(0.9 * $text-fontsize-xsmall);
+}
+
+.smallFontSize div.tei .teiManuscript.immediate_symbol img {
+  width: ceil(0.9 * $text-fontsize-small);
+  height: ceil(0.9 * $text-fontsize-small);
+}
+
+.mediumFontSize div.tei .teiManuscript.immediate_symbol img {
+  width: ceil(0.9 * $text-fontsize-medium);
+  height: ceil(0.9 * $text-fontsize-medium);
+}
+
+.largeFontSize div.tei .teiManuscript.immediate_symbol img {
+  width: ceil(0.9 * $text-fontsize-large);
+  height: ceil(0.9 * $text-fontsize-large);
+}
+
+.xlargeFontSize div.tei .teiManuscript.immediate_symbol img {
+  width: ceil(0.9 * $text-fontsize-xlarge);
+  height: ceil(0.9 * $text-fontsize-xlarge);
+}
+
+/* Size of the hand-symbol in manuscripts. */
+div.tei img.teiManuscript.handSymbol {
+  display: inline-block;
+  height: auto;
+  width: 1em; // default
+}
+
+.miniFontSize div.tei img.teiManuscript.handSymbol {
+  width: ceil(1 * $text-fontsize-mini);
+  height: ceil(1 * $text-fontsize-mini);
+}
+
+.tinyFontSize div.tei img.teiManuscript.handSymbol {
+  width: ceil(1 * $text-fontsize-tiny);
+  height: ceil(1 * $text-fontsize-tiny);
+}
+
+.xxxsmallFontSize div.tei img.teiManuscript.handSymbol {
+  width: ceil(1 * $text-fontsize-xxxsmall);
+  height: ceil(1 * $text-fontsize-xxxsmall);
+}
+
+.xxsmallFontSize div.tei img.teiManuscript.handSymbol {
+  width: ceil(1 * $text-fontsize-xxsmall);
+  height: ceil(1 * $text-fontsize-xxsmall);
+}
+
+.xsmallFontSize div.tei img.teiManuscript.handSymbol {
+  width: ceil(1 * $text-fontsize-xsmall);
+  height: ceil(1 * $text-fontsize-xsmall);
+}
+
+.smallFontSize div.tei img.teiManuscript.handSymbol {
+  width: ceil(1 * $text-fontsize-small);
+  height: ceil(1 * $text-fontsize-small);
+}
+
+.mediumFontSize div.tei img.teiManuscript.handSymbol {
+  width: ceil(1 * $text-fontsize-medium);
+  height: ceil(1 * $text-fontsize-medium);
+}
+
+.largeFontSize div.tei img.teiManuscript.handSymbol {
+  width: ceil(1 * $text-fontsize-large);
+  height: ceil(1 * $text-fontsize-large);
+}
+
+.xlargeFontSize div.tei img.teiManuscript.handSymbol {
+  width: ceil(1 * $text-fontsize-xlarge);
+  height: ceil(1 * $text-fontsize-xlarge);
+}
+
+div.tei {
+  .space {
+    color: #990202;
+  }
+
+  .substitution {
+    color: #0000a1;
+  }
+
+  .tei_substitution_zts {
+    color: #0000a1;
+  }
+
+  .alternative {
+    position: relative;
+  }
+
+  .tei_add_subst_zts {
+    color: #0000a1;
+  }
+
+  .tei_subst_table {
+    display: inline-table;
+    position: relative;
+    padding: 0;
+    left: -4.8em;
+    font-style: inherit;
+    margin-right: -4.8em;
+    margin-bottom: -1em;
+  }
+
+  .tei_subst_table_noIndent {
+    display: inline-table;
+    position: relative;
+    padding: 0;
+    font-style: inherit;
+    margin-bottom: -1em;
+  }
+
+  .tei_td_del {
+    display: table-cell;
+    position: relative;
+  }
+
+  .tei_td_add {
+    display: table-cell;
+    position: relative;
+    top: -1.9em;
+  }
+
+  .tei_td_add_sublinear {
+    display: table-cell;
+    position: relative;
+  }
+
+  .tei_tr {
+    display: table-row;
+  }
+
+  .tei_tr_add {
+    display: table-row;
+    line-height: 0;
+  }
+
+  .delSpan {
+    background-color: #a5a299;
+    display: inline-block;
+    left: -1.7647em;
+    position: relative;
+  }
+
+  .delSpan_noIndent {
+    background-color: #a5a299;
+    display: inline-block;
+  }
+
+  .delSpan_editorial {
+    background-color: #cd955e;
+    display: inline-block;
+    left: -1.7647em;
+    position: relative;
+  }
+
+  .delSpan_noIndent_editorial {
+    background-color: #cd955e;
+    display: inline-block;
+  }
+
+  .delSpan_medium {
+    background-color: #a3b550;
+    display: inline-block;
+    left: -1.7647em;
+    position: relative;
+  }
+
+  .delSpan_noIndent_medium {
+    background-color: #a3b550;
+    display: inline-block;
+  }
+
+  .deletion_strikethrough {
+    text-decoration: line-through;
+    background-color: #a5a299;
+  }
+
+  .deletion_subst {
+    text-decoration: line-through;
+  }
+
+  .tei_del_in_del {
+    position: relative;
+  }
+
+  .tei_deletion {
+    text-decoration: line-through;
+    color: #222;
+  }
+
+  .tei_deletion_add {
+    text-decoration: line-through;
+    color: #0000a1;
+  }
+
+  .tei_deletion_add_medium {
+    text-decoration: line-through;
+    color: #606b2f;
+  }
+
+  .tei_deletion_del {
+    text-decoration: none;
+    color: #222;
+  }
+
+  .tei_deletion_del_add {
+    text-decoration: none;
+    color: #0000a1;
+  }
+
+  .tei_deletion_del_subst {
+    text-decoration: line-through;
+    color: #222;
+  }
+
+  .tei_deletion_del::after {
+    content: ' ';
+    position: absolute;
+    border-top: 1px solid #000;
+    top: 35%;
+    left: 0;
+    right: 0;
+  }
+
+  .tei_deletion_del_add::after {
+    content: ' ';
+    position: absolute;
+    border-top: 1px solid #000;
+    top: 35%;
+    left: 0;
+    right: 0;
+  }
+
+  .tei_deletion_del_subst::after {
+    content: ' ';
+    position: absolute;
+    border-top: 1px solid #000;
+    top: 35%;
+    left: 0;
+    right: 0;
+  }
+
+  .tei_deletion_subst {
+    text-decoration: line-through;
+    color: #222;
+  }
+
+  .tei_deletion_editorial_wrapper {
+    text-decoration: line-through;
+    color: #a66e37 !important;
+  }
+
+  .tei_deletion_medium_wrapper {
+    text-decoration: line-through;
+    color: #008100 !important;
+  }
+
+  .tei_restore_editorial_wrapper {
+    border-bottom: 1px dashed #a66e37;
+  }
+
+  .tei_deletion_editorial {
+    text-decoration: none;
+    color: #000;
+  }
+
+  .tei_deletion_add_editorial {
+    text-decoration: none;
+    color: #0000a1;
+  }
+
+  .tei_add_margin {
+    color: #0000a1;
+    padding: 15px;
+  }
+
+  .tei_add_margin img {
+    margin-right: 3px;
+  }
+
+  .tei_add_over_zts {
+    vertical-align: super;
+    color: #0000a1;
+  }
+
+  .tei_add_over_hps {
+    color: #0000a1;
+    position: relative;
+    top: -0.9em;
+  }
+
+  .tei_add_sublinear {
+    vertical-align: -30%;
+    color: #0000a1;
+  }
+
+  .tei_add_inline {
+    color: #6262e6 !important;
+  }
+
+  .tei_add_in_add::before {
+    content: ' | ';
+    color: #990202 !important;
+  }
+
+  .tei_add_in_add {
+    color: #0000a1 !important;
+  }
+
+  .tei_add_choice {
+    position: absolute;
+    top: -0.9em;
+    left: 30px;
+  }
+
+  .tei_add_choice_sublinear {
+    position: absolute;
+    top: 1.5em;
+    left: -30px;
+  }
+
+  .tei_add_choice_noIndent {
+    position: absolute;
+    top: -1.2em;
+    left: 0;
+  }
+
+  .tei_add_choice_noIndent_sublinear {
+    position: absolute;
+    top: 1.5em;
+    left: 0;
+  }
+
+  .addSpan {
+    color: #0000a1;
+  }
+
+  .addSpan_choice {
+    color: #0000a1;
+    padding-left: 50px;
+  }
+
+  .tei_l_choice_master {
+    display: inline-block;
+    width: 50%;
+  }
+
+  .tei_l_choice_3 {
+    display: inline-block;
+    width: 33%;
+  }
+
+  span.split_symbol {
+    position: absolute;
+    z-index: 1;
+    top: 0.2em;
+    left: -8px;
+  }
+
+  span.join_symbol {
+    position: absolute;
+    z-index: 1;
+    top: -4px;
+    left: -9px;
+  }
+
+  .medium {
+    color: #008100 !important;
+  }
+
+  .restore {
+    border-bottom: 1px dashed green;
+  }
+
+  .switchpos_nonumber {
+    vertical-align: super;
+    color: #990202;
+  }
+
+  .switchpos_number {
+    vertical-align: super;
+    color: #0000a1;
+  }
+
+  .immediate_symbol {
+    position: relative;
+    bottom: -2px;
+    display: inline-block;
+  }
+
+  .add_margin {
+    color: #0000a1;
+  }
+
+  .add_over {
+    vertical-align: super;
+    color: #0000a1;
+  }
+
+  .add_sublinear {
+    vertical-align: -30%;
+    color: #0000a1;
+  }
+
+  .add_inline {
+    color: #6262e6 !important;
+  }
+
+  .add_subst {
+    color: #0000a1;
+  }
+
+  .add_choice {
+    position: absolute;
+    top: -1.2em;
+    left: 0;
+  }
+
+  &.teiManuscript {
+
+    .tooltiptrigger.ttMs,
+    .tooltiptrigger.tooltipMs {
+      cursor: help;
+    }
+
+    span.underline {
+      border-bottom: 1px solid black;
+      font-style: normal;
+    }
+
+    span.underline2 {
+      border-bottom: 3px double black;
+      font-style: normal;
+      text-decoration: none;
+    }
+
+    /* Is this used in ms? */
+    span.lemma {
+      background-color: #c1bac1;
+    }
+
+    p {
+      line-height: 180%;
+      position: relative;
+      text-indent: 1.7647em;
+    }
+
+    h4 {
+      margin: 1em 0 .5em !important;
+    }
+
+    h3 {
+      margin: 1.1em 0 .6em;
+      font-variant: normal;
+      line-height: 1.45;
+    }
+  }
+
+  p.teiManuscript.strofe[class*="lg"] {
+    line-height: 180%;
+    text-indent: 0 !important;
+  }
+}
+
+manuscripts {
+  div.tei {
+
+    /*
+    Doodles are not clickable in manuscripts since they
+    can't be opened in an illustrations-view from there, but
+    they should always be visible there.
+    */
+    img.teiManuscript.doodle {
+      cursor: default;
+      display: inline-block !important;
+    }
+
+    span.uppercase {
+      text-transform: uppercase;
+      font-variant: normal;
+    }
+
+    span.dashUnderline {
+      border-bottom: 1px dashed black;
+    }
+
+    .encircled {
+      border: 1px solid gray;
+    }
+
+    .encreasedSize {
+      font-size: 120%;
+    }
+
+    p.underline,
+    h3.underline {
+      font-style: normal;
+      text-decoration: underline;
+    }
+
+    img {
+      width: 0.9rem;
+      display: inline;
+    }
+  }
+}

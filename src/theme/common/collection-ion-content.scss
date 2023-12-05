@@ -1,0 +1,18 @@
+/* Styles for the ion-content container element with collection-ion-content class in all collection pages: cover, title, foreword, introduction and text */
+ion-content.collection-ion-content::part(scroll) {
+    display: flex;
+    padding: 20px;
+}
+@media screen and (max-width: 820px) {
+    // Reduce padding om small screens, center content
+    ion-content.collection-ion-content::part(scroll) {
+        justify-content: center;
+        padding: 10px;
+    }
+}
+ion-content.collection-ion-content.mobile-mode-content::part(scroll) {
+    align-items: center;
+    flex-flow: column nowrap;
+    justify-content: flex-start;
+    padding: 0;
+}

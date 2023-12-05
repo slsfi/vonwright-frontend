@@ -1,0 +1,47 @@
+/* Styles for the block in collection text columns where a different variant, manuscript or facsimile can be selected */
+div.text-select-wrapper {
+    padding: 0 0 1rem 0;
+    margin: 0 0 1.5rem 0;
+    border-bottom: 1px solid #666;
+    background-color: var(--text-area-background-color, #fafafa);
+    width: 100%;
+  
+    h3 {
+        font-size: 1rem;
+        font-weight: 600;
+        word-wrap: break-word;
+        white-space: normal;
+        margin: 0;
+    }
+  
+    .flex-buttons {
+        display: flex;
+        align-items: flex-start;
+        flex-wrap: wrap;
+    }
+  
+    h3 + .flex-buttons {
+        margin-top: 0.5rem;
+    }
+  
+    .flex-buttons + ion-item {
+        margin-top: 0.5rem;
+    }
+  
+    .flex-buttons > ion-button.button.align-right {
+        margin-left: auto;
+    }
+}
+.text-select-wrapper.facsimile-header {
+    border-bottom: 0;
+    padding-bottom: 0;
+    margin-bottom: 1rem;
+}
+.text-select-wrapper.facsimile-header.external-urls-header {
+    margin-bottom: 0;
+}
+.text-select-wrapper.facsimile-header.mobile-mode {
+    margin: 0 auto;
+    max-width: 710px;
+    padding: 0.5rem;
+}

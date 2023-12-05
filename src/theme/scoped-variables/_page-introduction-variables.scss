@@ -1,0 +1,13 @@
+/*
+  CSS variables scoped to <page-introduction> by import.
+
+  To override any of these variables in custom.scss you must use
+  this selector for defining the scope:
+
+  page-introduction[class][class] { }
+*/
+
+:host {
+  --intro-toc-background-color: var(--secondary-toolbar-color);
+  --intro-toc-text-color:       var(--secondary-toolbar-color-contrast);
+}

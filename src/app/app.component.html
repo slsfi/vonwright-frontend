@@ -1,0 +1,32 @@
+<ion-app>
+
+  <header>
+    <nav class="top-navigation" aria-labelledby="top-menu-label">
+      <top-menu (sideNavClick)="toggleSideNav()" [showSideNav]="showSideNav" [currentRouterUrl]="currentRouterUrl"></top-menu>
+    </nav>
+    <ion-progress-bar *ngIf="enableRouterLoadingBar" [class.showLoadingBar]="!loadingBarHidden" type="indeterminate" mode="ios"></ion-progress-bar>
+  </header>
+  <div class="content-container">
+    <nav id="side-navigation"
+          class="side-navigation"
+          [class.visuallyhidden]="!showSideNav"
+          [attr.aria-labelledby]="showCollectionSideMenu ? 'side-menu-collection-title' : 'main-side-menu-label'"
+    >
+      <main-side-menu *ngIf="mountMainSideMenu"
+            [class.visuallyhidden]="showCollectionSideMenu"
+            [urlSegments]="currentUrlSegments"
+      ></main-side-menu>
+      <collection-side-menu *ngIf="showCollectionSideMenu"
+            [collectionID]="collectionID"
+            [initialQueryParams]="collectionSideMenuInitialQueryParams"
+            [initialUrlSegments]="collectionSideMenuInitialUrlSegments"
+            [sideMenuToggled]="showSideNav"
+      ></collection-side-menu>
+    </nav>
+    <div class="main-content">
+      <ion-router-outlet [animated]="false" (activate)="hideLoadingBar(true)" (deactivate)="hideLoadingBar(false)"></ion-router-outlet>
+      <div *ngIf="mobileMode && showSideNav" class="backdrop-dismiss" (click)="toggleSideNav()"></div>
+    </div>
+  </div>
+
+</ion-app>

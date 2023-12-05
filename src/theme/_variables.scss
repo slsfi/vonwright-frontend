@@ -1,0 +1,65 @@
+:root {
+  // GLOBAL CSS VARIABLES
+
+  // Base colors
+  --primary-color:                    #497083;
+  --primary-color-rgb:                73, 112, 131;
+  --primary-color-contrast:           #fff;
+  --secondary-color:                  #d6d6d6;
+  --secondary-color-contrast:         #000;
+  --tertiary-color:                   var(--main-background-color); // must be light
+  --default-link-color:               #004aa5;
+  --main-background-color:            #ededed;
+  --main-background-accent-color:     #ccc;
+  --route-loading-progress-bar-color: rgba(255, 255, 255, 0.8);
+  --search-match-background-color:    #a5d7a5; // must be light
+  --text-area-background-color:       #fafafa;
+
+  // Buttons
+  --button-background-color:               var(--primary-color);
+  --button-text-color:                     var(--primary-color-contrast);
+  --fab-button-primary-background-color:   var(--primary-color);
+  --fab-button-primary-icon-color:         var(--primary-color-contrast);
+  --fab-button-secondary-background-color: #e9e9e9;
+  --fab-button-secondary-icon-color:       #000;
+  --outline-button-color:                  var(--primary-color); // must be dark
+
+  // Font stacks
+  --font-stack-system:             -apple-system, BlinkMacSystemFont, "Segoe UI",
+                                   Roboto, Oxygen-Sans, Ubuntu, Cantarell,
+                                   "Helvetica Neue", sans-serif;
+  --font-stack-app-base:           "Roboto", var(--font-stack-system);
+  --font-stack-home-banner:        var(--font-stack-app-base);
+  --font-stack-tei:                "SourceSerif", Constantia, "Lucida Bright",
+                                   Lucidabright, "Lucida Serif", Lucida,
+                                   "DejaVu Serif", "Bitstream Vera Serif",
+                                   "Liberation Serif", Georgia, serif;
+  --font-stack-tei-blackletter:    "Roboto", var(--font-stack-system);
+  --font-stack-tei-print-stamp:    Cambria, "Hoefler Text", Utopia,
+                                   "Liberation Serif", "Nimbus Roman No9 L Regular",
+                                   Times, "Times New Roman", serif;
+  --font-stack-tei-editorial-note: "Helvetica Neue", "Arial Nova", Helvetica,
+                                   Arial, sans-serif;
+
+  // Override global Ionic CSS variables
+  --ion-backdrop-opacity:       0.3;
+  --ion-color-primary:          var(--primary-color);
+  --ion-color-primary-rgb:      var(--primary-color-rgb);
+  --ion-color-primary-contrast: var(--primary-color-contrast);
+  --ion-color-step-100:         #f4f4f4;
+  --ion-font-family:            var(--font-stack-app-base);
+}
+
+
+// GLOBAL SCSS VARIABLES
+
+// Text size variables
+$text-fontsize-mini:     12px; // 0.75rem;   => Only for print
+$text-fontsize-tiny:     13px; // 0.8125rem; => Only for print
+$text-fontsize-xxxsmall: 14px; // 0.875rem;  => Only for print
+$text-fontsize-xxsmall:  15px; // 0.9375rem; => Only for print
+$text-fontsize-xsmall:   16px; // 1rem;
+$text-fontsize-small:    17px; // 1.0625rem;
+$text-fontsize-medium:   18px; // 1.125rem;
+$text-fontsize-large:    19px; // 1.1875rem; => Not for print
+$text-fontsize-xlarge:   21px; // 1.3125rem; => Not for print

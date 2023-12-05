@@ -1,0 +1,17 @@
+<ion-spinner *ngIf="!text" class="loading" name="crescent"></ion-spinner>
+<div class="tei teiContainer"
+      [innerHTML]="text"
+      [MathJax]="text"
+      [attr.lang]="textLanguage ? textLanguage : null"
+      [class.show_comments]="viewOptionsService.show.comments"
+      [class.show_personInfo]="viewOptionsService.show.personInfo"
+      [class.show_placeInfo]="viewOptionsService.show.placeInfo"
+      [class.show_workInfo]="viewOptionsService.show.workInfo"
+      [class.show_emendations]="viewOptionsService.show.emendations"
+      [class.show_normalisations]="viewOptionsService.show.normalisations"
+      [class.show_abbreviations]="viewOptionsService.show.abbreviations"
+      [class.show_paragraphNumbering]="viewOptionsService.show.paragraphNumbering"
+      [class.show_pageBreakOriginal]="viewOptionsService.show.pageBreakOriginal"
+      [class.show_pageBreakEdition]="viewOptionsService.show.pageBreakEdition"
+      [class.clickable-illustrations]="inlineVisibleIllustrations && illustrationsViewAvailable"
+></div>

@@ -1,0 +1,17 @@
+/*
+    CSS variables scoped to <page-index> by import.
+
+    To override any of these variables in custom.scss you must use
+    this selector for defining the scope:
+
+    page-index[class][class] { }
+*/
+
+:host {
+    // Indices of persons, places, keywords and works
+    --list-item-background-color:       transparent;
+    --list-item-border-color:           var(--main-background-accent-color);
+    --list-item-hover-background-color: #f5f5f5;
+    --list-heading-background-color:    #e0e0e0;
+    --list-heading-border-color:        #979797;
+}

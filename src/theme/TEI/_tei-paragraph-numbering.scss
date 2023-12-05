@@ -1,0 +1,60 @@
+/**
+ * TEI PARAGRAPH NUMBERING
+ * Styles for paragraph and line numberings.
+ */
+
+.tei span.lNumber,
+.tei span.paragraph_number {
+    display: none;
+}
+
+.tei.show_paragraphNumbering span.paragraph_number,
+.tei.show_paragraphNumbering span.lNumber {
+  display: block;
+  position: absolute;
+  margin-left: -35px;
+  text-align: left;
+  width: 30px;
+  font-family: var(--font-stack-app-base);
+  font-size: 0.6875rem;
+  text-indent: 0;
+  font-style: normal !important;
+  font-weight: normal !important;
+}
+
+.tei.show_paragraphNumbering span.lNumber,
+.tei.show_paragraphNumbering p.parIndent span.paragraph_number,
+.tei.show_paragraphNumbering p.hangingIndent span.paragraph_number,
+.tei.show_paragraphNumbering blockquote span.paragraph_number {
+  margin-left: -65px;
+}
+
+.tei.show_paragraphNumbering p.item_indented span.paragraph_number {
+  margin-left: -75px;
+}
+
+.tei.show_paragraphNumbering p.labelledLines_before span.lNumber {
+  margin-left: -145px;
+}
+
+/*
+Left padding for reading-texts and introductions when the
+paragraph numbering is displayed.
+*/
+reading-text .tei.show_paragraphNumbering,
+page-introduction .tei.show_paragraphNumbering {
+  padding-left: 20px;
+}
+
+@media screen and (max-width: 820px) {
+  /* Margin on small screens when showing paragraph numbering. */
+  reading-text .tei.show_paragraphNumbering,
+  page-introduction .tei.show_paragraphNumbering {
+    margin-left: 8px;
+  }
+}
+
+/* Left padding if showing paragraph numbering in mobile view. */
+page-text .mobile-mode-readingtext .tei.show_paragraphNumbering {
+  padding-left: 28px;
+}

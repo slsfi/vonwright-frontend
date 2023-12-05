@@ -1,0 +1,103 @@
+:host {
+    display: block;
+    line-height: 1.4;
+    width: 100%;
+}
+
+p {
+    margin: 0;
+}
+
+ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+
+    li {
+        padding:0.5rem 0;
+        width: 100%;
+
+        &:first-child {
+            padding-top: 0;
+        }
+
+        &:last-child {
+            padding-bottom: 0;
+        }
+
+        + li {
+            border-top: 1px solid var(--main-background-accent-color);
+        }
+
+        button {
+            align-items: center;
+            background: transparent;
+            cursor: pointer;
+            display: flex;
+            font-size: inherit;
+            line-height: inherit;
+            text-align: start;
+            width: 100%;
+
+            &:hover {
+                color: var(--outline-button-color);
+            }
+
+            ion-icon.toggle-icon {
+                font-size: 1.25rem;
+                flex-shrink: 0;
+                margin: 0 0 0 auto;
+                transform: rotate(0);
+                transition: transform ease-in-out 0.2s;
+        
+                &.open {
+                  transform: rotate(90deg);
+                }
+            }
+        }
+
+        ul {
+            border-top: 1px solid var(--main-background-accent-color);
+            margin-top: 0.5rem;
+            padding: 0.5rem 0 0 1.5rem;
+
+            li {
+                display: flex;
+
+                .text-name {
+                    padding: 0.25rem 0.75rem 0 0;
+                }
+
+                .text-links {
+                    margin: 0 0 0 auto;
+                }
+            }
+        }
+    }
+}
+
+a.button-link {
+    background-color: transparent;
+    border: 1px solid var(--outline-button-color);
+    border-radius: 2px;
+    color: var(--outline-button-color);
+    display: block;
+    font-size: 0.8125rem;
+    letter-spacing: 0;
+    margin: 0 0 0 auto;
+    padding: 0.375em 1em;
+    text-align: center;
+    text-decoration: none;
+    text-transform: uppercase;
+    transition: background-color 0.1s linear;
+    width: max-content;
+
+    &:hover {
+        background-color: rgba(0, 0, 0, 0.1);
+    }
+}
+
+a.button-link + a.button-link {
+    margin-top: 0.25rem;
+}

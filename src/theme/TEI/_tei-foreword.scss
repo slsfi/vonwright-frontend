@@ -1,0 +1,52 @@
+/**
+ * TEI FOREWORD
+ * Styles for forewords.
+ */
+
+page-foreword {
+  div.tei.tei {
+    header {
+      margin: 4em 0;
+    }
+
+    header p {
+      text-align: center;
+      line-height: 1.35;
+      text-indent: 0;
+    }
+
+    header p[role="doc-subtitle"] {
+      font-size: 1.2353em;
+      margin: 0.75em 0;
+    }
+
+    header p.writer {
+      font-size: 1em;
+      margin: 1.75em 0;
+      text-transform: uppercase;
+      letter-spacing: 0.02em;
+    }
+
+    h1.title + p.writer {
+      margin: 1em 0;
+    }
+
+    header h1.title > span.writer {
+      font-size: 0.5556em;
+      font-variant: normal;
+      font-weight: normal;
+    }
+
+    h1.title {
+      font-size: 1.5883em;
+      font-weight: normal;
+      font-style: normal;
+      text-transform: none;
+      font-variant: normal;
+      text-align: center;
+      margin: 0;
+      letter-spacing: 0.02em;
+      line-height: 1.35;
+    }
+  }
+}

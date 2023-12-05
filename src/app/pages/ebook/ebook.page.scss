@@ -1,0 +1,12 @@
+ion-content.ebook-ion-content::part(scroll) {
+    align-items: center;
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: center;
+}
+
+.ebook-error-message {
+    background-color: #f9fcfc;
+    font-size: 1.125rem;
+    padding: 1rem;
+}

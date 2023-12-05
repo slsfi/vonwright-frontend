@@ -1,0 +1,90 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar class="secondary">
+
+    <ng-container>
+      <ion-buttons slot="end" class="secondary-toolbar-buttons-wrapper">
+
+        <ng-container *ngIf="pdfData.downloadOptions?.length > 0">
+          <a *ngIf="pdfData.downloadOptions?.length < 2 && pdfData.downloadOptions?.[0]?.url"
+                [href]="pdfData.downloadOptions?.[0]?.url"
+                [attr.target]="(pdfData.downloadOptions?.[0]?.url | isExternalURL) ? '_blank' : null"
+          >
+            <ion-icon name="download"></ion-icon>
+            <span class="side-title" i18n="@@BasicActions.Download">Ladda ner</span>
+          </a>
+
+          <ion-button *ngIf="pdfData.downloadOptions?.length > 1" (click)="openDownloadPopover($event)">
+            <ion-icon name="download"></ion-icon>
+            <span class="side-title" i18n="@@BasicActions.Download">Ladda ner</span>
+          </ion-button>
+          <ion-popover #downloadOptionsPopover
+                [ngStyle]="{'--offset-y': '-30px', '--background': 'var(--main-background-color)'}"
+                reference="trigger"
+                side="bottom"
+                alignment="end"
+                [showBackdrop]="true"
+                [backdropDismiss]="true"
+                [isOpen]="downloadPopoverIsOpen"
+                (didDismiss)="downloadPopoverIsOpen = false"
+          >
+            <ng-template>
+              <div
+                    [ngStyle]="{
+                      'align-items': 'center',
+                      'background-color': 'var(--secondary-color)',
+                      'color': 'var(--secondary-color-contrast)',
+                      'display': 'flex',
+                      'justify-content': 'space-between',
+                      'padding': '0 0 0 1rem',
+                      'width': '100%'
+                    }">
+                <p [ngStyle]="{'margin': '0'}"><b i18n="@@BasicActions.Download">Ladda ner</b></p>
+                <ion-button
+                      class="close"
+                      fill="clear"
+                      (click)="closeDownloadPopover()"
+                      [ngStyle]="{
+                        '--color': 'var(--secondary-color-contrast)',
+                        '--padding-start': '0.65em',
+	                      '--padding-end': '0.65em'
+                      }"
+                >
+                  <ion-icon slot="icon-only" name="close" aria-label="Stäng" i18n-aria-label="@@BasicActions.Close"></ion-icon>
+                </ion-button>
+              </div>
+              <ul [ngStyle]="{'margin': '0.25rem 1rem 0.25rem 0'}">
+                <li *ngFor="let downloadOption of pdfData.downloadOptions" [ngStyle]="{'margin': '1rem 0'}">
+                  <a [href]="downloadOption.url" [attr.target]="(downloadOption.url | isExternalURL) ? '_blank' : null">
+                    {{downloadOption.label ?? downloadOption.url}}
+                    <ion-icon *ngIf="downloadOption.url | isExternalURL"
+                          name="open-outline"
+                          [ngStyle]="{
+                            'font-size': '1.375rem',
+                            'padding-left': '0.125rem',
+                            'vertical-align': 'text-bottom'
+                          }"
+                          aria-label="Länken öppnas i ett nytt fönster"
+                          i18n-aria-label="@@BasicActions.OpenInNewWindow"
+                    ></ion-icon>
+                  </a>
+                </li>
+              </ul>
+            </ng-template>
+          </ion-popover>
+        </ng-container>
+
+        <ion-button *ngIf="showURNButton" (click)="showReference()">
+          <ion-icon slot="start" name="arrow-redo-sharp"></ion-icon>
+          <span class="side-title" i18n="@@Reference.Refer">Hänvisa</span>
+        </ion-button>
+      </ion-buttons>
+    </ng-container>
+
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="no-padding" [scrollX]="false" [scrollY]="false">
+  
+  <object [data]="pdfURL" type="application/pdf"></object>
+
+</ion-content>

@@ -1,0 +1,207 @@
+// Import general styles for the secondary toolbar
+@import "src/theme/common/secondary-toolbar.scss";
+
+ion-content {
+  --padding-bottom: 5rem;
+}
+
+a.back-link {
+  align-items: center;
+  color: var(--secondary-toolbar-color-contrast);
+  display: flex;
+  padding-left: 1.875rem;
+  text-decoration: none;
+  transition: opacity 0.2s;
+
+  &:hover {
+      opacity: 0.6;
+  }
+
+  ion-icon {
+    font-size: 1.75rem !important;
+    min-width: 28px;
+  }
+
+  span {
+    font-size: 0.9375rem;
+    line-height: 1.5;
+    margin: 0 0 0 0.8em;
+  }
+}
+
+.loading-gallery {
+  padding-top: 8rem;
+}
+
+.loading-overlay {
+  align-items: center;
+  background-color: #fff;
+  border: 1px solid var(--outline-button-color);
+  border-radius: 0.5rem;
+  display: flex;
+  height: 150px;
+  justify-content: center;
+  left: 50%;
+  position: fixed;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 150px;
+  z-index: 10;
+}
+
+.page-title-wrapper {
+  align-items: center;
+  display: flex;
+  gap: 1rem;
+  margin: 0 0 1.5rem 0;
+
+  h1 {
+    font-size: 1.625rem;
+    font-weight: bold;
+    margin: 0;
+    text-transform: uppercase;
+  }
+
+  p {
+    border: 1px solid var(--outline-button-color);
+    border-radius: 0.5em;
+    font-size: 1rem;
+    padding: 0.25em 0.375em;
+    margin: 0;
+    text-align: center;
+  }
+}
+
+.info.markdown {
+  margin-bottom: 2rem;
+  max-width: 800px;
+  width: 100%;
+}
+
+.filters-wrapper {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.25rem;
+  margin-bottom: 2rem;
+  max-width: 1000px;
+
+  ion-select {
+    --border-color: var(--main-background-accent-color);
+    --highlight-color-focused: var(--outline-button-color);
+    --highlight-color-valid: var(--outline-button-color);
+    flex-grow: 1;
+    max-width: 30%;
+    min-width: 240px;
+
+    &:hover {
+      --border-color: var(--outline-button-color);
+    }
+  }
+
+  ion-button {
+    --padding-end: 0;
+    --padding-start: 0;
+    margin: 0;
+  }
+}
+
+.page-title-wrapper + .filters-wrapper {
+  margin-top: 2rem;
+}
+
+.filter-results {
+  font-style: italic;
+}
+
+ion-grid {
+  --ion-grid-padding: 0;
+  margin: -0.75rem -0.75rem 0 -0.75rem;
+
+  @media only screen and (min-width: 821px) {
+    margin-top: 0;
+  }
+}
+
+ion-col {
+  --ion-grid-column-padding: 0.75rem;
+
+  a,
+  button {
+    background-color: #fff;
+    border: 0.0625rem solid #fff;
+    color: #000;
+    display: flex;
+    flex-flow: column nowrap;
+    font-size: 1rem;
+    height: auto;
+    justify-content: space-between;
+    padding: 0.4375rem;
+    position: relative;
+    text-align: start;
+    text-decoration: none;
+    transition: all 0.15s ease-in-out;
+    width: 100%;
+
+    &:hover {
+      border-color: var(--button-background-color);
+      box-shadow: rgba(0, 0, 0, 0.2) 0px 3px 1px -2px, rgba(0, 0, 0, 0.2) 0px 2px 2px 0px, rgba(0, 0, 0, 0.2) 0px 1px 5px 0px;
+    }
+  }
+
+  button {
+    cursor: zoom-in;
+  }
+
+  figure {
+    margin: 0;
+  }
+
+  img {
+    display: block;
+    margin: 0 auto;
+  }
+
+  figcaption {
+    border-top: 1px solid var(--button-background-color);
+    margin: 0.5rem 0 0 0;
+    padding: 1rem 0.25rem 0.5rem 0.25rem;
+  }
+
+  .item-title {
+    align-items: center;
+    display: flex;
+    gap: 0.75rem;
+    justify-content: space-between;
+
+    h2 {
+      font-size: 1rem;
+      font-weight: bold;
+      line-height: 1.35;
+      margin: 0;
+
+      .subtitle {
+        font-weight: normal;
+      }
+    }
+
+    p {
+      border: 1px solid var(--outline-button-color);
+      border-radius: 0.5em;
+      font-size: 0.75rem;
+      padding: 0.25em 0.375em;
+      margin: 0;
+      text-align: center;
+    }
+  }
+
+  p.description {
+    font-size: 1rem;
+    line-height: 1.375;
+    margin: 0;
+  }
+
+  .item-title + p.description {
+    margin-top: 0.5rem;
+  }
+}

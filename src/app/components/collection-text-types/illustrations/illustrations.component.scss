@@ -1,0 +1,22 @@
+.illustration-image-wrapper {
+  margin: 0 0 1rem 0;
+
+  &:last-of-type {
+    padding-bottom: 2rem;
+  }
+
+  img {
+    cursor: zoom-in;
+    display: block;
+    height: auto;
+    width: auto;
+  }
+
+  img + ion-button.custom-button {
+    margin-top: 0.5em;
+  }
+}
+
+.view-all-button + div.illustration-image-wrapper {
+  margin-top: 1rem;
+}

@@ -1,0 +1,41 @@
+ion-button.button.custom-button,
+ion-button.button.custom-outline-button,
+ion-button.button.circular-icon-button {
+  --background: var(--button-background-color);
+  --border-radius: 2px;
+  --color: var(--button-text-color);
+  --padding-bottom: 0.25rem;
+  --padding-top: 0.25rem;
+  font-size: 0.8125rem;
+  letter-spacing: 0;
+  min-height: 1.875rem;
+  transition: all ease-in-out 0.2s;
+}
+ion-button.button.custom-outline-button,
+ion-button.button.circular-icon-button {
+  --background: transparent;
+  --background-hover: var(--button-background-color);
+  --background-focused: var(--button-background-color);
+  --border-color: var(--outline-button-color);
+  --border-width: 1px;
+  --color: var(--outline-button-color);
+}
+ion-button.button.circular-icon-button {
+  --border-radius: 1.25rem;
+  --padding-start: 0.25rem;
+  --padding-end: 0.25rem;
+
+  ion-icon {
+    --color: var(--outline-button-color);
+    --ionicon-stroke-width: 48px;
+    font-size: 1.25rem;
+  }
+}
+ion-button.button.close {
+  --background-hover: transparent;
+  --color: inherit;
+  transition: opacity 0.2s;
+}
+ion-button.button.close:hover {
+  opacity: 0.6;
+}

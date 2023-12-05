@@ -1,0 +1,96 @@
+div.teiContainer {
+    h2 {
+        font-size: 1.25em;
+        font-variant: small-caps;
+        margin: 0 0 .5em;
+    }
+
+    h3 {
+        font-size: 1em;
+        font-weight: normal;
+        margin: 1.25em 0 .5em;
+
+        &::after {
+            content: ": ";
+        }
+    }
+
+    dl {
+        display: table;
+        margin: 0;
+        width: 100%;
+
+        div {
+            display: table-row;
+
+            dt,
+            dd {
+                display: table-cell;
+            }
+
+            dt {
+                padding-right: 1.5em;
+                white-space: nowrap;
+
+                &::after {
+                    content: ": ";
+                }
+            }
+
+            dd {
+                overflow-wrap: break-word;
+                vertical-align: bottom;
+                width: 100%;
+
+                a {
+                    overflow-wrap: anywhere;
+                }
+            }
+
+            + div {
+                dt,
+                dd {
+                    border-top: 1px solid #e6e6e6;
+                }
+            }
+        }
+
+        &.dl-group {
+            border: 1px solid #e6e6e6;
+            display: block;
+            margin: 0.125em;
+            padding: 0.25em 0.5em;
+
+            div {
+                display: block;
+
+                dt,
+                dd {
+                    display: block;
+                    padding: 0;
+                    white-space: normal;
+                }
+
+                dd {
+                    margin-left: 1.25rem;
+                    width: auto;
+                }
+
+                + div {
+                    border-top: 1px solid #e6e6e6;
+
+                    dt,
+                    dd {
+                        border-top: 0;
+                    }
+                }
+            }
+
+            
+
+            + .dl-group {
+                margin-top: 0.75em;
+            }
+        }
+    }
+}

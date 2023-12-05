@@ -1,0 +1,13 @@
+services:
+  web:
+    restart: unless-stopped
+    build:
+      context: .
+      dockerfile: Dockerfile
+    extra_hosts:
+      - "api.sls.fi:172.16.2.136"
+      - "granska-api.sls.fi:172.16.2.136"
+      - "testa-vonwright.sls.fi:172.16.2.136"
+    image: docker.io/slsfinland/digital_edition_web_ng:latest
+    ports:
+      - 2089:4201

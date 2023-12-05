@@ -1,0 +1,100 @@
+/*
+ * App Global CSS
+ * ----------------------------------------------------------------------------
+ * This file is used as an entry point to import CSS/Sass files with styles
+ * that should be applied globally. These styles are for the entire app and
+ * not just one component.
+ */
+
+/* Core CSS required for Ionic components to work properly. */
+@import "~@ionic/angular/css/core.css";
+
+
+/* Basic CSS for apps built with Ionic. */
+@import "~@ionic/angular/css/normalize.css";
+@import "~@ionic/angular/css/structure.css";
+@import "~@ionic/angular/css/typography.css";
+
+
+/**
+ * Import font files using @font-face rules. Comment out the import lines of
+ * the font-families you don’t use in your project.
+ */
+@import "./theme/font-face/roboto";
+@import "./theme/font-face/source-serif";
+@import "./theme/font-face/mulish";
+@import "./theme/font-face/inter";
+
+
+/* CSS and Sass variables. */
+@import "./theme/variables";
+
+
+/* General global styles. */
+@import "./theme/general";
+
+
+/* Styles for markdown content. */
+@import "./theme/markdown";
+
+
+/* Style overrides to Ionic components. */
+@import "./theme/ionic/ion-alert";
+@import "./theme/ionic/ion-button";
+@import "./theme/ionic/ion-content";
+@import "./theme/ionic/ion-datetime";
+@import "./theme/ionic/ion-header";
+@import "./theme/ionic/ion-input";
+@import "./theme/ionic/ion-modal";
+@import "./theme/ionic/ion-popover";
+@import "./theme/ionic/ion-radio";
+@import "./theme/ionic/ion-searchbar";
+@import "./theme/ionic/ion-spinner";
+@import "./theme/ionic/ion-toggle";
+@import "./theme/ionic/ion-toolbar";
+
+
+/* Misc. global styles. */
+@import "./theme/misc";
+
+
+/**
+ * TEI global styles, applied to the content of collection pages.
+ * If your project doesn't have collections you can safely comment
+ * all of these out. You can also selectively comment out styles
+ * for components/features that you don't have, or comment out some
+ * of them and define your own styles from scratch in custom.scss.
+ */
+// TEI core styles. If you only have facsimiles you can comment it out.
+@import "./theme/TEI/tei-core";
+// TEI styles for semantic elements and icons.
+@import "./theme/TEI/tei-semantic-extras";
+// TEI styles for showing page breaks.
+@import "./theme/TEI/tei-page-breaks";
+// TEI styles for showing paragraph/line numberings.
+@import "./theme/TEI/tei-paragraph-numbering";
+// TEI common styles, used by multiple collection components.
+@import "./theme/TEI/tei-common";
+// TEI styles for the collection title page.
+@import "./theme/TEI/tei-title";
+// TEI styles for the collection foreword page.
+@import "./theme/TEI/tei-foreword";
+// TEI styles for the collection introduction page.
+@import "./theme/TEI/tei-introduction";
+// TEI styles for the collection reading text component.
+@import "./theme/TEI/tei-readingtext";
+// TEI styles for the collection comments component.
+@import "./theme/TEI/tei-comments";
+// TEI styles for the collection manuscripts component.
+@import "./theme/TEI/tei-manuscripts";
+// TEI styles for the collection variants component.
+@import "./theme/TEI/tei-variants";
+
+
+/**
+ * Styles for info-overlay and tooltip div:s in collection introduction
+ * and collection text pages. Projects that don't have collections or
+ * tooltips in introduction or text pages can comment these out.
+ */
+@import "./theme/common/info-overlay";
+@import "./theme/common/tooltip";

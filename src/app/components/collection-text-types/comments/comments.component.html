@@ -1,0 +1,34 @@
+<ion-spinner *ngIf="!text" class="loading" name="crescent"></ion-spinner>
+<div class="tei teiContainer"
+      [class.show_comments]="viewOptionsService.show.comments"
+      [class.show_personInfo]="viewOptionsService.show.personInfo"
+      [class.show_workInfo]="viewOptionsService.show.workInfo"
+      [class.show_abbreviations]="viewOptionsService.show.abbreviations"
+      [class.show_paragraphNumbering]="viewOptionsService.show.paragraphNumbering"
+>
+  <div [innerHTML]="text"></div>
+  <div class="ms" *ngIf="letter">
+    <h3 i18n="@@Commentary.Manuscript.Title">Manuskriptbeskrivning</h3>
+    <ul>
+      <li><ng-container i18n="@@Commentary.Manuscript.LegacyId">Brevsignum</ng-container>: {{letter['legacy_id']}}</li>
+      <li><ng-container i18n="@@Commentary.Manuscript.Sender">Avsändare</ng-container>: {{sender}}</li>
+      <li><ng-container i18n="@@Commentary.Manuscript.Receiver">Mottagare</ng-container>: {{receiver}}</li>
+      <li><ng-container i18n="@@Commentary.Manuscript.Archive">Arkiv</ng-container>: {{letter['source_archive']}}</li>
+      <li><ng-container i18n="@@Commentary.Manuscript.Collection">Samling, signum</ng-container>: {{letter['source_collection_id']}}</li>
+    </ul>
+    <ul>
+      <li *ngIf="letter['material_type']"><ng-container i18n="@@Commentary.Manuscript.Type">Form</ng-container>: {{letter['material_type']}}</li>
+      <li *ngIf="letter['material_source']"><ng-container i18n="@@Commentary.Manuscript.Status">Status</ng-container>: {{letter['material_source']}}</li>
+      <li *ngIf="letter['material_format']"><ng-container i18n="@@Commentary.Manuscript.Format">Format</ng-container>: {{letter['material_format']}}</li>
+      <li *ngIf="letter['leaf_count']"><ng-container i18n="@@Commentary.Manuscript.Leafs">Lägg</ng-container>: {{letter['leaf_count']}}</li>
+      <li *ngIf="letter['sheet_count']"><ng-container i18n="@@Commentary.Manuscript.Sheets">Antal blad</ng-container>: {{letter['sheet_count']}}</li>
+      <li *ngIf="letter['page_count']"><ng-container i18n="@@Commentary.Manuscript.Pages">Sidor brevtext</ng-container>: {{letter['page_count']}}</li>
+      <li *ngIf="letter['material_color']"><ng-container i18n="@@Commentary.Manuscript.Color">Färg</ng-container>: {{letter['material_color']}}</li>
+      <li *ngIf="letter['material_quality']"><ng-container i18n="@@Commentary.Manuscript.Quality">Kvalitet</ng-container>: {{letter['material_quality']}}</li>
+      <li *ngIf="letter['material_pattern']"><ng-container i18n="@@Commentary.Manuscript.Pattern">Mönster</ng-container>: {{letter['material_pattern']}}</li>
+      <li *ngIf="letter['material_state']"><ng-container i18n="@@Commentary.Manuscript.State">Tillstånd</ng-container>: {{letter['material_state']}}</li>
+      <li *ngIf="letter['material']"><ng-container i18n="@@Commentary.Manuscript.Material">Skrivmaterial</ng-container>: {{letter['material']}}</li>
+      <li *ngIf="letter['material_notes']"><ng-container i18n="@@Commentary.Manuscript.Other">Övrigt</ng-container>: {{letter['material_notes']}}</li>
+    </ul>
+  </div>
+</div>

@@ -1,0 +1,1206 @@
+/**
+ * TEI COMMON
+ * Common styles for TEI-texts. These are base styles for
+ * paragraphs, headings etc.
+ */
+
+div.tei {
+  p {
+    font-size: 1em;
+    line-height: 1.6em;
+    text-indent: 1.25em;
+    margin: 0;
+  }
+
+  blockquote {
+    font-style: normal;
+    font-size: 1em;
+    line-height: 1.6em;
+    margin: 1em 30px;
+  }
+
+  .padded p {
+    padding-left: 100px;
+  }
+
+  .padded h3 {
+    padding-left: 100px;
+  }
+
+  p.authorHeader {
+    text-indent: 0 !important;
+    margin-bottom: 0.5em;
+  }
+
+  p.invisiblelg {
+    margin-bottom: 1em !important;
+    margin-top: 1em !important;
+  }
+
+  /*
+  Stanzas with a blank line between them should not have two
+  blank lines just because there's a page number in between.
+  */
+  p.tei.invisiblelg + p.tei.invisiblelg {
+    margin-bottom: 0;
+  }
+
+  /*
+  No text-indent in blank lines, as they can contain <pb>
+  that shouldn't have indentation, and there shouldn't be
+  double blank lines if invisiblelg contains <pb>.
+  */
+  p.tei.invisiblelg {
+    text-indent: 0 !important;
+    margin-top: 0 !important;
+  }
+
+  /* COMMON PARAGRAPHS */
+  p.invisible {
+    height: 0 !important;
+    width: 0 !important;
+    display: none;
+  }
+
+  p.personDesc,
+  p.placeDesc,
+  p.titleDesc {
+    text-indent: 0 !important;
+    margin-bottom: 1em !important;
+    padding-bottom: 0 !important;
+  }
+
+  p.paragraphSpace {
+    padding-bottom: 1.5em !important;
+  }
+
+  .topMargin {
+    margin-top: 1em;
+  }
+
+  .bottomMargin {
+    margin-bottom: 1em;
+  }
+
+  p.dateline {
+    margin-top: 1em;
+    margin-bottom: 1em;
+  }
+
+  p.underline,
+  h3.underline {
+    font-style: italic;
+  }
+
+  h3.underline {
+    text-decoration: underline;
+  }
+
+  span.underline {
+    font-style: italic;
+  }
+
+  .underlineTT {
+    text-decoration: underline;
+  }
+
+  .true-underline {
+    text-decoration: underline;
+  }
+
+  .tei_hi_medium {
+    text-decoration: none;
+    color: #000;
+  }
+
+  .tei_encircled_medium {
+    border: 1px solid #008100;
+  }
+
+  .tei_dashUnderline_medium {
+    border-bottom: 1px dashed #008100;
+  }
+
+  .tei_underline_medium {
+    text-decoration: underline;
+    color: #008100;
+  }
+
+  .tei_underline2_medium {
+    border-bottom: 3px double #008100;
+    font-style: normal;
+    text-decoration: none;
+  }
+
+  .stamp,
+  .print {
+    font-family: var(--font-stack-tei-print-stamp);
+    letter-spacing: 1px;
+  }
+
+  .left {
+    text-align: left !important;
+    text-indent: 0 !important;
+  }
+
+  .center {
+    text-align: center;
+    text-indent: 0 !important;
+  }
+
+  .playCenter {
+    text-align: center;
+    text-indent: 0 !important;
+    margin-top: 0.9em !important;
+    margin-bottom: 0.3em !important;
+  }
+
+  .playCenter + .noIndent {
+    text-indent: 0 !important;
+    margin-bottom: 0.9em !important;
+  }
+
+  .center img {
+    height: 1em;
+  }
+
+  .right {
+    text-align: right;
+    text-indent: 0 !important;
+    margin-bottom: 1em;
+  }
+
+  .parIndent + .right + .right {
+    margin-top: -1em;
+  }
+
+  .img_left {
+    float: left;
+    padding-right: 8px;
+  }
+
+  .img_right {
+    float: right;
+    padding-left: 8px;
+  }
+
+  p.strofe {
+    text-indent: 0 !important;
+    padding-bottom: 1em !important;
+    margin-top: 1em !important;
+  }
+
+  p.l {
+    margin-left: 30px !important;
+    text-indent: -30px !important;
+    margin-top: 0;
+    margin-bottom: 0;
+  }
+
+  .tei_indent {
+    padding-left: 30px !important;
+    display: inline-block;
+  }
+
+  p.strofeSpacing {
+    padding-bottom: 1em !important;
+  }
+
+  p.strofePadding {
+    padding-left: 20px;
+  }
+
+  p.milestoneWhen,
+  p.milestonePart,
+  span.milestoneWhen,
+  span.milestonePart {
+    font-family: var(--font-stack-app-base);
+    font-size: 0.8824em !important;
+    color: #4e4e4e;
+    background-color: #ececec;
+    margin: 0.8em 0 !important;
+    padding: 0 0.8em !important;
+    line-height: 1.5em !important;
+  }
+
+  span.milestoneWhen,
+  span.milestonePart {
+    display: block;
+  }
+
+  hr.milestoneBar,
+  hr.milestoneSmallBar {
+    height: 1px;
+    border: 0;
+    background-color: #404040;
+    padding: 0;
+    margin: 1.5em auto;
+    width: 5.625em;
+  }
+
+  hr.milestoneSmallBar {
+    width: 2.25em;
+  }
+
+  hr.asterisk {
+    height: auto;
+    border: none;
+    background-color: transparent;
+    text-align: center;
+    margin: 1.75em auto 1.25em auto;
+  }
+
+  hr.asterisk::after {
+    color: #000;
+    content: "*";
+  }
+
+  hr.blank {
+    height: 0;
+    border: none;
+    background-color: transparent;
+    margin: 1.5em 0 0 0;
+  }
+
+  p.strofe + hr.milestoneBar,
+  p.strofe + hr.milestoneSmallBar {
+    margin-top: 0.5em;
+  }
+
+  p.teiOpener {
+    margin-bottom: 1.5em !important;
+  }
+
+  p.teiCloser {
+    margin-top: 1.5em !important;
+    margin-bottom: 1.5em !important;
+  }
+
+  .noIndent {
+    text-indent: 0 !important;
+  }
+
+  p.subtitle {
+    text-align: center;
+    font-style: italic;
+    font-size: 1.1176em;
+    margin: 0 0 2.25em 0;
+    text-indent: 0;
+  }
+
+  .parHalfIndent {
+    text-indent: 0 !important;
+    padding-left: 15px;
+  }
+
+  .halfLinePadding {
+    padding-bottom: 0.5em !important;
+  }
+
+  /* FOOTNOTES */
+  ol.footnotesList {
+    display: table;
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+
+    li.footnoteItem {
+      display: table-row;
+
+      a.footnoteReference {
+        display: table-cell;
+        padding: 0 0.7em 0 0;
+        text-align: right;
+        text-decoration: none;
+
+        &:hover:not(.disable-hover) {
+          text-decoration: underline;
+        }
+      }
+
+      span.footnoteText {
+        display: table-cell;
+        padding: 0;
+        overflow-wrap: anywhere;
+      }
+    }
+
+    /*
+    Zero-width space needed for some screen readers
+    since list-style-type is none.
+    */
+    li.footnoteItem::before {
+      content: "\200B";
+    }
+  }
+
+  /* COMMON SPANS */
+  .sub {
+    vertical-align: sub;
+    font-size: 0.8235em;
+  }
+
+  .sup {
+    vertical-align: super;
+    font-size: 0.8235em;
+  }
+
+  .raised {
+    vertical-align: 60%;
+    line-height: 0.5em;
+    font-size: 0.8235em;
+  }
+
+  .uppercase {
+    text-transform: uppercase;
+  }
+
+  .italics {
+    font-style: italic;
+  }
+
+  .italicsTT {
+    font-style: italic;
+  }
+
+  .expanded {
+    font-style: italic;
+  }
+
+  .expandedTT {
+    letter-spacing: 2px;
+  }
+
+  .trueexpanded {
+    letter-spacing: 2px;
+  }
+
+  .expanded.italics {
+    letter-spacing: 2px;
+    font-style: italic;
+  }
+
+  .romanType {
+    font-style: italic;
+  }
+
+  .bold {
+    font-weight: bold;
+  }
+
+  .boldTT {
+    font-weight: bold;
+  }
+
+  span.underline2 {
+    font-style: italic;
+    text-decoration: underline;
+  }
+
+  .underline2TT {
+    border-bottom: 3px double black;
+    font-style: normal;
+    text-decoration: none;
+  }
+
+  span.dashUnderline {
+    border-bottom: 1px dashed black;
+  }
+
+  .dashUnderlineTT {
+    border-bottom: 1px dashed black;
+  }
+
+  .encircled {
+    border: 1px solid gray;
+  }
+
+  .encircledTT {
+    border: 1px solid gray;
+  }
+
+  .encreasedSize {
+    font-size: 120%;
+  }
+
+  .encreasedSizeTT {
+    font-size: 120%;
+  }
+
+  .anchor_lemma {
+    display: none;
+  }
+
+  a.textreference {
+    color: #000 !important;
+  }
+
+  .deletion {
+    text-decoration: line-through;
+  }
+
+  .tei_editorial {
+    color: #a66e37 !important;
+  }
+
+  .tei_note_editorial {
+    color: #a66e37 !important;
+    font-family: var(--font-stack-tei-editorial-note);
+    font-size: 0.9em;
+  }
+
+  .tei_note_editorial_margin {
+    color: #a66e37 !important;
+    font-family: var(--font-stack-tei-editorial-note);
+    font-size: 0.9em;
+    padding-left: 15px;
+    padding-right: 15px;
+  }
+
+  .tei_hi_editorial_wrapper {
+    text-decoration: underline;
+    color: #a66e37 !important;
+  }
+
+  .tei_hi_editorial {
+    text-decoration: none;
+    color: #222;
+  }
+
+  .symbol_red {
+    color: #990202;
+  }
+
+  .gap {
+    color: #990202;
+  }
+
+  .unclear {
+    color: #808080;
+  }
+
+  /* Tables */
+  .table-wrapper {
+    overflow-x: auto;
+  }
+
+  table {
+    table-layout: fixed;
+  }
+
+  td,
+  th {
+    padding: 0.25em 1em 0.25em 0;
+    vertical-align: top;
+  }
+
+  td:last-child,
+  th:last-child {
+    padding-right: 0;
+  }
+
+  table caption.table-caption {
+    text-align: left;
+    margin: 0 0 1em 0;
+    width: 100%;
+    overflow-wrap: normal;
+  }
+
+  /* Style for centering a table */
+  table.centeredTable {
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  /* Style for adding borders to all cells in a table */
+  table.borderedCellTable th,
+  table.borderedCellTable td {
+    border: 1px solid #000;
+    padding: 0.25em;
+  }
+
+  /* Style for adding bottom borders to all rows in a table */
+  table.bottomBorderedRowsTable {
+
+    th,
+    td {
+      border-bottom: 1px solid #d0d0d0;
+      padding: 0.25em;
+    }
+
+    th {
+      border-bottom-color: #000;
+    }
+
+    tr:last-child > td {
+      border-bottom: 0;
+    }
+  }
+
+  /* Styles for tables with 2, 3 and 4 columns of equal width */
+  table.equalWidthTable2 th,
+  table.equalWidthTable2 td {
+    width: 50%;
+  }
+
+  table.equalWidthTable3 th,
+  table.equalWidthTable3 td {
+    width: 33.33%;
+  }
+
+  table.equalWidthTable4 th,
+  table.equalWidthTable4 td {
+    width: 25%;
+  }
+
+  /* Style for table which is padded to the right and left */
+  table.paddedTable {
+    margin-left: 1.5em !important;
+    margin-right: 1.5em !important;
+  }
+
+  /* Style for table which has condensed vertical spacing between cells */
+  table.condensedTableCells th,
+  table.condensedTableCells td {
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+
+  /* Style for adding a bottom border to table cells */
+  .botBorder {
+    border-bottom: 1px solid #000;
+  }
+
+  /* Style for adding a right border to table cells */
+  .rightBorder {
+    border-right: 1px solid #000;
+  }
+
+  .rightBorder + td {
+    padding-left: 1em;
+  }
+
+  /*
+  These heading styles are maybe not in use, at least in
+  Topelius. Maybe from Parland?
+  */
+  h1.poemtitle,
+  h1.lettertitle {
+    font-variant: small-caps;
+    font-weight: normal !important;
+    font-size: 1.5em;
+  }
+
+  h3.title {
+    text-align: center;
+    font-weight: normal !important;
+    font-variant: small-caps !important;
+  }
+
+  h3.title1 {
+    font-size: 1.5em !important;
+    font-weight: normal !important;
+    padding-top: 10px;
+  }
+
+  h3.poemtitle,
+  h3.lettertitle,
+  h3.tei.letterTitle {
+    font-variant: small-caps;
+    font-weight: normal !important;
+  }
+
+  h3.sub,
+  h3.shortstory,
+  h3.section {
+    font-weight: normal !important;
+    font-size: 1.2em !important;
+  }
+
+  h3.shortstory {
+    font-size: 1.1em;
+  }
+
+  h3.section {
+    font-size: 1.4em !important;
+  }
+
+  h3.sub2 {
+    font-weight: normal !important;
+    font-size: 1.15em !important;
+  }
+
+  h3.motto {
+    font-size: 1.1em !important;
+    font-style: italic;
+    font-weight: normal !important;
+  }
+
+  h3.motto_ms {
+    font-size: 1.2em !important;
+    font-weight: normal !important;
+  }
+
+  h3.titleTopMargin,
+  h3.tei.titleTopMargin {
+    margin-top: 2em !important;
+  }
+
+  h3.titleBottomMargin,
+  h3.tei.titleBottomMargin {
+    margin-bottom: 2em !important;
+  }
+
+  /* STYLES FOR HEADINGS */
+  h1.tei,
+  h2.tei,
+  h3.tei,
+  h4.tei,
+  h5.tei,
+  h6.tei {
+    line-height: 1.35;
+  }
+
+  h1.tei {
+    font-size: 1.3530em;
+    /* 23px when 1em = 17px */
+  }
+
+  h2.tei {
+    font-size: 1.2353em;
+    /* 21px */
+  }
+
+  h3.tei {
+    font-size: 1.1765em;
+    /* 20px */
+  }
+
+  h4.tei {
+    font-size: 1.0589em;
+    /* 18px */
+  }
+
+  h5.tei {
+    font-size: 1em;
+    /* 17px */
+  }
+
+  h6.tei {
+    font-size: 0.9412em;
+    /* 16px */
+  }
+
+  h3.tei:first-child {
+    margin-top: inherit;
+  }
+
+  h1.tei.title {
+    font-variant: small-caps;
+    text-align: center;
+    font-weight: normal;
+    margin: 1em 0;
+  }
+
+  h1.tei.poemtitle {
+    font-variant: small-caps;
+    text-align: left;
+    font-weight: normal !important;
+    margin: 1em 0 !important;
+  }
+
+  h1.tei.poemtitleFromMs,
+  h1.tei.poemtitleSuite {
+    font-style: italic;
+    text-align: left;
+    font-weight: normal !important;
+    margin: 1em 0 !important;
+    font-size: 1.3529em;
+  }
+
+  h1.tei.desc {
+    font-size: 1.1765em;
+    font-weight: normal;
+    font-style: italic;
+    text-align: center;
+    margin: 0 0 2em 0;
+  }
+
+  h2.tei.zts {
+    font-variant: small-caps;
+    font-size: 1.3em !important;
+    text-align: center;
+    font-weight: normal !important;
+    color: gray;
+    margin: 1em 0 !important;
+  }
+
+  h2.tei.section {
+    text-align: center !important;
+    font-weight: normal !important;
+    margin: 1em 0 !important;
+  }
+
+  p ~ h2.tei.section {
+    margin-top: 2em !important;
+  }
+
+  h2.tei.poemsection {
+    font-style: italic;
+    text-align: left;
+    font-weight: normal !important;
+    margin: 1em 0 !important;
+  }
+
+  h2.tei.section2 {
+    font-style: italic;
+    text-align: center;
+    font-weight: normal !important;
+    margin: 1em 0 !important;
+  }
+
+  p ~ h2.tei.section2 {
+    margin-top: 2em !important;
+  }
+
+  h2.tei.poemsection2 {
+    font-style: italic;
+    text-align: left;
+    font-weight: normal !important;
+    margin: 1em 0 !important;
+  }
+
+  h3.tei.chapter {
+    font-style: italic;
+    text-align: center;
+    font-weight: normal !important;
+    margin: 1.3em 0 1em 0 !important;
+  }
+
+  p ~ h3.tei.chapter {
+    margin-top: 1.75em !important;
+  }
+
+  h2.tei.section + h3.tei.chapter,
+  h2.tei.section2 + h3.tei.chapter {
+    margin-top: 1.3em !important;
+  }
+
+  h3.tei.poem {
+    font-style: italic;
+    text-align: left;
+    font-weight: normal !important;
+    margin: 1.3em 0 1em 0 !important;
+  }
+
+  h3.tei.poemdiary {
+    font-style: italic;
+    text-align: left;
+    font-weight: normal !important;
+    margin: 1.3em 0 1em 0 !important;
+    margin-left: 30px !important;
+    text-indent: -15px;
+  }
+
+  h3.tei.ms {
+    text-align: left;
+    font-weight: normal !important;
+    margin: 1.3em 0 1.3em 0 !important;
+  }
+
+  h3.tei.diary {
+    font-variant: small-caps;
+    text-align: center;
+    font-weight: normal !important;
+    margin: 1.3em 0 1em 0 !important;
+  }
+
+  h4.tei.sub {
+    font-style: italic;
+    text-align: center;
+    font-weight: normal !important;
+    margin: 1em 0 !important;
+  }
+
+  h4.tei.poemsub {
+    font-style: italic;
+    text-align: left;
+    font-weight: normal !important;
+    margin: 0.8em 0 1em 0 !important;
+  }
+
+  h4.tei.poemsubdiary {
+    font-style: italic;
+    text-align: left;
+    font-weight: normal !important;
+    margin: 0.8em 0 1em 0 !important;
+    margin-left: 30px !important;
+    text-indent: -15px;
+  }
+
+  h4.tei.mssub {
+    text-align: left;
+    font-weight: normal !important;
+    margin: 0.8em 0 1em 0 !important;
+  }
+
+  h5.tei.motto {
+    font-style: italic;
+    text-align: right;
+    font-weight: normal !important;
+    margin: 0.5em 0 0.7em 0 !important;
+    font-size: 0.88235em;
+  }
+
+  h5.tei.poemmotto {
+    font-style: italic;
+    text-align: left;
+    font-weight: normal !important;
+    margin: 0.5em 0 1.2em 0 !important;
+    font-size: 0.88235em;
+  }
+
+  h5.tei.sub2est {
+    font-style: italic;
+    text-align: center;
+    font-weight: normal !important;
+    margin: 1.3em 0 0.8em 0 !important;
+  }
+
+  h5.tei.poemsub2 {
+    font-style: italic;
+    text-align: left;
+    font-weight: normal !important;
+    margin: 1.3em 0 0.8em 0 !important;
+  }
+
+  h6.tei.sub3 {
+    font-style: italic;
+    text-align: center;
+    font-weight: normal !important;
+    font-family: Georgia, serif;
+    margin: 0.5em 0 0.8em 0 !important;
+  }
+
+  h6.tei.poemsub3 {
+    font-style: italic;
+    text-align: left;
+    font-weight: normal !important;
+    font-family: Georgia, serif;
+    margin: 0.5em 0 0.8em 0 !important;
+  }
+
+  h6.tei.motto2 {
+    font-style: italic;
+    text-align: right;
+    font-family: Georgia, serif;
+    font-weight: normal !important;
+    margin: 0.5em 0 0.5em 0 !important;
+    font-size: 0.88235em;
+  }
+
+  h6.tei.poemmotto2 {
+    font-style: italic;
+    text-align: left;
+    font-family: Georgia, serif;
+    font-weight: normal !important;
+    margin: 0.5em 0 0.5em 0 !important;
+    font-size: 0.88235em;
+  }
+
+  .blackletter {
+    font-family: var(--font-stack-tei-blackletter) !important;
+  }
+
+  p.paragraphDiary {
+    margin-top: 0.5em !important;
+  }
+
+  p.frontmatter {
+    padding-top: 2em !important;
+    padding-bottom: 2em !important;
+    padding-right: 1.5em !important;
+    padding-left: 1.5em !important;
+    border-top: 2px solid black;
+    border-bottom: 2px solid black;
+    line-height: 1.5em;
+  }
+
+  p.frontmatterPrevious {
+    padding-top: 2em !important;
+    margin-bottom: 1.5em !important;
+    padding-right: 1.5em !important;
+    padding-left: 1.5em !important;
+    border-top: 2px solid black;
+    line-height: 1.5em;
+  }
+
+  p.frontmatterMiddle {
+    margin-top: 1.5em !important;
+    margin-bottom: 1.5em !important;
+    padding-right: 1.5em !important;
+    padding-left: 1.5em !important;
+    line-height: 1.5em;
+  }
+
+  p.frontmatterNext {
+    margin-top: 1.5em !important;
+    padding-bottom: 2em !important;
+    padding-right: 1.5em !important;
+    padding-left: 1.5em !important;
+    border-bottom: 2px solid black;
+    line-height: 1.5em;
+  }
+
+  p.label_margin {
+    float: right;
+    text-indent: 0 !important;
+  }
+
+  p.label_above {
+    margin-left: 60px;
+    text-indent: 0 !important;
+    margin-top: 0.2em;
+    margin-bottom: 0.4em;
+  }
+
+  span.labelledLines_before {
+    margin-left: -80px !important;
+    text-indent: 0 !important;
+    position: absolute;
+  }
+
+  span.labelledLines_after {
+    float: right;
+    text-indent: 0 !important;
+  }
+
+  span.labelledLines_before_F {
+    margin-left: -200px !important;
+    text-indent: 0 !important;
+    position: absolute;
+  }
+
+  p.l.labelledLines_before {
+    position: relative;
+    margin-left: 110px !important;
+  }
+
+  p.l.labelledLines_before.lfinal {
+    position: relative;
+    margin-left: 120px !important;
+  }
+
+  p.item {
+    text-indent: 0 !important;
+    contain: none; // Needed to override Ionic's generic style for .item
+  }
+
+  p.item_indented {
+    margin-left: 40px !important;
+    text-indent: -15px !important;
+  }
+
+  p.lIndent {
+    text-indent: -9px !important;
+  }
+
+  p.lIndentDiary {
+    text-indent: -15px !important;
+  }
+
+  p.lcenter {
+    text-align: center !important;
+  }
+
+  p.lIndent.lcenter {
+    text-align: center !important;
+  }
+
+  p.lmedial {
+    text-indent: 30px !important;
+  }
+
+  p.lfinal {
+    text-indent: 80px !important;
+  }
+
+  p.lfinal2 {
+    text-indent: 95px !important;
+  }
+
+  .hangingIndent {
+    padding-left: 30px !important;
+    text-indent: -30px !important;
+  }
+
+  .poemP,
+  .poemP.right,
+  .poemP.normalizedIndent,
+  .poemP.noIndent {
+    margin-left: 30px !important;
+    text-indent: -15px !important;
+    margin-bottom: 1em !important;
+    text-align: left;
+  }
+
+  /* Figure caption in e.g. ZTS: Finland i 19de seklet */
+  .figureP {
+    color: #737373 !important;
+    font-size: 0.95em !important;
+    margin-top: 0.5em !important;
+    margin-bottom: 0.5em !important;
+  }
+
+  span.figure {
+    display: inline-block;
+    margin-top: 0.5em !important;
+    margin-bottom: 0.5em !important;
+    text-indent: 0 !important;
+  }
+
+  .parIndent {
+    text-indent: 30px !important;
+    padding-left: 30px;
+    padding-right: 30px;
+    padding-bottom: 0 !important;
+    margin-top: 0 !important;
+  }
+
+  :not(.parIndent) + .parIndent.noIndent {
+    text-indent: 0 !important;
+    padding-left: 30px;
+    padding-right: 30px;
+    margin-top: 1em !important;
+  }
+
+  :not(.parIndent) + .parIndent {
+    text-indent: 30px !important;
+    padding-left: 30px;
+    padding-right: 30px;
+    margin-top: 1em !important;
+  }
+
+  .parIndent + :not(.parIndent),
+  .parIndent + span.pb_edition + :not(.parIndent),
+  .parIndent + span.pb_orig + :not(.parIndent) {
+    margin-top: 1em !important;
+  }
+
+  .frontmatterNext + span {
+    margin-top: 1em !important;
+  }
+
+  /* Unclear if this rule is in use anymore. */
+  a.reference span.raised {
+    vertical-align: super;
+    line-height: 0.5em;
+    font-size: 0.65em !important;
+    font-variant: normal !important;
+    font-style: normal !important;
+    float: right !important;
+  }
+
+  .smallcaps {
+    font-variant: small-caps;
+  }
+
+  .abbr_noSmallcaps {
+    font-variant: normal;
+  }
+
+  .smallcapsItalics {
+    font-variant: small-caps;
+    font-style: italic;
+  }
+
+  /*
+  For instance drama, scene and person instructions,
+  e.g. in Topelius: Dramatik, Noveller och kortprosa
+  */
+  span.smallFont {
+    font-size: 0.9412em;
+  }
+
+  .small {
+    font-size: 0.9412em !important;
+    color: gray;
+  }
+
+  .footnotePoem {
+    display: block;
+    text-indent: 15px;
+  }
+
+  .ttDel {
+    display: none;
+  }
+
+  .revision {
+    border-radius: 5px;
+    border: 2px solid #000;
+    padding: 0.11em;
+  }
+
+  .figure-caption {
+    text-align: left;
+    margin: 0.5em 0;
+  }
+
+  .est_figure_graphic,
+  .est_figure_graphic.align_figure_left {
+    width: auto;
+    max-width: 100%;
+    padding-right: 0.5rem;
+    padding-left: 0;
+    float: left;
+  }
+
+  .est_figure_graphic.align_figure_right {
+    padding-right: 0;
+    padding-left: 0.5rem;
+    float: right;
+  }
+
+  .est_figure_graphic.align_figure_middle {
+    padding-right: 0;
+    padding-left: 0;
+    margin: 0 auto;
+    float: none;
+  }
+
+  img.doodle {
+    cursor: pointer;
+    display: none !important;
+    /* By default doodles in reading-text are not shown except when illustrations-view is shown. */
+  }
+
+  .pdf_figure_graphic {
+    display: inline-block;
+    margin: 0 0.5em 0 0;
+  }
+
+  .XMLcomment {
+    display: none;
+  }
+
+  /* Work titles in tooltips */
+  .work_title {
+    font-style: italic;
+  }
+
+  /* Why is this needed? */
+  a.anchor,
+  a.anchor:hover {
+    color: inherit;
+    opacity: 1;
+  }
+
+  /* The footnote indicator */
+  span.footnoteindicator {
+    font-size: 0.83em;
+    line-height: 0.5em;
+    vertical-align: super;
+    cursor: pointer;
+  }
+}

@@ -1,0 +1,60 @@
+<ion-content class="no-padding"
+      [class.portrait-mode]="imageOrientationPortrait"
+      [class.title-on-image]="titleOnImage"
+>
+  <div class="banner" [class.image-on-right]="imageOnRight">
+    <span *ngIf="!imageOrientationPortrait"
+          class="landscape-background-image"
+          role="img"
+          [style.background-image]="imageURLStyle"
+          [attr.aria-label]="imageAltText"
+    > </span>
+
+    <div *ngIf="!imageOrientationPortrait || titleOnImage" class="title-wrapper">
+      <h1 class="banner-title" i18n="@@Site.Title">Webbplatsens titel</h1>
+
+      <p *ngIf="siteHasSubtitle" role="doc-subtitle" class="banner-subtitle" i18n="@@Site.Subtitle">Webbplatsens undertitel</p>
+    </div>
+    <div *ngIf="imageOrientationPortrait" class="portrait-image-wrapper">
+      <img loading="lazy"
+            [src]="imageURL"
+            [alt]="imageAltText"
+            [style.object-position]="portraitImageObjectPosition"
+      >
+    </div>
+  </div>
+
+  <div class="text-content">
+    <div *ngIf="imageOrientationPortrait" class="title-wrapper">
+      <h1 class="site-title" i18n="@@Site.Title">Webbplatsens titel</h1>
+      <p *ngIf="siteHasSubtitle" role="doc-subtitle" class="site-subtitle" i18n="@@Site.Subtitle">Webbplatsens undertitel</p>
+    </div>
+
+    <div *ngIf="showSearchbar" class="search-bar-wrapper">
+      <ion-searchbar
+            class="custom-searchbar manual-exec"
+            [class.highlight]="searchQuery"
+            placeholder="Sök ..."
+            i18n-placeholder="@@BasicActions.SearchEllipsis"
+            show-clear-button="always"
+            enterkeyhint="search"
+            inputmode="search"
+            [searchIcon]="undefined"
+            [(ngModel)]="searchQuery"
+            (ionClear)="clearSearchQuery()"
+            (keyup.enter)="submitSearchQuery()"
+      ></ion-searchbar>
+      <ion-button (click)="submitSearchQuery()">
+        <ion-icon slot="icon-only" name="search" aria-label="Sök" i18n-aria-label="@@BasicActions.Search"></ion-icon>
+      </ion-button>
+    </div>
+
+    <div class="site-presentation markdown" [innerHTML]="descriptionText$ | async"></div>
+
+    <div *ngIf="showContentGrid" class="content-grid-wrapper">
+      <content-grid></content-grid>
+    </div>
+
+    <footer *ngIf="showFooter" class="footer markdown" [innerHTML]="footerText$ | async"></footer>
+  </div>
+</ion-content>

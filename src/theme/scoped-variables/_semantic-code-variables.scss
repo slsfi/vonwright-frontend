@@ -1,0 +1,20 @@
+/*
+  Semantic code color CSS variables scoped to <ion-app> by import, so in practice these are
+  global, though they won’t be included in the global styles.css.
+
+  To override any of these variables in custom.scss you must use
+  these selectors for defining the scope:
+
+  ion-app[class][class] { }
+*/
+
+:host {
+  --abbreviations-color:     #ffe2fa;
+  --emendations-color:       #ccc;
+  --normalisations-color:    #e6e6e6;
+  --pageBreakEdition-color:  #8f6b28;
+  --pageBreakOriginal-color: #b32fa0;
+  --persName-color:          #f9e0bf;
+  --placeName-color:         #dee8ca;
+  --workTitle-color:         #f7efba;
+}

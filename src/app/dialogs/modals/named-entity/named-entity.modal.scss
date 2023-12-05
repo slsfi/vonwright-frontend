@@ -1,0 +1,146 @@
+// Import general styles for modal with inner wrapper and box
+@import "src/theme/common/modal-inner-wrapper.scss";
+
+.modal-inner-wrapper {
+    .sd-header {
+        h2 {
+            margin: 0.25rem 0 0.125rem 0;
+    
+            .date,
+            .coordinates {
+                font-size: 0.857em;
+            }
+        }
+
+        .media_image_wrapper {
+            margin-top: 1rem;
+            
+            img {
+                width: auto;
+            }
+        }
+        
+        .media_description {
+            margin-top: 1rem;
+            margin-bottom: 2rem;
+        }
+    }
+
+    occurrences-accordion {
+        background: var(--main-background-color);
+        line-height: 1.4;
+        margin: 0;
+        padding: 1rem;
+        width: 100%;
+    }
+
+    .modal-inner-box,
+    occurrences-accordion {
+        + .modal-inner-box {
+            margin-top: 0.75rem;
+        }
+
+        p {
+            margin: 0;
+
+            + p {
+                margin-top: 0.25em;
+            }
+        }
+
+        dl {
+            display: table;
+            margin: 0;
+            width: 100%;
+
+            div {
+                display: table-row;
+    
+                dt,
+                dd {
+                    display: table-cell;
+                    padding: 0.25rem 0;
+                }
+    
+                dt {
+                    padding-right: 1.5em;
+    
+                    &::after {
+                        content: ": ";
+                    }
+                }
+    
+                dd {
+                    overflow-wrap: break-word;
+                    vertical-align: bottom;
+                    width: 100%;
+
+                    a {
+                        overflow-wrap: anywhere;
+                    }
+                }
+    
+                + div {
+                    dt,
+                    dd {
+                        border-top: 1px solid var(--main-background-accent-color);
+                    }
+                }
+
+                &:first-child {
+                    dt,
+                    dd {
+                        padding-top: 0;
+                    }
+                }
+
+                &:last-child {
+                    dt,
+                    dd {
+                        padding-bottom: 0;
+                    }
+                }
+            }
+        }
+
+        dl + p,
+        dl + ion-button,
+        p + ion-button {
+            margin-top: 0.75rem;
+        }
+    }
+
+    .sd-header + .modal-inner-box {
+        margin-top: 1rem;
+    }
+
+    h3 {
+        border-top: 1px solid var(--main-background-accent-color);
+        font-size: 1rem;
+        font-weight: normal;
+        margin: 0 0 0.75rem 0;
+        padding: 0.75rem 0 0 1rem;
+    }
+
+    .sd-header + h3 {
+        margin-top: 1rem;
+    }
+
+    a.button-link {
+        background-color: transparent;
+        border: 1px solid var(--outline-button-color);
+        border-radius: 2px;
+        color: var(--outline-button-color);
+        display: block;
+        font-size: 0.8125rem;
+        letter-spacing: 0;
+        padding: 0.375em 1em;
+        text-decoration: none;
+        text-transform: uppercase;
+        transition: background-color 0.1s linear;
+
+        &:hover {
+            background-color: rgba(0, 0, 0, 0.1);
+        }
+    }
+}

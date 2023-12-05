@@ -1,0 +1,12 @@
+ion-radio {
+    --color-checked: var(--outline-button-color);
+}
+ion-item {
+    &.item-radio-checked {
+        --color: var(--outline-button-color);
+
+        &.select-interface-option {
+            --background-focused-opacity: 0.03;
+        }
+    }
+}

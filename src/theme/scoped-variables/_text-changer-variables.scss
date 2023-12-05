@@ -1,0 +1,16 @@
+/*
+  Text changer CSS variables scoped to <ion-app> by import, so in practice these are
+  global, though they won’t be included in the global styles.css.
+
+  To override any of these variables in custom.scss you must use
+  this selector for defining the scope:
+
+  ion-app[class][class] { }
+*/
+
+ion-app {
+  // Component colors in mobile mode. In desktop mode the component inherits
+  // it’s colors from the parent element (secondary toolbar).
+  --text-changer-mobile-color:          var(--secondary-toolbar-color);
+  --text-changer-mobile-color-contrast: var(--secondary-toolbar-color-contrast);
+}

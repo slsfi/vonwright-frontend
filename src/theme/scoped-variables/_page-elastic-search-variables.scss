@@ -1,0 +1,31 @@
+/*
+  CSS variables scoped to <page-elastic-search> by import.
+
+  To override any of these variables in custom.scss you must use
+  this selector for defining the scope:
+
+  page-elastic-search[class][class] { }
+*/
+
+:host {
+  // Colors for different text types
+  --com-color:  #980202;
+  --est-color:  #0a2a80;
+  --fore-color: #113c49;
+  --inl-color:  #812b5d;
+  --ms-color:   #69863a;
+  --tit-color:  #5e1a06;
+  --var-color:  #803fa7;
+
+  // Search hit items
+  --hititem-border-color:           var(--main-background-accent-color);
+  --hititem-hover-background-color: #fff;
+  --hititem-hover-border-color:     var(--outline-button-color);
+
+  --search-match-highlight-background-color: var(--search-match-background-color);
+  --search-match-highlight-text-color:       #000;
+
+  --date-histogram-year-bar-color:      var(--primary-color);
+  --date-histogram-year-hover-color:    var(--secondary-color);
+  --date-histogram-year-in-range-color: #751e22;
+}

@@ -1,0 +1,17 @@
+// Import styles for the text-select-wrapper class
+@import "src/theme/common/text-select-wrapper.scss";
+
+.show-normalized-toggle {
+  background-color: var(--tertiary-color);
+  margin-top: 0.5rem;
+  padding: 0.625rem 0.75rem;
+  width: 100%;
+
+  &:first-child {
+    margin-top: 0;
+  }
+
+  ion-toggle {
+    width: 100%;
+  }
+}

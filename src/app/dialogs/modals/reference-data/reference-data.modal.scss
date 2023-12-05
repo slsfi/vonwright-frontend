@@ -1,0 +1,25 @@
+// Import general styles for modal with inner wrapper and box
+@import "src/theme/common/modal-inner-wrapper.scss";
+
+.modal-inner-wrapper {
+	h3 {
+		font-size: 1em;
+		font-weight: bold;
+		line-height: 1.25;
+		margin: 0;
+	}
+
+	p + h3 {
+		margin-top: 1em;
+	}
+
+	.modal-inner-box {
+		p {
+            margin: 0;
+        }
+
+		.urn a {
+			word-break: break-all;
+		}
+	}
+}

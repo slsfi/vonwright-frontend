@@ -1,0 +1,147 @@
+/**
+ * TEI READING-TEXT
+ * Styles for reading-texts.
+ */
+
+/*
+Size of comment asterisks at different font sizes.
+The size of the asterisks, page numberings and "squared
+times" symbol (normalisations) have to be defined this
+way as they should be affected by the chosen font size,
+but not the size of the text-element they are included
+in. For instance, the asterisks must not be larger
+inside headings.
+*/
+.miniFontSize div.tei img.comment {
+  width: ceil(0.75 * $text-fontsize-mini) !important;
+  height: ceil(0.75 * $text-fontsize-mini) !important;
+}
+
+.tinyFontSize div.tei img.comment {
+  width: ceil(0.75 * $text-fontsize-tiny) !important;
+  height: ceil(0.75 * $text-fontsize-tiny) !important;
+}
+
+.xxxsmallFontSize div.tei img.comment {
+  width: ceil(0.75 * $text-fontsize-xxxsmall) !important;
+  height: ceil(0.75 * $text-fontsize-xxxsmall) !important;
+}
+
+.xxsmallFontSize div.tei img.comment {
+  width: ceil(0.75 * $text-fontsize-xxsmall) !important;
+  height: ceil(0.75 * $text-fontsize-xxsmall) !important;
+}
+
+.xsmallFontSize div.tei img.comment {
+  width: ceil(0.75 * $text-fontsize-xsmall) !important;
+  height: ceil(0.75 * $text-fontsize-xsmall) !important;
+}
+
+.smallFontSize div.tei img.comment {
+  width: ceil(0.75 * $text-fontsize-small) !important;
+  height: ceil(0.75 * $text-fontsize-small) !important;
+}
+
+.mediumFontSize div.tei img.comment {
+  width: ceil(0.75 * $text-fontsize-medium) !important;
+  height: ceil(0.75 * $text-fontsize-medium) !important;
+}
+
+.largeFontSize div.tei img.comment {
+  width: ceil(0.75 * $text-fontsize-large) !important;
+  height: ceil(0.75 * $text-fontsize-large) !important;
+}
+
+.xlargeFontSize div.tei img.comment {
+  width: ceil(0.75 * $text-fontsize-xlarge) !important;
+  height: ceil(0.75 * $text-fontsize-xlarge) !important;
+}
+
+/*
+Show doodles in reading-text when there is an illustrations-view
+open. Also always show 'unkown' doodle images in reading-text.
+*/
+.illustrations-view-shown reading-text div.tei img.doodle,
+reading-text div.tei img.doodle.unknown {
+  display: inline-block !important;
+}
+
+reading-text {
+  div.tei {
+    transition: padding-left linear 0.2s;
+
+    /*
+    Tooltip triggers
+    */
+    .unclear.tooltiptrigger,
+    .gap.tooltiptrigger,
+    .marginalia.tooltiptrigger,
+    .revision.tooltiptrigger,
+    .tooltiptrigger > .keyword_symbol,
+    &.clickable-illustrations .est_figure_graphic {
+      cursor: pointer;
+    }
+
+    span.dashUnderline {
+      font-style: italic;
+      border-bottom: none;
+    }
+
+    .encreasedSize {
+      font-style: italic;
+      font-size: 100%;
+    }
+
+    span.uppercase,
+    span.uppercaseDiary {
+      font-variant: small-caps;
+      text-transform: none;
+    }
+
+    .encircled {
+      font-style: italic;
+      border: none;
+    }
+
+    img.hide-illustration {
+      visibility: hidden;
+      height: 0;
+
+      & ~ p.tei:first-of-type::after {
+        content: '';
+        cursor: pointer;
+        background-image: url('/assets/images/img_placeholder.svg');
+        height: 1.059em;
+        /* equals 18px on default 17px text size */
+        width: 1.176em;
+        /* equals 20px on default 17px text size */
+        margin-left: 5px;
+        margin-bottom: -3px;
+        display: inline-block;
+        background-repeat: no-repeat;
+        background-size: cover;
+      }
+
+      & + span.tei.figureP.iconBefore::before {
+        content: '';
+        cursor: pointer;
+        background-image: url('/assets/images/img_placeholder.svg');
+        height: 1.059em;
+        /* equals 18px on default 17px text size */
+        width: 1.176em;
+        /* equals 20px on default 17px text size */
+        margin-right: 5px;
+        margin-bottom: -3px;
+        display: inline-block;
+        background-repeat: no-repeat;
+        background-size: cover;
+      }
+    }
+
+    a.xreference.ref_illustration {
+      img {
+        margin-left: 0.15em;
+      }
+    }
+  }
+}

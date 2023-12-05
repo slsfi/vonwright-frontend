@@ -1,0 +1,149 @@
+<ion-content>
+
+  <h1 class="page-title">
+    <ng-container *ngIf="this.indexType === 'persons'"
+          i18n="@@MainSideMenu.IndexPersons"
+    >Personregister</ng-container>
+    <ng-container *ngIf="this.indexType === 'places'"
+          i18n="@@MainSideMenu.IndexPlaces"
+    >Ortregister</ng-container>
+    <ng-container *ngIf="this.indexType === 'keywords'"
+          i18n="@@MainSideMenu.IndexKeywords"
+    >Ämnesord</ng-container>
+    <ng-container *ngIf="this.indexType === 'works'"
+          i18n="@@MainSideMenu.IndexWorks"
+    >Verkregister</ng-container>
+  </h1>
+
+  <ng-container *ngIf="(mdContent$ | async) as mdContent">
+    <div class="info markdown" [innerHTML]="mdContent"></div>
+  </ng-container>
+
+  <div class="index-container">
+
+    <div class="index-data">
+
+      <div class="search-row">
+        <ion-searchbar
+              class="custom-searchbar"
+              placeholder="Sök ..."
+              i18n-placeholder="@@Index.SearchPlaceholder"
+              [(ngModel)]="searchText"
+              [debounce]="500"
+              (ionInput)="searchData()"
+        ></ion-searchbar>
+
+        <ng-container *ngIf="showFilter">
+          <ion-button fill="outline" class="custom-outline-button filter-button" (click)="openFilterModal()">
+            <ion-icon slot="start" name="filter-outline"></ion-icon>
+            <ng-container i18n="@@Index.Filter">Avgränsa</ng-container>
+          </ion-button>
+        </ng-container>
+      </div>
+
+      <div class="active-filters-row" *ngIf="filters?.isEmpty !== undefined && filters?.isEmpty === false">
+        <p>
+          <span class="active-filters-label"><ng-container i18n="@@Index.ActiveFilters">Aktiva avgränsningar</ng-container>: </span>
+
+          <ng-container *ngIf="filters.filterPersonTypes && filters.filterPersonTypes.length > 0">
+            <ng-container *ngFor="let fpt of filters.filterPersonTypes; let i = index">
+              <span class="active-person-type">{{fpt.name}}</span><ng-container *ngIf="i < filters.filterPersonTypes.length - 1">, </ng-container></ng-container></ng-container><ng-container *ngIf="filters.filterPersonTypes && filters.filterPersonTypes.length > 0 && (filters.filterYearMin || filters.filterYearMax)">, </ng-container>
+          <ng-container *ngIf="filters.filterYearMin || filters.filterYearMax">
+            <span class="active-filter-year-heading"><ng-container i18n="@@Index.Born">Födda</ng-container> </span><span *ngIf="filters.filterYearMin">{{filters.filterYearMin}}</span>–<span *ngIf="filters.filterYearMax">{{filters.filterYearMax}}</span>
+          </ng-container>
+
+          <ng-container *ngIf="filters.filterPlaceCountries && filters.filterPlaceCountries.length > 0">
+            <ng-container *ngFor="let fpc of filters.filterPlaceCountries; let i = index">
+              <span class="active-category-type">{{fpc.name}}</span><ng-container *ngIf="i < filters.filterPlaceCountries.length - 1">, </ng-container></ng-container></ng-container>
+
+          <ng-container *ngIf="filters.filterCategoryTypes && filters.filterCategoryTypes.length > 0">
+            <ng-container *ngFor="let fct of filters.filterCategoryTypes; let i = index"><span class="active-category-type">{{fct.name}}</span><ng-container *ngIf="i < filters.filterCategoryTypes.length - 1">, </ng-container></ng-container>
+          </ng-container>
+        </p>
+        <ion-button class="close" fill="clear" (click)="clearFilters()" title="Ta bort aktiva avgränsningar" i18n-title="@@Index.ClearFilters">
+          <ion-icon name="close" slot="icon-only" aria-label="Ta bort aktiva avgränsningar" i18n-aria-label="@@Index.ClearFilters"></ion-icon>
+        </ion-button>
+      </div>
+
+      <div class="data-row" [class.no-groupings]="indexDatabase !== 'elastic'">
+        <p *ngIf="data.length > 0" class="shown-records"><ng-container i18n="@@Index.ShownRecords">Visade poster</ng-container>: {{data.length}}</p>
+        <ol>
+          <li *ngFor="let item of data; trackBy: trackData">
+            <h2 *ngIf="item.firstOfItsKind">
+              {{item.firstOfItsKind}}
+            </h2>
+            <a *ngIf="indexType === 'persons' && (item.sort_by_name?.length > 0 || item.name_for_list?.length > 0)"
+                  aria-haspopup="dialog"
+                  [routerLink]="[]"
+                  [queryParams]="{ id: item.id }"
+                  [queryParamsHandling]="'merge'"
+                  [relativeTo]="route"
+                  [replaceUrl]="true"
+            >
+              <ng-container *ngIf="indexDatabase === 'elastic' && item.full_name">
+                {{item.full_name}} <span *ngIf="item.date_born || item.date_deceased" [innerHTML]="item.year_born_deceased"></span>
+              </ng-container>
+              <ng-container *ngIf="indexDatabase !== 'elastic' && item.name_for_list">
+                {{item.name_for_list}} <span *ngIf="item.lived_between"> ({{item.lived_between}})</span>
+              </ng-container>
+            </a>
+            <a *ngIf="(indexType === 'keywords' || indexType === 'places') && item.name.length > 1"
+                  [routerLink]="[]"
+                  [queryParams]="{ id: item.id }"
+                  [queryParamsHandling]="'merge'"
+                  [relativeTo]="route"
+                  [replaceUrl]="true"
+            >
+              {{item.name}}
+            </a>
+            <a *ngIf="indexType === 'works' && item.title.length > 1"
+                  [routerLink]="[]"
+                  [queryParams]="{ id: item.id }"
+                  [queryParamsHandling]="'merge'"
+                  [relativeTo]="route"
+                  [replaceUrl]="true"
+            >
+              <span *ngFor="let author of item.author_data; let i = index;" class="author">{{(author['last_name'] != '')?author['last_name'].trim():''}}<span *ngIf="author['first_name'].length>0">, </span>{{(author['first_name'] != '')?author['first_name'].trim():''}}{{(i < (item.author_data.length-1))?', ': ''}}</span><span *ngIf="item.author_data.length>0">, </span><i>{{item.title}}</i>
+            </a>
+          </li>
+        </ol>
+      </div>
+
+      <div class="load-more-row">
+        <div class="loading-spinner-wrapper">
+          <ion-spinner *ngIf="showLoading" class="loading" name="crescent"></ion-spinner>
+        </div>
+        <ion-button *ngIf="indexDatabase === 'elastic' && data.length > 0 && hasMore()"
+              class="custom-button"
+              (click)="loadMore($event)"
+              [disabled]="showLoading"
+              i18n="@@BasicActions.ShowMore"
+        >Visa fler</ion-button>
+      </div>
+
+      <div class="footer-row" *ngIf="data.length > 30">
+        <ion-button fill="outline"
+              class="custom-outline-button"
+              (click)="scrollToTop()"
+              i18n="@@BasicActions.ScrollToTop"
+        >Till början</ion-button>
+      </div>
+
+    </div>
+
+    <div *ngIf="indexType !== 'works'" class="alphabet-filter">
+      <ion-fab-button size="small" (click)="reset()" title="Ta bort sökord och aktiva avgränsningar" i18n-title="@@Index.Reset">
+        <ion-icon name="refresh" aria-label="Ta bort sökord och aktiva avgränsningar" i18n-aria-label="@@Index.Reset"></ion-icon>
+      </ion-fab-button>
+      <ion-fab-button size="small"
+            *ngFor="let letter of alphabet"
+            (click)="filterByInitialLetter(letter)"
+      >{{letter}}</ion-fab-button>
+      <ion-fab-button size="small" (click)="reset()" title="Ta bort sökord och aktiva avgränsningar" i18n-title="@@Index.Reset">
+        <ion-icon name="refresh" aria-label="Ta bort sökord och aktiva avgränsningar" i18n-aria-label="@@Index.Reset"></ion-icon>
+      </ion-fab-button>
+    </div>
+
+  </div>
+
+</ion-content>

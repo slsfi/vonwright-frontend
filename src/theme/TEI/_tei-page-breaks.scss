@@ -1,0 +1,97 @@
+/**
+ * TEI PAGE BREAKS
+ * Styles for page breaks, both original and edition.
+ */
+
+.pb_orig,
+.pb_edition {
+    display: none;
+}
+
+div.tei.show_pageBreakOriginal .pb_orig,
+div.tei.show_pageBreakEdition .pb_edition {
+    font-family: var(--font-stack-app-base);
+    line-height: 1;
+    display: inline;
+}
+
+div.tei.show_pageBreakOriginal .pb_orig {
+    color: var(--pageBreakOriginal-color, #b32fa0);
+}
+
+div.tei.show_pageBreakEdition .pb_edition {
+    color: var(--pageBreakEdition-color, #8f6b28);
+}
+
+/* Size of page numberings at different font sizes. */
+.miniFontSize div.tei.show_pageBreakOriginal,
+.miniFontSize div.tei.show_pageBreakEdition {
+  .pb_orig,
+  .pb_edition {
+    font-size: ceil(0.875 * $text-fontsize-mini);
+  }
+}
+
+.tinyFontSize div.tei.show_pageBreakOriginal,
+.tinyFontSize div.tei.show_pageBreakEdition {
+  .pb_orig,
+  .pb_edition {
+    font-size: ceil(0.875 * $text-fontsize-tiny);
+  }
+}
+
+.xxxsmallFontSize div.tei.show_pageBreakOriginal,
+.xxxsmallFontSize div.tei.show_pageBreakEdition {
+  .pb_orig,
+  .pb_edition {
+    font-size: ceil(0.875 * $text-fontsize-xxxsmall);
+  }
+}
+
+.xxsmallFontSize div.tei.show_pageBreakOriginal,
+.xxsmallFontSize div.tei.show_pageBreakEdition {
+  .pb_orig,
+  .pb_edition {
+    font-size: ceil(0.875 * $text-fontsize-xxsmall);
+  }
+}
+
+.xsmallFontSize div.tei.show_pageBreakOriginal,
+.xsmallFontSize div.tei.show_pageBreakEdition {
+  .pb_orig,
+  .pb_edition {
+    font-size: ceil(0.875 * $text-fontsize-xsmall);
+  }
+}
+
+.smallFontSize div.tei.show_pageBreakOriginal,
+.smallFontSize div.tei.show_pageBreakEdition {
+  .pb_orig,
+  .pb_edition {
+    font-size: ceil(0.875 * $text-fontsize-small);
+  }
+}
+
+.mediumFontSize div.tei.show_pageBreakOriginal,
+.mediumFontSize div.tei.show_pageBreakEdition {
+  .pb_orig,
+  .pb_edition {
+    font-size: ceil(0.875 * $text-fontsize-medium);
+  }
+}
+
+.largeFontSize div.tei.show_pageBreakOriginal,
+.largeFontSize div.tei.show_pageBreakEdition {
+  .pb_orig,
+  .pb_edition {
+    font-size: ceil(0.875 * $text-fontsize-large);
+  }
+}
+
+.xlargeFontSize div.tei.show_pageBreakOriginal,
+.xlargeFontSize div.tei.show_pageBreakEdition {
+  .pb_orig,
+  .pb_edition {
+    font-size: ceil(0.875 * $text-fontsize-xlarge);
+  }
+}

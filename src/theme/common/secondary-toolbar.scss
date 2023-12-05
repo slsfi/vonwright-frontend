@@ -1,0 +1,55 @@
+/* General styles for the ion-toolbar element with class secondary, e.g. in: cover, title, foreword, introduction and text pages */
+ion-toolbar.secondary {
+  ion-button {
+    --background: transparent;
+    --background-hover: transparent !important;
+    --box-shadow: none;
+    --color: inherit;
+    --ripple-color: transparent;
+    --transition: opacity 0.2s;
+    letter-spacing: normal;
+
+    &:hover {
+      --opacity: 0.6;
+    }
+  }
+
+  .secondary-toolbar-buttons-wrapper {
+    a {
+      align-items: center;
+      color: var(--secondary-toolbar-color-contrast);
+      display: flex;
+      padding: 0 10px;
+      text-decoration: none;
+      text-transform: uppercase;
+      transition: opacity 0.2s;
+
+      &:hover {
+        opacity: 0.6;
+      }
+    }
+
+    a,
+    ion-button {
+      ion-icon {
+        font-size: 1.5625rem !important;
+        margin-inline-end: 0.3em;
+      }
+
+      .side-title {
+        font-size: 0.625rem;
+
+        @media only screen and (max-width: 820px) {
+          clip: rect(1px, 1px, 1px, 1px);
+          clip-path: inset(50%);
+          height: 1px;
+          margin: -1px;
+          overflow: hidden;
+          padding: 0;
+          position: absolute;
+          width: 1px;
+        }
+      }
+    }
+  }
+}

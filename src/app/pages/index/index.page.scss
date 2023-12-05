@@ -1,0 +1,186 @@
+// Import scoped CSS variables
+@import "src/theme/scoped-variables/page-index-variables.scss";
+
+ion-content {
+    --padding-bottom: 5rem;
+}
+
+h1.page-title {
+    font-size: 1.625rem;
+    font-weight: bold;
+    margin: 0 0 1.5rem 0;
+    text-transform: uppercase;
+}
+
+.info.markdown {
+    margin-bottom: 1rem;
+    max-width: 800px;
+    width: 100%;
+}
+
+.index-container {
+    display: flex;
+    max-width: 1000px;
+    width: 100%;
+
+    .index-data {
+        align-items: flex-start;
+        display: flex;
+        flex-flow: column nowrap;
+        width: 100%;
+
+        > * {
+            width: 100%;
+        }
+
+        .search-row {
+            align-items: center;
+            display: flex;
+            flex-flow: row wrap;
+            column-gap: 1rem;
+            justify-content: space-between;
+
+            ion-searchbar {
+                flex-grow: 1;
+                max-width: 600px;
+                min-width: 250px;
+                padding-inline-end: 0;
+                padding-inline-start: 0;
+                width: auto;
+            }
+
+            .filter-button {
+                margin: 0.5rem 0;
+            }
+        }
+
+        .active-filters-row {
+            align-items: flex-start;
+            border: 1px solid var(--primary-color);
+            border-radius: 3px;
+            display: flex;
+            gap: 1rem;
+            justify-content: space-between;
+            margin: 1rem 0;
+            padding: 0.75rem 0.625rem 0.75rem 1rem;
+
+            p {
+                line-height: 1.5;
+                margin: 0;
+                width: 100%;
+            }
+
+            ion-button {
+                --padding-bottom: 0;
+                --padding-end: 0;
+                --padding-start: 0;
+                --padding-top: 0;
+                min-height: 18px;
+                margin: 0;
+                overflow: visible;
+            }
+
+            .active-filters-label {
+                font-weight: bold;
+            }
+
+            .active-filter-year-heading {
+                text-transform: lowercase;
+            }
+        }
+
+        .data-row {
+            margin: 1.25rem 0 1rem 0;
+
+            .shown-records {
+                font-size: 0.875rem;
+                font-style: italic;
+                margin-top: 0;
+                text-align: right;
+            }
+
+            ol {
+                list-style-type: none;
+            }
+
+            ol,
+            li {
+                margin: 0;
+                padding: 0;
+            }
+
+            h2,
+            a {
+                font-size: 1rem;
+                margin: 0;
+                padding: 0.75rem 1rem;
+            }
+
+            h2 {
+                background-color: var(--list-heading-background-color, #e0e0e0);
+                border-top: 1px solid var(--list-heading-border-color, #979797);
+                font-size: 1.125rem;
+                text-transform: uppercase;
+            }
+
+            a {
+                background-color: var(--list-item-background-color, transparent);
+                border-top: 1px solid var(--list-item-border-color, #ccc);
+                color: #000;
+                display: block;
+                padding-left: 2.25rem;
+                text-decoration: none;
+                transition: all .4s;
+
+                &:hover {
+                    background-color: var(--list-item-hover-background-color, #f5f5f5);
+                    text-decoration: underline;
+                }
+            }
+
+            &.no-groupings {
+                a {
+                    padding-left: 1rem;
+                }
+            }
+        }
+
+        .load-more-row,
+        .footer-row {
+            display: flex;
+            flex-flow: column nowrap;
+            justify-content: center;
+            align-items: center;
+            align-content: center;
+               
+            .loading-spinner-wrapper {
+                min-height: 4rem;
+            }
+        
+            ion-spinner.loading {
+                padding: 1rem 0;
+            }
+        }
+        
+        .load-more-row + .footer-row ion-button {
+            margin-top: 1rem;
+        }
+    }
+
+    .alphabet-filter {
+        flex-grow: 0;
+        margin: 0.125rem 0 0 1.25rem;
+
+        ion-fab-button {
+            --background: var(--fab-button-primary-background-color, var(--primary-color));
+            --box-shadow: none;
+            --color: var(--fab-button-primary-icon-color, var(--primary-color-contrast));
+            font-size: 1.125rem;
+            margin-right: 0;
+
+            @media screen and (max-width: 820px) {
+                margin-left: 0;
+            }
+        }
+    }
+}

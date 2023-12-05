@@ -1,0 +1,37 @@
+ion-footer {
+  ion-toolbar {
+    --background: transparent;
+    --padding-end: 0.5rem;
+    --padding-start: 0.5rem;
+  }
+}
+
+.born-between {
+  align-content: center;
+  display: flex;
+  gap: 0.75rem;
+  justify-content: space-between;
+  padding: 1rem 1rem 0 1rem;
+  width: 100%;
+
+  ion-input {
+    --background: #ffffff;
+    --highlight-color-valid: var(--outline-button-color);
+    width: 100%;
+  }
+}
+
+ion-list.list-md {
+  background-color: transparent;
+
+  ion-list-header {
+    --background: var(--secondary-color);
+    --color: var(--secondary-color-contrast);
+    font-size: 1rem;
+    font-weight: bold;
+  }
+}
+
+ion-item {
+  --background: transparent;
+}

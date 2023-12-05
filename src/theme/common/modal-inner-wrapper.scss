@@ -1,0 +1,20 @@
+.modal-inner-wrapper {
+    background: #fafafa;
+    margin-bottom: 1.5rem;
+    padding: 1rem;
+    width: 100%;
+
+	h2 {
+		font-size: 1.3125rem;
+		line-height: 1.25;
+		margin: 0 0 1rem 0;
+	}
+
+    .modal-inner-box {
+        background: var(--main-background-color);
+        line-height: 1.4;
+        margin: 0;
+        padding: 1rem;
+        width: 100%;
+    }
+}

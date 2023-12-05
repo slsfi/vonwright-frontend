@@ -1,0 +1,15 @@
+/*
+  Info overlay pop-up CSS variables scoped to <ion-app> by import, so in practice these are
+  global, though they won’t be included in the global styles.css.
+
+  To override any of these variables in custom.scss you must use
+  this selector for defining the scope:
+
+  ion-app[class][class] { }
+*/
+
+ion-app {
+  --info-overlay-background-color: #333;
+  --info-overlay-text-color:       #e3e3e3;
+  --info-overlay-link-color:       #84cce3;
+}

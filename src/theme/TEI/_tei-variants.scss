@@ -1,0 +1,146 @@
+/**
+ * TEI VARIANTS
+ * Styles for variants.
+ */
+
+div.tei {
+  .lemma {
+    background-color: var(--lemma-identical-variant-background-color, #fff1b9) !important;
+  }
+
+  div.lemma {
+    display: inline-block;
+  }
+
+  .variant {
+    background-color: var(--variant-background-color, #c5c5c5) !important;
+  }
+
+  div.variant {
+    display: inline-block;
+  }
+
+  .orthographic {
+    background-color: var(--orthographic-variant-background-color, #eee6ff) !important;
+  }
+
+  div.orthographic {
+    display: inline-block;
+  }
+
+  .substantial {
+    background-color: var(--substantial-variant-background-color, #fee0e2) !important;
+  }
+
+  div.substantial {
+    display: inline-block;
+  }
+
+  .interpunction {
+    background-color: var(--interpunction-variant-background-color, #dbf0ec) !important;
+  }
+
+  div.interpunction {
+    display: inline-block;
+  }
+
+  .identical {
+    background-color: var(--lemma-identical-variant-background-color, #fff1b9) !important;
+  }
+
+  div.identical {
+    display: inline-block;
+  }
+
+  .typographic {
+    background-color: var(--typographic-variant-background-color, #f6e65b) !important;
+  }
+
+  div.typographic {
+    display: inline-block;
+  }
+
+  .error {
+    background-color: var(--error-variant-background-color, #f3c598) !important;
+  }
+
+  div.error {
+    display: inline-block;
+  }
+
+  .var_bold {
+    font-weight: bold;
+  }
+
+  span.extVariantsTrigger {
+    cursor: pointer;
+  }
+
+  span.extVariantsTrigger:hover {
+    opacity: 0.7;
+  }
+
+  span.extVariants {
+    display: none;
+    z-index: 1000;
+    padding: 3px;
+    margin-left: 0.25em;
+    border: 1px solid rgb(152, 0, 0);
+    background: var(--text-area-background-color, #fafafa);
+    border-radius: 3px;
+    box-shadow: rgba(0, 0, 0, 0.3) 0 2px 10px;
+  }
+
+  span.extVariants.show-extVariants {
+    display: inline;
+  }
+
+  &.teiVariant {
+    h4 {
+      margin: 1em 0 .5em !important;
+      font-size: 1.0589em;
+    }
+
+    h3 {
+      margin: 1.1em 0 .6em !important;
+      font-size: 1.1765em;
+      font-variant: initial !important;
+    }
+
+    h1.poemtitle {
+      font-variant: normal !important;
+      font-style: italic !important;
+      font-size: 1.3530em;
+    }
+
+    .variantScrollTarget {
+      cursor: pointer;
+    }
+
+    .variantScrollTarget.highlight,
+    .variantScrollTarget.highlight .teiVariant {
+      font-weight: bold;
+    }
+
+    .anchorScrollTarget {
+      cursor: pointer;
+    }
+
+    .var_margin {
+      position: absolute;
+      left: -1em;
+      text-indent: 1.25em !important;
+    }
+
+    .tit_figure_graphic {
+      width: auto;
+      max-width: 100%;
+      display: block;
+      margin: 0 auto;
+    }
+  }
+}
+
+.teiVariant.ref_variant + .teiVariant.ref_variant {
+  margin-left: -0.125em;
+}

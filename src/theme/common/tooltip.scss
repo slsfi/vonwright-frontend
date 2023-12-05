@@ -1,0 +1,29 @@
+/*
+  Style for tooltip boxes. The tooltips also inherit styles from div.tei
+*/
+.tei.toolTip {
+  background: var(--text-area-background-color, #fafafa);
+  border: 1px solid #222;
+  border-radius: 3px;
+  box-shadow: rgba(0, 0, 0, 0.3) 0 2px 10px;
+  font-family: var(--font-stack-app-base);
+  font-size: 1em;
+  line-height: 1.4em;
+  max-width: 25em;
+  padding: 0.5rem 0.625rem !important;
+  text-align: left;
+  transform-origin: left top; // This is necessary for the scaling to work properly if the tooltip wouldn't fit in view otherwise.
+  white-space: normal;
+  width: max-content;
+  z-index: 1001;
+
+  /* Styles for (foot)notes in tooltips */
+  a.footnoteReference {
+    display: none;
+  }
+  p.footnoteText {
+    display: inline-block;
+    line-height: 1.4em;
+    text-indent: 0;
+  }
+}

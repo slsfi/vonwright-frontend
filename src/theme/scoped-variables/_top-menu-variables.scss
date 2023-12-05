@@ -1,0 +1,16 @@
+/*
+  Top menu CSS variables scoped to <ion-app> by import, so in practice these are
+  global, though they won’t be included in the global styles.css.
+
+  To override any of these variables in custom.scss you must use
+  this selector for defining the scope:
+
+  ion-app[class][class] { }
+*/
+
+ion-app {
+  --top-menu-height:                         62px;
+  --top-menu-toolbar-button-icons-font-size: 1.875rem;
+  --top-menu-button-filter:                  drop-shadow(0 1px 3px rgba(35, 35, 35, .3));
+  --top-menu-logo-height:                    56px;
+}

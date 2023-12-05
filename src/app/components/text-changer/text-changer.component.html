@@ -1,0 +1,17 @@
+<div class="text-changer-wrapper" [class.mobile-mode]="mobileMode" [class.desktop-mode]="!mobileMode">
+  <div class="prev-wrapper">
+    <button *ngIf="!firstItem" class="prev-button" (click)="previous()">
+      <ion-icon name="arrow-back"></ion-icon>
+      <span *ngIf="!mobileMode" class="prev-text-name">{{ prevItemTitle }}</span>
+    </button>
+  </div>
+  <div class="current-text-name">
+    <p>{{ currentItemTitle }}</p>
+  </div>
+  <div class="next-wrapper">
+    <button *ngIf="!lastItem" class="next-button" (click)="next()">
+      <span *ngIf="!mobileMode" class="next-text-name">{{ nextItemTitle }}</span>
+      <ion-icon name="arrow-forward"></ion-icon>
+    </button>
+  </div>
+</div>

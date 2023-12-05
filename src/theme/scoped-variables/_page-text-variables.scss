@@ -1,0 +1,19 @@
+/*
+    CSS variables scoped to <page-text> by import.
+
+    To override any of these variables in custom.scss you must use
+    this selector for defining the scope:
+
+    page-text[class][class] { }
+*/
+
+:host {
+    // Variant category colors
+    --error-variant-background-color:           #f3c598;
+    --interpunction-variant-background-color:   #dbf0ec;
+    --lemma-identical-variant-background-color: #fff1b9;
+    --orthographic-variant-background-color:    #eee6ff;
+    --substantial-variant-background-color:     #fee0e2;
+    --typographic-variant-background-color:     #f6e65b;
+    --variant-background-color:                 #c5c5c5;
+}

@@ -1,0 +1,134 @@
+.full-page-modal {
+  display: flex;
+  flex-flow: column nowrap;
+  align-items: center;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+
+  .facsimile-button-group {
+    display: flex;
+    flex-flow: column nowrap;
+    align-items: center;
+    margin: 4px auto;
+    z-index: 2;
+  
+    .action-buttons {
+      align-items: center;
+      display: flex;
+      flex-flow: row nowrap;
+      gap: 6px;
+      justify-content: center;
+      margin: 4px auto;
+  
+      ion-fab {
+        display: flex;
+        flex-flow: row wrap;
+        justify-content: center;
+        align-items: center;
+        position: relative;
+      }
+
+      ion-fab-button {
+        --background: var(--fab-button-secondary-background-color);
+        --box-shadow: none;
+        --color: var(--fab-button-secondary-icon-color);
+        &.primary-fab-button {
+            --background: var(--fab-button-primary-background-color);
+            --color: var(--fab-button-primary-icon-color);
+        }
+      }
+
+      ion-icon {
+        --ionicon-stroke-width: 36px;
+      }
+
+      ion-input {
+        width: fit-content;
+      }
+    }
+
+    @media screen and (max-width: 400px) {
+      .action-buttons {
+        gap: 5px;
+
+        ion-fab-button {
+          margin: 5px;
+        }
+      }
+    }
+
+    .image-description {
+      margin: 4px 0;
+      max-width: 800px;
+      display: block;
+      width: 100%;
+      text-align: center;
+      background-color: var(--main-background-color);
+      border-radius: 3px;
+      padding: 10px;
+      white-space: normal;
+      line-height: 1.4rem;
+
+      .image-title {
+        font-weight: bold;
+      }
+
+      &.visuallyhidden {
+        display: none;
+      }
+    }
+  }
+
+  .left-controls,
+  .right-controls {
+    position: fixed;
+    top: 50%;
+
+    ion-fab-button {
+      --background: var(--fab-button-secondary-background-color);
+      --box-shadow: none;
+      --color: var(--fab-button-secondary-icon-color);
+      &.primary-fab-button {
+          --background: var(--fab-button-primary-background-color);
+          --color: var(--fab-button-primary-icon-color);
+      }
+    }
+
+    ion-icon {
+      --ionicon-stroke-width: 36px;
+    }
+  }
+  .left-controls {
+    left: 0;
+  }
+  .right-controls {
+    right: 0;
+  }
+
+  .facsimile-image-wrapper {
+    align-items: center;
+    display: flex;
+    flex-flow: column nowrap;
+    height: 100%;
+    justify-content: center;
+    position: relative;
+    touch-action: none;
+    z-index: 1;
+  
+    img {
+      cursor: move;
+      display: block;
+      margin: 0 auto;
+      max-height: 100%;
+      max-width: 100%;
+      object-fit: contain;
+      object-position: top;
+      height: auto;
+      width: auto;
+      touch-action: none;
+      will-change: transform;
+      position: relative;
+    }
+  }
+}

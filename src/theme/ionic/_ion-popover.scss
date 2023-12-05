@@ -1,0 +1,32 @@
+ion-popover.view-options-popover {
+    --max-width: 100%;
+    --min-width: 300px;
+    --offset-y: -30px;
+    --width: min-content;
+}
+
+/* Inline popover in page-text to add new view, additional styles defined inline in the template */
+ion-popover.page-text-add-view-popover {
+    &::part(content) {
+        width: 350px;
+    }
+
+    ion-content {
+        --background: transparent;
+    }
+
+    ion-content::part(scroll) {
+        align-items: flex-end;
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+        justify-content: flex-end;
+    }
+
+    ion-button.custom-outline-button {
+        &:hover,
+        &:focus {
+            --border-color: var(--outline-button-color) !important;
+        }
+    }
+}

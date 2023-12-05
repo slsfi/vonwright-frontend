@@ -1,0 +1,14 @@
+/*
+  Secondary toolbar CSS variables scoped to <ion-app> by import, so in practice these are
+  global, though they won’t be included in the global styles.css.
+
+  To override any of these variables in custom.scss you must use
+  this selector for defining the scope:
+
+  ion-app[class][class] { }
+*/
+
+ion-app {
+  --secondary-toolbar-color:              var(--secondary-color);
+  --secondary-toolbar-color-contrast:     var(--secondary-color-contrast);
+}

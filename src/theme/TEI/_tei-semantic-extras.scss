@@ -1,0 +1,262 @@
+/**
+ * TEI SEMANTIC EXTRAS
+ * Styles for semantic code and icons.
+ */
+
+/*
+Size of, among others, the red triangle that indicates the
+start of lemmas.
+*/
+div.tei span.add_margin img,
+div.tei img.doodle,
+div.tei span.anchorScrollTarget img,
+div.tei span.anchorScrollTarget.highlight img,
+div.tei a.ref_variant img,
+div.tei span.extVariantsTrigger img {
+    display: inline-block;
+    width:   0.75em; // default
+    height:  0.75em;
+}
+div.tei span.anchorScrollTarget.highlight img,
+div.tei a.ref_variant.tooltiptrigger.highlight img,
+div.tei span.extVariantsTrigger.highlight img {
+    animation: filter-animation-brightness 1.5s infinite;
+}
+.miniFontSize div.tei span.add_margin img,
+.miniFontSize div.tei img.doodle,
+.miniFontSize div.tei span.anchorScrollTarget img,
+.miniFontSize div.tei a.ref_variant img,
+.miniFontSize div.tei span.extVariantsTrigger img {
+    width:  ceil(0.75 * $text-fontsize-mini);
+    height: ceil(0.75 * $text-fontsize-mini);
+}
+.tinyFontSize div.tei span.add_margin img,
+.tinyFontSize div.tei img.doodle,
+.tinyFontSize div.tei span.anchorScrollTarget img,
+.tinyFontSize div.tei a.ref_variant img,
+.tinyFontSize div.tei span.extVariantsTrigger img {
+    width:  ceil(0.75 * $text-fontsize-tiny);
+    height: ceil(0.75 * $text-fontsize-tiny);
+}
+.xxxsmallFontSize div.tei span.add_margin img,
+.xxxsmallFontSize div.tei img.doodle,
+.xxxsmallFontSize div.tei span.anchorScrollTarget img,
+.xxxsmallFontSize div.tei a.ref_variant img,
+.xxxsmallFontSize div.tei span.extVariantsTrigger img {
+    width:  ceil(0.75 * $text-fontsize-xxxsmall);
+    height: ceil(0.75 * $text-fontsize-xxxsmall);
+}
+.xxsmallFontSize div.tei span.add_margin img,
+.xxsmallFontSize div.tei img.doodle,
+.xxsmallFontSize div.tei span.anchorScrollTarget img,
+.xxsmallFontSize div.tei a.ref_variant img,
+.xxsmallFontSize div.tei span.extVariantsTrigger img {
+    width:  ceil(0.75 * $text-fontsize-xxsmall);
+    height: ceil(0.75 * $text-fontsize-xxsmall);
+}
+.xsmallFontSize div.tei span.add_margin img,
+.xsmallFontSize div.tei img.doodle,
+.xsmallFontSize div.tei span.anchorScrollTarget img,
+.xsmallFontSize div.tei a.ref_variant img,
+.xsmallFontSize div.tei span.extVariantsTrigger img {
+    width:  ceil(0.75 * $text-fontsize-xsmall);
+    height: ceil(0.75 * $text-fontsize-xsmall);
+}
+.smallFontSize div.tei span.add_margin img,
+.smallFontSize div.tei img.doodle,
+.smallFontSize div.tei span.anchorScrollTarget img,
+.smallFontSize div.tei a.ref_variant img,
+.smallFontSize div.tei span.extVariantsTrigger img {
+    width:  ceil(0.75 * $text-fontsize-small);
+    height: ceil(0.75 * $text-fontsize-small);
+}
+.mediumFontSize div.tei span.add_margin img,
+.mediumFontSize div.tei img.doodle,
+.mediumFontSize div.tei span.anchorScrollTarget img,
+.mediumFontSize div.tei a.ref_variant img,
+.mediumFontSize div.tei span.extVariantsTrigger img {
+    width:  ceil(0.75 * $text-fontsize-medium);
+    height: ceil(0.75 * $text-fontsize-medium);
+}
+.largeFontSize div.tei span.add_margin img,
+.largeFontSize div.tei img.doodle,
+.largeFontSize div.tei span.anchorScrollTarget img,
+.largeFontSize div.tei a.ref_variant img,
+.largeFontSize div.tei span.extVariantsTrigger img {
+    width:  ceil(0.75 * $text-fontsize-large);
+    height: ceil(0.75 * $text-fontsize-large);
+}
+.xlargeFontSize div.tei span.add_margin img,
+.xlargeFontSize div.tei img.doodle,
+.xlargeFontSize div.tei span.anchorScrollTarget img,
+.xlargeFontSize div.tei a.ref_variant img,
+.xlargeFontSize div.tei span.extVariantsTrigger img {
+    width:  ceil(0.75 * $text-fontsize-xlarge);
+    height: ceil(0.75 * $text-fontsize-xlarge);
+}
+
+/*
+Size of the "squared times" symbol at different font sizes
+(the symbol indicates a normalisation where something has
+been removed from the text, or in variants, text that is
+missing.
+*/
+div.tei.show_normalisations span.reg_hide img,
+div.tei.show_emendations span.corr_hide img,
+div.tei span.seg img {
+    display: inline-block;
+    width:   0.625em; // default if the font size is not working
+    height:  0.625em;
+}
+.miniFontSize div.tei.show_normalisations span.reg_hide img,
+.miniFontSize div.tei.show_emendations span.corr_hide img,
+.miniFontSize div.tei span.seg img {
+    width:  ceil(0.585 * $text-fontsize-mini);
+    height: ceil(0.585 * $text-fontsize-mini);
+}
+.tinyFontSize div.tei.show_normalisations span.reg_hide img,
+.tinyFontSize div.tei.show_emendations span.corr_hide img,
+.tinyFontSize div.tei span.seg img {
+    width:  ceil(0.585 * $text-fontsize-tiny);
+    height: ceil(0.585 * $text-fontsize-tiny);
+}
+.xxsmallFontSize div.tei.show_normalisations span.reg_hide img,
+.xxsmallFontSize div.tei.show_emendations span.corr_hide img,
+.xxsmallFontSize div.tei span.seg img {
+    width:  ceil(0.585 * $text-fontsize-xxsmall);
+    height: ceil(0.585 * $text-fontsize-xxsmall);
+}
+.xsmallFontSize div.tei.show_normalisations span.reg_hide img,
+.xsmallFontSize div.tei.show_emendations span.corr_hide img,
+.xsmallFontSize div.tei span.seg img {
+    width:  ceil(0.585 * $text-fontsize-xsmall);
+    height: ceil(0.585 * $text-fontsize-xsmall);
+}
+.smallFontSize div.tei.show_normalisations span.reg_hide img,
+.smallFontSize div.tei.show_emendations span.corr_hide img,
+.smallFontSize div.tei span.seg img {
+    width:  ceil(0.585 * $text-fontsize-small);
+    height: ceil(0.585 * $text-fontsize-small);
+}
+.mediumFontSize div.tei.show_normalisations span.reg_hide img,
+.mediumFontSize div.tei.show_emendations span.corr_hide img,
+.mediumFontSize div.tei span.seg img {
+    width:  ceil(0.585 * $text-fontsize-medium);
+    height: ceil(0.585 * $text-fontsize-medium);
+}
+.largeFontSize div.tei.show_normalisations span.reg_hide img,
+.largeFontSize div.tei.show_emendations span.corr_hide img,
+.largeFontSize div.tei span.seg img {
+    width:  ceil(0.585 * $text-fontsize-large);
+    height: ceil(0.585 * $text-fontsize-large);
+}
+.xlargeFontSize div.tei.show_normalisations span.reg_hide img,
+.xlargeFontSize div.tei.show_emendations span.corr_hide img,
+.xlargeFontSize div.tei span.seg img {
+    width:  ceil(0.585 * $text-fontsize-xlarge);
+    height: ceil(0.585 * $text-fontsize-xlarge);
+}
+
+/* Symbol/icon representing a drawing etc. */
+div.tei img.symbol {
+    display: inline-block;
+    height: auto;
+    vertical-align: text-bottom;
+    width: 1.235em; // default
+}
+.miniFontSize div.tei img.symbol {
+    width:  ceil(1.235 * $text-fontsize-mini);
+    height: ceil(1.235 * $text-fontsize-mini);
+    vertical-align: floor(-0.2 * $text-fontsize-mini);
+}
+.tinyFontSize div.tei img.symbol {
+    width:  ceil(1.235 * $text-fontsize-tiny);
+    height: ceil(1.235 * $text-fontsize-tiny);
+    vertical-align: floor(-0.2 * $text-fontsize-tiny);
+}
+.xxxsmallFontSize div.tei img.symbol {
+    width:  ceil(1.235 * $text-fontsize-xxxsmall);
+    height: ceil(1.235 * $text-fontsize-xxxsmall);
+    vertical-align: floor(-0.2 * $text-fontsize-xxxsmall);
+}
+.xxsmallFontSize div.tei img.symbol {
+    width:  ceil(1.235 * $text-fontsize-xxsmall);
+    height: ceil(1.235 * $text-fontsize-xxsmall);
+    vertical-align: floor(-0.2 * $text-fontsize-xxsmall);
+}
+.xsmallFontSize div.tei img.symbol {
+    width:  ceil(1.235 * $text-fontsize-xsmall);
+    height: ceil(1.235 * $text-fontsize-xsmall);
+    vertical-align: floor(-0.2 * $text-fontsize-xsmall);
+}
+.smallFontSize div.tei img.symbol {
+    width:  ceil(1.235 * $text-fontsize-small);
+    height: ceil(1.235 * $text-fontsize-small);
+    vertical-align: floor(-0.2 * $text-fontsize-small);
+}
+.mediumFontSize div.tei img.symbol {
+    width:  ceil(1.235 * $text-fontsize-medium);
+    height: ceil(1.235 * $text-fontsize-medium);
+    vertical-align: floor(-0.2 * $text-fontsize-medium);
+}
+.largeFontSize div.tei img.symbol {
+    width:  ceil(1.235 * $text-fontsize-large);
+    height: ceil(1.235 * $text-fontsize-large);
+    vertical-align: floor(-0.2 * $text-fontsize-large);
+}
+.xlargeFontSize div.tei img.symbol {
+    width:  ceil(1.235 * $text-fontsize-xlarge);
+    height: ceil(1.235 * $text-fontsize-xlarge);
+    vertical-align: floor(-0.2 * $text-fontsize-xlarge);
+}
+
+/* Named entities and other semantic elements. */
+div.tei .tooltip,
+.tei img.comment,
+.tei span.corr_hide,
+.tei span.reg_hide {
+    display: none;
+}
+
+.tei.show_comments img.comment {
+    display: inline-block;
+    cursor: pointer;
+    top: 0;
+}
+
+.tei.show_personInfo span.person {
+    background-color: var(--persName-color, #f9e0bf);
+    cursor: pointer;
+}
+
+.tei.show_placeInfo span.placeName {
+    background-color: var(--placeName-color, #dee8ca);
+    cursor: pointer;
+}
+
+.tei.show_workInfo span.title {
+    background-color: var(--workTitle-color, #f7efba);
+    cursor: pointer;
+}
+
+.tei.show_abbreviations span.abbr {
+    background-color: var(--abbreviations-color, #ffe2fa);
+    cursor: pointer;
+}
+
+.tei.show_emendations span.corr, 
+.tei.show_emendations span.corr_red {
+    background-color: var(--emendations-color, #ccc);
+    cursor: pointer;
+}
+
+.tei.show_normalisations span.reg.ttNormalisations {
+    background-color: var(--normalisations-color, #e6e6e6);
+    cursor: pointer;
+}
+
+.tei.show_normalisations span.reg_hide,
+.tei.show_emendations span.corr_hide {
+    display: inline;
+    cursor: pointer;
+} 

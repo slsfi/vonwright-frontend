@@ -1,0 +1,137 @@
+:host {
+  display: block;
+}
+
+.year-input-row {
+  align-items: center;
+  display: flex;
+
+  p {
+    margin: 0 0.5rem;
+  }
+
+  ion-datetime-button::part(native) {
+    background-color: #fff;
+    border-radius: 3px;
+    border: 1px solid #b5b5b5;
+    transition: border-color 0.4s;
+  }
+
+  ion-datetime-button::part(native):hover {
+    border-color: var(--outline-button-color);
+  }
+
+  ion-datetime-button.date-active::part(native) {
+    color: var(--outline-button-color) !important;
+  }
+
+  ion-datetime-button.blank::part(native) {
+    color: #fff;
+  }
+
+  ion-button {
+    --color: #000;
+    --padding-end: 0.25rem;
+    --padding-start: 0.25rem;
+    margin: 0 0 0 0.5rem;
+  }
+
+  .current-year-range {
+    align-items: center;
+    border: 1px solid var(--main-background-accent-color);
+    border-radius: 3px;
+    display: flex;
+    justify-content: center;
+    min-height: 30px;
+    min-width: 52px;
+  }
+
+  .dash {
+    margin: 0 0.5rem;
+  }
+}
+
+.histogram-wrapper {
+  margin: 20px 0 0 32px;
+  position: relative;
+}
+
+.diagram {
+  border-left: 1px solid #aaaaaa;
+  border-right: 1px solid #aaaaaa;
+  cursor: crosshair;
+  padding-bottom: 0.25rem;
+  width: 100%;
+}
+
+.doc-count-line {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 0.25rem;
+
+  span {
+    color: #555;
+    font-size: 12px;
+    margin-left: -3px;
+
+    + span {
+      margin-left: 0;
+      margin-right: -3px;
+    }
+  }
+}
+
+.year {
+  height: 4px;
+  position: relative;
+}
+
+.yearIsDecade {
+  border-bottom: 1px solid #aaaaaa;
+  height: 5px;
+}
+
+.yearBar {
+  background-color: var(--date-histogram-year-bar-color);
+  height: 100%;
+  position: relative;
+  width: 0;
+}
+
+.yearDetails {
+  background-color: rgba(255,255,255,0.8);
+  color: #555;
+  display: none;
+  font-size: 12px !important;
+  padding: 2px;
+  position: absolute;
+  right: 0;
+  top: -20px;
+}
+
+.year:hover {
+  background-color: var(--date-histogram-year-hover-color);
+}
+
+.year:hover > .yearBar, .yearBarInRange {
+  background-color: var(--date-histogram-year-in-range-color);
+}
+
+.year:hover .yearDetails {
+  display: block;
+}
+
+.decadeMarker {
+  height: 0;
+  position: relative;
+}
+
+.decade {
+  color: #555;
+  font-size: 12px !important;
+  left: -55px;
+  position: absolute;
+  text-align: right;
+  top: -7px;
+  width: 50px;
+}

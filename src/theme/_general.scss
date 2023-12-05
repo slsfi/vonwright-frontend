@@ -1,0 +1,32 @@
+html.md {
+  --ion-default-font: var(--font-stack-app-base);
+}
+
+body {
+  background-color: var(--main-background-color, #f2f2f2);
+  font-size: 1rem;
+  -webkit-user-select: text;
+  user-select: text;
+}
+
+a {
+  color: var(--default-link-color);
+}
+
+.visuallyhidden {
+  display: none !important;
+}
+
+.screen-reader-only {
+  border: 0;
+  clip: rect(1px 1px 1px 1px);
+  clip: rect(1px, 1px, 1px, 1px);
+  clip-path: inset(50%);
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
+  white-space: nowrap;
+  width: 1px;
+}

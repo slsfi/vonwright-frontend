@@ -1,0 +1,139 @@
+/*
+  Style for infoOverlay boxes. They also inherit styles from div.tei
+*/
+.tei.infoOverlay {
+  background: var(--info-overlay-background-color);
+  border-radius: 3px 3px 0 0;
+  box-shadow: 0 0 10px 2px rgba(0, 0, 0, 0.4);
+  clip-path: inset(-12px -12px 0px -12px);
+  color: var(--info-overlay-text-color);
+  display: inline-block;
+  font-family: var(--font-stack-app-base);
+  font-size: 1em;
+  line-height: 1.4em;
+  margin: 0;
+  max-height: 50%;
+  outline: 0;
+  overflow: auto;
+  padding: 0;
+  text-align: left;
+  white-space: normal;
+  z-index: 1000;
+
+  .infoOverlayHeader {
+    background: var(--info-overlay-background-color);
+    display: inline-block;
+    padding: 12px 16px 8px 16px;
+    position: sticky;
+    top: 0;
+    width: 100%;
+    z-index: 10;
+
+    .infoOverlayTitle {
+      color: var(--info-overlay-text-color);
+      display: inline;
+      font-size: 0.7em;
+      font-weight: 600;
+      line-height: 1.2;
+      text-transform: uppercase;
+    }
+
+    ion-button {
+      --color: var(--info-overlay-text-color);
+      --padding-end: 0;
+      --padding-start: 0;
+      float: right;
+      font-size: 0.875rem;
+      margin: 0;
+      min-height: auto;
+
+      &::part(native) {
+        min-height: auto;
+      }
+
+      &:focus {
+        outline-style: auto;
+      }
+    }
+  }
+
+  .infoOverlayContent {
+    clear: both;
+    padding: 0 24px 24px 16px;
+
+    a {
+      color: var(--info-overlay-link-color);
+    }
+
+    .footnoteWrapper {
+      display: flex;
+    }
+
+    a.footnoteReference {
+      display: inline-block;
+      margin-right: 0.7em;
+      text-decoration: none;
+    }
+
+    p.footnoteText,
+    p.infoOverlayText {
+      color: var(--info-overlay-text-color);
+      display: inline-block;
+      font-weight: 300;
+      line-height: 1.4em;
+      text-indent: 0;
+      width: 100%;
+
+      img.comment {
+        filter: brightness(150%);
+      }
+    }
+
+    span.teiComment.noteLemma {
+      font-weight: 600;
+    }
+
+    span.teiComment.noteText {
+      font-weight: 300;
+    }
+
+    span.ioLemma {
+      font-style: italic;
+      font-weight: 600;
+
+      span.reg_hide,
+      span.corr_hide {
+        cursor: auto;
+      }
+
+      span.reg_hide img,
+      span.corr_hide img {
+        filter: invert(1);
+      }
+    }
+
+    span.ioLemma::after {
+      content: " – ";
+      font-style: normal;
+      font-weight: 300;
+    }
+  }
+}
+
+.infoOverlay.show_personInfo .infoOverlayContent p.footnoteText span.person,
+.infoOverlay.show_personInfo .infoOverlayContent p.infoOverlayText span.person,
+.infoOverlay.show_placeInfo .infoOverlayContent p.footnoteText span.placeName,
+.infoOverlay.show_placeInfo .infoOverlayContent p.infoOverlayText span.placeName,
+.infoOverlay.show_workInfo .infoOverlayContent p.footnoteText span.title,
+.infoOverlay.show_workInfo .infoOverlayContent p.infoOverlayText span.title,
+.infoOverlay.show_emendations .infoOverlayContent p.footnoteText span.corr,
+.infoOverlay.show_emendations .infoOverlayContent p.infoOverlayText span.corr,
+.infoOverlay.show_emendations .infoOverlayContent p.footnoteText span.corr_red,
+.infoOverlay.show_emendations .infoOverlayContent p.infoOverlayText span.corr_red,
+.infoOverlay.show_normalisations .infoOverlayContent p.footnoteText span.reg,
+.infoOverlay.show_normalisations .infoOverlayContent p.infoOverlayText span.reg,
+.infoOverlay.show_abbreviations .infoOverlayContent p.footnoteText span.abbr,
+.infoOverlay.show_abbreviations .infoOverlayContent p.infoOverlayText span.abbr {
+  color: #222;
+  font-weight: normal;
+}

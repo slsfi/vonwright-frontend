@@ -1,0 +1,48 @@
+/**
+ * TEI TITLE
+ * Styles for title pages.
+ */
+
+page-title {
+  div.tei {
+    .title,
+    .subtitle,
+    .collectiontitle {
+      font-size: 2.2353em;
+      font-weight: normal;
+      line-height: 1.2;
+      text-align: center;
+      text-transform: uppercase;
+    }
+
+    .subtitle {
+      font-size: 1.4706em;
+      margin-top: 1em;
+    }
+
+    .collectiontitle {
+      font-size: 1.8824em;
+      margin-top: 0.25em;
+      margin-bottom: 1em;
+      letter-spacing: 0.1em;
+      text-indent: 0;
+    }
+
+    .seriestitle {
+      margin-top: 2.5rem;
+      margin-bottom: 1em;
+      font-size: 1.2942em;
+      font-weight: normal;
+      line-height: 1.2;
+      text-align: center;
+      text-indent: 0;
+    }
+
+    .chapter {
+      font-size: 1.2942em;
+      font-weight: normal;
+      line-height: 1.2;
+      text-align: center;
+    }
+  }
+}
