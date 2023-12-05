@@ -7,7 +7,7 @@
 #    https://hub.docker.com/_/node/
 FROM node:20-alpine AS base
 # Change working directory.
-WORKDIR /digital_edition_web_ng
+WORKDIR /digital-edition-frontend-ng
 
 
 # 2. Create intermediate build image, starting from base image.
@@ -37,7 +37,7 @@ COPY package.json package-lock.json ./
 RUN npm install --omit=dev
 # Copy the dist folder from the build image to the final,
 # runtime image.
-COPY --from=build /digital_edition_web_ng/dist /digital_edition_web_ng/dist
+COPY --from=build /digital-edition-frontend-ng/dist /digital-edition-frontend-ng/dist
 # Set NODE_ENV environment variable to production.
 ENV NODE_ENV production
 # Run app.

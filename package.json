@@ -1,7 +1,10 @@
 {
   "name": "sls-digital-edition-frontend",
-  "description": "An Angular app for digital editions",
-  "homepage": "https://github.com/slsfi/digital_edition_web_ng",
+  "version": "0.0.0",
+  "description": "Angular frontend app for the SLS Digital Edition Platform",
+  "homepage": "https://github.com/slsfi/digital-edition-frontend-ng#readme",
+  "license": "MIT",
+  "private": true,
   "scripts": {
     "ng": "ng",
     "start": "ng serve --configuration=development,sv",
@@ -12,7 +15,6 @@
     "serve:ssr": "node dist/app/proxy-server.js",
     "ssr-start": "npm run build:ssr && npm run serve:ssr"
   },
-  "private": true,
   "dependencies": {
     "@angular/animations": "^17.0.5",
     "@angular/common": "^17.0.5",
