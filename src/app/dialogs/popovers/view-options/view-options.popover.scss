@@ -82,21 +82,21 @@ ion-button.text-xlarge {
 	height: 0.8125rem;
 	padding-right: 0.125rem;
 }
-.show_personInfo {
+.show_personInfo::part(label) {
 	background-color: var(--persName-color, #f9e0bf);
 }
-.show_workInfo {
+.show_workInfo::part(label) {
 	background-color: var(--workTitle-color, #f7efba);
 }
-.show_placeInfo {
+.show_placeInfo::part(label) {
 	background-color: var(--placeName-color, #dee8ca);
 }
-.show_abbreviations {
+.show_abbreviations::part(label) {
 	background-color: var(--abbreviations-color, #ffe2fa);
 }
-.show_emendationsInfo {
+.show_emendationsInfo::part(label) {
 	background-color: var(--emendations-color, #ccc);
 }
-.show_normalisationsInfo {
+.show_normalisationsInfo::part(label) {
 	background-color: var(--normalisations-color, #e6e6e6);
 }
