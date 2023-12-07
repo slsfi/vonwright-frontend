@@ -100,3 +100,9 @@ ion-button.text-xlarge {
 .show_normalisationsInfo::part(label) {
 	background-color: var(--normalisations-color, #e6e6e6);
 }
+.show_pageBreakOriginal::part(label) {
+	color: var(--pageBreakOriginal-color, #b32fa0);
+}
+.show_pageBreakEdition::part(label) {
+	color: var(--pageBreakEdition-color, #8f6b28);
+}

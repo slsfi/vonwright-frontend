@@ -91,10 +91,10 @@
   </ion-item>
 
   <ion-item *ngIf="availableToggles.pageBreakOriginal">
-    <ion-toggle [(ngModel)]="show.pageBreakOriginal" (ionChange)="toggleOption('pageBreakOriginal')" justify="space-between" [enableOnOffLabels]="true" i18n="@@ViewOptions.PageBreakOriginal">Sidnummer, original</ion-toggle>
+    <ion-toggle class="show_pageBreakOriginal" [(ngModel)]="show.pageBreakOriginal" (ionChange)="toggleOption('pageBreakOriginal')" justify="space-between" [enableOnOffLabels]="true" i18n="@@ViewOptions.PageBreakOriginal">Sidnummer, original</ion-toggle>
   </ion-item>
 
   <ion-item *ngIf="availableToggles.pageBreakEdition">
-    <ion-toggle [(ngModel)]="show.pageBreakEdition" (ionChange)="toggleOption('pageBreakEdition')" justify="space-between" [enableOnOffLabels]="true" i18n="@@ViewOptions.PageBreakEdition">Sidnummer, tryckt utgåva</ion-toggle>
+    <ion-toggle class="show_pageBreakEdition" [(ngModel)]="show.pageBreakEdition" (ionChange)="toggleOption('pageBreakEdition')" justify="space-between" [enableOnOffLabels]="true" i18n="@@ViewOptions.PageBreakEdition">Sidnummer, tryckt utgåva</ion-toggle>
   </ion-item>
 </ion-list>
