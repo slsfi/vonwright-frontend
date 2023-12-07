@@ -301,25 +301,22 @@
                           (ionChange)="toggleFilter(filterGroup.name, filter)"
                           [disabled]="disableFilterCheckboxes || (filter.doc_count < 1 && !filter.selected)"
                     >
-                      <span [ngStyle]="{'white-space': 'normal'}">
-                        <span>
-                          <ng-container *ngIf="filterGroup.name === 'Type'">
-                            <ng-container [ngSwitch]="filter.key.toString()">
-                              <ng-container *ngSwitchCase="'est'" i18n="@@ReadingText.ReadingText">Lästext</ng-container>
-                              <ng-container *ngSwitchCase="'com'" i18n="@@Commentary.Commentary">Kommentar</ng-container>
-                              <ng-container *ngSwitchCase="'ms'" i18n="@@Manuscripts.Manuscript">Manuskript</ng-container>
-                              <ng-container *ngSwitchCase="'var'" i18n="@@Variants.Variant">Tryckt variant</ng-container>
-                              <ng-container *ngSwitchCase="'tit'" i18n="@@CollectionTitle.TitlePage">Titelblad</ng-container>
-                              <ng-container *ngSwitchCase="'fore'" i18n="@@CollectionForeword.Foreword">Förord</ng-container>
-                              <ng-container *ngSwitchCase="'inl'" i18n="@@CollectionIntroduction.Introduction">Inledning</ng-container>
-                              <ng-container *ngSwitchDefault>{{filter.key.toString()}}</ng-container>
-                            </ng-container>
-                          </ng-container>
-                          <ng-container *ngIf="filterGroup.name !== 'Type'">
-                            {{filter.key_as_string || filter.key}}
-                          </ng-container>
-                        </span><span [ngStyle]="{'font-size': '0.875em', 'color': '#686868'}" [innerHTML]="' (' + filter.doc_count + ')'"></span>
-                      </span>
+                      <ng-container *ngIf="filterGroup.name === 'Type'">
+                        <ng-container [ngSwitch]="filter.key.toString()">
+                          <ng-container *ngSwitchCase="'est'" i18n="@@ReadingText.ReadingText">Lästext</ng-container>
+                          <ng-container *ngSwitchCase="'com'" i18n="@@Commentary.Commentary">Kommentar</ng-container>
+                          <ng-container *ngSwitchCase="'ms'" i18n="@@Manuscripts.Manuscript">Manuskript</ng-container>
+                          <ng-container *ngSwitchCase="'var'" i18n="@@Variants.Variant">Tryckt variant</ng-container>
+                          <ng-container *ngSwitchCase="'tit'" i18n="@@CollectionTitle.TitlePage">Titelblad</ng-container>
+                          <ng-container *ngSwitchCase="'fore'" i18n="@@CollectionForeword.Foreword">Förord</ng-container>
+                          <ng-container *ngSwitchCase="'inl'" i18n="@@CollectionIntroduction.Introduction">Inledning</ng-container>
+                          <ng-container *ngSwitchDefault>{{filter.key.toString()}}</ng-container>
+                        </ng-container>
+                      </ng-container>
+                      <ng-container *ngIf="filterGroup.name !== 'Type'">
+                        {{filter.key_as_string || filter.key}}
+                      </ng-container>
+                      <span [ngStyle]="{'font-size': 'var(--doc-count-font-size)', 'color': 'var(--doc-count-color)'}" [innerHTML]="' (' + filter.doc_count + ')'"></span>
                     </ion-checkbox>
                   </li>
                 </ng-container>

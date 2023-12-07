@@ -229,6 +229,12 @@ h1.page-title {
           --checkbox-background: #fff;
           color: var(--outline-button-color);
         }
+
+        &::part(label) {
+          --doc-count-color: #686868;
+          --doc-count-font-size: 0.875em;
+          white-space: normal;
+        }
       }
 
       ion-button.more-filters {
