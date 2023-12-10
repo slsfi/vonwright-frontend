@@ -15,6 +15,7 @@ import { isEmptyObject } from '@utility-functions';
 })
 export class HtmlParserService {
   private apiURL: string = '';
+  private mediaCollectionMappings: any = {};
 
   constructor(
     private collectionContentService: CollectionContentService
@@ -22,6 +23,7 @@ export class HtmlParserService {
     const apiBaseURL = config.app?.backendBaseURL ?? '';
     const projectName = config.app?.projectNameDB ?? '';
     this.apiURL = apiBaseURL + '/' + projectName;
+    this.mediaCollectionMappings = config.collections?.mediaCollectionMappings ?? {};
   }
 
   postprocessReadingText(text: string, collectionId: string) {
@@ -58,9 +60,14 @@ export class HtmlParserService {
           res.content &&
           res.content !== '<html xmlns="http://www.w3.org/1999/xhtml"><head></head><body>File not found</body></html>'
         ) {
+          const _apiURL = this.apiURL;
           const collectionID = String(id).split('_')[0];
           let text = res.content as string;
           text = this.postprocessReadingText(text, collectionID);
+
+          const galleryId = !isEmptyObject(this.mediaCollectionMappings)
+            ? this.mediaCollectionMappings[collectionID]
+            : undefined;
 
           // Parse the read text html to get all illustrations in it using
           // SSR compatible htmlparser2
@@ -74,9 +81,14 @@ export class HtmlParserService {
                   }
                   const image = { src: attributes.src, class: illustrationClass };
                   images.push(image);
-                } else if (attributes.class?.includes('doodle') && attributes['data-id']) {
+                } else if (
+                  attributes.class?.includes('doodle') &&
+                  attributes['data-id'] &&
+                  galleryId
+                ) {
                   const image = {
-                    src: 'assets/images/verk/' + attributes['data-id'].replace('tag_', '') + '.jpg',
+                    src: `${_apiURL}/gallery/get/${galleryId}/`
+                          + attributes['data-id'].replace('tag_', '') + '.jpg',
                     class: 'doodle'
                   };
                   images.push(image);
@@ -100,9 +112,8 @@ export class HtmlParserService {
     text = text.replace(/images\//g, 'assets/images/');
     text = text.replace(/assets\/images\/verk\/http/g, 'http');
 
-    const galleries = config.collections?.mediaCollectionMappings ?? {};
-    const galleryId = !isEmptyObject(galleries)
-      ? galleries[collectionId]
+    const galleryId = !isEmptyObject(this.mediaCollectionMappings)
+      ? this.mediaCollectionMappings[collectionId]
       : undefined;
     const visibleInlineIllustrations = config.collections?.inlineIllustrations ?? [];
 
