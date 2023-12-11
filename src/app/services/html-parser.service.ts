@@ -28,14 +28,15 @@ export class HtmlParserService {
 
   postprocessReadingText(text: string, collectionId: string) {
     text = text.trim();
+    // Fix image paths
+    text = text.replace(/images\//g, 'assets/images/');
+    // Map illustration image paths to backend media paths
     text = this.mapIllustrationImagePaths(text, collectionId);
-
     // Add "tei" class to all classlists
     text = text.replace(
       /class="([a-z A-Z _ 0-9]{1,140})"/g,
       'class="tei $1"'
     );
-
     return text;
   }
 
@@ -65,9 +66,7 @@ export class HtmlParserService {
           let text = res.content as string;
           text = this.postprocessReadingText(text, collectionID);
 
-          const galleryId = !isEmptyObject(this.mediaCollectionMappings)
-            ? this.mediaCollectionMappings[collectionID]
-            : undefined;
+          const galleryId = this.mediaCollectionMappings?.[collectionID];
 
           // Parse the read text html to get all illustrations in it using
           // SSR compatible htmlparser2
@@ -108,16 +107,17 @@ export class HtmlParserService {
     );
   }
 
-  mapIllustrationImagePaths(text: string, collectionId: string) {
-    text = text.replace(/images\//g, 'assets/images/');
-    text = text.replace(/assets\/images\/verk\/http/g, 'http');
-
-    const galleryId = !isEmptyObject(this.mediaCollectionMappings)
-      ? this.mediaCollectionMappings[collectionId]
-      : undefined;
+  /**
+   * Replace paths in src attribute values for all images with classname
+   * 'est_figure_graphic' in the given text (html as string). The paths
+   * are replaced with the mapped backend path for the collection.
+   * Returns the text with replaced values.
+   */
+  mapIllustrationImagePaths(text: string, collectionID: string): string {
+    const galleryId = this.mediaCollectionMappings?.[collectionID];
     const visibleInlineIllustrations = config.collections?.inlineIllustrations ?? [];
 
-    if (text.includes('est_figure_graphic') || text.includes('assets/images/verk/')) {
+    if (text.includes('est_figure_graphic')) {
       // Use SSR compatible htmlparser2 and related DOM-handling modules
       // (domhandler: https://domhandler.js.org/, domutils: https://domutils.js.org/,
       // dom-serializer: https://github.com/cheeriojs/dom-serializer)
@@ -126,24 +126,33 @@ export class HtmlParserService {
       const parser = new Parser(handler);
       parser.write(text);
       parser.end();
-      if (!visibleInlineIllustrations.includes(Number(collectionId))) {
+
+      // Find all elements with 'est_figure_graphic' classname
+      const m = findAll(
+        el => String(getAttributeValue(el, 'class')).includes('est_figure_graphic'), handler.dom
+      );
+
+      if (!visibleInlineIllustrations.includes(Number(collectionID))) {
         // Hide inline illustrations in the read text
-        const m = findAll(
-          el => String(getAttributeValue(el, 'class')).includes('est_figure_graphic'), handler.dom
-        );
         m.forEach(element => {
           element.attribs.class += ' hide-illustration';
         });
       }
-      const m2 = findAll(
-        el => String(getAttributeValue(el, 'src')).includes('assets/images/verk/'), handler.dom
-      );
-      m2.forEach(element => {
-        element.attribs.src = element.attribs.src.replace(
-          'assets/images/verk/',
-          `${this.apiURL}/gallery/get/${galleryId}/`
-        );
-      });
+
+      // Replace src path with backend base path
+      if (galleryId) {
+        m.forEach(element => {
+          // Only replace relative paths
+          if (element.attribs.src && !(
+            element.attribs.src.indexOf('://') > 0 ||
+            element.attribs.src.indexOf('//') === 0
+          )) {
+            element.attribs.src = `${this.apiURL}/gallery/get/${galleryId}/`
+                                  + element.attribs.src;
+          }
+        });
+      }
+      
       text = render(handler.dom, { decodeEntities: false });
     }
 
@@ -157,8 +166,10 @@ export class HtmlParserService {
     parser.end();
 
     return existsOne(
-      el => (String(getAttributeValue(el, 'class')).includes('est_figure_graphic') &&
-        !String(getAttributeValue(el, 'class')).includes('hide-illustration')), handler.dom
+      el => (
+        String(getAttributeValue(el, 'class')).includes('est_figure_graphic') &&
+        !String(getAttributeValue(el, 'class')).includes('hide-illustration')
+      ), handler.dom
     );
   }
 
