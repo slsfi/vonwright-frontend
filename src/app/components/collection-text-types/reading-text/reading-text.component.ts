@@ -147,7 +147,8 @@ export class ReadingTextComponent implements OnChanges, OnDestroy, OnInit {
           if (eventTarget.classList.contains('doodle') && eventTarget.hasAttribute('src')) {
             // Click on a pictogram ("doodle")
             image = {
-              src: 'assets/images/verk/' + String(eventTarget.dataset['id']).replace('tag_', '') + '.jpg',
+              src: this.parserService.getMappedMediaCollectionURL(this.textItemID.split('_')[0])
+                   + String(eventTarget.dataset['id']).replace('tag_', '') + '.jpg',
               class: 'doodle'
             };
           } else if (this.inlineVisibleIllustrations) {

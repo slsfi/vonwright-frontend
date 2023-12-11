@@ -233,6 +233,12 @@ export class HtmlParserService {
   }
 
 
+  getMappedMediaCollectionURL(collectionID: string): string {
+    const galleryId = this.mediaCollectionMappings?.[collectionID];
+    return galleryId ? `${this.apiURL}/gallery/get/${galleryId}/` : '';
+  }
+
+
   /**
    * Returns the text with all occurrences of a selected set of characters
    * replaced with their corresponding character entity references.
