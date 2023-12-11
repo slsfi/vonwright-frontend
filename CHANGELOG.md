@@ -7,15 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.2] – 2023-12-11
+
 ### Changed
 
-- Doodle illustrations must be placed in a media collection in the backend rather than in the hard coded `src/assets/images/verk/` folder in the frontend. Use `collections.mediaCollectionMappings` in `config.ts` to map the id of the collection with doodles to the id of the media collection that holds the images in the backend.
-- Illustration image path mapping to media collections is performed solely based on the presence of the CSS class name `est_figure_graphic` on `img` elements – not as previously based on the image `src` containing `assets/images/verk/` in it. Thus, illustration images that are to be mapped to media collections must have just the image file names in the `src` attributes, rather than `images/verk/<filename>` as previously. Images with absolute URLs in `src` are never mapped regardless of class names.
-- Fixing image paths in collection pages from `images/` to `assets/images/` is done specifically at the start of `src` attribute values – not for any occurrence of the string `images/`.
+- Doodle illustrations must be placed in a media collection in the backend rather than in the hard coded `src/assets/images/verk/` folder in the frontend. Use `collections.mediaCollectionMappings` in `config.ts` to map the id of the collection with doodles to the id of the media collection that holds the images in the backend. ([9fd9d0e](https://github.com/slsfi/digital-edition-frontend-ng/commit/9fd9d0e7ab003e2d0dc3fd18c6e8c0edba88d7f5), [02d3d21](https://github.com/slsfi/digital-edition-frontend-ng/commit/02d3d21fbdc24f785e29db6a80acbe8409e91d0d))
+- Illustration image path mapping to media collections is performed solely based on the presence of the CSS class name `est_figure_graphic` on `img` elements – not as previously based on the image `src` containing `assets/images/verk/` in it. Thus, illustration images that are to be mapped to media collections must have just the image file names in the `src` attributes, rather than `images/verk/<filename>` as previously. Images with absolute URLs in `src` are never mapped regardless of class names. ([2b4f4e6](https://github.com/slsfi/digital-edition-frontend-ng/commit/2b4f4e6fed6020562e0927c8a72969662a80e536))
+- Fixing image paths in collection pages from `images/` to `assets/images/` is done specifically at the start of `src` attribute values – not for any occurrence of the string `images/`. ([111f902](https://github.com/slsfi/digital-edition-frontend-ng/commit/111f9022c4771f271cb812fc9c887c0faa93ece3))
 
 ### Removed
 
-- Legacy settings from Angular configuation file.
+- Legacy settings from Angular configuration file. ([fbfc51c](https://github.com/slsfi/digital-edition-frontend-ng/commit/fbfc51c52b3681e265a28db0132b247fb3b136df))
 
 ## [1.0.1] – 2023-12-07
 
@@ -35,6 +37,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initial release.
 
-[unreleased]: https://github.com/slsfi/digital-edition-frontend-ng/compare/v1.0.1...HEAD
+[unreleased]: https://github.com/slsfi/digital-edition-frontend-ng/compare/v1.0.2...HEAD
+[1.0.2]: https://github.com/slsfi/digital-edition-frontend-ng/compare/v1.0.1...v1.0.2
 [1.0.1]: https://github.com/slsfi/digital-edition-frontend-ng/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/slsfi/digital-edition-frontend-ng/releases/tag/v1.0.0
