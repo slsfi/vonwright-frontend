@@ -191,7 +191,7 @@ export class CollectionIntroductionPage implements OnInit, OnDestroy {
         if (res?.content) {
           this.textLoading = false;
           // Fix paths for images and file extensions for icons
-          let textContent = res.content.replace(/images\//g, 'assets/images/');
+          let textContent = res.content.replace(/src="images\//g, 'src="assets/images/');
 
           // TODO: this manipulation of the introductions TOC should maybe be done using htmlparser2,
           // TODO: on the other hand using regex doesn't rely on an external dependency ...

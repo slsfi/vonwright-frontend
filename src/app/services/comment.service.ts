@@ -125,7 +125,7 @@ export class CommentService {
 
   private postprocessCommentsText(text: string): string {
     // Fix image paths
-    text = text.replace(/images\//g, 'assets/images/');
+    text = text.replace(/src="images\//g, 'src="assets/images/');
     // Add "teiComment" to all classlists
     text = text.replace(
       /class=\"([a-z A-Z _ 0-9]{1,140})\"/g,

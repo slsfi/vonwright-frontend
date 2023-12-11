@@ -423,7 +423,7 @@ export class DownloadTextsModal implements OnDestroy, OnInit {
   }
 
   private getProcessedPrintIntro(text: string): string {
-    text = text.replace(/images\//g, 'assets/images/');
+    text = text.replace(/src="images\//g, 'src="assets/images/');
     text = this.fixImagePaths(text);
     return this.constructHtmlForPrint(text, 'intro');
   }
@@ -911,8 +911,8 @@ export class DownloadTextsModal implements OnDestroy, OnInit {
   private fixImagePaths(text: string): string {
     // fix image paths
     return text.replace(
-      /assets\/images\//g,
-      (this.document.defaultView?.location.origin ?? '')
+      /src="assets\/images\//g,
+      'src="' + (this.document.defaultView?.location.origin ?? '')
             + (this.document.defaultView?.location.pathname.split('/')[1] === this.activeLocale ? '/' + this.activeLocale : '')
             + '/assets/images/'
     );

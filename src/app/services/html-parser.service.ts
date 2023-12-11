@@ -7,7 +7,6 @@ import { render } from 'dom-serializer';
 
 import { config } from '@config';
 import { CollectionContentService } from '@services/collection-content.service';
-import { isEmptyObject } from '@utility-functions';
 
 
 @Injectable({
@@ -29,7 +28,7 @@ export class HtmlParserService {
   postprocessReadingText(text: string, collectionId: string) {
     text = text.trim();
     // Fix image paths
-    text = text.replace(/images\//g, 'assets/images/');
+    text = text.replace(/src="images\//g, 'src="assets/images/');
     // Map illustration image paths to backend media paths
     text = this.mapIllustrationImagePaths(text, collectionId);
     // Add "tei" class to all classlists
@@ -43,7 +42,7 @@ export class HtmlParserService {
   postprocessManuscriptText(text: string) {
     text = text.trim();
     // Fix image paths
-    text = text.replace(/images\//g, 'assets/images/');
+    text = text.replace(/src="images\//g, 'src="assets/images/');
     // Add "tei" and "teiManuscript" to all classlists
     text = text.replace(
       /class=\"([a-z A-Z _ 0-9]{1,140})\"/g,

@@ -92,7 +92,7 @@ export class CollectionTitlePage implements OnDestroy, OnInit {
       return this.collectionContentService.getTitle(id, lang).pipe(
         map((res: any) => {
           if (res?.content) {
-            let text = res.content.replace(/images\//g, 'assets/images/');
+            let text = res.content.replace(/src="images\//g, 'src="assets/images/');
             text = this.parserService.insertSearchMatchTags(text, this.searchMatches);
             return this.sanitizer.bypassSecurityTrustHtml(text);
           } else {

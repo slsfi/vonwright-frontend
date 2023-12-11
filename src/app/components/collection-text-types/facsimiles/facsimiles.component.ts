@@ -162,7 +162,7 @@ export class FacsimilesComponent implements OnInit {
     this.facsURLDefault = config.app.backendBaseURL + '/' + config.app.projectNameDB +
           `/facsimiles/${facs.publication_facsimile_collection_id}/`;
     this.text = this.sanitizer.bypassSecurityTrustHtml(
-      facs.content?.replace(/images\//g, 'assets/images/')
+      facs.content?.replace(/src="images\//g, 'src="assets/images/')
     );
 
     if (extImageNr !== undefined) {
