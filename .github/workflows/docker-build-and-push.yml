@@ -1,0 +1,48 @@
+name: "Build and push docker image"
+
+# run this workflow when a new release/tag is pushed
+on:
+  push:
+    tags:
+      - '*'
+
+  # allow this workflow to be manually triggered from the actions tab (for debugging)
+  workflow_dispatch:
+
+# allow job to read repository and write image/package to ghcr.io
+permissions:
+    contents: read
+    packages: write
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    steps:
+      # check out repository
+      - uses: actions/checkout@v4
+
+      # log in with github token credentials
+      - name: Log in to ghcr.io
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # pull metadata from Github events (so we can use release version number)
+      - name: Pull metadata from Github
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ github.repository }}
+
+      # build image, tagging with the release tag and latest on a release, 
+      # or with "master" if built against master using workflow_dispatch
+      - name: Build and push docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: Dockerfile
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
