@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Base app Docker image repository and tag in `compose.yml`.
+
 ### Fixed
 
 - Remove incomplete regex sanitization of script tags in search query results. The regex sanitization is unnecessary because the query results are anyway parsed as HTML, only text nodes are retained and any `<`, `>` characters are converted to their corresponding HTML entities.

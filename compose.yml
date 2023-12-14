@@ -8,6 +8,6 @@ services:
       - "api.sls.fi:172.16.2.136"
       - "granska-api.sls.fi:172.16.2.136"
       - "testa-vonwright.sls.fi:172.16.2.136"
-    image: docker.io/slsfinland/digital-edition-frontend-ng:latest
+    image: ghcr.io/slsfi/digital-edition-frontend-ng:main
     ports:
       - 2089:4201
