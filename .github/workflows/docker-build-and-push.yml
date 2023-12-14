@@ -1,6 +1,6 @@
 name: "Build and push docker image"
 
-# run this workflow when a new commit or release/tag is pushed
+# run this workflow when a new commit in the "main" branch or release/tag is pushed
 on:
   push:
     branches:

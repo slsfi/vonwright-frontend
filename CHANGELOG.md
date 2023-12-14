@@ -7,13 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- GitHub Actions workflow definition for triggering builds on commit push to `main` branch or new release/tag. ([aa32c39](https://github.com/slsfi/digital-edition-frontend-ng/commit/aa32c3941b335219f5e1d68ebbcb9ba6ece21312), [a5b22e7](https://github.com/slsfi/digital-edition-frontend-ng/commit/a5b22e7ca599b27fcf98e2996a8e40b9de801557), [a7be6c3](https://github.com/slsfi/digital-edition-frontend-ng/commit/a7be6c3b71e059af6192d03303064e6c2d219cf2), [00b19e4](https://github.com/slsfi/digital-edition-frontend-ng/commit/00b19e43a3270d83744f84e700e898df51b81c08))
+
 ### Changed
 
-- Base app Docker image repository and tag in `compose.yml`.
+- Update Angular to 17.0.7. ([90028cf](https://github.com/slsfi/digital-edition-frontend-ng/commit/90028cfae667383603fd8852412ec7448ec6da5a))
+- Update base app Docker image repository and tag in `compose.yml`. ([8bdfc5a](https://github.com/slsfi/digital-edition-frontend-ng/commit/8bdfc5a04b5e138ce12fafb69c7e90730dad73f9))
+- Update README, CHANGELOG and build workflow code comments.
 
 ### Fixed
 
-- Remove incomplete regex sanitization of script tags in search query results. The regex sanitization is unnecessary because the query results are anyway parsed as HTML, only text nodes are retained and any `<`, `>` characters are converted to their corresponding HTML entities.
+- Remove incomplete regex sanitization of script tags in search query results. The regex sanitization is unnecessary because the query results are anyway parsed as HTML, only text nodes are retained and any `<`, `>` characters are converted to their corresponding HTML entities. ([ce54078](https://github.com/slsfi/digital-edition-frontend-ng/commit/ce540787c76c28554b241f140138531cb08ba6d2))
 
 ## [1.0.2] – 2023-12-11
 

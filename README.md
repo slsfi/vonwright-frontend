@@ -101,7 +101,7 @@ Open your browser on http://localhost:4201/. You need to manually run the build 
 
 ## About the SLS Digital Edition Platform
 
-The platform consists of a [Flask-driven REST API][digital_edition_api], a [backend search app][digital_edition_search] run by the Elastic (ELK) Stack, a [template for a backend files repository][digital_edition_required_files_template] and a [database template][digital_edition_db]. There is also a [tool for creating commentaries][digital_edition_commentary] to texts in [TEI-XML][TEI] format.
+The platform consists of an [Angular frontend app][digital-edition-frontend-ng], a [Flask-driven REST API][digital_edition_api], a [backend search app][digital_edition_search] run by the Elastic (ELK) Stack, a [template for a backend files repository][digital_edition_required_files_template] and a [database template][digital_edition_db]. There is also a [tool for creating commentaries][digital_edition_commentary] to texts in [TEI-XML][TEI] format.
 
 
 [angular]: https://angular.io/
