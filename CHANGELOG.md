@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.3] – 2023-12-14
+
 ### Added
 
 - GitHub Actions workflow definition for triggering builds on commit push to `main` branch or new release/tag. ([aa32c39](https://github.com/slsfi/digital-edition-frontend-ng/commit/aa32c3941b335219f5e1d68ebbcb9ba6ece21312), [a5b22e7](https://github.com/slsfi/digital-edition-frontend-ng/commit/a5b22e7ca599b27fcf98e2996a8e40b9de801557), [a7be6c3](https://github.com/slsfi/digital-edition-frontend-ng/commit/a7be6c3b71e059af6192d03303064e6c2d219cf2), [00b19e4](https://github.com/slsfi/digital-edition-frontend-ng/commit/00b19e43a3270d83744f84e700e898df51b81c08))
@@ -15,7 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Update Angular to 17.0.7. ([90028cf](https://github.com/slsfi/digital-edition-frontend-ng/commit/90028cfae667383603fd8852412ec7448ec6da5a))
 - Update base app Docker image repository and tag in `compose.yml`. ([8bdfc5a](https://github.com/slsfi/digital-edition-frontend-ng/commit/8bdfc5a04b5e138ce12fafb69c7e90730dad73f9))
-- Update README, CHANGELOG and build workflow code comments.
+- Update README, CHANGELOG and build workflow code comments. ([35d373d](https://github.com/slsfi/digital-edition-frontend-ng/commit/35d373d67254638574483eae01f7a8a6415bba68))
 
 ### Fixed
 
@@ -51,7 +53,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initial release.
 
-[unreleased]: https://github.com/slsfi/digital-edition-frontend-ng/compare/v1.0.2...HEAD
+[unreleased]: https://github.com/slsfi/digital-edition-frontend-ng/compare/1.0.3...HEAD
+[1.0.3]: https://github.com/slsfi/digital-edition-frontend-ng/compare/v1.0.2...1.0.3
 [1.0.2]: https://github.com/slsfi/digital-edition-frontend-ng/compare/v1.0.1...v1.0.2
 [1.0.1]: https://github.com/slsfi/digital-edition-frontend-ng/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/slsfi/digital-edition-frontend-ng/releases/tag/v1.0.0
