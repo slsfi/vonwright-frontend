@@ -1,8 +1,10 @@
 name: "Build and push docker image"
 
-# run this workflow when a new release/tag is pushed
+# run this workflow when a new commit or release/tag is pushed
 on:
   push:
+    branches:
+      - 'main'
     tags:
       - '*'
 
@@ -38,7 +40,7 @@ jobs:
           images: ghcr.io/${{ github.repository }}
 
       # build image, tagging with the release tag and latest on a release, 
-      # or with "master" if built against master using workflow_dispatch
+      # or with "main" if built against main (commit push) or built using workflow_dispatch
       - name: Build and push docker image
         uses: docker/build-push-action@v5
         with:
