@@ -30,6 +30,7 @@ export class ManuscriptsComponent implements OnInit {
   manuscripts: any[] = [];
   selectedManuscript: any = undefined;
   showNormalizedMs: boolean = false;
+  showNormalizedToggle: boolean = true;
   showOpenLegendButton: boolean = false;
   showTitle: boolean = true;
   text: SafeHtml = '';
@@ -44,6 +45,7 @@ export class ManuscriptsComponent implements OnInit {
     private scrollService: ScrollService,
     public viewOptionsService: ViewOptionsService
   ) {
+    this.showNormalizedToggle = config.component?.manuscripts?.showNormalizedToggle ?? true;
     this.showOpenLegendButton = config.component?.manuscripts?.showOpenLegendButton ?? false;
     this.showTitle = config.component?.manuscripts?.showTitle ?? true;
   }

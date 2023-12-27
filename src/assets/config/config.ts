@@ -328,6 +328,7 @@ export const config: Config = {
     },
     manuscripts: {
       showTitle: true,
+      showNormalizedToggle: true,
       showOpenLegendButton: true
     },
     topMenu: {

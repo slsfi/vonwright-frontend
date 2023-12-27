@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Config option to show or hide the toggle for switching between the normalized and non-normalized version of manuscripts: `config.component.manuscripts.showNormalizedToggle`. The new config option defaults to `true`.
+
 ### Changed
 
 - Update Angular to 17.0.8.
