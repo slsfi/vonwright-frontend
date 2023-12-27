@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 - Update Angular to 17.0.8.
+- Update ng-extract-i18n-merge to 2.9.1.
 
 ## [1.0.3] – 2023-12-14
 
