@@ -57,6 +57,7 @@ export class DownloadTextsModal implements OnDestroy, OnInit {
   publicationData$: Observable<any>;
   publicationTitle: string = '';
   readTextsMode: boolean = false;
+  replaceImageAssetsPaths: boolean = true;
   showLoadingError: boolean = false;
   showMissingTextError: boolean = false;
   showPrintError: boolean = false;
@@ -132,6 +133,8 @@ export class DownloadTextsModal implements OnDestroy, OnInit {
     this.downloadFormatsMs.length && this.downloadFormatsMs.push(
       this.downloadFormatsMs.splice(this.downloadFormatsMs.indexOf('print'), 1)[0]
     );
+
+    this.replaceImageAssetsPaths = config.collections?.replaceImageAssetsPaths ?? true;
   }
 
   ngOnInit(): void {
@@ -423,7 +426,9 @@ export class DownloadTextsModal implements OnDestroy, OnInit {
   }
 
   private getProcessedPrintIntro(text: string): string {
-    text = text.replace(/src="images\//g, 'src="assets/images/');
+    if (this.replaceImageAssetsPaths) {
+      text = text.replace(/src="images\//g, 'src="assets/images/');
+    }
     text = this.fixImagePaths(text);
     return this.constructHtmlForPrint(text, 'intro');
   }

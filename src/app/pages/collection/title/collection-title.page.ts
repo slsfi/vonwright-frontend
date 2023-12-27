@@ -27,6 +27,7 @@ export class CollectionTitlePage implements OnDestroy, OnInit {
   intervalTimerId: number = 0;
   loadContentFromMarkdown: boolean = false;
   mobileMode: boolean = false;
+  replaceImageAssetsPaths: boolean = true;
   searchMatches: string[] = [];
   showURNButton: boolean = false;
   showViewOptionsButton: boolean = true;
@@ -51,6 +52,7 @@ export class CollectionTitlePage implements OnDestroy, OnInit {
     @Inject(LOCALE_ID) private activeLocale: string
   ) {
     this.loadContentFromMarkdown = config.page?.title?.loadContentFromMarkdown ?? false;
+    this.replaceImageAssetsPaths = config.collections?.replaceImageAssetsPaths ?? true;
     this.showURNButton = config.page?.title?.showURNButton ?? false;
     this.showViewOptionsButton = config.page?.title?.showViewOptionsButton ?? true;
   }
@@ -92,7 +94,9 @@ export class CollectionTitlePage implements OnDestroy, OnInit {
       return this.collectionContentService.getTitle(id, lang).pipe(
         map((res: any) => {
           if (res?.content) {
-            let text = res.content.replace(/src="images\//g, 'src="assets/images/');
+            let text = this.replaceImageAssetsPaths
+              ? res.content.replace(/src="images\//g, 'src="assets/images/')
+              : res.content;
             text = this.parserService.insertSearchMatchTags(text, this.searchMatches);
             return this.sanitizer.bypassSecurityTrustHtml(text);
           } else {

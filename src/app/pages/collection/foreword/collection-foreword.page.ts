@@ -24,6 +24,7 @@ export class CollectionForewordPage implements OnDestroy, OnInit {
   collectionID: string = '';
   intervalTimerId: number = 0;
   mobileMode: boolean = false;
+  replaceImageAssetsPaths: boolean = true;
   searchMatches: string[] = [];
   showURNButton: boolean = false;
   showViewOptionsButton: boolean = true;
@@ -46,6 +47,7 @@ export class CollectionForewordPage implements OnDestroy, OnInit {
     private viewOptionsService: ViewOptionsService,
     @Inject(LOCALE_ID) private activeLocale: string
   ) {
+    this.replaceImageAssetsPaths = config.collections?.replaceImageAssetsPaths ?? true;
     this.showURNButton = config.page?.foreword?.showURNButton ?? false;
     this.showViewOptionsButton = config.page?.foreword?.showViewOptionsButton ?? true;
   }
@@ -86,7 +88,9 @@ export class CollectionForewordPage implements OnDestroy, OnInit {
     return this.collectionContentService.getForeword(id, lang).pipe(
       map((res: any) => {
         if (res?.content && res?.content !== 'File not found') {
-          let text = res.content.replace(/src="images\//g, 'src="assets/images/');
+          let text = this.replaceImageAssetsPaths
+            ? res.content.replace(/src="images\//g, 'src="assets/images/')
+            : res.content;
           text = this.parserService.insertSearchMatchTags(text, this.searchMatches);
           return this.sanitizer.bypassSecurityTrustHtml(text);
         } else {

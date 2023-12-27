@@ -39,6 +39,7 @@ export class FacsimilesComponent implements OnInit {
   numberOfImages: number = 0;
   prevX: number = 0;
   prevY: number = 0;
+  replaceImageAssetsPaths: boolean = true;
   selectedFacsimile: any | null = null;
   selectedFacsimileIsExternal: boolean = false;
   showTitle: boolean = true;
@@ -54,6 +55,7 @@ export class FacsimilesComponent implements OnInit {
   ) {
     this.facsSize = config.component?.facsimiles?.imageQuality ?? 1;
     this.facsURLAlternate = config.app?.alternateFacsimileBaseURL ?? '';
+    this.replaceImageAssetsPaths = config.collections?.replaceImageAssetsPaths ?? true;
     this.showTitle = config.component?.facsimiles?.showTitle ?? true;
   }
 
@@ -161,9 +163,10 @@ export class FacsimilesComponent implements OnInit {
     this.numberOfImages = facs.number_of_pages;
     this.facsURLDefault = config.app.backendBaseURL + '/' + config.app.projectNameDB +
           `/facsimiles/${facs.publication_facsimile_collection_id}/`;
-    this.text = this.sanitizer.bypassSecurityTrustHtml(
-      facs.content?.replace(/src="images\//g, 'src="assets/images/')
-    );
+    const facsText = this.replaceImageAssetsPaths
+      ? facs.content?.replace(/src="images\//g, 'src="assets/images/')
+      : facs.content;
+    this.text = this.sanitizer.bypassSecurityTrustHtml(facsText);
 
     if (extImageNr !== undefined) {
       this.facsNumber = extImageNr;

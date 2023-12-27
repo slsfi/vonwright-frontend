@@ -42,6 +42,7 @@ export class CollectionIntroductionPage implements OnInit, OnDestroy {
   intervalTimerId: number = 0;
   mobileMode: boolean = false;
   pos: string | null = null;
+  replaceImageAssetsPaths: boolean = true;
   searchMatches: string[] = [];
   showTextDownloadButton: boolean = false;
   showURNButton: boolean = true;
@@ -92,6 +93,7 @@ export class CollectionIntroductionPage implements OnInit, OnDestroy {
     @Inject(LOCALE_ID) private activeLocale: string
   ) {
     this.hasSeparateIntroToc = config.page?.introduction?.hasSeparateTOC ?? false;
+    this.replaceImageAssetsPaths = config.collections?.replaceImageAssetsPaths ?? true;
     this.showTextDownloadButton = config.page?.introduction?.showTextDownloadButton ?? false;
     this.showURNButton = config.page?.introduction?.showURNButton ?? true;
     this.showViewOptionsButton = config.page?.introduction?.showViewOptionsButton ?? true;
@@ -190,8 +192,10 @@ export class CollectionIntroductionPage implements OnInit, OnDestroy {
       next: (res: any) => {
         if (res?.content) {
           this.textLoading = false;
-          // Fix paths for images and file extensions for icons
-          let textContent = res.content.replace(/src="images\//g, 'src="assets/images/');
+          // Fix paths for images
+          let textContent = this.replaceImageAssetsPaths
+            ? res.content.replace(/src="images\//g, 'src="assets/images/')
+            : res.content;
 
           // TODO: this manipulation of the introductions TOC should maybe be done using htmlparser2,
           // TODO: on the other hand using regex doesn't rely on an external dependency ...

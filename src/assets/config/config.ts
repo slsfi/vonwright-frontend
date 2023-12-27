@@ -34,6 +34,7 @@ export const config: Config = {
   },
   collections: {
     addTEIClassNames: true,
+    replaceImageAssetsPaths: true,
     enableLegacyIDs: true,
     enableMathJax: false,
     firstTextItem: {

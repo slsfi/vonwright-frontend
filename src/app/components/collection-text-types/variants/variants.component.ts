@@ -103,22 +103,10 @@ export class VariantsComponent implements OnInit {
       this.emitOutputValues(this.selectedVariant);
     }
     if (this.selectedVariant) {
-      let text = this.postprocessVariantText(this.selectedVariant.content);
+      let text = this.parserService.postprocessVariantText(this.selectedVariant.content);
       text = this.parserService.insertSearchMatchTags(text, this.searchMatches);
       this.text = this.sanitizer.bypassSecurityTrustHtml(text);
     }
-  }
-
-  postprocessVariantText(text: string) {
-    text = text.trim();
-    // Fix image paths
-    text = text.replace(/src="images\//g, 'src="assets/images/');
-    // Add "tei" and "teiVariant" to all classlists
-    text = text.replace(
-      /class=\"([a-z A-Z _ 0-9]{1,140})\"/g,
-      'class=\"teiVariant tei $1\"'
-    );
-    return text;
   }
 
   async selectVariant(event: any) {
