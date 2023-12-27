@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Config option to show or hide the toggle for switching between the normalized and non-normalized version of manuscripts: `config.component.manuscripts.showNormalizedToggle`. The new config option defaults to `true`.
+- Config option to add mandatory TEI class names to collection text HTML loaded from the backend: `config.collections.addTEIClassNames`. The new config option defaults to `true`, which corresponds to the old behaviour. If set to `false`, the class attributes of all HTML elements in reading texts and manuscripts fetched from the backend, must contain the value `tei`. In addition, elements in manuscripts also must contain the class name `teiManuscript`. Otherwise, some inherent functionality and styles won’t work anymore for these texts. Setting the new config option to `false` improves app performance.
 
 ### Changed
 

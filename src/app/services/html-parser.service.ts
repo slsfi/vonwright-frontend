@@ -13,6 +13,7 @@ import { CollectionContentService } from '@services/collection-content.service';
   providedIn: 'root',
 })
 export class HtmlParserService {
+  private addTEIClassNames: boolean = true;
   private apiURL: string = '';
   private mediaCollectionMappings: any = {};
 
@@ -23,6 +24,7 @@ export class HtmlParserService {
     const projectName = config.app?.projectNameDB ?? '';
     this.apiURL = apiBaseURL + '/' + projectName;
     this.mediaCollectionMappings = config.collections?.mediaCollectionMappings ?? {};
+    this.addTEIClassNames = config.collections?.addTEIClassNames ?? true;
   }
 
   postprocessReadingText(text: string, collectionId: string) {
@@ -31,11 +33,13 @@ export class HtmlParserService {
     text = text.replace(/src="images\//g, 'src="assets/images/');
     // Map illustration image paths to backend media paths
     text = this.mapIllustrationImagePaths(text, collectionId);
-    // Add "tei" class to all classlists
-    text = text.replace(
-      /class="([a-z A-Z _ 0-9]{1,140})"/g,
-      'class="tei $1"'
-    );
+    // Add "tei" class to all classlists if config option for this enabled
+    if (this.addTEIClassNames) {
+      text = text.replace(
+        /class="([a-z A-Z _ 0-9]{1,140})"/g,
+        'class="tei $1"'
+      );
+    }
     return text;
   }
 
@@ -43,11 +47,13 @@ export class HtmlParserService {
     text = text.trim();
     // Fix image paths
     text = text.replace(/src="images\//g, 'src="assets/images/');
-    // Add "tei" and "teiManuscript" to all classlists
-    text = text.replace(
-      /class=\"([a-z A-Z _ 0-9]{1,140})\"/g,
-      'class=\"teiManuscript tei $1\"'
-    );
+    // Add "tei" and "teiManuscript" to all classlists if config option for this enabled
+    if (this.addTEIClassNames) {
+      text = text.replace(
+        /class=\"([a-z A-Z _ 0-9]{1,140})\"/g,
+        'class=\"teiManuscript tei $1\"'
+      );
+    }
     return text;
   }
 

@@ -33,6 +33,7 @@ export const config: Config = {
     }
   },
   collections: {
+    addTEIClassNames: true,
     enableLegacyIDs: true,
     enableMathJax: false,
     firstTextItem: {
