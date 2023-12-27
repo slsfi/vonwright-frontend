@@ -90,7 +90,15 @@ export class ContentGridComponent implements OnInit {
                   ...collection,
                   imageAltText: coverRes.content.match(/!\[(.*?)\]\(.*?\)/)[1] || undefined,
                   imageURL: coverRes.content.match(/!\[.*?\]\((.*?)\)/)[1] || undefined
-                }))
+                })),
+                catchError((error: any) => {
+                  // error getting collection cover URL, so add collection with placeholder cover image
+                  return of({
+                    ...collection,
+                    imageAltText: 'Collection cover image',
+                    imageURL: 'assets/images/collection-cover-placeholder.jpg'
+                  });
+                })
               ),
           ),
           map((collection: any) => {
