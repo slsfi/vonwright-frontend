@@ -9,6 +9,7 @@ import { config } from '@config';
   providedIn: 'root',
 })
 export class CommentService {
+  private addTEIClassNames: boolean = true;
   private apiURL: string = '';
   private cachedCollectionComments: Record<string, any> = {};
   private replaceImageAssetsPaths: boolean = true;
@@ -19,6 +20,7 @@ export class CommentService {
     const apiBaseURL = config.app?.backendBaseURL ?? '';
     const projectName = config.app?.projectNameDB ?? '';
     this.apiURL = apiBaseURL + '/' + projectName;
+    this.addTEIClassNames = config.collections?.addTEIClassNames ?? true;
     this.replaceImageAssetsPaths = config.collections?.replaceImageAssetsPaths ?? true;
   }
 
@@ -130,11 +132,13 @@ export class CommentService {
     if (this.replaceImageAssetsPaths) {
       text = text.replace(/src="images\//g, 'src="assets/images/');
     }
-    // Add "teiComment" to all classlists
-    text = text.replace(
-      /class=\"([a-z A-Z _ 0-9]{1,140})\"/g,
-      'class=\"teiComment $1\"'
-    );
+    // Add "teiComment" to all classlists if config option for this enabled
+    if (this.addTEIClassNames) {
+      text = text.replace(
+        /class=\"([a-z A-Z _ 0-9]{1,140})\"/g,
+        'class=\"teiComment $1\"'
+      );
+    }
     
     // text = text.replace(/(teiComment teiComment )/g, 'teiComment ');
     // text = text.replace(/&lt;/g, '<').replace(/&gt;/g, '>');

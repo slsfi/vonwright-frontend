@@ -63,11 +63,13 @@ export class HtmlParserService {
     text = text.trim();
     // Fix image paths if config option for this enabled
     text = this.fixImageAssetsPaths(text);
-    // Add "tei" and "teiVariant" to all classlists
-    text = text.replace(
-      /class=\"([a-z A-Z _ 0-9]{1,140})\"/g,
-      'class=\"teiVariant tei $1\"'
-    );
+    // Add "tei" and "teiVariant" to all classlists if config option for this enabled
+    if (this.addTEIClassNames) {
+      text = text.replace(
+        /class=\"([a-z A-Z _ 0-9]{1,140})\"/g,
+        'class=\"teiVariant tei $1\"'
+      );
+    }
     return text;
   }
 
