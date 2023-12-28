@@ -23,6 +23,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Show placeholder image for collections in the content grid on the content and home page if unable to retrieve collection cover image URL from the backend. Previously a missing cover image URL disrupted loading of all collections in the grid.
 
+### Removed
+
+- Trimming of collection texts fetched from backend.
+
 ## [1.0.3] – 2023-12-14
 
 ### Added

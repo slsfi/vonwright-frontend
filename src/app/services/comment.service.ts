@@ -46,8 +46,7 @@ export class CommentService {
       return this.http.get(endpoint).pipe(
         map((body: any) => {
           if (body?.content) {
-            body = body.content.trim();
-            body = this.postprocessCommentsText(body);
+            body = this.postprocessCommentsText(body.content);
             this.clearCachedCollectionComments();
             this.cachedCollectionComments[textItemID] = body;
           }

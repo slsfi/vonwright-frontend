@@ -30,7 +30,6 @@ export class HtmlParserService {
   }
 
   postprocessReadingText(text: string, collectionId: string): string {
-    text = text.trim();
     // Fix image paths if config option for this enabled
     text = this.fixImageAssetsPaths(text);
     // Map illustration image paths to backend media paths
@@ -46,7 +45,6 @@ export class HtmlParserService {
   }
 
   postprocessManuscriptText(text: string): string {
-    text = text.trim();
     // Fix image paths if config option for this enabled
     text = this.fixImageAssetsPaths(text);
     // Add "tei" and "teiManuscript" to all classlists if config option for this enabled
@@ -60,7 +58,6 @@ export class HtmlParserService {
   }
 
   postprocessVariantText(text: string): string {
-    text = text.trim();
     // Fix image paths if config option for this enabled
     text = this.fixImageAssetsPaths(text);
     // Add "tei" and "teiVariant" to all classlists if config option for this enabled
