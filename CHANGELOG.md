@@ -7,25 +7,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.0] – 2023-12-28
+
 ### Added
 
-- Config option to show or hide the toggle for switching between the normalized and non-normalized version of manuscripts: `config.component.manuscripts.showNormalizedToggle`. The new config option defaults to `true`, which corresponds to the old behaviour.
-- Config option to add mandatory TEI class names to collection text HTML loaded from the backend: `config.collections.addTEIClassNames`. The new config option defaults to `true`, which corresponds to the old behaviour. If set to `false`, the class attributes of all HTML elements in reading texts, manuscripts and variants fetched from the backend, must contain the value `tei`. In addition, elements in comments must contain the class name `teiComment`, elements in manuscripts the class name `teiManuscript`, and elements in variants `teiVariant`. Otherwise, some inherent functionality and styles won’t work anymore for these texts. Setting the new config option to `false` improves app performance.
-- Config option to fix paths to the `assets/images/` folder in collection texts: `config.collections.replaceImageAssetsPaths`. The new config option defaults to `true`, which corresponds to the old behaviour. When this option is `true`, `src` attribute values starting with `images/` in the HTML of collection texts are replaced with `assets/images/`, which is the correct path to the image assets folder. Setting the new config option to `false` improves app performance.
+- Config option to show or hide the toggle for switching between the normalized and non-normalized version of manuscripts: `config.component.manuscripts.showNormalizedToggle`. The new config option defaults to `true`, which corresponds to the old behaviour. ([930eec2](https://github.com/slsfi/digital-edition-frontend-ng/commit/930eec227765d662726e2f9124d9763766fe73e2))
+- Config option to add mandatory TEI class names to collection text HTML loaded from the backend: `config.collections.addTEIClassNames`. The new config option defaults to `true`, which corresponds to the old behaviour. If set to `false`, the class attributes of all HTML elements in reading texts, manuscripts and variants fetched from the backend, must contain the value `tei`. In addition, elements in comments must contain the class name `teiComment`, elements in manuscripts the class name `teiManuscript`, and elements in variants `teiVariant`. Otherwise, some inherent functionality and styles won’t work anymore for these texts. Setting the new config option to `false` improves app performance. ([df6554d](https://github.com/slsfi/digital-edition-frontend-ng/commit/df6554d6a7105b64dd109b308dc9c7ed82c274e5), [b8984f8](https://github.com/slsfi/digital-edition-frontend-ng/commit/b8984f8b7abf85f0c05438c4d2232776464538db))
+- Config option to fix paths to the `assets/images/` folder in collection texts: `config.collections.replaceImageAssetsPaths`. The new config option defaults to `true`, which corresponds to the old behaviour. When this option is `true`, `src` attribute values starting with `images/` in the HTML of collection texts are replaced with `assets/images/`, which is the correct path to the image assets folder. Setting the new config option to `false` improves app performance. ([1f9d7ed](https://github.com/slsfi/digital-edition-frontend-ng/commit/1f9d7ed89135001dfececdea586f567d5c1388af))
 
 ### Changed
 
-- Update Angular to 17.0.8.
-- Update ng-extract-i18n-merge to 2.9.1.
-- Eagerly load home page banner image in portrait mode.
+- Update Angular to 17.0.8. ([e936d0b](https://github.com/slsfi/digital-edition-frontend-ng/commit/e936d0b097877cca2d61ff93ddee53b14583672b))
+- Update ng-extract-i18n-merge to 2.9.1. ([98e567b](https://github.com/slsfi/digital-edition-frontend-ng/commit/98e567b691d0e7c2550e2bbe5bc6015859e4798f))
+- Eagerly load home page banner image in portrait mode. ([5d11e3c](https://github.com/slsfi/digital-edition-frontend-ng/commit/5d11e3cce6b57335e8c6ae8816f5bd38aefa414f))
 
 ### Fixed
 
-- Show placeholder image for collections in the content grid on the content and home page if unable to retrieve collection cover image URL from the backend. Previously a missing cover image URL disrupted loading of all collections in the grid.
+- Show placeholder image for collections in the content grid on the content and home page if unable to retrieve collection cover image URL from the backend. Previously a missing cover image URL disrupted loading of all collections in the grid. ([3f3b256](https://github.com/slsfi/digital-edition-frontend-ng/commit/3f3b256d1926a982ff81fd704f1e36cd445182e4))
 
 ### Removed
 
-- Trimming of collection texts fetched from backend.
+- Trimming of collection texts fetched from backend. ([990a08c](https://github.com/slsfi/digital-edition-frontend-ng/commit/990a08c54b1207bcd3e290c3307d2d480901b8fe))
 
 ## [1.0.3] – 2023-12-14
 
@@ -73,7 +75,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initial release.
 
-[unreleased]: https://github.com/slsfi/digital-edition-frontend-ng/compare/1.0.3...HEAD
+[unreleased]: https://github.com/slsfi/digital-edition-frontend-ng/compare/1.1.0...HEAD
+[1.1.0]: https://github.com/slsfi/digital-edition-frontend-ng/compare/1.0.3...1.1.0
 [1.0.3]: https://github.com/slsfi/digital-edition-frontend-ng/compare/v1.0.2...1.0.3
 [1.0.2]: https://github.com/slsfi/digital-edition-frontend-ng/compare/v1.0.1...v1.0.2
 [1.0.1]: https://github.com/slsfi/digital-edition-frontend-ng/compare/v1.0.0...v1.0.1
