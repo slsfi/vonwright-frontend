@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Paths to font files in @font-face rules from absolute to relative.
+- Update Ionic to 7.6.3 and Ionicons to 7.2.2.
 
 ## [1.1.0] – 2023-12-28
 
