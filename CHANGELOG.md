@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+Added
+
+- nginx web server to serve static files in front of Node. This improves performance under load since 1) nginx is more performant than Node’s Express-server, 2) nginx’s performance is not impacted by Node being busy with server-side rendering tasks for dynamic content.
+
+
 ## [1.1.0] – 2023-12-28
 
 ### Added
