@@ -11,7 +11,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 ### Changed
 
 - Default site logo in top menu changed to optimized PNG image file. Added both black and white versions of SLS’s logo to `assets/images/logo/`.
-
+- Update Angular Dev-kit, CLI and SSR to 17.0.9.
 
 
 ## [1.1.1] – 2024-01-09
