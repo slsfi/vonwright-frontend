@@ -8,6 +8,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ## [Unreleased]
 
+### Changed
+
+- Default site logo in top menu changed to optimized PNG image file. Added both black and white versions of SLS’s logo to `assets/images/logo/`.
+
 
 
 ## [1.1.1] – 2024-01-09

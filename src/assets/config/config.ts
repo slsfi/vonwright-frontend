@@ -340,8 +340,8 @@ export const config: Config = {
       showURNButton: false,
       showLanguageButton: true,
       showSiteLogo: true,
-      siteLogoDefaultImageURL: "assets/images/logo.svg",
-      siteLogoMobileImageURL: "assets/images/logo-mobile.svg",
+      siteLogoDefaultImageURL: "assets/images/logo/SLS_logo_full_white_346x112.png",
+      siteLogoMobileImageURL: "assets/images/logo/SLS_logo_symbol_white_112x112.png",
       siteLogoLinkURL: "https://www.sls.fi/"
     },
     variants: {

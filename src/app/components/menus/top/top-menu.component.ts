@@ -35,9 +35,9 @@ export class TopMenuComponent implements OnDestroy, OnInit {
   showTopContentButton: boolean = true;
   showTopSearchButton: boolean = true;
   showTopURNButton: boolean = true;
-  siteLogoDefaultImageUrl: string = 'assets/images/logo.svg';
+  siteLogoDefaultImageUrl: string = 'assets/images/logo/SLS_logo_full_white_346x112.png';
   siteLogoLinkUrl: string = 'https://www.sls.fi/';
-  siteLogoMobileImageUrl: string = 'assets/images/logo-mobile.svg';
+  siteLogoMobileImageUrl: string = 'assets/images/logo/SLS_logo_symbol_white_112x112.png';
   _window: Window;
 
   constructor(
@@ -56,8 +56,8 @@ export class TopMenuComponent implements OnDestroy, OnInit {
     this.showSiteLogo = config.component?.topMenu?.showSiteLogo ?? false;
 
     this.siteLogoLinkUrl = config.component?.topMenu?.siteLogoLinkURL ?? 'https://www.sls.fi/';
-    this.siteLogoDefaultImageUrl = config.component?.topMenu?.siteLogoDefaultImageURL ?? 'assets/images/logo.svg';
-    this.siteLogoMobileImageUrl = config.component?.topMenu?.siteLogoMobileImageURL ?? 'assets/images/logo-mobile.svg';
+    this.siteLogoDefaultImageUrl = config.component?.topMenu?.siteLogoDefaultImageURL ?? 'assets/images/logo/SLS_logo_full_white_346x112.png';
+    this.siteLogoMobileImageUrl = config.component?.topMenu?.siteLogoMobileImageURL ?? 'assets/images/logo/SLS_logo_symbol_white_112x112.png';
 
     if (!this.siteLogoMobileImageUrl && this.siteLogoDefaultImageUrl) {
       this.siteLogoMobileImageUrl = this.siteLogoDefaultImageUrl;
