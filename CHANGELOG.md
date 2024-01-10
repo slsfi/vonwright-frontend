@@ -8,9 +8,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ## [Unreleased]
 
+
+
+## [1.2.0] – 2024-01-10
+
 ### Added
 
-- Config option to specify the dimensions of the site logo in the top menu: `config.component.topMenu.siteLogoDimensions`. The new config option is an object containing nested objects for specifying the height and width of the logo in both desktop and mobile mode. If the option is omitted, it defaults to an empty object, which corresponds to the old behaviour where the height and width attributes of the HTMLImageElement of the logo are not set. Setting the dimensions reduces layout shifts during page loading. Structure of the `siteLogoDimensions` with example values:
+- Config option to specify the dimensions of the site logo in the top menu: `config.component.topMenu.siteLogoDimensions` ([7402e28](https://github.com/slsfi/digital-edition-frontend-ng/commit/7402e280cae7c3f6472f7ca7c2a8e57f0795afa1)). The new config option is an object containing nested objects for specifying the height and width of the logo in both desktop and mobile mode. If the option is omitted, it defaults to an empty object, which corresponds to the old behaviour where the height and width attributes of the HTMLImageElement of the logo are not set. Setting the dimensions reduces layout shifts during page loading. Structure of the `siteLogoDimensions` with example values:
 
 ```
 siteLogoDimensions: {
@@ -25,13 +29,13 @@ siteLogoDimensions: {
 }
 ```
 
-- Documentation on updating, building and deployment, as well as development.
+- Documentation on updating, building and deployment, as well as development. ([c329aa8](https://github.com/slsfi/digital-edition-frontend-ng/commit/c329aa8c0eaf357d948cb6ca75b9685b2e4f2134))
 
 ### Changed
 
-- Default site logo in top menu changed to optimized PNG image file. Added both black and white versions of SLS’s logo to `assets/images/logo/`.
-- Update Angular Dev-kit, CLI and SSR to 17.0.9.
-- Update dev-dependency follow-redirects to 1.15.4.
+- Default site logo in top menu changed to optimized PNG image file. Added both black and white versions of SLS’s logo to `assets/images/logo/`. ([9df4bef](https://github.com/slsfi/digital-edition-frontend-ng/commit/9df4bef940ddd66c6087daa93bee9fd166b4e731))
+- Update Angular dev-kit, CLI and SSR to 17.0.9. ([c67b22e](https://github.com/slsfi/digital-edition-frontend-ng/commit/c67b22e89fd459b850c523d679f1653ea5e2eaeb))
+- Update dev-dependency follow-redirects to 1.15.4. ([30355ea](https://github.com/slsfi/digital-edition-frontend-ng/commit/30355ea87e03c68c31df87ed34bb85cadd9e1f35))
 
 
 
@@ -126,7 +130,8 @@ siteLogoDimensions: {
 
 
 
-[unreleased]: https://github.com/slsfi/digital-edition-frontend-ng/compare/1.1.1...HEAD
+[unreleased]: https://github.com/slsfi/digital-edition-frontend-ng/compare/1.2.0...HEAD
+[1.2.0]: https://github.com/slsfi/digital-edition-frontend-ng/compare/1.1.1...1.2.0
 [1.1.1]: https://github.com/slsfi/digital-edition-frontend-ng/compare/1.1.0...1.1.1
 [1.1.0]: https://github.com/slsfi/digital-edition-frontend-ng/compare/1.0.3...1.1.0
 [1.0.3]: https://github.com/slsfi/digital-edition-frontend-ng/compare/v1.0.2...1.0.3
