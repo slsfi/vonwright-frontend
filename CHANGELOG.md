@@ -8,6 +8,23 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ## [Unreleased]
 
+### Added
+
+- Config option to specify the dimensions of the site logo in the top menu: `config.component.topMenu.siteLogoDimensions`. The new config option is an object containing nested objects for specifying the height and width of the logo in both desktop and mobile mode. If the option is omitted, it defaults to an empty object, which corresponds to the old behaviour where the height and width attributes of the HTMLImageElement of the logo are not set. Setting the dimensions reduces layout shifts during page loading. Structure of the `siteLogoDimensions` with example values:
+
+```
+siteLogoDimensions: {
+  default: {
+    height: 56,
+    width: 173
+  },
+  mobile: {
+    height: 56,
+    width: 56
+  }
+}
+```
+
 ### Changed
 
 - Default site logo in top menu changed to optimized PNG image file. Added both black and white versions of SLS’s logo to `assets/images/logo/`.

@@ -38,6 +38,7 @@ export class TopMenuComponent implements OnDestroy, OnInit {
   siteLogoDefaultImageUrl: string = 'assets/images/logo/SLS_logo_full_white_346x112.png';
   siteLogoLinkUrl: string = 'https://www.sls.fi/';
   siteLogoMobileImageUrl: string = 'assets/images/logo/SLS_logo_symbol_white_112x112.png';
+  siteLogoDimensions: any = {};
   _window: Window;
 
   constructor(
@@ -58,6 +59,7 @@ export class TopMenuComponent implements OnDestroy, OnInit {
     this.siteLogoLinkUrl = config.component?.topMenu?.siteLogoLinkURL ?? 'https://www.sls.fi/';
     this.siteLogoDefaultImageUrl = config.component?.topMenu?.siteLogoDefaultImageURL ?? 'assets/images/logo/SLS_logo_full_white_346x112.png';
     this.siteLogoMobileImageUrl = config.component?.topMenu?.siteLogoMobileImageURL ?? 'assets/images/logo/SLS_logo_symbol_white_112x112.png';
+    this.siteLogoDimensions = config.component?.topMenu?.siteLogoDimensions ?? {};
 
     if (!this.siteLogoMobileImageUrl && this.siteLogoDefaultImageUrl) {
       this.siteLogoMobileImageUrl = this.siteLogoDefaultImageUrl;

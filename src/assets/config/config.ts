@@ -342,7 +342,17 @@ export const config: Config = {
       showSiteLogo: true,
       siteLogoDefaultImageURL: "assets/images/logo/SLS_logo_full_white_346x112.png",
       siteLogoMobileImageURL: "assets/images/logo/SLS_logo_symbol_white_112x112.png",
-      siteLogoLinkURL: "https://www.sls.fi/"
+      siteLogoLinkURL: "https://www.sls.fi/",
+      siteLogoDimensions: {
+        default: {
+          height: 56,
+          width: 173
+        },
+        mobile: {
+          height: 56,
+          width: 56
+        }
+      }
     },
     variants: {
       showOpenLegendButton: true

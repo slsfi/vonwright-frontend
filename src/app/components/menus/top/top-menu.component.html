@@ -67,8 +67,22 @@
   </li>
   <li *ngIf="showSiteLogo" class="site-logo" role="menuitem">
     <a href="{{siteLogoLinkUrl}}">
-      <img *ngIf="siteLogoDefaultImageUrl" class="default-logo" alt="Logo" i18n-alt="@@TopMenu.LogoAltText" src="{{siteLogoDefaultImageUrl}}" loading="lazy">
-      <img *ngIf="siteLogoMobileImageUrl" class="mobile-logo" alt="Logo" i18n-alt="@@TopMenu.LogoAltText" src="{{siteLogoMobileImageUrl}}" loading="lazy">
+      <img *ngIf="siteLogoDefaultImageUrl"
+            class="default-logo"
+            alt="Logo"
+            i18n-alt="@@TopMenu.LogoAltText"
+            [attr.height]="siteLogoDimensions?.default?.height ? siteLogoDimensions.default.height : null"
+            [attr.width]="siteLogoDimensions?.default?.width ? siteLogoDimensions.default.width : null"
+            [src]="siteLogoDefaultImageUrl"
+      >
+      <img *ngIf="siteLogoMobileImageUrl"
+            class="mobile-logo"
+            alt="Logo"
+            i18n-alt="@@TopMenu.LogoAltText"
+            [attr.height]="siteLogoDimensions?.mobile?.height ? siteLogoDimensions.mobile.height : null"
+            [attr.width]="siteLogoDimensions?.mobile?.width ? siteLogoDimensions.mobile.width : null"
+            [src]="siteLogoMobileImageUrl"
+      >
     </a>
   </li>
 </ul>
