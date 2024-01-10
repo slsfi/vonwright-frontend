@@ -12,8 +12,13 @@ WORKDIR /digital-edition-frontend-ng
 
 # 2. Create intermediate build image, starting from base image.
 FROM base AS build
-# notify docker that static browser content will be a volume, so it can be used by nginx
-# the volume should automatically be populated with the correct files from the image on first docker compose up
+# Notify Docker that static browser content will be a volume,
+# so it can be used by nginx. The volume should automatically
+# be populated with the correct files from the image on first
+# docker compose up. On recreating the container 
+# docker compose down --volumes needs to be run before
+# running docker compose up since volumes are persistent and
+# won't be replaced when images are updated.
 VOLUME [ "/digital-edition-frontend-ng/dist/app/browser" ]
 # Copy all files from the source folder to the
 # workdir in the container filesystem.

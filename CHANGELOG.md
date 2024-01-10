@@ -25,6 +25,8 @@ siteLogoDimensions: {
 }
 ```
 
+- Documentation on updating, building and deployment, as well as development.
+
 ### Changed
 
 - Default site logo in top menu changed to optimized PNG image file. Added both black and white versions of SLS’s logo to `assets/images/logo/`.

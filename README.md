@@ -7,6 +7,7 @@ Internationalization and server-side rendering are supported out of the box, mea
 Examples of digital editions employing this frontend app include:
 
 - [Zacharias Topelius Skrifter][topelius]
+- [Historiska recept][historiskarecept]
 - [Leo Mechelin – Pro lege][mechelin]
 
 The app is built on [Angular][angular] and uses [Ionic][ionic] web components.
@@ -39,6 +40,12 @@ The `base` branch of the forked repository must **never** be manually modified. 
 This workflow enables updates to the app in the original, upstream repository to be easily distributed to forked project repositories.
 
 By default, the app has Swedish and Finnish language versions enabled. See the documentation (forthcoming) on how to configure internationalization, customize your app, build it for production and deploy it.
+
+
+## Documentation
+
+- [Updating, building and deployment](docs/DEPLOYMENT.md).
+- [Development notes](docs/DEVELOPMENT.md).
 
 
 ## Development Setup
@@ -118,6 +125,7 @@ The platform consists of an [Angular frontend app][digital-edition-frontend-ng],
 [git_bash]: https://gitforwindows.org/
 [gith_bash_tutorial]: https://www.atlassian.com/git/tutorials/git-bash
 [github_desktop]: https://desktop.github.com/
+[historiskarecept]: https://historiskarecept.sls.fi/
 [ionic]: https://ionicframework.com/
 [mechelin]: https://leomechelin.fi/
 [node.js]: https://nodejs.org/
