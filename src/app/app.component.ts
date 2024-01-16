@@ -13,7 +13,7 @@ import { isBrowser } from '@utility-functions';
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
 })
-export class DigitalEditionApp implements OnDestroy, OnInit {
+export class AppComponent implements OnDestroy, OnInit {
   appIsStarting: boolean = true;
   collectionID: string = '';
   collectionSideMenuInitialUrlSegments: UrlSegment[];

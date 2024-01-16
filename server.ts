@@ -10,7 +10,7 @@ import * as express from 'express';
 import { existsSync } from 'fs';
 import { join } from 'path';
 
-import { AppServerModule } from './src/main.server';
+import AppServerModule from './src/main.server';
 import { environment } from './src/environments/environment';
 
 // The Express app is exported so that it can be used by serverless Functions.
