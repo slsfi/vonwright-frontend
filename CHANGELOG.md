@@ -8,13 +8,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ## [Unreleased]
 
+
+
+## [1.2.1] – 2024-01-16
+
 ### Added
 
-- Compression of static files. During the build step, static files of type `html`, `xml`, `txt`, `css`, `js`, `svg`, `ico`, `json`, `ttf` and `otf` in `dist/app/browser/` are precompressed using gzip. Files smaller than 1300 B are not compressed. If there is a compressed version of a static file, nginx is configured to serve it instead of the uncompressed file. The necessary directives for compressing dynamically generated HTML on-the-fly have also been added to the nginx configuration ([`nginx.conf`](/nginx.conf)), however, the directives have been commented out because of the increased server CPU load associated with on-the-fly compression. Each project can choose to enable the directives as they see fit.
+- Compression of static files. During the build step, static files of type `html`, `xml`, `txt`, `css`, `js`, `svg`, `ico`, `json`, `ttf` and `otf` in `dist/app/browser/` are precompressed using gzip. Files smaller than 1300 B are not compressed. If there is a compressed version of a static file, nginx is configured to serve it instead of the uncompressed file. The necessary directives for compressing dynamically generated HTML on-the-fly have also been added to the nginx configuration ([`nginx.conf`](/nginx.conf)), however, the directives have been commented out because of the increased server CPU load associated with on-the-fly compression. Each project can choose to enable the directives as they see fit. ([667b535](https://github.com/slsfi/digital-edition-frontend-ng/commit/667b535290b161648641d1c15c449bef01a1b9a8))
 
 ### Fixed
 
-- Legacy setup code from Angular 15 to 17 migration. Angular 17 introduced several changes to the `app.module.\*`, `main.server.ts`, `main.ts`, `server.ts` and `tsconfig.\*` files. During the original v15 -> v17 update of the app all of these changes were not implemented. This fix attempts to align the app with the setup of a new modules based Angular 17 app that has SSR and i18n enabled.
+- Legacy setup code from Angular 15 to 17 migration. Angular 17 introduced several changes to the `app.module.\*`, `main.server.ts`, `main.ts`, `server.ts` and `tsconfig.\*` files. During the original v15 -> v17 update of the app all of these changes were not implemented. This fix attempts to align the app with the setup of a new modules based Angular 17 app that has SSR and i18n enabled. ([2b7c94d](https://github.com/slsfi/digital-edition-frontend-ng/commit/2b7c94d368adc51de871322ea1e4dcb3df74f5fd))
 
 
 
@@ -138,7 +142,8 @@ siteLogoDimensions: {
 
 
 
-[unreleased]: https://github.com/slsfi/digital-edition-frontend-ng/compare/1.2.0...HEAD
+[unreleased]: https://github.com/slsfi/digital-edition-frontend-ng/compare/1.2.1...HEAD
+[1.2.1]: https://github.com/slsfi/digital-edition-frontend-ng/compare/1.2.0...1.2.1
 [1.2.0]: https://github.com/slsfi/digital-edition-frontend-ng/compare/1.1.1...1.2.0
 [1.1.1]: https://github.com/slsfi/digital-edition-frontend-ng/compare/1.1.0...1.1.1
 [1.1.0]: https://github.com/slsfi/digital-edition-frontend-ng/compare/1.0.3...1.1.0
