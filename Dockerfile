@@ -31,6 +31,8 @@ RUN npm install
 RUN npm run generate-sitemap
 # Build the Angular SSR app.
 RUN npm run build:ssr
+# Create precompressed versions of static files (dist/app/browser/).
+RUN npm run compress
 
 
 # 3. Create final image, starting from base image.
