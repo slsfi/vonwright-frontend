@@ -8,6 +8,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ## [Unreleased]
 
+### Changed
+
+- Fix indentation in [`nginx.conf`](/nginx.conf).
+
 
 
 ## [1.2.1] – 2024-01-16
