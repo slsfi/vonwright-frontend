@@ -12,7 +12,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 - Fix indentation in [`nginx.conf`](/nginx.conf).
 - Use `ARG` instructions in [`Dockerfile`](/Dockerfile) to define variables for setting Angular major version and Node image tag of the base image. This makes updating `Dockerfile` clearer as the Angular major version has to be changed in the file when the Angular major version of the app is updated.
-
+- Update Angular to 17.1.0.
 
 
 ## [1.2.1] – 2024-01-16
