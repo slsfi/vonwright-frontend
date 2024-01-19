@@ -2,16 +2,25 @@
 # only necessary build artifacts and resources are
 # included in the final image.
 
+# Define Angular major version used by the app, used to install
+# corresponding Angular CLI globally.
+ARG ANGULAR_MAJOR_VERSION=17
+
+# Define tag of official Node image to be used as the base image,
+# https://hub.docker.com/_/node/.
+ARG NODE_IMAGE_TAG=20-alpine
+
 
 # 1. Create base image from official Node image.
-#    https://hub.docker.com/_/node/
-FROM node:20-alpine AS base
+FROM node:${NODE_IMAGE_TAG} AS base
 # Change working directory.
 WORKDIR /digital-edition-frontend-ng
 
 
 # 2. Create intermediate build image, starting from base image.
 FROM base AS build
+# Redeclare ARG-variable to make it available in this stage.
+ARG ANGULAR_MAJOR_VERSION
 # Notify Docker that static browser content will be a volume,
 # so it can be used by nginx. The volume should automatically
 # be populated with the correct files from the image on first
@@ -24,7 +33,7 @@ VOLUME [ "/digital-edition-frontend-ng/dist/app/browser" ]
 # workdir in the container filesystem.
 COPY . .
 # Install the Angular CLI globally.
-RUN npm install -g @angular/cli@17
+RUN npm install -g @angular/cli@${ANGULAR_MAJOR_VERSION}
 # Install app dependencies.
 RUN npm install
 # Run script that generates sitemap.txt.
