@@ -1,7 +1,6 @@
 import { Component, Inject, LOCALE_ID, OnInit } from '@angular/core';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { catchError, map, Observable, of } from 'rxjs';
-import { marked } from 'marked';
 
 import { MarkdownContentService } from '@services/markdown-content.service';
 
@@ -27,7 +26,9 @@ export class PageNotFoundPage implements OnInit {
   private getMdContent(fileID: string): Observable<SafeHtml> {
     return this.mdContentService.getMdContent(fileID).pipe(
       map((res: any) => {
-        return this.sanitizer.bypassSecurityTrustHtml(marked(res.content));
+        return this.sanitizer.bypassSecurityTrustHtml(
+          this.mdContentService.getParsedMd(res.content)
+        );
       }),
       catchError((e: any) => {
         console.error('Error getting markdown page content from backend', e);

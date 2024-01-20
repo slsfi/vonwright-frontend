@@ -14,6 +14,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 - Use `ARG` instructions in [`Dockerfile`](/Dockerfile) to define variables for setting Angular major version and Node image tag of the base image. This makes updating `Dockerfile` clearer as the Angular major version has to be changed in the file when the Angular major version of the app is updated.
 - Update Angular to 17.1.0.
 - Update htmlparser2 to 9.1.0.
+- Update marked to 11.1.1 and remove @types/marked. Move markdown parsing to function in MarkdownContentService.
 - Update zone.js to 0.14.3.
 - Update typescript to 5.3.3.
 - Update @types/node to 20.11.5.

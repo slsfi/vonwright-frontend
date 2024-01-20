@@ -4,7 +4,6 @@ import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { PRIMARY_OUTLET, Router, UrlSegment, UrlTree } from '@angular/router';
 import { IonicModule, ModalController } from '@ionic/angular';
 import { catchError, forkJoin, map, Observable, of, Subscription, tap } from 'rxjs';
-import { marked } from 'marked';
 
 import { config } from '@config';
 import { CollectionContentService } from '@services/collection-content.service';
@@ -926,7 +925,9 @@ export class DownloadTextsModal implements OnDestroy, OnInit {
   private getMdContent(fileID: string): Observable<SafeHtml> {
     return this.mdContentService.getMdContent(fileID).pipe(
       map((res: any) => {
-        return this.sanitizer.bypassSecurityTrustHtml(marked(res.content));
+        return this.sanitizer.bypassSecurityTrustHtml(
+          this.mdContentService.getParsedMd(res.content)
+        );
       }),
       catchError((e) => {
         return of('');

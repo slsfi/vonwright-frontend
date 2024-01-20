@@ -3,7 +3,6 @@ import { AsyncPipe, NgIf } from '@angular/common';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { IonicModule } from '@ionic/angular';
 import { catchError, map, Observable, of } from 'rxjs';
-import { marked } from 'marked';
 
 import { MarkdownContentService } from '@services/markdown-content.service';
 import { ScrollService } from '@services/scroll.service';
@@ -59,7 +58,9 @@ export class LegendComponent implements OnDestroy, OnInit {
         if (isBrowser()) {
           this.scrollToInitialTextPosition();
         }
-        return this.sanitizer.bypassSecurityTrustHtml(marked(res.content));
+        return this.sanitizer.bypassSecurityTrustHtml(
+          this.mdContentService.getParsedMd(res.content)
+        );
       }),
       catchError(e => {
         if (fileID.split('-').length > 3) {

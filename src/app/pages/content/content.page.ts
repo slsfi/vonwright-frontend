@@ -1,7 +1,6 @@
 import { Component, Inject, LOCALE_ID, OnInit, SecurityContext } from '@angular/core';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { catchError, map, Observable, of } from 'rxjs';
-import { marked } from 'marked';
 
 import { MarkdownContentService } from '@services/markdown-content.service';
 
@@ -33,7 +32,7 @@ export class ContentPage implements OnInit {
   getMdContent(fileID: string): Observable<string> {
     return this.mdContentService.getMdContent(fileID).pipe(
       map((res: any) => {
-        return marked(res.content);
+        return this.mdContentService.getParsedMd(res.content);
       }),
       catchError(e => {
         return of('');

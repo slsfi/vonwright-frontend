@@ -3,7 +3,6 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { ModalController } from '@ionic/angular';
 import { catchError, combineLatest, forkJoin, map, Observable, of, Subscription } from 'rxjs';
-import { marked } from 'marked';
 
 import { config } from '@config';
 import { ReferenceDataModal } from '@modals/reference-data/reference-data.modal';
@@ -188,7 +187,9 @@ export class MediaCollectionPage implements OnDestroy, OnInit {
     return this.mdContentService.getMdContent(fileID).pipe(
       map((res: any) => {
         return this.sanitizer.sanitize(
-          SecurityContext.HTML, this.sanitizer.bypassSecurityTrustHtml(marked(res.content))
+          SecurityContext.HTML, this.sanitizer.bypassSecurityTrustHtml(
+            this.mdContentService.getParsedMd(res.content)
+          )
         );
       }),
       catchError((e) => {

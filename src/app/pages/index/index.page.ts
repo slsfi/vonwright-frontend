@@ -3,7 +3,6 @@ import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { ActivatedRoute, Router } from '@angular/router';
 import { IonContent, ModalController } from '@ionic/angular';
 import { catchError, map, Observable, of, Subscription } from 'rxjs';
-import { marked } from 'marked';
 
 import { config } from '@config';
 import { IndexFilterModal } from '@modals/index-filter/index-filter.modal';
@@ -123,7 +122,9 @@ export class IndexPage implements OnInit {
   private getMdContent(fileID: string): Observable<SafeHtml> {
     return this.mdContentService.getMdContent(fileID).pipe(
       map((res: any) => {
-        return this.sanitizer.bypassSecurityTrustHtml(marked(res.content));
+        return this.sanitizer.bypassSecurityTrustHtml(
+          this.mdContentService.getParsedMd(res.content)
+        );
       }),
       catchError((e) => {
         return of('');

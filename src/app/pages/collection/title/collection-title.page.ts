@@ -3,7 +3,6 @@ import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { ActivatedRoute } from '@angular/router';
 import { ModalController, PopoverController } from '@ionic/angular';
 import { catchError, combineLatest, map, Observable, of, Subscription, switchMap, tap } from 'rxjs';
-import { marked } from 'marked';
 
 import { config } from '@config';
 import { ReferenceDataModal } from '@modals/reference-data/reference-data.modal';
@@ -120,7 +119,9 @@ export class CollectionTitlePage implements OnDestroy, OnInit {
   private getMdContent(fileID: string): Observable<SafeHtml> {
     return this.mdContentService.getMdContent(fileID).pipe(
       map((res: any) => {
-        return this.sanitizer.bypassSecurityTrustHtml(marked(res.content));
+        return this.sanitizer.bypassSecurityTrustHtml(
+          this.mdContentService.getParsedMd(res.content)
+        );
       }),
       catchError((e: any) => {
         console.error(e);

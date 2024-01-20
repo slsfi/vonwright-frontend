@@ -3,7 +3,6 @@ import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { ActivatedRoute, Router } from '@angular/router';
 import { IonContent } from '@ionic/angular';
 import { catchError, map, merge, Observable, of, Subject, Subscription, switchMap } from 'rxjs';
-import { marked } from 'marked';
 
 import { config } from '@config';
 import { AggregationData, AggregationsData, Facet, Facets, TimeRange } from '@models/elastic-search.model';
@@ -460,7 +459,9 @@ export class ElasticSearchPage implements OnDestroy, OnInit {
   private getMdContent(fileID: string): Observable<SafeHtml> {
     return this.mdContentService.getMdContent(fileID).pipe(
       map((res: any) => {
-        return this.sanitizer.bypassSecurityTrustHtml(marked(res.content));
+        return this.sanitizer.bypassSecurityTrustHtml(
+          this.mdContentService.getParsedMd(res.content)
+        );
       }),
       catchError((e) => {
         return of('');
