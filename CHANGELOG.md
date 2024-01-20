@@ -20,6 +20,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 - Update browser-sync to 3.0.2.
 - Update jasmine-core to 5.1.1 and @types/jasmine to 5.1.4.
 
+### Removed
+
+- jasmine-spec-reporter from devDependencies.
 
 
 ## [1.2.1] – 2024-01-16
