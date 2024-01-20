@@ -22,8 +22,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ### Removed
 
-- jasmine-spec-reporter from devDependencies.
 - @angular-eslint from devDependencies.
+- jasmine-spec-reporter from devDependencies.
+- ts-node from devDependencies.
+
+
 
 ## [1.2.1] – 2024-01-16
 
