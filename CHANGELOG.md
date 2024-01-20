@@ -16,6 +16,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 - Update htmlparser2 to 9.1.0.
 - Update marked to 11.1.1 and remove @types/marked. Move markdown parsing to function in MarkdownContentService.
 - Update zone.js to 0.14.3.
+- Moved @angular/compiler from devDependencies to dependencies (like in fresh Angular 17 apps).
 - Update typescript to 5.3.3.
 - Update @types/node to 20.11.5.
 - Update browser-sync to 3.0.2.
