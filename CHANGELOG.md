@@ -15,6 +15,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 - Update Angular to 17.1.0.
 - Update zone.js to 0.14.3.
 - Update typescript to 5.3.3.
+- Update @types/node to 20.11.5.
+
 
 
 ## [1.2.1] – 2024-01-16
