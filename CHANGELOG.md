@@ -18,6 +18,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 - Update typescript to 5.3.3.
 - Update @types/node to 20.11.5.
 - Update browser-sync to 3.0.2.
+- Update jasmine-core to 5.1.1 and @types/jasmine to 5.1.4.
 
 
 
