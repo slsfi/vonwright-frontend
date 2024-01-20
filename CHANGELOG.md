@@ -17,6 +17,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 - Update zone.js to 0.14.3.
 - Update typescript to 5.3.3.
 - Update @types/node to 20.11.5.
+- Update browser-sync to 3.0.2.
 
 
 
