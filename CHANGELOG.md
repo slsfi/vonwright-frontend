@@ -14,6 +14,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 - Use `ARG` instructions in [`Dockerfile`](/Dockerfile) to define variables for setting Angular major version and Node image tag of the base image. This makes updating `Dockerfile` clearer as the Angular major version has to be changed in the file when the Angular major version of the app is updated.
 - Update Angular to 17.1.0.
 - Update zone.js to 0.14.3.
+- Update typescript to 5.3.3.
 
 
 ## [1.2.1] – 2024-01-16
