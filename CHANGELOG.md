@@ -25,6 +25,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 - @angular-eslint from devDependencies.
 - jasmine-spec-reporter from devDependencies.
+- karma-coverage-istanbul-reporter from devDependencies.
 - ts-node from devDependencies.
 
 
