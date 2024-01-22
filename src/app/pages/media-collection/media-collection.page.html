@@ -29,7 +29,7 @@
   <p *ngIf="mediaCollectionDescription" [innerHTML]="mediaCollectionDescription"></p>
 
   <ng-container *ngIf="(mdContent$ | async) as mdContent">
-    <div class="info markdown" [innerHTML]="mdContent"></div>
+    <div class="info markdown" [innerHTML]="mdContent | trustHtml"></div>
   </ng-container>
 
   <ng-container *ngIf="loadingGallery">

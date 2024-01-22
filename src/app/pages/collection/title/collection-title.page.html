@@ -30,7 +30,7 @@
           [class.teiContainer]="!loadContentFromMarkdown"
           [class.markdown]="loadContentFromMarkdown"
           [class.md_content]="loadContentFromMarkdown"
-          [innerHTML]="text"
+          [innerHTML]="text | trustHtml"
     ></div>
     <ng-template #loading>
       <ion-spinner class="loading" name="crescent"></ion-spinner>

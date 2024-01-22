@@ -1,13 +1,12 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, Inject, LOCALE_ID, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { ActivatedRoute, Router } from '@angular/router';
 import { IonContent } from '@ionic/angular';
-import { catchError, map, merge, Observable, of, Subject, Subscription, switchMap } from 'rxjs';
+import { map, merge, Observable, of, Subject, Subscription, switchMap } from 'rxjs';
 
 import { config } from '@config';
 import { AggregationData, AggregationsData, Facet, Facets, TimeRange } from '@models/elastic-search.model';
 import { ElasticSearchService } from '@services/elastic-search.service';
-import { MarkdownContentService } from '@services/markdown-content.service';
+import { MarkdownService } from '@services/markdown.service';
 import { PlatformService } from '@services/platform.service';
 import { UrlService } from '@services/url.service';
 import { isBrowser, isEmptyObject, sortArrayOfObjectsNumerically } from '@utility-functions';
@@ -37,7 +36,7 @@ export class ElasticSearchPage implements OnDestroy, OnInit {
   initializing: boolean = true;
   loading: boolean = true;
   loadingMoreHits: boolean = false;
-  mdContent$: Observable<SafeHtml>;
+  mdContent$: Observable<string | null>;
   pages: number = 1;
   query: string = ''; // variable bound to the input search field with ngModel
   range?: TimeRange | null = undefined;
@@ -59,11 +58,10 @@ export class ElasticSearchPage implements OnDestroy, OnInit {
     private cf: ChangeDetectorRef,
     private elasticService: ElasticSearchService,
     private elementRef: ElementRef,
-    private mdContentService: MarkdownContentService,
+    private mdService: MarkdownService,
     private platformService: PlatformService,
     private route: ActivatedRoute,
     private router: Router,
-    private sanitizer: DomSanitizer,
     private urlService: UrlService,
     @Inject(LOCALE_ID) private activeLocale: string
   ) {
@@ -98,7 +96,9 @@ export class ElasticSearchPage implements OnDestroy, OnInit {
   }
 
   ngOnInit() {
-    this.mdContent$ = this.getMdContent(this.activeLocale + '-12-01');
+    this.mdContent$ = this.mdService.getParsedMdContent(
+      this.activeLocale + '-12-01'
+    );
 
     // Set up search data stream subscriptions
     this.subscribeToSearchDataStreams();
@@ -454,19 +454,6 @@ export class ElasticSearchPage implements OnDestroy, OnInit {
     this.from += this.hitsPerPage;
 
     this.updateURLQueryParameters({ pages: this.pages + 1 });
-  }
-
-  private getMdContent(fileID: string): Observable<SafeHtml> {
-    return this.mdContentService.getMdContent(fileID).pipe(
-      map((res: any) => {
-        return this.sanitizer.bypassSecurityTrustHtml(
-          this.mdContentService.getParsedMd(res.content)
-        );
-      }),
-      catchError((e) => {
-        return of('');
-      })
-    );
   }
 
   private getInitialAggregations(): Observable<any> {

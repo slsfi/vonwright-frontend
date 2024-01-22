@@ -143,7 +143,7 @@
 
         <ng-template #showNotice let-instructionsText>
           <div *ngIf="copyrightText || instructionsText" class="notice">
-            <div *ngIf="instructionsText" class="markdown download-instructions" [innerHTML]="instructionsText"></div>
+            <div *ngIf="instructionsText" class="markdown download-instructions" [innerHTML]="instructionsText | trustHtml"></div>
             <p *ngIf="copyrightText && !copyrightURL" class="copyright-notice"><ng-container i18n="@@DownloadTexts.CopyrightNoticeLabel">Licens</ng-container>: <span [innerHTML]="copyrightText"></span></p>
             <p *ngIf="copyrightText && copyrightURL" class="copyright-notice">
               <ng-container i18n="@@DownloadTexts.CopyrightNoticeLabel">Licens</ng-container>: 

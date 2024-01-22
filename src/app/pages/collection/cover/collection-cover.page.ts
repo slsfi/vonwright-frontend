@@ -2,7 +2,7 @@ import { Component, Inject, LOCALE_ID, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { catchError, map, Observable, of, switchMap, tap } from 'rxjs';
 
-import { MarkdownContentService } from '@services/markdown-content.service';
+import { MarkdownService } from '@services/markdown.service';
 import { PlatformService } from '@services/platform.service';
 
 
@@ -17,7 +17,7 @@ export class CollectionCoverPage implements OnInit {
   mobileMode: boolean = false;
 
   constructor(
-    private mdContentService: MarkdownContentService,
+    private mdService: MarkdownService,
     private platformService: PlatformService,
     private route: ActivatedRoute,
     @Inject(LOCALE_ID) private activeLocale: string
@@ -39,7 +39,7 @@ export class CollectionCoverPage implements OnInit {
   }
 
   private getCoverDataFromMdContent(fileID: string): Observable<any> {
-    return this.mdContentService.getMdContent(fileID).pipe(
+    return this.mdService.getMdContent(fileID).pipe(
       map((res: any) => {
         // Extract image url and alt-text from markdown content.
         let image_alt = res.content.match(/!\[(.*?)\]\(.*?\)/)[1];

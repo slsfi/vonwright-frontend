@@ -49,12 +49,12 @@
       </ion-button>
     </div>
 
-    <div class="site-presentation markdown" [innerHTML]="descriptionText$ | async"></div>
+    <div class="site-presentation markdown" [innerHTML]="(descriptionText$ | async) | trustHtml"></div>
 
     <div *ngIf="showContentGrid" class="content-grid-wrapper">
       <content-grid></content-grid>
     </div>
 
-    <footer *ngIf="showFooter" class="footer markdown" [innerHTML]="footerText$ | async"></footer>
+    <footer *ngIf="showFooter" class="footer markdown" [innerHTML]="(footerText$ | async) | trustHtml"></footer>
   </div>
 </ion-content>

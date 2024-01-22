@@ -1,8 +1,7 @@
-import { Component, Inject, LOCALE_ID, OnInit, SecurityContext } from '@angular/core';
-import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
-import { catchError, map, Observable, of } from 'rxjs';
+import { Component, Inject, LOCALE_ID, OnInit } from '@angular/core';
+import { Observable } from 'rxjs';
 
-import { MarkdownContentService } from '@services/markdown-content.service';
+import { MarkdownService } from '@services/markdown.service';
 
 
 @Component({
@@ -11,32 +10,16 @@ import { MarkdownContentService } from '@services/markdown-content.service';
   styleUrls: ['./content.page.scss']
 })
 export class ContentPage implements OnInit {
-  mdContent$: Observable<SafeHtml | null>;
+  mdContent$: Observable<string | null>;
 
   constructor(
-    private mdContentService: MarkdownContentService,
-    private sanitizer: DomSanitizer,
+    private mdService: MarkdownService,
     @Inject(LOCALE_ID) private activeLocale: string
   ) {}
 
   ngOnInit() {
-    this.mdContent$ = this.getMdContent(this.activeLocale + '-02').pipe(
-      map((res: string) => {
-        return this.sanitizer.sanitize(
-          SecurityContext.HTML, this.sanitizer.bypassSecurityTrustHtml(res)
-        );
-      })
-    );
-  }
-
-  getMdContent(fileID: string): Observable<string> {
-    return this.mdContentService.getMdContent(fileID).pipe(
-      map((res: any) => {
-        return this.mdContentService.getParsedMd(res.content);
-      }),
-      catchError(e => {
-        return of('');
-      })
+    this.mdContent$ = this.mdService.getParsedMdContent(
+      this.activeLocale + '-02'
     );
   }
 

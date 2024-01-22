@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
 
 import { ContentGridComponent } from '@components/content-grid/content-grid.component';
+import { TrustHtmlPipe } from '@pipes/trust-html-pipe';
 import { HomePageRoutingModule } from './home-routing.module';
 import { HomePage } from './home.page';
 
@@ -17,6 +18,7 @@ import { HomePage } from './home.page';
     FormsModule,
     IonicModule,
     ContentGridComponent,
+    TrustHtmlPipe,
     HomePageRoutingModule
   ],
 })

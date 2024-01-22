@@ -3,7 +3,7 @@
   <h1 class="page-title" i18n="@@ElasticSearch.SearchEdition">Sök i utgåvan</h1>
 
   <ng-container *ngIf="(mdContent$ | async) as mdContent">
-    <div class="info markdown" [innerHTML]="mdContent"></div>
+    <div class="info markdown" [innerHTML]="mdContent | trustHtml"></div>
   </ng-container>
 
   <div class="search-container">

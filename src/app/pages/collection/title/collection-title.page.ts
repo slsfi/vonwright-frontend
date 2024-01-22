@@ -1,5 +1,4 @@
 import { Component, ElementRef, Inject, LOCALE_ID, OnDestroy, OnInit } from '@angular/core';
-import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { ActivatedRoute } from '@angular/router';
 import { ModalController, PopoverController } from '@ionic/angular';
 import { catchError, combineLatest, map, Observable, of, Subscription, switchMap, tap } from 'rxjs';
@@ -10,7 +9,7 @@ import { Textsize } from '@models/textsize.model';
 import { ViewOptionsPopover } from '@popovers/view-options/view-options.popover';
 import { CollectionContentService } from '@services/collection-content.service';
 import { HtmlParserService } from '@services/html-parser.service';
-import { MarkdownContentService } from '@services/markdown-content.service';
+import { MarkdownService } from '@services/markdown.service';
 import { PlatformService } from '@services/platform.service';
 import { ScrollService } from '@services/scroll.service';
 import { ViewOptionsService } from '@services/view-options.service';
@@ -30,7 +29,7 @@ export class CollectionTitlePage implements OnDestroy, OnInit {
   searchMatches: string[] = [];
   showURNButton: boolean = false;
   showViewOptionsButton: boolean = true;
-  text$: Observable<SafeHtml>;
+  text$: Observable<string | null>;
   textsize: Textsize = Textsize.Small;
   textsizeSubscription: Subscription | null = null;
 
@@ -39,12 +38,11 @@ export class CollectionTitlePage implements OnDestroy, OnInit {
   constructor(
     private collectionContentService: CollectionContentService,
     private elementRef: ElementRef,
-    private mdContentService: MarkdownContentService,
+    private mdService: MarkdownService,
     private modalController: ModalController,
     private parserService: HtmlParserService,
     private popoverCtrl: PopoverController,
     private route: ActivatedRoute,
-    private sanitizer: DomSanitizer,
     private scrollService: ScrollService,
     private platformService: PlatformService,
     private viewOptionsService: ViewOptionsService,
@@ -88,7 +86,7 @@ export class CollectionTitlePage implements OnDestroy, OnInit {
     this.textsizeSubscription?.unsubscribe();
   }
 
-  private loadTitle(id: string, lang: string): Observable<SafeHtml> {
+  private loadTitle(id: string, lang: string): Observable<string | null> {
     if (!this.loadContentFromMarkdown) {
       return this.collectionContentService.getTitle(id, lang).pipe(
         map((res: any) => {
@@ -96,40 +94,22 @@ export class CollectionTitlePage implements OnDestroy, OnInit {
             let text = this.replaceImageAssetsPaths
               ? res.content.replace(/src="images\//g, 'src="assets/images/')
               : res.content;
-            text = this.parserService.insertSearchMatchTags(text, this.searchMatches);
-            return this.sanitizer.bypassSecurityTrustHtml(text);
+            return this.parserService.insertSearchMatchTags(text, this.searchMatches);
           } else {
-            return of(this.sanitizer.bypassSecurityTrustHtml(
-              $localize`:@@CollectionTitle.None:Titelbladet kunde inte laddas.`
-            ));
+            return $localize`:@@CollectionTitle.None:Titelbladet kunde inte laddas.`;
           }
         }),
         catchError((e: any) => {
           console.error(e);
-          return of(this.sanitizer.bypassSecurityTrustHtml(
-            $localize`:@@CollectionTitle.None:Titelbladet kunde inte laddas.`
-          ));
+          return of($localize`:@@CollectionTitle.None:Titelbladet kunde inte laddas.`);
         })
       );
     } else {
-      return this.getMdContent(`${lang}-09-${id}`);
+      return this.mdService.getParsedMdContent(
+        `${lang}-09-${id}`,
+        $localize`:@@CollectionTitle.None:Titelbladet kunde inte laddas.`
+      );
     }
-  }
-
-  private getMdContent(fileID: string): Observable<SafeHtml> {
-    return this.mdContentService.getMdContent(fileID).pipe(
-      map((res: any) => {
-        return this.sanitizer.bypassSecurityTrustHtml(
-          this.mdContentService.getParsedMd(res.content)
-        );
-      }),
-      catchError((e: any) => {
-        console.error(e);
-        return of(this.sanitizer.bypassSecurityTrustHtml(
-          $localize`:@@CollectionTitle.None:Titelbladet kunde inte laddas.`
-        ));
-      })
-    );
   }
 
   async showViewOptionsPopover(event: any) {

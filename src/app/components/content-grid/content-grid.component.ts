@@ -8,7 +8,7 @@ import { config } from '@config';
 import { ContentItem } from '@models/content-item.model';
 import { ParentChildPagePathPipe } from '@pipes/parent-child-page-path.pipe';
 import { CollectionsService } from '@services/collections.service';
-import { MarkdownContentService } from '@services/markdown-content.service';
+import { MarkdownService } from '@services/markdown.service';
 
 
 @Component({
@@ -28,7 +28,7 @@ export class ContentGridComponent implements OnInit {
 
   constructor(
     private collectionsService: CollectionsService,
-    private mdContentService: MarkdownContentService,
+    private mdService: MarkdownService,
     @Inject(LOCALE_ID) private activeLocale: string
   ) {
     this.availableEbooks = config.ebooks ?? [];
@@ -84,7 +84,7 @@ export class ContentGridComponent implements OnInit {
           // parallell, to fetch sequentially you'd use concatMap)
           mergeMap(
             (collection: any) => 
-              this.mdContentService.getMdContent(`${this.activeLocale}-08-${collection.id}`).pipe(
+              this.mdService.getMdContent(`${this.activeLocale}-08-${collection.id}`).pipe(
                 // add image alt-text and cover URL from response to collection data
                 map((coverRes: any) => ({
                   ...collection,

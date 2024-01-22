@@ -8,7 +8,7 @@ import { config } from '@config';
 import { ParentChildPagePathPipe } from '@pipes/parent-child-page-path.pipe';
 import { CollectionsService } from '@services/collections.service';
 import { DocumentHeadService } from '@services/document-head.service';
-import { MarkdownContentService } from '@services/markdown-content.service';
+import { MarkdownService } from '@services/markdown.service';
 import { MediaCollectionService } from '@services/media-collection.service';
 import { addOrRemoveValueInArray, sortArrayOfObjectsAlphabetically } from '@utility-functions';
 
@@ -37,7 +37,7 @@ export class MainSideMenuComponent implements OnInit, OnChanges {
   constructor(
     private collectionsService: CollectionsService,
     private headService: DocumentHeadService,
-    private mdcontentService: MarkdownContentService,
+    private mdcontentService: MarkdownService,
     private mediaCollectionService: MediaCollectionService,
     @Inject(LOCALE_ID) private activeLocale: string
   ) {

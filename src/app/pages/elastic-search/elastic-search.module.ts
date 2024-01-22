@@ -6,6 +6,7 @@ import { IonicModule } from '@ionic/angular';
 import { DateHistogramComponent } from '@components/date-histogram/date-histogram.component';
 import { ElasticHitCollectionPagePathPipe } from '@pipes/elastic-hit-collection-page-path.pipe';
 import { ElasticHitCollectionPageQueryparamsPipe } from '@pipes/elastic-hit-collection-page-queryparams.pipe';
+import { TrustHtmlPipe } from '@pipes/trust-html-pipe';
 import { ElasticSearchPageRoutingModule } from './elastic-search-routing.module';
 import { ElasticSearchPage } from './elastic-search.page';
 
@@ -21,6 +22,7 @@ import { ElasticSearchPage } from './elastic-search.page';
     DateHistogramComponent,
     ElasticHitCollectionPagePathPipe,
     ElasticHitCollectionPageQueryparamsPipe,
+    TrustHtmlPipe,
     ElasticSearchPageRoutingModule
   ]
 })

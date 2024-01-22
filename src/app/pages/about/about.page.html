@@ -1,3 +1,3 @@
 <ion-content>
-  <article class="md_content markdown" [innerHTML]="markdownText$ | async"></article>
+  <article class="md_content markdown" [innerHTML]="(markdownText$ | async) | trustHtml"></article>
 </ion-content>

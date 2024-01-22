@@ -12,22 +12,23 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 - Fix indentation in [`nginx.conf`](/nginx.conf).
 - Use `ARG` instructions in [`Dockerfile`](/Dockerfile) to define variables for setting Angular major version and Node image tag of the base image. This makes updating `Dockerfile` clearer as the Angular major version has to be changed in the file when the Angular major version of the app is updated.
-- Update Angular to 17.1.0.
-- Update htmlparser2 to 9.1.0.
-- Update marked to 11.1.1 and remove @types/marked. Move markdown parsing to function in MarkdownContentService.
-- Update zone.js to 0.14.3.
+- Refactor functions and services related to markdown content. Remove duplicate code by moving functions for getting markdown content to the markdown service. Add pipe for marking HTML safe (bypassing sanitization) in order to separate the getting and parsing of markdown to HTML from the trusting of the HTML. Rename MarkdownContentService MarkdownService.
+- Deps: update Angular to 17.1.0.
+- Deps: update htmlparser2 to 9.1.0.
+- Deps: update marked to 11.1.1 and remove @types/marked. Move markdown parsing to function in dedicated markdown service.
+- Deps: update zone.js to 0.14.3.
 - Moved @angular/compiler from devDependencies to dependencies (like in fresh Angular 17 apps).
-- Update typescript to 5.3.3.
-- Update @types/node to 20.11.5.
-- Update browser-sync to 3.0.2.
-- Update jasmine-core to 5.1.1 and @types/jasmine to 5.1.4.
+- Deps: update typescript to 5.3.3.
+- Deps: update @types/node to 20.11.5.
+- Deps: update browser-sync to 3.0.2.
+- Deps: update jasmine-core to 5.1.1 and @types/jasmine to 5.1.4.
 
 ### Removed
 
-- @angular-eslint from devDependencies.
-- jasmine-spec-reporter from devDependencies.
-- karma-coverage-istanbul-reporter from devDependencies.
-- ts-node from devDependencies.
+- Deps: @angular-eslint from devDependencies.
+- Deps: jasmine-spec-reporter from devDependencies.
+- Deps: karma-coverage-istanbul-reporter from devDependencies.
+- Deps: ts-node from devDependencies.
 
 
 

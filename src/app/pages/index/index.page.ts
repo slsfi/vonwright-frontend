@@ -1,13 +1,12 @@
 import { Component, Inject, LOCALE_ID, OnInit, ViewChild } from '@angular/core';
-import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { ActivatedRoute, Router } from '@angular/router';
 import { IonContent, ModalController } from '@ionic/angular';
-import { catchError, map, Observable, of, Subscription } from 'rxjs';
+import { Observable, Subscription } from 'rxjs';
 
 import { config } from '@config';
 import { IndexFilterModal } from '@modals/index-filter/index-filter.modal';
 import { NamedEntityModal } from '@modals/named-entity/named-entity.modal';
-import { MarkdownContentService } from '@services/markdown-content.service';
+import { MarkdownService } from '@services/markdown.service';
 import { NamedEntityService } from '@services/named-entity.service';
 import { TooltipService } from '@services/tooltip.service';
 import { sortArrayOfObjectsAlphabetically } from '@utility-functions';
@@ -38,7 +37,7 @@ export class IndexPage implements OnInit {
   itemType: string = '';
   lastFetchSize: number = 0;
   maxFetchSize: number = 500;
-  mdContent$: Observable<SafeHtml>;
+  mdContent$: Observable<string | null>;
   routeParamsSubscription: Subscription | null = null;
   routeQueryParamsSubscription: Subscription | null = null;
   searchText: string = '';
@@ -46,12 +45,11 @@ export class IndexPage implements OnInit {
   showLoading: boolean = true;
 
   constructor(
-    private mdContentService: MarkdownContentService,
+    private mdService: MarkdownService,
     private modalCtrl: ModalController,
     private namedEntityService: NamedEntityService,
     public route: ActivatedRoute,
     private router: Router,
-    private sanitizer: DomSanitizer,
     private tooltipService: TooltipService,
     @Inject(LOCALE_ID) private activeLocale: string
   ) {}
@@ -97,7 +95,7 @@ export class IndexPage implements OnInit {
       }
 
       if (indexTypeMdNodeID) {
-        this.mdContent$ = this.getMdContent(
+        this.mdContent$ = this.mdService.getParsedMdContent(
           this.activeLocale + '-' + indexTypeMdNodeID
         );
       }
@@ -117,19 +115,6 @@ export class IndexPage implements OnInit {
   ngOnDestroy() {
     this.routeParamsSubscription?.unsubscribe();
     this.routeQueryParamsSubscription?.unsubscribe();
-  }
-
-  private getMdContent(fileID: string): Observable<SafeHtml> {
-    return this.mdContentService.getMdContent(fileID).pipe(
-      map((res: any) => {
-        return this.sanitizer.bypassSecurityTrustHtml(
-          this.mdContentService.getParsedMd(res.content)
-        );
-      }),
-      catchError((e) => {
-        return of('');
-      })
-    );
   }
 
   private getIndexData() {

@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
 
+import { TrustHtmlPipe } from '@pipes/trust-html-pipe';
 import { MediaCollectionPageRoutingModule } from './media-collection-routing.module';
 import { MediaCollectionPage } from './media-collection.page';
 
@@ -15,6 +16,7 @@ import { MediaCollectionPage } from './media-collection.page';
     CommonModule,
     FormsModule,
     IonicModule,
+    TrustHtmlPipe,
     MediaCollectionPageRoutingModule
   ],
 })

@@ -4,6 +4,6 @@
       <ion-icon name="warning-outline"></ion-icon>
       <ng-container i18n="@@PageNotFound.404PageNotFound">404 Sidan hittas inte</ng-container>
     </h1>
-    <div class="markdown" [innerHTML]="(markdownText$ | async)"></div>
+    <div class="markdown" [innerHTML]="(markdownText$ | async) | trustHtml"></div>
   </article>
 </ion-content>

@@ -1,15 +1,14 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Inject, LOCALE_ID, OnDestroy, OnInit, SecurityContext } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Inject, LOCALE_ID, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { ModalController } from '@ionic/angular';
-import { catchError, combineLatest, forkJoin, map, Observable, of, Subscription } from 'rxjs';
+import { combineLatest, forkJoin, map, Observable, Subscription } from 'rxjs';
 
 import { config } from '@config';
 import { ReferenceDataModal } from '@modals/reference-data/reference-data.modal';
 import { GalleryItem } from '@models/gallery-item-model';
 import { FullscreenImageViewerModal } from '@modals/fullscreen-image-viewer/fullscreen-image-viewer.modal';
 import { DocumentHeadService } from '@services/document-head.service';
-import { MarkdownContentService } from '@services/markdown-content.service';
+import { MarkdownService } from '@services/markdown.service';
 import { MediaCollectionService } from '@services/media-collection.service';
 import { UrlService } from '@services/url.service';
 import { isEmptyObject, sortArrayOfObjectsAlphabetically, sortArrayOfObjectsNumerically } from '@utility-functions';
@@ -41,7 +40,7 @@ export class MediaCollectionPage implements OnDestroy, OnInit {
   galleryTitles: (string | undefined)[] = [];
   loadingGallery: boolean = true;
   loadingImageModal: boolean = false;
-  mdContent$: Observable<SafeHtml | null>;
+  mdContent$: Observable<string | null>;
   mediaCollectionID: string | undefined = undefined;
   mediaCollectionDescription: string = '';
   mediaCollectionTitle: string = '';
@@ -54,12 +53,11 @@ export class MediaCollectionPage implements OnDestroy, OnInit {
   constructor(
     private cdRef: ChangeDetectorRef,
     private headService: DocumentHeadService,
-    private mdContentService: MarkdownContentService,
+    private mdService: MarkdownService,
     private mediaCollectionService: MediaCollectionService,
     private modalController: ModalController,
     private route: ActivatedRoute,
     private router: Router,
-    private sanitizer: DomSanitizer,
     private urlService: UrlService,
     @Inject(LOCALE_ID) private activeLocale: string
   ) {
@@ -111,7 +109,9 @@ export class MediaCollectionPage implements OnDestroy, OnInit {
         this.namedEntityID = '';
         this.mediaCollectionTitle = $localize`:@@MainSideMenu.MediaCollections:Bildbank`;
         this.cdRef.detectChanges();
-        this.mdContent$ = this.getMdContent(this.activeLocale + '-11-all');
+        this.mdContent$ = this.mdService.getParsedMdContent(
+          this.activeLocale + '-11-all'
+        );
 
         if (routeParams.filters) {
           this.setActiveFiltersFromQueryParams(routeParams.filters);
@@ -183,21 +183,6 @@ export class MediaCollectionPage implements OnDestroy, OnInit {
     this.urlParametersSubscription?.unsubscribe();
   }
 
-  private getMdContent(fileID: string): Observable<SafeHtml | null> {
-    return this.mdContentService.getMdContent(fileID).pipe(
-      map((res: any) => {
-        return this.sanitizer.sanitize(
-          SecurityContext.HTML, this.sanitizer.bypassSecurityTrustHtml(
-            this.mdContentService.getParsedMd(res.content)
-          )
-        );
-      }),
-      catchError((e) => {
-        return of('');
-      })
-    );
-  }
-
   private loadMediaCollections() {
     this.galleryData = [];
 
@@ -239,7 +224,9 @@ export class MediaCollectionPage implements OnDestroy, OnInit {
       }
     }
 
-    this.mdContent$ = this.getMdContent(this.activeLocale + '-11-' + mediaCollectionID);
+    this.mdContent$ = this.mdService.getParsedMdContent(
+      this.activeLocale + '-11-' + mediaCollectionID
+    );
 
     // Get selected media collection data, then filter options and apply any active filters
     this.mediaCollectionService.getSingleMediaCollection(mediaCollectionID, this.activeLocale).subscribe(
