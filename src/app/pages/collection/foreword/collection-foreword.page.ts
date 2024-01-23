@@ -1,5 +1,4 @@
 import { Component, ElementRef, Inject, LOCALE_ID, OnDestroy, OnInit } from '@angular/core';
-import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { ActivatedRoute } from '@angular/router';
 import { ModalController, PopoverController } from '@ionic/angular';
 import { catchError, combineLatest, map, Observable, of, Subscription, switchMap, tap } from 'rxjs';
@@ -28,7 +27,7 @@ export class CollectionForewordPage implements OnDestroy, OnInit {
   searchMatches: string[] = [];
   showURNButton: boolean = false;
   showViewOptionsButton: boolean = true;
-  text$: Observable<SafeHtml>;
+  text$: Observable<string>;
   textsize: Textsize = Textsize.Small;
   textsizeSubscription: Subscription | null = null;
 
@@ -42,7 +41,6 @@ export class CollectionForewordPage implements OnDestroy, OnInit {
     private platformService: PlatformService,
     private popoverCtrl: PopoverController,
     private route: ActivatedRoute,
-    private sanitizer: DomSanitizer,
     private scrollService: ScrollService,
     private viewOptionsService: ViewOptionsService,
     @Inject(LOCALE_ID) private activeLocale: string
@@ -84,26 +82,23 @@ export class CollectionForewordPage implements OnDestroy, OnInit {
     this.textsizeSubscription?.unsubscribe();
   }
 
-  private loadForeword(id: string, lang: string): Observable<SafeHtml> {
+  private loadForeword(id: string, lang: string): Observable<string> {
     return this.collectionContentService.getForeword(id, lang).pipe(
       map((res: any) => {
         if (res?.content && res?.content !== 'File not found') {
           let text = this.replaceImageAssetsPaths
             ? res.content.replace(/src="images\//g, 'src="assets/images/')
             : res.content;
-          text = this.parserService.insertSearchMatchTags(text, this.searchMatches);
-          return this.sanitizer.bypassSecurityTrustHtml(text);
+          return this.parserService.insertSearchMatchTags(text, this.searchMatches);
         } else {
-          return of(this.sanitizer.bypassSecurityTrustHtml(
-            $localize`:@@CollectionForeword.None:Förordet kunde inte laddas.`
-          ));
+          return $localize`:@@CollectionForeword.None:Förordet kunde inte laddas.`;
         }
       }),
       catchError((e: any) => {
         console.error(e);
-        return of(this.sanitizer.bypassSecurityTrustHtml(
+        return of(
           $localize`:@@CollectionForeword.None:Förordet kunde inte laddas.`
-        ));
+        );
       })
     );
   }

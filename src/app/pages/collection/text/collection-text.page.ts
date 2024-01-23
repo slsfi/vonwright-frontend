@@ -1,5 +1,4 @@
 import { ChangeDetectorRef, Component, ElementRef, Inject, LOCALE_ID, NgZone, OnDestroy, OnInit, QueryList, Renderer2, ViewChild, ViewChildren } from '@angular/core';
-import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { ActivatedRoute, Router } from '@angular/router';
 import { IonFabButton, IonFabList, IonPopover, ModalController, PopoverController } from '@ionic/angular';
 import { Observable, Subscription } from 'rxjs';
@@ -43,7 +42,7 @@ export class CollectionTextPage implements OnDestroy, OnInit {
     left: -1500 + 'px'
   };
   infoOverlayPosType: string = 'fixed';
-  infoOverlayText: SafeHtml = '';
+  infoOverlayText: string = '';
   infoOverlayTitle: string = '';
   infoOverlayTriggerElem: HTMLElement | null = null;
   infoOverlayWidth: string | null = null;
@@ -70,7 +69,7 @@ export class CollectionTextPage implements OnDestroy, OnInit {
     left: -1500 + 'px'
   };
   toolTipScaleValue: number | null = null;
-  toolTipText: SafeHtml = '';
+  toolTipText: string = '';
   tooltipVisible: boolean = false;
   userIsTouching: boolean = false;
   views: any[] = [];
@@ -97,7 +96,6 @@ export class CollectionTextPage implements OnDestroy, OnInit {
     private renderer2: Renderer2,
     private route: ActivatedRoute,
     private router: Router,
-    private sanitizer: DomSanitizer,
     private scrollService: ScrollService,
     private tooltipService: TooltipService,
     private urlService: UrlService,
@@ -1249,11 +1247,11 @@ export class CollectionTextPage implements OnDestroy, OnInit {
   }
 
   private setToolTipText(text: string) {
-    this.toolTipText = this.sanitizer.bypassSecurityTrustHtml(text);
+    this.toolTipText = text;
   }
 
   private setInfoOverlayText(text: string) {
-    this.infoOverlayText = this.sanitizer.bypassSecurityTrustHtml(text);
+    this.infoOverlayText = text;
   }
 
   private setInfoOverlayTitle(title: string) {

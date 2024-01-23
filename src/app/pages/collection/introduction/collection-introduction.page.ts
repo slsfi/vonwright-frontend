@@ -1,5 +1,4 @@
 import { Component, ElementRef, Inject, LOCALE_ID, NgZone, OnDestroy, OnInit, Renderer2 } from '@angular/core';
-import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ModalController, PopoverController } from '@ionic/angular';
 import { combineLatest, map, Subscription } from 'rxjs';
@@ -35,7 +34,7 @@ export class CollectionIntroductionPage implements OnInit, OnDestroy {
     left: -1500 + 'px'
   };
   infoOverlayPosType: string = 'fixed';
-  infoOverlayText: SafeHtml = '';
+  infoOverlayText: string = '';
   infoOverlayTitle: string = '';
   infoOverlayTriggerElem: HTMLElement | null = null;
   infoOverlayWidth: string | null = null;
@@ -47,9 +46,9 @@ export class CollectionIntroductionPage implements OnInit, OnDestroy {
   showTextDownloadButton: boolean = false;
   showURNButton: boolean = true;
   showViewOptionsButton: boolean = true;
-  text: SafeHtml;
+  text: string = '';
   textLoading: boolean = true;
-  textMenu: SafeHtml;
+  textMenu: string = '';
   textsize: Textsize = Textsize.Small;
   textsizeSubscription: Subscription | null = null;
   tocMenuOpen: boolean = false;
@@ -60,7 +59,7 @@ export class CollectionIntroductionPage implements OnInit, OnDestroy {
   };
   toolTipPosType: string = 'fixed';
   toolTipScaleValue: number | null = null;
-  toolTipText: SafeHtml = '';
+  toolTipText: string = '';
   tooltipVisible: boolean = false;
   urlParametersSubscription: Subscription | null = null;
   userIsTouching: boolean = false;
@@ -84,7 +83,6 @@ export class CollectionIntroductionPage implements OnInit, OnDestroy {
     private platformService: PlatformService,
     private popoverCtrl: PopoverController,
     private renderer2: Renderer2,
-    private sanitizer: DomSanitizer,
     private tooltipService: TooltipService,
     private route: ActivatedRoute,
     private router: Router,
@@ -205,7 +203,7 @@ export class CollectionIntroductionPage implements OnInit, OnDestroy {
           if (matches && matches.length > 0) {
             // The introduction's table of contents was found,
             // copy it to this.textMenu and remove it from this.text
-            this.textMenu = this.sanitizer.bypassSecurityTrustHtml(matches[1]);
+            this.textMenu = matches[1];
             textContent = textContent.replace(pattern, '');
             if (!this.platformService.isMobile()) {
               if (!this.tocMenuOpen) {
@@ -216,8 +214,7 @@ export class CollectionIntroductionPage implements OnInit, OnDestroy {
             this.hasSeparateIntroToc = false;
           }
 
-          textContent = this.parserService.insertSearchMatchTags(textContent, this.searchMatches);
-          this.text = this.sanitizer.bypassSecurityTrustHtml(textContent);
+          this.text = this.parserService.insertSearchMatchTags(textContent, this.searchMatches);
           // Try to scroll to a position in the text or first search match
           if (this.pos) {
             this.scrollToPos();
@@ -768,11 +765,11 @@ export class CollectionIntroductionPage implements OnInit, OnDestroy {
   }
 
   setToolTipText(text: string) {
-    this.toolTipText = this.sanitizer.bypassSecurityTrustHtml(text);
+    this.toolTipText = text;
   }
 
   setInfoOverlayText(text: string) {
-    this.infoOverlayText = this.sanitizer.bypassSecurityTrustHtml(text);
+    this.infoOverlayText = text;
   }
 
   setInfoOverlayTitle(title: string) {

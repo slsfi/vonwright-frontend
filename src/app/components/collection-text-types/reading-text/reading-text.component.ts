@@ -1,11 +1,11 @@
 import { Component, Input, ElementRef, EventEmitter, OnInit, Output, Renderer2, NgZone, SimpleChanges, OnChanges, OnDestroy } from '@angular/core';
 import { NgIf } from '@angular/common';
-import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { IonicModule, ModalController } from '@ionic/angular';
 
 import { config } from '@config';
 import { MathJaxDirective } from '@directives/math-jax.directive';
 import { IllustrationModal } from '@modals/illustration/illustration.modal';
+import { TrustHtmlPipe } from '@pipes/trust-html-pipe';
 import { CollectionContentService } from '@services/collection-content.service';
 import { HtmlParserService } from '@services/html-parser.service';
 import { PlatformService } from '@services/platform.service';
@@ -19,7 +19,7 @@ import { isBrowser } from '@utility-functions';
   selector: 'reading-text',
   templateUrl: './reading-text.component.html',
   styleUrls: ['./reading-text.component.scss'],
-  imports: [NgIf, IonicModule, MathJaxDirective]
+  imports: [NgIf, IonicModule, MathJaxDirective, TrustHtmlPipe]
 })
 export class ReadingTextComponent implements OnChanges, OnDestroy, OnInit {
   @Input() language: string = '';
@@ -33,7 +33,7 @@ export class ReadingTextComponent implements OnChanges, OnDestroy, OnInit {
   inlineVisibleIllustrations: boolean = false;
   intervalTimerId: number = 0;
   mobileMode: boolean = false;
-  text: SafeHtml = '';
+  text: string = '';
   textLanguage: string = '';
 
   private unlistenClickEvents?: () => void;
@@ -46,7 +46,6 @@ export class ReadingTextComponent implements OnChanges, OnDestroy, OnInit {
     private parserService: HtmlParserService,
     private platformService: PlatformService,
     private renderer2: Renderer2,
-    private sanitizer: DomSanitizer,
     private scrollService: ScrollService,
     public viewOptionsService: ViewOptionsService
   ) {
@@ -96,10 +95,8 @@ export class ReadingTextComponent implements OnChanges, OnDestroy, OnInit {
           res?.content &&
           res?.content !== '<html xmlns="http://www.w3.org/1999/xhtml"><head></head><body>File not found</body></html>'
         ) {
-          let text: string = res.content;
-          text = this.parserService.postprocessReadingText(text, this.textItemID.split('_')[0]);
-          text = this.parserService.insertSearchMatchTags(text, this.searchMatches);
-          this.text = this.sanitizer.bypassSecurityTrustHtml(text);
+          let text: string = this.parserService.postprocessReadingText(res.content, this.textItemID.split('_')[0]);
+          this.text = this.parserService.insertSearchMatchTags(text, this.searchMatches);
           this.inlineVisibleIllustrations = this.parserService.readingTextHasVisibleIllustrations(text);
 
           if (this.textPosition) {

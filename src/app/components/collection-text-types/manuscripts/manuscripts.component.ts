@@ -1,9 +1,9 @@
 import { Component, ElementRef, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { NgIf } from '@angular/common';
-import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { AlertButton, AlertController, AlertInput, IonicModule } from '@ionic/angular';
 
 import { config } from '@config';
+import { TrustHtmlPipe } from '@pipes/trust-html-pipe';
 import { CollectionContentService } from '@services/collection-content.service';
 import { HtmlParserService } from '@services/html-parser.service';
 import { ScrollService } from '@services/scroll.service';
@@ -15,7 +15,7 @@ import { ViewOptionsService } from '@services/view-options.service';
   selector: 'manuscripts',
   templateUrl: './manuscripts.component.html',
   styleUrls: ['./manuscripts.component.scss'],
-  imports: [NgIf, IonicModule]
+  imports: [NgIf, IonicModule, TrustHtmlPipe]
 })
 export class ManuscriptsComponent implements OnInit {
   @Input() msID: number | undefined = undefined;
@@ -33,7 +33,7 @@ export class ManuscriptsComponent implements OnInit {
   showNormalizedToggle: boolean = true;
   showOpenLegendButton: boolean = false;
   showTitle: boolean = true;
-  text: SafeHtml = '';
+  text: string = '';
   textLanguage: string = '';
 
   constructor(
@@ -41,7 +41,6 @@ export class ManuscriptsComponent implements OnInit {
     private collectionContentService: CollectionContentService,
     private elementRef: ElementRef,
     private parserService: HtmlParserService,
-    private sanitizer: DomSanitizer,
     private scrollService: ScrollService,
     public viewOptionsService: ViewOptionsService
   ) {
@@ -115,8 +114,7 @@ export class ManuscriptsComponent implements OnInit {
             ? this.selectedManuscript.manuscript_normalized
             : this.selectedManuscript.manuscript_changes;
       text = this.parserService.postprocessManuscriptText(text);
-      text = this.parserService.insertSearchMatchTags(text, this.searchMatches);
-      this.text = this.sanitizer.bypassSecurityTrustHtml(text);
+      this.text = this.parserService.insertSearchMatchTags(text, this.searchMatches);
 
       this.textLanguage = this.selectedManuscript.language
             ? this.selectedManuscript.language

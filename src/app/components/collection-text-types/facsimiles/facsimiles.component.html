@@ -5,7 +5,7 @@
       [class.facs-title-shown]="!selectedFacsimileIsExternal && showTitle"
       [class.mobile-mode]="mobileMode"
 >
-  <h3 *ngIf="!selectedFacsimileIsExternal && showTitle" [innerHTML]="selectedFacsimile.title"></h3>
+  <h3 *ngIf="!selectedFacsimileIsExternal && showTitle" [innerHTML]="selectedFacsimile.title | trustHtml"></h3>
   <h3 *ngIf="selectedFacsimileIsExternal" i18n="@@Facsimiles.ExternalFacsimiles">Externa faksimil</h3>
   <div *ngIf="facsimiles.length > 1 || (facsimiles.length == 1 && externalFacsimiles.length > 0)"
         class="flex-buttons"
@@ -101,4 +101,4 @@
   </ion-fab>
 </ng-container>
 
-<div *ngIf="text" class="tei teiContainer" [innerHTML]="text"></div>
+<div *ngIf="text" class="tei teiContainer" [innerHTML]="text | trustHtml"></div>

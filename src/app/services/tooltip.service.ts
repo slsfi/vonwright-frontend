@@ -1,5 +1,4 @@
-import { Injectable, SecurityContext } from '@angular/core';
-import { DomSanitizer } from '@angular/platform-browser';
+import { Injectable } from '@angular/core';
 import { catchError, map, Observable, of } from 'rxjs';
 
 import { config } from '@config';
@@ -25,8 +24,7 @@ export class TooltipService {
   constructor(
     private commentService: CommentService,
     private namedEntityService: NamedEntityService,
-    private platformService: PlatformService,
-    private sanitizer: DomSanitizer
+    private platformService: PlatformService
   ) {
     this.simpleWorkMetadata = config.modal?.namedEntity?.useSimpleWorkMetadata ?? false;
   }
@@ -113,7 +111,7 @@ export class TooltipService {
     );
   }
 
-  getFootnoteTooltip(id: string, textType: string, triggerElem: HTMLElement): Observable<any> {
+  getFootnoteTooltip(id: string, textType: string, triggerElem: HTMLElement): Observable<string> {
     const cachedTooltip = this.cachedTooltips.footnotes.has(textType + '_' + id)
       ? this.cachedTooltips.footnotes.get(textType + '_' + id) : '';
 
@@ -169,15 +167,12 @@ export class TooltipService {
       }
 
       // Prepend the footnoteindicator to the the footnote text.
-      const footnoteWithIndicator: string = '<div class="footnoteWrapper">'
+      const footnoteHTML: string = '<div class="footnoteWrapper">'
         + '<a class="xreference footnoteReference'
         + (textTypeClass ? ' ' + textTypeClass : '')
         + (columnId ? ' targetColumnId_' + columnId : '')
         + '" href="#' + id + '">' + triggerElem.textContent
         + '</a>' + '<p class="footnoteText">' + ttText  + '</p></div>';
-      const footnoteHTML: string | null = this.sanitizer.sanitize(
-        SecurityContext.HTML, this.sanitizer.bypassSecurityTrustHtml(footnoteWithIndicator)
-      );
       this.cachedTooltips.footnotes.size > this.maxTooltipCacheSize && this.cachedTooltips.footnotes.clear();
       this.platformService.isDesktop() && this.cachedTooltips.footnotes.set(textType + '_' + id, footnoteHTML);
       return of(footnoteHTML || '');

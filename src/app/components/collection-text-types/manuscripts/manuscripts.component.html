@@ -23,5 +23,5 @@
       [class.show_abbreviations]="viewOptionsService.show.abbreviations"
       [class.show_pageBreakOriginal]="viewOptionsService.show.pageBreakOriginal"
       [attr.lang]="textLanguage ? textLanguage : null"
-      [innerHTML]="text"
+      [innerHTML]="text | trustHtml"
 ></div>

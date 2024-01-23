@@ -1,9 +1,9 @@
 import { Component, ElementRef, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { NgIf } from '@angular/common';
-import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { AlertButton, AlertController, AlertInput, IonicModule } from '@ionic/angular';
 
 import { config } from '@config';
+import { TrustHtmlPipe } from '@pipes/trust-html-pipe';
 import { CollectionContentService } from '@services/collection-content.service';
 import { HtmlParserService } from '@services/html-parser.service';
 import { ScrollService } from '@services/scroll.service';
@@ -15,7 +15,7 @@ import { ViewOptionsService } from '@services/view-options.service';
   selector: 'variants',
   templateUrl: './variants.component.html',
   styleUrls: ['./variants.component.scss'],
-  imports: [NgIf, IonicModule]
+  imports: [NgIf, IonicModule, TrustHtmlPipe]
 })
 export class VariantsComponent implements OnInit {
   @Input() searchMatches: Array<string> = [];
@@ -31,7 +31,7 @@ export class VariantsComponent implements OnInit {
   intervalTimerId: number = 0;
   selectedVariant: any = undefined;
   showOpenLegendButton: boolean = false;
-  text: SafeHtml = '';
+  text: string = '';
   variants: any[] = [];
 
   constructor(
@@ -39,7 +39,6 @@ export class VariantsComponent implements OnInit {
     private collectionContentService: CollectionContentService,
     private elementRef: ElementRef,
     private parserService: HtmlParserService,
-    private sanitizer: DomSanitizer,
     private scrollService: ScrollService,
     public viewOptionsService: ViewOptionsService
   ) {
@@ -104,8 +103,7 @@ export class VariantsComponent implements OnInit {
     }
     if (this.selectedVariant) {
       let text = this.parserService.postprocessVariantText(this.selectedVariant.content);
-      text = this.parserService.insertSearchMatchTags(text, this.searchMatches);
-      this.text = this.sanitizer.bypassSecurityTrustHtml(text);
+      this.text = this.parserService.insertSearchMatchTags(text, this.searchMatches);
     }
   }
 

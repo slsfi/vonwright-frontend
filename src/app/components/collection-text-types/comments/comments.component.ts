@@ -1,9 +1,9 @@
 import { Component, ElementRef, EventEmitter, Input, NgZone, OnDestroy, OnInit, Output, Renderer2 } from '@angular/core';
 import { NgIf } from '@angular/common';
-import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { IonicModule, ModalController } from '@ionic/angular';
 
 import { IllustrationModal } from '@modals/illustration/illustration.modal';
+import { TrustHtmlPipe } from '@pipes/trust-html-pipe';
 import { CommentService } from '@services/comment.service';
 import { HtmlParserService } from '@services/html-parser.service';
 import { PlatformService } from '@services/platform.service';
@@ -17,7 +17,7 @@ import { concatenateNames, isBrowser } from '@utility-functions';
   selector: 'comments',
   templateUrl: './comments.component.html',
   styleUrls: ['./comments.component.scss'],
-  imports: [NgIf, IonicModule]
+  imports: [NgIf, IonicModule, TrustHtmlPipe]
 })
 export class CommentsComponent implements OnInit, OnDestroy {
   @Input() searchMatches: string[] = [];
@@ -31,7 +31,7 @@ export class CommentsComponent implements OnInit, OnDestroy {
   mobileMode: boolean = true;
   receiver: string = '';
   sender: string = '';
-  text: SafeHtml | string = '';
+  text: string = '';
 
   private unlistenClickEvents?: () => void;
 
@@ -43,7 +43,6 @@ export class CommentsComponent implements OnInit, OnDestroy {
     private parserService: HtmlParserService,
     private platformService: PlatformService,
     private renderer2: Renderer2,
-    private sanitizer: DomSanitizer,
     private scrollService: ScrollService,
     public viewOptionsService: ViewOptionsService
   ) {}
@@ -68,8 +67,7 @@ export class CommentsComponent implements OnInit, OnDestroy {
     this.commentService.getComments(this.textItemID).subscribe({
       next: (text) => {
         if (text) {
-          text = this.parserService.insertSearchMatchTags(String(text), this.searchMatches);
-          this.text = this.sanitizer.bypassSecurityTrustHtml(text);
+          this.text = this.parserService.insertSearchMatchTags(String(text), this.searchMatches);
           if (this.searchMatches.length) {
             this.scrollService.scrollToFirstSearchMatch(this.elementRef.nativeElement, this.intervalTimerId);
           }

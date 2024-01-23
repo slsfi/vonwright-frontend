@@ -1,13 +1,13 @@
-import { Component, EventEmitter, Input, OnInit, Output, SecurityContext } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { NgFor, NgIf, NgStyle } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { DomSanitizer } from '@angular/platform-browser';
 import { AlertButton, AlertController, AlertInput, IonicModule, ModalController } from '@ionic/angular';
 
 import { config } from '@config';
 import { DraggableImageDirective } from '@directives/draggable-image.directive';
 import { FullscreenImageViewerModal } from '@modals/fullscreen-image-viewer/fullscreen-image-viewer.modal';
 import { Facsimile } from '@models/facsimile.model';
+import { TrustHtmlPipe } from '@pipes/trust-html-pipe';
 import { CollectionContentService } from '@services/collection-content.service';
 import { PlatformService } from '@services/platform.service';
 import { sortArrayOfObjectsNumerically } from '@utility-functions';
@@ -18,7 +18,7 @@ import { sortArrayOfObjectsNumerically } from '@utility-functions';
   selector: 'facsimiles',
   templateUrl: './facsimiles.component.html',
   styleUrls: ['./facsimiles.component.scss'],
-  imports: [NgFor, NgIf, NgStyle, DraggableImageDirective, FormsModule, IonicModule]
+  imports: [NgFor, NgIf, NgStyle, FormsModule, IonicModule, DraggableImageDirective, TrustHtmlPipe]
 })
 export class FacsimilesComponent implements OnInit {
   @Input() facsID: number | undefined = undefined;
@@ -43,15 +43,14 @@ export class FacsimilesComponent implements OnInit {
   selectedFacsimile: any | null = null;
   selectedFacsimileIsExternal: boolean = false;
   showTitle: boolean = true;
-  text: any = '';
+  text: string = '';
   zoom: number = 1.0;
 
   constructor(
     private alertCtrl: AlertController,
     private collectionContentService: CollectionContentService,
     private modalCtrl: ModalController,
-    private platformService: PlatformService,
-    private sanitizer: DomSanitizer
+    private platformService: PlatformService
   ) {
     this.facsSize = config.component?.facsimiles?.imageQuality ?? 1;
     this.facsURLAlternate = config.app?.alternateFacsimileBaseURL ?? '';
@@ -77,10 +76,7 @@ export class FacsimilesComponent implements OnInit {
             facsimile.itemId = this.textItemID;
             facsimile.manuscript_id = f.publication_manuscript_id;
             if (!f['external_url']) {
-              facsimile.title = this.sanitizer.sanitize(
-                SecurityContext.HTML,
-                this.sanitizer.bypassSecurityTrustHtml(f['title'])
-              );
+              facsimile.title = f['title'];
             }
             if (f['external_url'] && !f['folder_path']) {
               this.externalFacsimiles.push({'title': f['title'], 'url': f['external_url'], 'priority': f['priority']});
@@ -163,10 +159,9 @@ export class FacsimilesComponent implements OnInit {
     this.numberOfImages = facs.number_of_pages;
     this.facsURLDefault = config.app.backendBaseURL + '/' + config.app.projectNameDB +
           `/facsimiles/${facs.publication_facsimile_collection_id}/`;
-    const facsText = this.replaceImageAssetsPaths
+    this.text = this.replaceImageAssetsPaths
       ? facs.content?.replace(/src="images\//g, 'src="assets/images/')
       : facs.content;
-    this.text = this.sanitizer.bypassSecurityTrustHtml(facsText);
 
     if (extImageNr !== undefined) {
       this.facsNumber = extImageNr;

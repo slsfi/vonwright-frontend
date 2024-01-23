@@ -478,7 +478,7 @@
         [class.show_emendations]="viewOptionsService.show.emendations"
         [class.show_abbreviations]="viewOptionsService.show.abbreviations"
         [ngStyle]="{'position': toolTipPosType, 'top': toolTipPosition.top, 'left': toolTipPosition.left, 'max-width': toolTipMaxWidth, 'transform': 'scale(' + toolTipScaleValue + ')'}"
-        [innerHTML]="toolTipText"
+        [innerHTML]="toolTipText | trustHtml"
         [MathJax]="toolTipText"
   ></div>
   <div tabindex="-1"
@@ -505,6 +505,6 @@
         ></ion-icon>
       </ion-button>
     </div>
-    <div class="infoOverlayContent" [innerHTML]="infoOverlayText" [MathJax]="infoOverlayText"></div>
+    <div class="infoOverlayContent" [innerHTML]="infoOverlayText | trustHtml" [MathJax]="infoOverlayText"></div>
   </div>
 </ng-template>

@@ -6,7 +6,7 @@
       [class.show_abbreviations]="viewOptionsService.show.abbreviations"
       [class.show_paragraphNumbering]="viewOptionsService.show.paragraphNumbering"
 >
-  <div [innerHTML]="text"></div>
+  <div [innerHTML]="text | trustHtml"></div>
   <div class="ms" *ngIf="letter">
     <h3 i18n="@@Commentary.Manuscript.Title">Manuskriptbeskrivning</h3>
     <ul>

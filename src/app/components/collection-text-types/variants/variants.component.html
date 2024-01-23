@@ -13,5 +13,5 @@
 
 <div class="tei teiContainer teiVariant"
       [class.show_pageBreakOriginal]="viewOptionsService.show.pageBreakOriginal"
-      [innerHTML]="text"
+      [innerHTML]="text | trustHtml"
 ></div>

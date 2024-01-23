@@ -1,6 +1,6 @@
 <ion-spinner *ngIf="!text" class="loading" name="crescent"></ion-spinner>
 <div class="tei teiContainer"
-      [innerHTML]="text"
+      [innerHTML]="text | trustHtml"
       [MathJax]="text"
       [attr.lang]="textLanguage ? textLanguage : null"
       [class.show_comments]="viewOptionsService.show.comments"

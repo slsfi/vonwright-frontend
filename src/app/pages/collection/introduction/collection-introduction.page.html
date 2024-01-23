@@ -45,7 +45,7 @@
           [class.show_paragraphNumbering]="viewOptionsService.show.paragraphNumbering && viewOptionsTogglesIntro.paragraphNumbering"
           [class.show_pageBreakEdition]="viewOptionsService.show.pageBreakEdition && viewOptionsTogglesIntro.pageBreakEdition"
           [class.hideIntro]="hasSeparateIntroToc"
-          [innerHTML]="text"
+          [innerHTML]="text | trustHtml"
     ></div>
 
     <!-- Tooltip wrapper -->
@@ -54,7 +54,7 @@
           [class.show_personInfo]="viewOptionsService.show.personInfo"
           [class.show_workInfo]="viewOptionsService.show.workInfo"
           [ngStyle]="{'position': toolTipPosType, 'top': toolTipPosition.top, 'left': toolTipPosition.left, 'max-width': toolTipMaxWidth, 'transform': 'scale(' + toolTipScaleValue + ')'}"
-          [innerHTML]="toolTipText"
+          [innerHTML]="toolTipText | trustHtml"
     ></div>
     
     <!-- Info overlay wrapper -->
@@ -77,7 +77,7 @@
           ></ion-icon>
         </ion-button>
       </div>
-      <div class="infoOverlayContent" [innerHTML]="infoOverlayText"></div>
+      <div class="infoOverlayContent" [innerHTML]="infoOverlayText | trustHtml"></div>
     </div>
   </article>
 
@@ -93,7 +93,7 @@
         ></ion-icon>
       </ion-button>
     </div>
-    <div id="toc-text" [innerHTML]="textMenu"></div>
+    <div id="toc-text" [innerHTML]="textMenu | trustHtml"></div>
   </nav>
 
 </ion-content>
