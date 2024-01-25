@@ -2,6 +2,7 @@ import { Directive, ElementRef, Input, OnChanges } from '@angular/core';
 import { SafeHtml } from '@angular/platform-browser';
 
 import { config } from '@config';
+import { isBrowser } from '@utility-functions';
 
 
 declare var MathJax: {
@@ -26,7 +27,7 @@ export class MathJaxDirective implements OnChanges {
   }
 
   ngOnChanges() {
-    if (this.mathJaxEnabled && this.mathJaxInput) {
+    if (isBrowser() && this.mathJaxEnabled && this.mathJaxInput) {
       try {
         // Tell the MathJax-processor to convert any TeX notated math in this.elRef.nativeElement
         MathJax.Hub.Queue(['Typeset', MathJax.Hub, this.elRef.nativeElement]);

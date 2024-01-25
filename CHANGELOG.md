@@ -14,6 +14,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 - Use `ARG` instructions in [`Dockerfile`](/Dockerfile) to define variables for setting Angular major version and Node image tag of the base image. This makes updating `Dockerfile` clearer as the Angular major version has to be changed in the file when the Angular major version of the app is updated.
 - Refactor functions and services related to markdown content. Remove duplicate code by moving functions for getting markdown content to the markdown service. Add pipe for marking HTML safe (bypassing sanitization) in order to separate the getting and parsing of markdown to HTML from the trusting of the HTML. Rename MarkdownContentService MarkdownService.
 - Replace `bypassSecurityTrustHtml` function calls with `trustHtml` pipe.
+- Run MathJax only in the browser.
 - Deps: update Angular to 17.1.0.
 - Deps: update htmlparser2 to 9.1.0.
 - Deps: update marked to 11.1.1 and remove @types/marked. Move markdown parsing to function in dedicated markdown service.
