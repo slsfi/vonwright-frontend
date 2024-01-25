@@ -15,7 +15,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 - Refactor functions and services related to markdown content. Remove duplicate code by moving functions for getting markdown content to the markdown service. Add pipe for marking HTML safe (bypassing sanitization) in order to separate the getting and parsing of markdown to HTML from the trusting of the HTML. Rename MarkdownContentService MarkdownService.
 - Replace `bypassSecurityTrustHtml` function calls with `trustHtml` pipe.
 - Run MathJax only in the browser.
-- Deps: update Angular to 17.1.0.
+- Deps: update Angular to 17.1.1.
 - Deps: update htmlparser2 to 9.1.0.
 - Deps: update marked to 11.1.1 and remove @types/marked. Move markdown parsing to function in dedicated markdown service.
 - Deps: update zone.js to 0.14.3.
