@@ -16,6 +16,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 - Replace `bypassSecurityTrustHtml` function calls with `trustHtml` pipe.
 - Run MathJax only in the browser.
 - Deps: update Angular to 17.1.1.
+- Deps: update Ionic to 7.6.6.
 - Deps: update htmlparser2 to 9.1.0.
 - Deps: update marked to 11.1.1 and remove @types/marked. Move markdown parsing to function in dedicated markdown service.
 - Deps: update zone.js to 0.14.3.
