@@ -8,30 +8,34 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ## [Unreleased]
 
+
+
+## [1.2.2] – 2024-01-25
+
 ### Changed
 
-- Fix indentation in [`nginx.conf`](/nginx.conf).
-- Use `ARG` instructions in [`Dockerfile`](/Dockerfile) to define variables for setting Angular major version and Node image tag of the base image. This makes updating `Dockerfile` clearer as the Angular major version has to be changed in the file when the Angular major version of the app is updated.
-- Refactor functions and services related to markdown content. Remove duplicate code by moving functions for getting markdown content to the markdown service. Add pipe for marking HTML safe (bypassing sanitization) in order to separate the getting and parsing of markdown to HTML from the trusting of the HTML. Rename MarkdownContentService MarkdownService.
-- Replace `bypassSecurityTrustHtml` function calls with `trustHtml` pipe.
-- Run MathJax only in the browser.
-- Deps: update Angular to 17.1.1.
-- Deps: update Ionic to 7.6.6.
-- Deps: update htmlparser2 to 9.1.0.
-- Deps: update marked to 11.1.1 and remove @types/marked. Move markdown parsing to function in dedicated markdown service.
-- Deps: update zone.js to 0.14.3.
-- Moved @angular/compiler from devDependencies to dependencies (like in fresh Angular 17 apps).
-- Deps: update typescript to 5.3.3.
-- Deps: update @types/node to 20.11.5.
-- Deps: update browser-sync to 3.0.2.
-- Deps: update jasmine-core to 5.1.1 and @types/jasmine to 5.1.4.
+- Fix indentation in [`nginx.conf`](/nginx.conf). ([779b217](https://github.com/slsfi/digital-edition-frontend-ng/commit/779b21778e35591aa43cdddabf0f9682c9df40e7))
+- Use `ARG` instructions in [`Dockerfile`](/Dockerfile) to define variables for setting Angular major version and Node image tag of the base image. This makes updating `Dockerfile` clearer as the Angular major version has to be changed in the file when the Angular major version of the app is updated. ([700b4e5](https://github.com/slsfi/digital-edition-frontend-ng/commit/700b4e53e574e937b36e8bd0b76546c798f7d5ab))
+- Refactor functions and services related to markdown content. Remove duplicate code by moving functions for getting markdown content to the markdown service. Add pipe for marking HTML safe (bypassing sanitization) in order to separate the getting and parsing of markdown to HTML from the trusting of the HTML. Rename MarkdownContentService MarkdownService. ([a294791](https://github.com/slsfi/digital-edition-frontend-ng/commit/a294791f2946ec66d5b32557ba2f7d8ae030fe98))
+- Replace `bypassSecurityTrustHtml` function calls with `trustHtml` pipe. ([b698c67](https://github.com/slsfi/digital-edition-frontend-ng/commit/b698c677f40dba5d073688e7d30e524e101bc63f))
+- Run MathJax only in the browser. ([d92853c](https://github.com/slsfi/digital-edition-frontend-ng/commit/d92853c15435c07d40ed79ea1a2ef9cf9f98eb6e))
+- Deps: update Angular to 17.1.1. ([3aba10e](https://github.com/slsfi/digital-edition-frontend-ng/commit/3aba10e41213d7e18a1af120f1ecd63eec2a4fda), [a3783f2](https://github.com/slsfi/digital-edition-frontend-ng/commit/a3783f2d6b4f6f30ef14b6766a22d524b8e60dd8))
+- Deps: update Ionic to 7.6.6. ([1baa779](https://github.com/slsfi/digital-edition-frontend-ng/commit/1baa779dd2e4853d78513dffb2de4a19a5be5d44))
+- Deps: update htmlparser2 to 9.1.0. ([3a28300](https://github.com/slsfi/digital-edition-frontend-ng/commit/3a28300a9b2594e1b3a8da3a92d1e8cb547292c2))
+- Deps: update marked to 11.1.1 and remove @types/marked. Move markdown parsing to function in dedicated markdown service. ([2d214df](https://github.com/slsfi/digital-edition-frontend-ng/commit/2d214df0a76c5fd5d82e760b02ecbf9a9823b141))
+- Deps: update zone.js to 0.14.3. ([9a33558](https://github.com/slsfi/digital-edition-frontend-ng/commit/9a335581bd6edaa84437b56b90866c440f9af714))
+- Moved @angular/compiler from devDependencies to dependencies (like in fresh Angular 17 apps). ([c8a680d](https://github.com/slsfi/digital-edition-frontend-ng/commit/c8a680da970c5f27f76088186fe9555f0dcf98a5))
+- Deps: update typescript to 5.3.3. ([c2ef241](https://github.com/slsfi/digital-edition-frontend-ng/commit/c2ef241c96610f915b201f272de5be07735852d9))
+- Deps: update @types/node to 20.11.5. ([ba5a0ea](https://github.com/slsfi/digital-edition-frontend-ng/commit/ba5a0ea2a69721e7ece6d54b3bd803a153247200))
+- Deps: update browser-sync to 3.0.2. ([7f65bed](https://github.com/slsfi/digital-edition-frontend-ng/commit/7f65bed1369ca517ce108ee6bf4e3ba7948b4c00))
+- Deps: update jasmine-core to 5.1.1 and @types/jasmine to 5.1.4. ([b548e78](https://github.com/slsfi/digital-edition-frontend-ng/commit/b548e789674599298a79076136a5d98d404ed774))
 
 ### Removed
 
-- Deps: @angular-eslint from devDependencies.
-- Deps: jasmine-spec-reporter from devDependencies.
-- Deps: karma-coverage-istanbul-reporter from devDependencies.
-- Deps: ts-node from devDependencies.
+- Deps: @angular-eslint from devDependencies. ([c719b45](https://github.com/slsfi/digital-edition-frontend-ng/commit/c719b45b41c93379f9819ad7d01e267c572ab52c))
+- Deps: jasmine-spec-reporter from devDependencies. ([a9e0702](https://github.com/slsfi/digital-edition-frontend-ng/commit/a9e070215e15adb5f1078b688ab7bd347d316270))
+- Deps: karma-coverage-istanbul-reporter from devDependencies. ([f27d677](https://github.com/slsfi/digital-edition-frontend-ng/commit/f27d6770d2623acea2f07067952edec0529976cd))
+- Deps: ts-node from devDependencies. ([e55173f](https://github.com/slsfi/digital-edition-frontend-ng/commit/e55173f496db494fcd369b414efa1adf5353beb9))
 
 
 
@@ -71,8 +75,8 @@ siteLogoDimensions: {
 ### Changed
 
 - Default site logo in top menu changed to optimized PNG image file. Added both black and white versions of SLS’s logo to `assets/images/logo/`. ([9df4bef](https://github.com/slsfi/digital-edition-frontend-ng/commit/9df4bef940ddd66c6087daa93bee9fd166b4e731))
-- Update Angular dev-kit, CLI and SSR to 17.0.9. ([c67b22e](https://github.com/slsfi/digital-edition-frontend-ng/commit/c67b22e89fd459b850c523d679f1653ea5e2eaeb))
-- Update dev-dependency follow-redirects to 1.15.4. ([30355ea](https://github.com/slsfi/digital-edition-frontend-ng/commit/30355ea87e03c68c31df87ed34bb85cadd9e1f35))
+- Deps: update Angular dev-kit, CLI and SSR to 17.0.9. ([c67b22e](https://github.com/slsfi/digital-edition-frontend-ng/commit/c67b22e89fd459b850c523d679f1653ea5e2eaeb))
+- Deps: update dev-dependency follow-redirects to 1.15.4. ([30355ea](https://github.com/slsfi/digital-edition-frontend-ng/commit/30355ea87e03c68c31df87ed34bb85cadd9e1f35))
 
 
 
@@ -85,7 +89,7 @@ siteLogoDimensions: {
 ### Changed
 
 - Paths to font files in @font-face rules from absolute to relative. ([2dd2bf3](https://github.com/slsfi/digital-edition-frontend-ng/commit/2dd2bf34d76233f5eafc15e607a491a7800e1a38))
-- Update Ionic to 7.6.3 and Ionicons to 7.2.2. ([f35d148](https://github.com/slsfi/digital-edition-frontend-ng/commit/f35d14831bec9aa7430c43a4bd7854c3f77871b9))
+- Deps: update Ionic to 7.6.3 and Ionicons to 7.2.2. ([f35d148](https://github.com/slsfi/digital-edition-frontend-ng/commit/f35d14831bec9aa7430c43a4bd7854c3f77871b9))
 
 
 
@@ -99,9 +103,9 @@ siteLogoDimensions: {
 
 ### Changed
 
-- Update Angular to 17.0.8. ([e936d0b](https://github.com/slsfi/digital-edition-frontend-ng/commit/e936d0b097877cca2d61ff93ddee53b14583672b))
-- Update ng-extract-i18n-merge to 2.9.1. ([98e567b](https://github.com/slsfi/digital-edition-frontend-ng/commit/98e567b691d0e7c2550e2bbe5bc6015859e4798f))
 - Eagerly load home page banner image in portrait mode. ([5d11e3c](https://github.com/slsfi/digital-edition-frontend-ng/commit/5d11e3cce6b57335e8c6ae8816f5bd38aefa414f))
+- Deps: update Angular to 17.0.8. ([e936d0b](https://github.com/slsfi/digital-edition-frontend-ng/commit/e936d0b097877cca2d61ff93ddee53b14583672b))
+- Deps: update ng-extract-i18n-merge to 2.9.1. ([98e567b](https://github.com/slsfi/digital-edition-frontend-ng/commit/98e567b691d0e7c2550e2bbe5bc6015859e4798f))
 
 ### Fixed
 
@@ -121,9 +125,9 @@ siteLogoDimensions: {
 
 ### Changed
 
-- Update Angular to 17.0.7. ([90028cf](https://github.com/slsfi/digital-edition-frontend-ng/commit/90028cfae667383603fd8852412ec7448ec6da5a))
 - Update base app Docker image repository and tag in `compose.yml`. ([8bdfc5a](https://github.com/slsfi/digital-edition-frontend-ng/commit/8bdfc5a04b5e138ce12fafb69c7e90730dad73f9))
 - Update README, CHANGELOG and build workflow code comments. ([35d373d](https://github.com/slsfi/digital-edition-frontend-ng/commit/35d373d67254638574483eae01f7a8a6415bba68))
+- Deps: update Angular to 17.0.7. ([90028cf](https://github.com/slsfi/digital-edition-frontend-ng/commit/90028cfae667383603fd8852412ec7448ec6da5a))
 
 ### Fixed
 
@@ -153,11 +157,11 @@ siteLogoDimensions: {
 
 ### Changed
 
-- Update Ionic to 7.6.0. ([9c66917](https://github.com/slsfi/digital-edition-frontend-ng/commit/9c66917e8df33e96c5ac115aae618c6bce453c4a))
-- Update Angular to 17.0.6. ([bf878ae](https://github.com/slsfi/digital-edition-frontend-ng/commit/bf878aeeeb7a6100b81f4e1e808e7913806ec5b8))
 - Apply background colors to toggle labels only instead of the entire toggles in the view options popover. ([fc2fc38](https://github.com/slsfi/digital-edition-frontend-ng/commit/fc2fc38c64d3c4d66c2838769f9cac74f0a72a08))
 - Adjust padding of facsimile page number input elements to accommodate changed spec in Ionic 7.6.0. ([34d1ab0](https://github.com/slsfi/digital-edition-frontend-ng/commit/34d1ab074e03d386f01e6fe00e1fe5e0409dcfb5))
 - Move inline styles for checkbox labels on the elastic-search page to the component SCSS-file. ([8d0a766](https://github.com/slsfi/digital-edition-frontend-ng/commit/8d0a76692396c77715fa570ac32e8f19bfd6b41a))
+- Deps: update Ionic to 7.6.0. ([9c66917](https://github.com/slsfi/digital-edition-frontend-ng/commit/9c66917e8df33e96c5ac115aae618c6bce453c4a))
+- Deps: update Angular to 17.0.6. ([bf878ae](https://github.com/slsfi/digital-edition-frontend-ng/commit/bf878aeeeb7a6100b81f4e1e808e7913806ec5b8))
 
 
 
@@ -167,7 +171,8 @@ siteLogoDimensions: {
 
 
 
-[unreleased]: https://github.com/slsfi/digital-edition-frontend-ng/compare/1.2.1...HEAD
+[unreleased]: https://github.com/slsfi/digital-edition-frontend-ng/compare/1.2.2...HEAD
+[1.2.2]: https://github.com/slsfi/digital-edition-frontend-ng/compare/1.2.1...1.2.2
 [1.2.1]: https://github.com/slsfi/digital-edition-frontend-ng/compare/1.2.0...1.2.1
 [1.2.0]: https://github.com/slsfi/digital-edition-frontend-ng/compare/1.1.1...1.2.0
 [1.1.1]: https://github.com/slsfi/digital-edition-frontend-ng/compare/1.1.0...1.1.1
