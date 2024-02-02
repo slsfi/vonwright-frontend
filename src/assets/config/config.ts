@@ -32,6 +32,7 @@ export const config: Config = {
       }
     },
     prebuild: {
+      sitemap: true,
       staticCollectionMenus: true
     },
     ssr: {

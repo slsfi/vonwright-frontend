@@ -1,6 +1,11 @@
 const fs = require('fs');
 const path = require('path');
 
+/**
+ * Get the config object used by the app.
+ * @param configFilepath File path to config.ts where the config object is defined.
+ * @returns Object containing the config.
+ */
 function getConfig(configFilepath) {
   // Join the relative file path with the current working directory to create an absolute path
   const absoluteConfigFilepath = path.join(__dirname, configFilepath);
@@ -49,6 +54,12 @@ async function fetchFromAPI(endpoint) {
   }
 }
 
+/**
+ * Given an object with nested objects in the property 'branchingKey',
+ * returns a flattened array of the object. If 'requiredKey' is not
+ * undefined, only objects that have a non-empty 'requiredKey' property
+ * are included.
+ */
 function flattenObjectTree(data, branchingKey = 'children', requiredKey = undefined) {
   const dataWithoutChildren = (({ [branchingKey]: _, ...d }) => d)(data);
   let list = [];
@@ -66,6 +77,13 @@ function flattenObjectTree(data, branchingKey = 'children', requiredKey = undefi
   return list;
 }
 
+/**
+ * Get the translation of the phrase with the given id in the given locale.
+ * The translation is fetched from the messages.<locale>.xlf files in the
+ * given folder.
+ * @returns The translation as a string or 'link' if unable to find the id
+ * in the translation file.
+ */
 function getTranslation(folderPath, locale, id) {
   if (!id) {
     return 'link';
@@ -98,6 +116,9 @@ function getTranslation(folderPath, locale, id) {
   }
 }
 
+/**
+ * Export all functions in this file as a CommonJS module.
+ */
 module.exports = {
   getConfig,
   fetchFromAPI,

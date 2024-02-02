@@ -8,9 +8,27 @@ const sitemapFilename = 'sitemap.txt';
 generateSitemap();
 
 
+/**
+ * Generates a simple sitemap text file in the root folder `src/`.
+ * The file contains one URL per line. The script uses the settings
+ * in config.ts to fetch data about the project and generate the
+ * URLs to all unique pages. The following page types are included:
+ * - Home
+ * - About
+ * - Ebook
+ * - Collection
+ * - Media collection
+ */
 async function generateSitemap() {
-  console.log('Generating sitemap ...');
   const config = common.getConfig(configFilepath);
+  const generateSitemap = config.app?.prebuild?.sitemap ?? true;
+  
+  if (generateSitemap) {
+    console.log('Generating sitemap ...');
+  } else {
+    console.log('Skipping generation of sitemap, disabled in config.\n');
+    return;
+  }
 
   const projectName = config.app?.projectNameDB ?? '';
   const API = config.app?.backendBaseURL ?? '';
