@@ -10,12 +10,13 @@
     "start": "ng serve --configuration=development,sv",
     "start:fi": "ng serve --configuration=development,fi",
     "extract-i18n": "ng extract-i18n --sort idAsc",
-    "generate-sitemap": "node ./generate_sitemap.js",
+    "generate-sitemap": "node ./prebuild-generate-sitemap.js",
+    "generate-static-collection-menus": "node ./prebuild-generate-static-collection-menus.js",
     "build:ssr": "ng build --configuration production && ng run app:server:production && copyfiles proxy-server.js dist/app",
     "serve:ssr": "node dist/app/proxy-server.js",
     "ssr-start": "npm run build:ssr && npm run serve:ssr",
     "gzipper": "gzipper",
-    "compress": "gzipper compress ./dist/app/browser --include html,xml,txt,css,js,svg,ico,json,ttf,otf --threshold 1300 --gzip-level 9 --remove-larger"
+    "compress": "gzipper compress ./dist/app/browser --include html,htm,xml,txt,css,js,svg,ico,json,ttf,otf --threshold 1300 --gzip-level 9 --remove-larger"
   },
   "dependencies": {
     "@angular/animations": "^17.1.1",

@@ -41,6 +41,7 @@
               "src/assets/icon/favicon.ico",
               "src/robots.txt",
               "src/sitemap.txt",
+              "src/static-html/",
               "src/assets",
               {
                 "glob": "**/*",

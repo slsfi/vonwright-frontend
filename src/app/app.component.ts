@@ -21,6 +21,7 @@ export class AppComponent implements OnDestroy, OnInit {
   currentRouterUrl: string = '';
   currentUrlSegments: UrlSegment[] = [];
   enableRouterLoadingBar: boolean = false;
+  enableCollectionSideMenuSSR: boolean = false;
   loadingBarHidden: boolean = false;
   mobileMode: boolean = true;
   mountMainSideMenu: boolean = false;
@@ -34,6 +35,7 @@ export class AppComponent implements OnDestroy, OnInit {
     private platformService: PlatformService,
     private router: Router
   ) {
+    this.enableCollectionSideMenuSSR = config.app?.ssr?.collectionSideMenu ?? false;
     this.enableRouterLoadingBar = config.app?.enableRouterLoadingBar ?? false;
   }
 

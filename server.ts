@@ -17,6 +17,7 @@ import { environment } from './src/environments/environment';
 export function app(lang: string): express.Express {
   const server = express();
   const distFolder = join(process.cwd(), `dist/app/browser/${lang}`);
+  const staticHtmlFolder = join(process.cwd(), `dist/app/browser/${lang}/static-html`);
   const indexHtml = existsSync(join(distFolder, 'index.original.html'))
     ? join(distFolder, 'index.original.html')
     : join(distFolder, 'index.html');
@@ -25,6 +26,17 @@ export function app(lang: string): express.Express {
 
   server.set('view engine', 'html');
   server.set('views', distFolder);
+
+  // Serve static files from /static-html
+  server.use('/static-html', express.static(staticHtmlFolder, {
+    fallthrough: true // Allows the request to continue to the next middleware if no file is found
+  }));
+
+  // Handle 404 for /static-html, this is to prevent the built-in Angular wildcard route for
+  // 404 pages from handling missing files in the path
+  server.use('/static-html', (req, res) => {
+    res.status(404).send('File not found');
+  });
 
   // Example Express Rest API endpoints
   // server.get('/api/**', (req, res) => { });

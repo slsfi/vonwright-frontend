@@ -1,5 +1,5 @@
 import { Inject, Injectable, LOCALE_ID } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { BehaviorSubject, catchError, map, Observable, of } from 'rxjs';
 
 import { config } from '@config';
@@ -59,6 +59,20 @@ export class CollectionTableOfContentsService {
 
   getActiveTocOrder(): Observable<string> {
     return this.activeTocOrder.asObservable();
+  }
+
+  getStaticTableOfContents(id: string): Observable<string> {
+    const headers = new HttpHeaders({
+      'Content-Type': 'text/html; charset=UTF-8'
+    });
+    const endpoint = `/static-html/collection-toc/${id}_${this.activeLocale}.htm`;
+
+    return this.http.get(endpoint, {headers, responseType: 'text'}).pipe(
+      catchError((error) => {
+        console.log('Error loading static html', error);
+        return of('');
+      })
+    );
   }
 
   private async handleError(error: Response | any) {

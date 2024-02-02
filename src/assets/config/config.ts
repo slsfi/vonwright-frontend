@@ -30,6 +30,12 @@ export const config: Config = {
           URL: "assets/images/home-page-banner.jpg"
         }
       }
+    },
+    prebuild: {
+      staticCollectionMenus: true
+    },
+    ssr: {
+      collectionSideMenu: false
     }
   },
   collections: {

@@ -38,6 +38,8 @@ RUN npm install -g @angular/cli@${ANGULAR_MAJOR_VERSION}
 RUN npm install
 # Run script that generates sitemap.txt.
 RUN npm run generate-sitemap
+# Run script that generates static html files for collection menus.
+RUN npm run generate-static-collection-menus
 # Build the Angular SSR app.
 RUN npm run build:ssr
 # Create precompressed versions of static files (dist/app/browser/).

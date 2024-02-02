@@ -69,3 +69,7 @@ Thumbs.db
 
 # Dev config files
 /src/assets/config/config-*.ts
+
+# Static html files
+/src/static-html/collection-toc/*
+!/src/static-html/collection-toc/.gitkeep

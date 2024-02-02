@@ -1,9 +1,50 @@
 page-elastic-search {
-    .hit-item {
-        em {
-            background-color: var(--search-match-highlight-background-color);
-            color: var(--search-match-highlight-text-color);
-            font-style: normal;
-        }
+  .hit-item {
+    em {
+      background-color: var(--search-match-highlight-background-color);
+      color: var(--search-match-highlight-text-color);
+      font-style: normal;
     }
+  }
+}
+
+static-html {
+  .static-collection-toc {
+    /*
+      Prevent flickering of the static collection TOC before the
+      dynamic TOC is loaded by setting color to transparent. The static
+      TOC is only relevant for robots.
+    */
+    * {
+      color: transparent;
+    }
+    ion-spinner.loading {
+      color: inherit !important;
+    }
+    /*
+      The below styles mimic the styles of the dynamic TOC. Can be used
+      instead of setting color of all elements to transparent above, but
+      with @defer of the component this will cause flickering.
+    */
+    /*
+    p {
+      background-color: var(--side-menu-collection-title-background-color);
+      color: var(--side-menu-collection-title-text-color);
+      margin: 0;
+      padding: 16px 18px 16px 16px;
+    }
+    ul {
+      list-style-type: none;
+      margin: 0;
+      padding: 0;
+    }
+    li {
+      padding: 1rem 1rem 0.375rem 1rem;
+    }
+    a {
+      color: var(--side-menu-text-color);
+      text-decoration: none;
+    }
+    */
+  }
 }
