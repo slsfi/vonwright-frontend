@@ -17,6 +17,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 - Deps: update Angular to 17.1.2.
 - Deps: update Ionic to 7.7.0.
+- Deps: update @types/node to 20.11.16.
 
 
 
