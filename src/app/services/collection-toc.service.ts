@@ -65,7 +65,7 @@ export class CollectionTableOfContentsService {
     const headers = new HttpHeaders({
       'Content-Type': 'text/html; charset=UTF-8'
     });
-    const endpoint = `/static-html/collection-toc/${id}_${this.activeLocale}.htm`;
+    const endpoint = `http://localhost:4201/static-html/collection-toc/${id}_${this.activeLocale}.htm`;
 
     return this.http.get(endpoint, {headers, responseType: 'text'}).pipe(
       catchError((error) => {
