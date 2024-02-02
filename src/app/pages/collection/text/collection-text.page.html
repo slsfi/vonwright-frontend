@@ -337,12 +337,18 @@
         (openNewLegendView)="openNewView($event)"
   ></variants>
   
-  <illustrations *ngIf="view.type === 'illustrations'"
-        [singleImage]="view.image"
-        [textItemID]="textItemID"
-        (showAllImages)="updateIllustrationViewImage($event)"
-        (setMobileModeActiveText)="setActiveMobileModeViewType(undefined, $event)"
-  ></illustrations>
+  <ng-container *ngIf="view.type === 'illustrations'">
+    @defer {
+      <illustrations
+            [singleImage]="view.image"
+            [textItemID]="textItemID"
+            (showAllImages)="updateIllustrationViewImage($event)"
+            (setMobileModeActiveText)="setActiveMobileModeViewType(undefined, $event)"
+      ></illustrations>
+    } @loading (minimum 1s) {
+      <ion-spinner class="loading" name="crescent"></ion-spinner>
+    }
+  </ng-container>
 
   <text-legend *ngIf="view.type === 'legend'"
         [itemId]="textItemID"

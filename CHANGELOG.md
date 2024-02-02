@@ -16,6 +16,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 ### Changed
 
 - Defer loading of the facsimile component on the collection text page to the browser. This increases server-side rendering performance since the component isn’t rendered on the server.
+- Defer loading of the illustrations component on the collection text page to the browser. This increases server-side rendering performance since the component isn’t rendered on the server.
 - Deps: update Angular to 17.1.2.
 - Deps: update Ionic to 7.7.0.
 - Deps: update `marked` to 11.2.0.
