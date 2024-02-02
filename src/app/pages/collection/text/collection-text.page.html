@@ -300,14 +300,20 @@
         (setMobileModeActiveText)="setActiveMobileModeViewType(undefined, $event)"
   ></comments>
 
-  <facsimiles *ngIf="view.type === 'facsimiles'"
-        [textItemID]="textItemID"
-        [facsID]="view.id"
-        [imageNr]="view.nr"
-        (selectedFacsID)="updateViewProperty('id', $event, i)"
-        (selectedImageNr)="updateViewProperty('nr', $event, i)"
-        (selectedFacsName)="updateViewProperty('title', $event, i, false)"
-  ></facsimiles>
+  <ng-container *ngIf="view.type === 'facsimiles'">
+    @defer {
+      <facsimiles
+            [textItemID]="textItemID"
+            [facsID]="view.id"
+            [imageNr]="view.nr"
+            (selectedFacsID)="updateViewProperty('id', $event, i)"
+            (selectedImageNr)="updateViewProperty('nr', $event, i)"
+            (selectedFacsName)="updateViewProperty('title', $event, i, false)"
+      ></facsimiles>
+    } @loading (minimum 1s) {
+      <ion-spinner class="loading" name="crescent"></ion-spinner>
+    }
+  </ng-container>
 
   <manuscripts *ngIf="view.type === 'manuscripts'"
         [textItemID]="textItemID"
