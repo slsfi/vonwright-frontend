@@ -4,6 +4,7 @@ import { Observable, of } from 'rxjs';
 
 import { config } from '@config';
 import { CollectionTableOfContentsService } from '@services/collection-toc.service';
+import { isBrowser } from '@utility-functions';
 
 
 @Component({
@@ -52,7 +53,11 @@ export class StaticHtmlComponent implements OnChanges {
   }
 
   private getStaticContent(): Observable<string> {
-    if (this.type === 'collection-toc' && this.prebuiltCollectionMenus) {
+    // Get the static TOC for the collection if prebuilding of static
+    // TOC files is enabled in config and running on the server. In the
+    // browser the dynamic TOC is loaded, so no need to first render the
+    // static one.
+    if (this.type === 'collection-toc' && this.prebuiltCollectionMenus && !isBrowser()) {
       return this.tocService.getStaticTableOfContents(this.id);
     }
 
