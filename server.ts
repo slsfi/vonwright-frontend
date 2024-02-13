@@ -12,6 +12,7 @@ import { join } from 'path';
 
 import AppServerModule from './src/main.server';
 import { environment } from './src/environments/environment';
+import { REQUEST } from './src/express.tokens';
 
 // The Express app is exported so that it can be used by serverless Functions.
 export function app(lang: string): express.Express {
@@ -60,7 +61,8 @@ export function app(lang: string): express.Express {
         publicPath: distFolder,
         providers: [
           { provide: APP_BASE_HREF, useValue: baseUrl },
-          { provide: LOCALE_ID, useValue: lang }
+          { provide: LOCALE_ID, useValue: lang },
+          { provide: REQUEST, useValue: req }
         ],
       })
       .then((html) => res.send(html))

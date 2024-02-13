@@ -102,7 +102,7 @@ export class TooltipService {
     return this.commentService.getSingleComment(textItemID, elementID).pipe(
       map((comment: any) => {
         this.cachedTooltips.comments.size > this.maxTooltipCacheSize && this.cachedTooltips.comments.clear();
-        this.platformService.isDesktop() && this.cachedTooltips.comments.set(elementID, comment);
+        !this.platformService.isMobile() && this.cachedTooltips.comments.set(elementID, comment);
         return (
           { name: 'Comment', description: comment } ||
           { name: 'Error', description: '' }
@@ -152,7 +152,7 @@ export class TooltipService {
       ttText = ttText.replaceAll(' xmlns:tei="http://www.tei-c.org/ns/1.0"', '');
 
       let columnId = '';
-      if (this.platformService.isDesktop()) {
+      if (!this.platformService.isMobile()) {
         // Get column id of the column where the footnote is.
         let containerElem = triggerElem.parentElement;
         while (
@@ -174,7 +174,7 @@ export class TooltipService {
         + '" href="#' + id + '">' + triggerElem.textContent
         + '</a>' + '<p class="footnoteText">' + ttText  + '</p></div>';
       this.cachedTooltips.footnotes.size > this.maxTooltipCacheSize && this.cachedTooltips.footnotes.clear();
-      this.platformService.isDesktop() && this.cachedTooltips.footnotes.set(textType + '_' + id, footnoteHTML);
+      !this.platformService.isMobile() && this.cachedTooltips.footnotes.set(textType + '_' + id, footnoteHTML);
       return of(footnoteHTML || '');
     } else {
       return of('');

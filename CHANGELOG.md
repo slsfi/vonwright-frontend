@@ -29,7 +29,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ### Fixed
 
-- Correctly infer app mode on touch devices. Previously the app was set to mobile mode on all touchscreen devices, which was not optimal for e.g. laptops with touchscreens.
+- Set correct app mode (desktop or mobile) on server. Prior to this fix the server app would always return the app rendered in desktop mode, regardless of the actual client device. Previously Ionic’s Platform service was used to determine the current device in the browser, but since it’s not SSR-compatible, the user agent string is now used instead. On the server, the user agent is read from the request headers, and in the browser from the `Window.navigator` object. The app mode is now correctly set for most devices and browsers. One notable exception is Safari on iPads with iOS 13+, which are recognized as desktop devices. Using only the user agent string, it is not possible to distinguish Safari on iPads with iOS 13+ from Safari on MacBooks with MacOS. This fix makes the app compatible with Angular hydration, and nullifies the unreleased changes in [a2f3ea2](https://github.com/slsfi/digital-edition-frontend-ng/commit/a2f3ea276497d410d744a3a88486d0fa57188f66).
 
 ### Removed
 

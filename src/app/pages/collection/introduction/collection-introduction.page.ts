@@ -654,7 +654,7 @@ export class CollectionIntroductionPage implements OnInit, OnDestroy {
         left: ttProperties.left
       };
       this.toolTipPosType = 'absolute';
-      if (!this.platformService.isDesktop()) {
+      if (this.platformService.isMobile()) {
         this.toolTipPosType = 'fixed';
       }
       this.tooltipVisible = true;
