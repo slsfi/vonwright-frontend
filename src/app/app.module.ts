@@ -19,12 +19,22 @@ import { TopMenuComponent } from '@components/menus/top/top-menu.component';
   ],
   imports: [
     BrowserModule,
-    IonicModule.forRoot(
-      {
-        mode: 'md',
-        backButtonText: '',
+    IonicModule.forRoot({
+      backButtonText: '',
+      mode: 'md',
+      platform: {
+        /**
+         * The default `desktop` function returns false for devices with a touchscreen.
+         * This is not wanted, so test the user agent for 'Mobi' instead, see
+         * - https://developer.mozilla.org/en-US/docs/Web/HTTP/Browser_detection_using_the_user_agent#mobile_tablet_or_desktop
+         * - https://ionicframework.com/docs/angular/platform#customizing-platform-detection-functions
+         */
+        'desktop': (win) => {
+          const isMobile = /Mobi/i.test(win.navigator.userAgent);
+          return !isMobile;
+        }
       }
-    ),
+    }),
     AppRoutingModule,
     CommonModule,
     CollectionSideMenuComponent,

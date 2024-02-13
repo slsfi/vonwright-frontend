@@ -24,6 +24,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 - Deps: update `ng-extract-i18n-merge` to 2.10.0.
 - Deps: update `@types/node` to 20.11.17.
 
+### Fixed
+
+- Correctly infer app mode on touch devices. Previously the app was set to mobile mode on all touchscreen devices, which was not optimal for e.g. laptops with touchscreens.
+
 
 
 ## [1.2.3] – 2024-01-26
