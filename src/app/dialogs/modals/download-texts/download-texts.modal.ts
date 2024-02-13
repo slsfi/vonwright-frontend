@@ -10,6 +10,7 @@ import { CollectionContentService } from '@services/collection-content.service';
 import { CollectionsService } from '@services/collections.service';
 import { CollectionTableOfContentsService } from '@services/collection-toc.service';
 import { CommentService } from '@services/comment.service';
+import { DocumentHeadService } from '@services/document-head.service';
 import { HtmlParserService } from '@services/html-parser.service';
 import { MarkdownService } from '@services/markdown.service';
 import { ReferenceDataService } from '@services/reference-data.service';
@@ -68,6 +69,7 @@ export class DownloadTextsModal implements OnDestroy, OnInit {
     private collectionContentService: CollectionContentService,
     private collectionsService: CollectionsService,
     private commentService: CommentService,
+    private headService: DocumentHeadService,
     private mdService: MarkdownService,
     private modalCtrl: ModalController,
     private parserService: HtmlParserService,
@@ -164,9 +166,12 @@ export class DownloadTextsModal implements OnDestroy, OnInit {
       this.setCollectionTitle();
 
       if (this.readTextsMode) {
-        // Get publication title from TOC (this way we can also get
-        // correct chapter titles for publications with chapters)
-        this.setPublicationTitle();
+        // Get publication title
+        this.headService.getCurrentPageTitle().subscribe((pubTitle: string) => {
+          this.publicationTitle = pubTitle?.slice(-1) === '.'
+                ? pubTitle.slice(0, -1)
+                : pubTitle;
+        });
 
         if (this.downloadFormatsEst.length || this.downloadFormatsCom.length) {
           // Get publication data in order to determine if reading-texts and
@@ -762,60 +767,6 @@ export class DownloadTextsModal implements OnDestroy, OnInit {
           }
         }
       );
-    }
-  }
-
-  private setPublicationTitle() {
-    if (this.collectionId) {
-      this.tocService.getTableOfContents(this.collectionId).subscribe(
-        (toc: any) => {
-          if (toc?.children) {
-            const idParts = this.textItemID.split(';');
-            const searchItemId = idParts[0];
-            const positionId = idParts[1] || '';
-            if (!positionId) {
-              this.recursiveSearchTocForPublicationTitle(toc.children, searchItemId);
-            } else {
-              this.recursiveSearchTocForPublicationTitle(toc.children, searchItemId + ';', true);
-            }
-          }
-        }
-      );
-    }
-  }
-
-  private recursiveSearchTocForPublicationTitle(
-    tocArray: any[],
-    searchId: string,
-    idIncludesPosition: boolean = false,
-    parentTitle?: string
-  ) {
-    if (tocArray?.length) {
-      for (let i = 0; i < tocArray.length; i++) {
-        if (tocArray[i].itemId === searchId) {
-          this.publicationTitle = tocArray[i].text;
-          if (this.publicationTitle?.slice(-1) === '.') {
-            this.publicationTitle = this.publicationTitle.slice(0, -1);
-          }
-          break;
-        } else if (
-          idIncludesPosition &&
-          tocArray[i].itemId?.startsWith(searchId)
-        ) {
-          this.publicationTitle = parentTitle || '';
-          if (this.publicationTitle?.slice(-1) === '.') {
-            this.publicationTitle = this.publicationTitle.slice(0, -1);
-          }
-          break;
-        } else if (tocArray[i].children) {
-          this.recursiveSearchTocForPublicationTitle(
-            tocArray[i].children,
-            searchId,
-            idIncludesPosition,
-            tocArray[i].text
-          );
-        }
-      }
     }
   }
 

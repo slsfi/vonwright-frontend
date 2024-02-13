@@ -17,7 +17,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 - Defer loading of the facsimile component on the collection text page to the browser. This increases server-side rendering performance since the component isn’t rendered on the server.
 - Defer loading of the illustrations component on the collection text page to the browser. This increases server-side rendering performance since the component isn’t rendered on the server.
-- Refactor requests for flattened collection table of contents to use function in service.
+- Refactor requests for flattened collection table of contents to use function in the collection TOC service.
+- Refactor the download texts modal to get the current text title from the document head service.
 - Deps: update Angular to 17.1.3.
 - Deps: update Ionic to 7.7.1.
 - Deps: update `marked` to 12.0.0.
