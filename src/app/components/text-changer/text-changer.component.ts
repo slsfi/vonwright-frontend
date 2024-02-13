@@ -1,55 +1,50 @@
 import { Component, Input, OnChanges, OnDestroy, OnInit, SimpleChanges } from '@angular/core';
 import { NgIf } from '@angular/common';
-import { Router } from '@angular/router';
+import { RouterLink } from '@angular/router';
 import { IonicModule } from '@ionic/angular';
 import { Subscription } from 'rxjs';
 
 import { config } from '@config';
 import { CollectionTableOfContentsService } from '@services/collection-toc.service';
+import { DocumentHeadService } from '@services/document-head.service';
+import { CollectionPagePathPipe } from '@pipes/collection-page-path.pipe';
+import { CollectionPagePositionQueryparamPipe } from '@pipes/collection-page-position-queryparam.pipe';
 import { PlatformService } from '@services/platform.service';
-import { sortArrayOfObjectsAlphabetically, sortArrayOfObjectsNumerically } from '@utility-functions';
 
 
+/**
+ * Component for displaying the title of the current collection page as well
+ * as links to the previous and next collection page based on the collection
+ * menu/table of contents. This component is responsible for setting the 
+ * document title to the title of the current text for collection pages.
+ * Thus this component must always be server-side rendered.
+ */
 @Component({
   standalone: true,
   selector: 'text-changer',
   templateUrl: './text-changer.component.html',
   styleUrls: ['./text-changer.component.scss'],
-  imports: [NgIf, IonicModule]
+  imports: [NgIf, RouterLink, IonicModule, CollectionPagePathPipe, CollectionPagePositionQueryparamPipe]
 })
 export class TextChangerComponent implements OnChanges, OnDestroy, OnInit {
   @Input() parentPageType: string = '';
   @Input() textItemID: string = '';
   @Input() textPosition: string = '';
 
-  activeTocOrder: string = '';
-  activeTocOrderSubscription: Subscription | null = null;
-  collectionHasCover: boolean = false;
-  collectionHasTitle: boolean = false;
-  collectionHasForeword: boolean = false;
-  collectionHasIntro: boolean = false;
   collectionId: string = '';
-  currentItemTitle: string = '';
-  firstItem?: boolean;
-  flattened: Array<any> = [];
-  lastItem?: boolean;
+  collectionTitle: string = '';
+  currentTocTextIndex: number = 0;
+  flattenedToc: any[] = [];
+  frontMatterPages: any[] = [];
   mobileMode: boolean = false;
-  nextItem: any;
-  nextItemTitle?: string;
-  prevItem: any;
-  prevItemTitle?: string;
   tocItemId: string = '';
+  tocSubscr: Subscription | null = null;
 
   constructor(
+    private headService: DocumentHeadService,
     private platformService: PlatformService,
-    private router: Router,
     private tocService: CollectionTableOfContentsService
-  ) {
-    this.collectionHasCover = config.collections?.frontMatterPages?.cover ?? false;
-    this.collectionHasTitle = config.collections?.frontMatterPages?.title ?? false;
-    this.collectionHasForeword = config.collections?.frontMatterPages?.foreword ?? false;
-    this.collectionHasIntro = config.collections?.frontMatterPages?.introduction ?? false;
-  }
+  ) {}
 
   ngOnChanges(changes: SimpleChanges) {
     let firstChange = true;
@@ -71,535 +66,126 @@ export class TextChangerComponent implements OnChanges, OnDestroy, OnInit {
       }
     }
 
-    if (!this.parentPageType) {
-      this.parentPageType = 'page-text';
-    }
-
-    this.collectionId = this.textItemID.split('_')[0];
-    this.tocItemId = this.textItemID;
-    if (this.textPosition) {
-      this.tocItemId += ';' + this.textPosition;
-    }
-
-    if (
-      !firstChange &&
-      this.parentPageType === 'page-text' &&
-      (
-        changes.textItemID === undefined ||
-        this.textItemID === changes.textItemID.previousValue
-      ) &&
-      changes.textPosition &&
-      this.textPosition !== changes.textPosition.previousValue
-    ) {
-      // Same read text, different text position
-      this.setCurrentPreviousAndNextItemsFromFlattenedToc(this.tocItemId);
-    } else if (
-      !firstChange &&
-      this.parentPageType === 'page-text' &&
-      this.flattened.length > 0 &&
-      changes.textItemID &&
-      this.collectionId === changes.textItemID.previousValue.split('_')[0]
-    ) {
-      // Different read text, same collection
-      this.setCurrentPreviousAndNextItemsFromFlattenedToc(this.tocItemId);
-    } else if (!firstChange) {
-      // Different collection or parent page type
-      this.loadData();
+    if (!firstChange) {
+      this.updateVariables();
+      this.updateCurrentText();
     }
   }
 
   ngOnInit() {
     this.mobileMode = this.platformService.isMobile();
+    this.updateVariables();
+    this.setFrontmatterPagesArray();
 
-    this.activeTocOrderSubscription = this.tocService.getActiveTocOrder().subscribe(
-      (tocOrder: string) => {
-        if (tocOrder !== this.activeTocOrder) {
-          this.activeTocOrder = tocOrder;
-          if (this.textItemID) {
-            this.loadData();
-          }
+    // Subscribe to BehaviorSubject emitting the current (flattened) TOC.
+    // The received TOC is already properly ordered.
+    this.tocSubscr = this.tocService.getCurrentFlattenedCollectionToc().subscribe(
+      (toc: any) => {
+        if (
+          toc?.children?.length &&
+          this.collectionId === toc?.collectionId
+        ) {
+          this.collectionTitle = toc.text || '';
+          // Prepend the frontmatter pages to the TOC array
+          this.flattenedToc = this.frontMatterPages.concat(toc.children);
+          // Search for the current text in the array and display it
+          this.updateCurrentText();
         }
       }
     );
   }
 
   ngOnDestroy() {
-    this.activeTocOrderSubscription?.unsubscribe();
+    this.tocSubscr?.unsubscribe();
   }
 
-  loadData() {
-    this.flattened = [];
+  private updateVariables() {
+    if (!this.parentPageType) {
+      this.parentPageType = 'text';
+    }
 
-    if (this.parentPageType === 'page-cover') {
-      // Initialised from page-cover
-      this.currentItemTitle = $localize`:@@CollectionCover.Cover:Omslag`;
+    this.collectionId = this.textItemID.split('_')[0];
+    this.tocItemId = this.textPosition
+          ? this.textItemID + ';' + this.textPosition
+          : this.textItemID;
+  }
 
-      this.firstItem = true;
-      this.lastItem = false;
-      if (this.collectionHasTitle) {
-        this.setPageTitleAsNext(this.collectionId);
-      } else if (this.collectionHasForeword) {
-        this.setPageForewordAsNext(this.collectionId);
-      } else if (this.collectionHasIntro) {
-        this.setPageIntroductionAsNext(this.collectionId);
-      } else {
-        this.setFirstTocItemAsNext(this.collectionId);
-      }
+  private setFrontmatterPagesArray() {
+    if (config.collections?.frontMatterPages?.cover) {
+      this.frontMatterPages.push({
+        text: $localize`:@@CollectionCover.Cover:Omslag`,
+        page: 'cover',
+        itemId: this.collectionId
+      });
+    }
+    if (config.collections?.frontMatterPages?.title) {
+      this.frontMatterPages.push({
+        text: $localize`:@@CollectionTitle.TitlePage:Titelblad`,
+        page: 'title',
+        itemId: this.collectionId
+      });
+    }
+    if (config.collections?.frontMatterPages?.foreword) {
+      this.frontMatterPages.push({
+        text: $localize`:@@CollectionForeword.Foreword:Förord`,
+        page: 'foreword',
+        itemId: this.collectionId
+      });
+    }
+    if (config.collections?.frontMatterPages?.introduction) {
+      this.frontMatterPages.push({
+        text: $localize`:@@CollectionIntroduction.Introduction:Inledning`,
+        page: 'introduction',
+        itemId: this.collectionId
+      });
+    }
+  }
 
-    } else if (this.parentPageType === 'page-title') {
-      // Initialised from page-title
-      this.currentItemTitle = $localize`:@@CollectionTitle.TitlePage:Titelblad`;
-
-      if (this.collectionHasCover) {
-        this.firstItem = false;
-        this.setPageCoverAsPrevious(this.collectionId);
-      } else {
-        this.firstItem = true;
-      }
-
-      this.lastItem = false;
-      if (this.collectionId === 'mediaCollections') {
-        this.setMediaCollectionsAsNext();
-      } else {
-        if (this.collectionHasForeword) {
-          this.setPageForewordAsNext(this.collectionId);
-        } else if (this.collectionHasIntro) {
-          this.setPageIntroductionAsNext(this.collectionId);
-        } else {
-          this.setFirstTocItemAsNext(this.collectionId);
-        }
-      }
-
-    } else if (this.parentPageType === 'page-foreword') {
-      // Initialised from page-foreword
-      this.currentItemTitle = $localize`:@@CollectionForeword.Foreword:Förord`;
-
-      this.lastItem = false;
-      if (this.collectionHasCover || this.collectionHasTitle) {
-        this.firstItem = false;
-      } else {
-        this.firstItem = true;
-      }
-
-      if (this.collectionHasTitle) {
-        this.setPageTitleAsPrevious(this.collectionId);
-      } else if (this.collectionHasCover) {
-        this.setPageCoverAsPrevious(this.collectionId);
-      }
-
-      if (this.collectionHasIntro) {
-        this.setPageIntroductionAsNext(this.collectionId);
-      } else {
-        this.setFirstTocItemAsNext(this.collectionId);
-      }
-
-    } else if (this.parentPageType === 'page-introduction') {
-      // Initialised from page-introduction
-      this.currentItemTitle = $localize`:@@CollectionIntroduction.Introduction:Inledning`;
-
-      this.lastItem = false;
-      if (this.collectionHasCover || this.collectionHasTitle || this.collectionHasForeword) {
-        this.firstItem = false;
-      } else {
-        this.firstItem = true;
-      }
-
-      if (this.collectionHasForeword) {
-        this.setPageForewordAsPrevious(this.collectionId);
-      } else if (this.collectionHasTitle) {
-        this.setPageTitleAsPrevious(this.collectionId);
-      } else if (this.collectionHasCover) {
-        this.setPageCoverAsPrevious(this.collectionId);
-      }
-      this.setFirstTocItemAsNext(this.collectionId);
-
+  /**
+   * Updates the text that's displayed as the current text (as well as the
+   * previous and next text), and sets the document title to the current
+   * text title. If the current text is a positioned heading in a longer
+   * text, the patent text title is set as the document title.
+   */
+  private updateCurrentText() {
+    const foundTextIndex = this.getCurrentTextIndex();
+    if (foundTextIndex > -1) {
+      this.currentTocTextIndex = foundTextIndex;
     } else {
-      // Default functionality, e.g. as when initialised from page-text
-      this.firstItem = false;
-      this.lastItem = false;
-      this.next(true);
+      console.error('Unable to find the current text in flattenedTOC in text-changer component.');
+      this.currentTocTextIndex = 0;
     }
-  }
 
-  setFirstTocItemAsNext(collectionId: string) {
-    try {
-      this.tocService.getTableOfContents(collectionId).subscribe(
-        (toc: any) => {
-          if (toc && toc.children && String(toc.collectionId) === collectionId) {
-            this.flatten(toc);
-            if (this.activeTocOrder === 'alphabetical') {
-              this.sortFlattenedTocAlphabetically();
-            } else if (this.activeTocOrder === 'chronological') {
-              this.sortFlattenedTocChronologically();
-            } else if (this.activeTocOrder === 'categorical') {
-              this.sortFlattenedTocCategorically();
-            }
-            for (let i = 0; i < this.flattened.length; i++) {
-              if (
-                this.flattened[i].itemId !== undefined &&
-                this.flattened[i].type !== 'subtitle' &&
-                this.flattened[i].type !== 'section_title'
-              ) {
-                this.nextItemTitle = this.flattened[i].text;
-                this.nextItem = this.flattened[i];
-                break;
-              }
-            }
-          } else {
-            this.nextItemTitle = '';
-            this.nextItem = null;
-            this.lastItem = true;
-          }
-        }
-      );
-    } catch (e) {
-      console.log('Unable to get first toc item as next in text-changer');
-      this.nextItemTitle = '';
-      this.nextItem = null;
-      this.lastItem = true;
-    }
-  }
-
-  setPageTitleAsNext(collectionId: string) {
-    this.nextItemTitle = $localize`:@@CollectionTitle.TitlePage:Titelblad`;
-    this.nextItem = {
-      itemId: collectionId,
-      page: 'page-title'
-    };
-  }
-
-  setPageForewordAsNext(collectionId: string) {
-    this.nextItemTitle = $localize`:@@CollectionForeword.Foreword:Förord`;
-    this.nextItem = {
-      itemId: collectionId,
-      page: 'page-foreword'
-    };
-  }
-
-  setPageIntroductionAsNext(collectionId: string) {
-    this.nextItemTitle = $localize`:@@CollectionIntroduction.Introduction:Inledning`;
-    this.nextItem = {
-      itemId: collectionId,
-      page: 'page-introduction'
-    };
-  }
-
-  setMediaCollectionsAsNext() {
-    this.nextItemTitle = '';
-    this.nextItem = {
-      itemId: 'mediaCollections',
-      page: 'media-collection'
-    };
-  }
-
-  setPageCoverAsPrevious(collectionId: string) {
-    this.prevItemTitle = $localize`:@@CollectionCover.Cover:Omslag`;
-    this.prevItem = {
-      itemId: collectionId,
-      page: 'page-cover'
-    };
-  }
-
-  setPageTitleAsPrevious(collectionId: string) {
-    this.prevItemTitle = $localize`:@@CollectionTitle.TitlePage:Titelblad`;
-    this.prevItem = {
-      itemId: collectionId,
-      page: 'page-title'
-    };
-  }
-
-  setPageForewordAsPrevious(collectionId: string) {
-    this.prevItemTitle = $localize`:@@CollectionForeword.Foreword:Förord`;
-    this.prevItem = {
-      itemId: collectionId,
-      page: 'page-foreword'
-    };
-  }
-
-  setPageIntroductionAsPrevious(collectionId: string) {
-    this.prevItemTitle = $localize`:@@CollectionIntroduction.Introduction:Inledning`;
-    this.prevItem = {
-      itemId: collectionId,
-      page: 'page-introduction'
-    };
-  }
-
-  async previous(test?: boolean) {
-    if (this.parentPageType === 'page-text') {
-      this.tocService.getTableOfContents(this.collectionId).subscribe(
-        toc => {
-          this.findNext(toc);
-        }
+    // Set the document title to the current text title.
+    // Positioned item's title should not be set, instead we have to
+    // search for the non-positioned item's title.
+    let titleItemIndex = this.currentTocTextIndex;
+    if (this.textPosition) {
+      titleItemIndex = this.flattenedToc.findIndex(
+        ({ itemId }) => itemId === this.textItemID
       );
     }
-    if (this.prevItem !== undefined && test !== true) {
-      await this.open(this.prevItem);
-    } else if (test && this.prevItem !== undefined) {
-      return true;
-    } else if (test && this.prevItem === undefined) {
-      return false;
-    }
-    return false;
+
+    const itemTitle = titleItemIndex > -1
+          ? this.flattenedToc[titleItemIndex].text || ''
+          : this.flattenedToc[this.currentTocTextIndex].text || '';
+    this.headService.setTitle([itemTitle, this.collectionTitle]);
   }
 
-  async next(test?: boolean) {
-    if (this.tocItemId !== 'mediaCollections' && this.parentPageType === 'page-text') {
-      this.tocService.getTableOfContents(this.collectionId).subscribe(
-        toc => {
-          this.findNext(toc);
+  private getCurrentTextIndex() {
+    let currentTextIndex = -1;
+    for (let i = 0; i < this.flattenedToc.length; i++) {
+      if (!this.flattenedToc[i].page) {
+        // Text page
+        if (this.flattenedToc[i].itemId === this.tocItemId) {
+          return i;
         }
-      );
-    }
-    if (this.nextItem !== undefined && test !== true) {
-      await this.open(this.nextItem);
-    } else if (test && this.nextItem !== undefined) {
-      return true;
-    } else if (test && this.nextItem === undefined) {
-      return false;
-    }
-    return false;
-  }
-
-  findNext(toc: any) {
-    if (this.flattened.length < 1) {
-      this.flatten(toc);
-    }
-    if (this.activeTocOrder === 'alphabetical') {
-      this.sortFlattenedTocAlphabetically();
-    } else if (this.activeTocOrder === 'chronological') {
-      this.sortFlattenedTocChronologically();
-    } else if (this.activeTocOrder === 'categorical') {
-      this.sortFlattenedTocCategorically();
-    }
-    let itemFound = this.setCurrentPreviousAndNextItemsFromFlattenedToc(this.tocItemId);
-    if (!itemFound) {
-      if (this.tocItemId.indexOf(';') > -1) {
-        let searchTocId = this.tocItemId.split(';')[0];
-        // The current toc item was not found with position in legacy id, so look for toc item without position
-        itemFound = this.setCurrentPreviousAndNextItemsFromFlattenedToc(searchTocId);
-        if (!itemFound && this.tocItemId.split(';')[0].split('_').length > 2) {
-          // The current toc item was not found without position either, so look without chapter if any
-          const chapterStartPos = this.tocItemId.split(';')[0].lastIndexOf('_');
-          searchTocId = this.tocItemId.slice(0, chapterStartPos);
-          itemFound = this.setCurrentPreviousAndNextItemsFromFlattenedToc(searchTocId);
-        }
+      } else if (this.flattenedToc[i].page === this.parentPageType) {
+        // Front matter page
+        return i;
       }
     }
-  }
-
-  setCurrentPreviousAndNextItemsFromFlattenedToc(currentTextId: string) {
-    // get the id of the current toc item in the flattened toc array
-    let currentId = 0;
-    let currentItemFound = false;
-    for (let i = 0; i < this.flattened.length; i ++) {
-      if ( this.flattened[i].itemId === currentTextId ) {
-        currentId = i;
-        currentItemFound = true;
-        break;
-      }
-    }
-    let nextId = 0 as any;
-    let prevId = 0 as any;
-    // last item
-    if ((currentId + 1) === this.flattened.length) {
-      // nextId = 0; // this line makes the text-changer into a loop
-      nextId = null;
-    } else {
-      nextId = currentId + 1;
-    }
-
-    if (currentId === 0) {
-      // prevId = this.flattened.length - 1; // this line makes the text-changer into a loop
-      prevId = null;
-    } else {
-      prevId = currentId - 1;
-    }
-
-    // Set the new next, previous and current items only if on page-text in order to prevent these
-    // from flashing before the new page is loaded.
-    if (this.parentPageType === 'page-text') {
-      if (nextId !== null) {
-        this.lastItem = false;
-        this.nextItem = this.flattened[nextId];
-        if (this.nextItem !== undefined && this.nextItem.text !== undefined) {
-          this.nextItemTitle = String(this.nextItem.text);
-        } else {
-          this.nextItemTitle = '';
-        }
-      } else {
-        this.lastItem = true;
-        this.nextItem = null;
-        this.nextItemTitle = '';
-      }
-    }
-
-    if (prevId !== null) {
-      if (this.parentPageType === 'page-text') {
-        this.firstItem = false;
-        this.prevItem = this.flattened[prevId];
-        if (this.prevItem !== undefined && this.prevItem.text !== undefined) {
-          this.prevItemTitle = String(this.prevItem.text);
-        } else {
-          this.prevItemTitle = '';
-        }
-      }
-    } else {
-      if (this.collectionHasIntro) {
-        this.firstItem = false;
-        this.setPageIntroductionAsPrevious(this.collectionId);
-      } else if (this.collectionHasForeword) {
-        this.firstItem = false;
-        this.setPageForewordAsPrevious(this.collectionId);
-      } else if (this.collectionHasTitle) {
-        this.firstItem = false;
-        this.setPageTitleAsPrevious(this.collectionId);
-      } else if (this.collectionHasCover) {
-        this.firstItem = false;
-        this.setPageCoverAsPrevious(this.collectionId);
-      } else {
-        this.firstItem = true;
-        this.prevItem = null;
-        this.prevItemTitle = '';
-      }
-    }
-
-    if (this.parentPageType === 'page-text') {
-      if (this.flattened[currentId] !== undefined) {
-        this.currentItemTitle = String(this.flattened[currentId].text);
-      } else {
-        this.currentItemTitle = '';
-      }
-    }
-    return currentItemFound;
-  }
-
-  flatten(toc: any) {
-    if (toc !== null && toc !== undefined) {
-      if (toc.children) {
-        for (let i = 0, count = toc.children.length; i < count; i++) {
-          if (toc.children[i].itemId !== undefined && toc.children[i].itemId !== '') {
-            this.flattened.push(toc.children[i]);
-          }
-          this.flatten(toc.children[i]);
-        }
-      }
-    }
-  }
-
-  sortFlattenedTocAlphabetically() {
-    if (this.flattened.length > 0) {
-      this.flattened.sort(
-        (a: any, b: any) =>
-          (a.text !== undefined && b.text !== undefined) ?
-            ((String(a.text).toUpperCase() < String(b.text).toUpperCase()) ? -1 :
-            (String(a.text).toUpperCase() > String(b.text).toUpperCase()) ? 1 : 0) : 0
-      );
-    }
-  }
-
-  sortFlattenedTocChronologically() {
-    if (this.flattened.length > 0) {
-      this.flattened.sort(
-        (a: any, b: any) =>
-          (a.date < b.date) ? -1 : (a.date > b.date) ? 1 : 0
-      );
-    }
-  }
-
-  sortFlattenedTocCategorically() {
-    const primarySortKey = config.component?.collectionSideMenu?.categoricalSortingPrimaryKey ?? '';
-    const secondarySortKey = config.component?.collectionSideMenu?.categoricalSortingSecondaryKey ?? '';
-
-    if (this.flattened.length > 0 && primarySortKey && secondarySortKey) {
-      if (primarySortKey === 'date') {
-        sortArrayOfObjectsNumerically(this.flattened, primarySortKey, 'asc');
-      } else {
-        sortArrayOfObjectsAlphabetically(this.flattened, primarySortKey);
-      }
-
-      const categorized: any[] = [];
-      let categoryItems: any[] = [];
-      let prevCategory = '';
-
-      for (let i = 0; i < this.flattened.length; i++) {
-        const currentCategory = this.flattened[i][primarySortKey];
-        if (i < 1) {
-          prevCategory = currentCategory;
-        }
-        if (currentCategory !== prevCategory) {
-          if (secondarySortKey === 'date') {
-            sortArrayOfObjectsNumerically(categoryItems, secondarySortKey, 'asc');
-          } else if (secondarySortKey) {
-            sortArrayOfObjectsAlphabetically(categoryItems, secondarySortKey);
-          }
-          categorized.push(categoryItems);
-          categoryItems = [];
-        }
-        categoryItems.push(this.flattened[i]);
-      }
-
-      if (categoryItems.length > 0) {
-        if (secondarySortKey === 'date') {
-          sortArrayOfObjectsNumerically(categoryItems, secondarySortKey, 'asc');
-        } else if (secondarySortKey) {
-          sortArrayOfObjectsAlphabetically(categoryItems, secondarySortKey);
-        }
-        categorized.push(categoryItems);
-      }
-      this.flattened = categorized.flat();
-    }
-  }
-
-  findPrevTitle(toc: any, currentIndex: any, prevChild?: any) {
-    if (currentIndex === 0) {
-      this.findPrevTitle(prevChild, prevChild.length);
-    }
-    for (let i = currentIndex; i > 0; i--) {
-      if (toc[i - 1] !== undefined) {
-        if (toc[i - 1].type !== 'subtitle' && toc[i - 1].type !== 'section_title') {
-          return toc[i - 1];
-        }
-      }
-    }
-  }
-
-  async open(item: any) {
-    if (item.page !== undefined) {
-      // Open text in page-cover, page-title, page-foreword, page-introduction or media-collection
-      if (item.page === 'page-cover') {
-        this.router.navigate(['/collection', item.itemId, 'cover']);
-      } else if (item.page === 'page-title') {
-        this.router.navigate(['/collection', item.itemId, 'title']);
-      } else if (item.page === 'page-foreword') {
-        this.router.navigate(['/collection', item.itemId, 'foreword']);
-      } else if (item.page === 'page-introduction') {
-        this.router.navigate(['/collection', item.itemId, 'introduction']);
-      } else if (item.page === 'media-collection') {
-        this.router.navigate(['/media-collection']);
-      }
-    } else {
-      // Open text in page-text
-      let itemIdParts = item.itemId.split(';');
-      let positionId = '';
-      if (itemIdParts.length > 1) {
-        positionId = itemIdParts[1];
-      }
-      itemIdParts = itemIdParts[0].split('_');
-      const collectionId = itemIdParts[0];
-      const publicationId = itemIdParts[1];
-      let chapterId = '';
-      if (itemIdParts.length > 2) {
-        chapterId = itemIdParts[2];
-      }
-
-      this.router.navigate(
-        (
-          chapterId ? ['/collection', collectionId, 'text', publicationId, chapterId] :
-          ['/collection', collectionId, 'text', publicationId]
-        ),
-        (positionId ? { queryParams: { position: positionId } } : {})
-      );
-    }
+    return currentTextIndex;
   }
 
 }

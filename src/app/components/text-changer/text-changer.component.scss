@@ -54,16 +54,16 @@
     white-space: nowrap;
   }
 
-  button {
+  a {
     align-items: center;
-    background: transparent;
     color: inherit;
     display: flex;
     height: 100%;
     hyphens: auto;
     outline-offset: -0.125rem;
     overflow: hidden;
-    padding: 0 6px;
+    padding: 0 0.375rem;
+    text-decoration: none;
     width: 100%;
 
     > span {
@@ -109,7 +109,7 @@
       max-width: 100%;
     }
 
-    button {
+    a {
       &:hover {
         opacity: 0.6;
         transition: opacity 0.2s;
@@ -135,7 +135,7 @@
 .text-changer-wrapper.mobile-mode {
   justify-content: space-between;
 
-  button {
+  a {
     padding: 0 10px;
   }
 

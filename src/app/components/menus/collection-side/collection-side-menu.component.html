@@ -19,7 +19,7 @@
           i18n-cancelText="@@BasicActions.Cancel"
           [interfaceOptions]="sortSelectOptions"
           (ionChange)="setActiveMenuSorting($event)"
-          [value]="activeMenuSorting"
+          [value]="activeMenuOrder"
     >
       <ion-select-option
             value="default"
@@ -39,24 +39,24 @@
       >Kategorivis</ion-select-option>
     </ion-select>
   </div>
-  <ul role="menu" [ngClass]="activeMenuSorting + '-menu-sorting'">
-    <li *ngIf="_config.collections?.frontMatterPages?.cover" [attr.aria-current]="initialUrlSegments[2].path === 'cover' ? 'page' : null" role="menuitem" data-id="toc_cover">
-      <a routerLink="{{collectionID | collectionPagePath: 'cover'}}" [class.menu-highlight]="initialUrlSegments[2].path === 'cover'">
+  <ul role="menu" [ngClass]="activeMenuOrder + '-menu-sorting'">
+    <li *ngIf="enableCover" [attr.aria-current]="routeUrlSegments[2].path === 'cover' ? 'page' : null" role="menuitem" data-id="toc_cover">
+      <a routerLink="{{collectionID | collectionPagePath: 'cover'}}" [class.menu-highlight]="routeUrlSegments[2].path === 'cover'">
         <span class="label" i18n="@@CollectionCover.Cover">Omslag</span>
       </a>
     </li>
-    <li *ngIf="_config.collections?.frontMatterPages?.title" [attr.aria-current]="initialUrlSegments[2].path === 'title' ? 'page' : null" role="menuitem" data-id="toc_title">
-      <a routerLink="{{collectionID | collectionPagePath: 'title'}}" [class.menu-highlight]="initialUrlSegments[2].path === 'title'">
+    <li *ngIf="enableTitle" [attr.aria-current]="routeUrlSegments[2].path === 'title' ? 'page' : null" role="menuitem" data-id="toc_title">
+      <a routerLink="{{collectionID | collectionPagePath: 'title'}}" [class.menu-highlight]="routeUrlSegments[2].path === 'title'">
         <span class="label" i18n="@@CollectionTitle.TitlePage">Titelblad</span>
       </a>
     </li>
-    <li *ngIf="_config.collections?.frontMatterPages?.foreword" [attr.aria-current]="initialUrlSegments[2].path === 'foreword' ? 'page' : null" role="menuitem" data-id="toc_foreword">
-      <a routerLink="{{collectionID | collectionPagePath: 'foreword'}}" [class.menu-highlight]="initialUrlSegments[2].path === 'foreword'">
+    <li *ngIf="enableForeword" [attr.aria-current]="routeUrlSegments[2].path === 'foreword' ? 'page' : null" role="menuitem" data-id="toc_foreword">
+      <a routerLink="{{collectionID | collectionPagePath: 'foreword'}}" [class.menu-highlight]="routeUrlSegments[2].path === 'foreword'">
         <span class="label" i18n="@@CollectionForeword.Foreword">Förord</span>
       </a>
     </li>
-    <li *ngIf="_config.collections?.frontMatterPages?.introduction" [attr.aria-current]="initialUrlSegments[2].path === 'introduction' ? 'page' : null" role="menuitem" data-id="toc_introduction">
-      <a routerLink="{{collectionID | collectionPagePath: 'introduction'}}" [class.menu-highlight]="initialUrlSegments[2].path === 'introduction'">
+    <li *ngIf="enableIntroduction" [attr.aria-current]="routeUrlSegments[2].path === 'introduction' ? 'page' : null" role="menuitem" data-id="toc_introduction">
+      <a routerLink="{{collectionID | collectionPagePath: 'introduction'}}" [class.menu-highlight]="routeUrlSegments[2].path === 'introduction'">
         <span class="label" i18n="@@CollectionIntroduction.Introduction">Inledning</span>
       </a>
     </li>
@@ -68,7 +68,7 @@
   <ng-container *ngFor="let item of list">
     <li 
           [attr.data-id]="item.itemId ? 'toc_' + item.itemId : ''"
-          [attr.aria-current]="highlightedMenu === item.itemId ? 'page' : null"
+          [attr.aria-current]="currentMenuItemId === item.itemId ? 'page' : null"
           [attr.aria-haspopup]="item.children ? 'menu' : null"
           [attr.aria-expanded]="item.children ? selectedMenu.includes(item.itemId) || selectedMenu.includes(item.nodeId) : null"
           role="menuitem"
@@ -76,7 +76,7 @@
       <a *ngIf="item.itemId"
             [routerLink]="item.itemId | collectionPagePath"
             [queryParams]="item.itemId | collectionPagePositionQueryparam"
-            [class.menu-highlight]="highlightedMenu === item.itemId"
+            [class.menu-highlight]="currentMenuItemId === item.itemId"
             [class.submenu-label]="item.children"
       >
         <ng-container *ngTemplateOutlet="menuItemContent; context: {$implicit: item}"/>

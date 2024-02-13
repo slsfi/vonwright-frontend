@@ -2,9 +2,17 @@
 
   <header>
     <nav class="top-navigation" aria-labelledby="top-menu-label">
-      <top-menu (sideNavClick)="toggleSideNav()" [showSideNav]="showSideNav" [currentRouterUrl]="currentRouterUrl"></top-menu>
+      <top-menu
+            (sideNavClick)="toggleSideNav()"
+            [showSideNav]="showSideNav"
+            [currentRouterUrl]="currentRouterUrl"
+      ></top-menu>
     </nav>
-    <ion-progress-bar *ngIf="enableRouterLoadingBar" [class.showLoadingBar]="!loadingBarHidden" type="indeterminate" mode="ios"></ion-progress-bar>
+    <ion-progress-bar *ngIf="enableRouterLoadingBar"
+          [class.showLoadingBar]="!loadingBarHidden"
+          type="indeterminate"
+          mode="ios"
+    ></ion-progress-bar>
   </header>
   <div class="content-container">
     <nav id="side-navigation"
@@ -30,8 +38,8 @@
         @defer {
           <collection-side-menu
                 [collectionID]="collectionID"
-                [initialQueryParams]="collectionSideMenuInitialQueryParams"
-                [initialUrlSegments]="collectionSideMenuInitialUrlSegments"
+                [routeQueryParams]="collSideMenuQueryParams"
+                [routeUrlSegments]="collSideMenuUrlSegments"
                 [sideMenuToggled]="showSideNav"
           ></collection-side-menu>
         } @placeholder {
@@ -43,14 +51,18 @@
       <ng-container *ngIf="showCollectionSideMenu && enableCollectionSideMenuSSR">
         <collection-side-menu
               [collectionID]="collectionID"
-              [initialQueryParams]="collectionSideMenuInitialQueryParams"
-              [initialUrlSegments]="collectionSideMenuInitialUrlSegments"
+              [routeQueryParams]="collSideMenuQueryParams"
+              [routeUrlSegments]="collSideMenuUrlSegments"
               [sideMenuToggled]="showSideNav"
         ></collection-side-menu>
       </ng-container>
     </nav>
     <div class="main-content">
-      <ion-router-outlet [animated]="false" (activate)="hideLoadingBar(true)" (deactivate)="hideLoadingBar(false)"></ion-router-outlet>
+      <ion-router-outlet
+            [animated]="false"
+            (activate)="hideLoadingBar(true)"
+            (deactivate)="hideLoadingBar(false)"
+      ></ion-router-outlet>
       <div *ngIf="mobileMode && showSideNav" class="backdrop-dismiss" (click)="toggleSideNav()"></div>
     </div>
   </div>
