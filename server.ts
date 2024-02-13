@@ -50,6 +50,9 @@ export function app(lang: string): express.Express {
   server.get('*', (req, res, next) => {
     const { protocol, originalUrl, baseUrl, headers } = req;
 
+    // Set Vary: User-Agent header for dynamically rendered pages
+    res.setHeader('Vary', 'User-Agent');
+
     // * Inlining critical CSS is disabled here and in angular.json:
     // * architect.build.configurations.production.optimization.styles.inlineCritical
     commonEngine
