@@ -10,7 +10,7 @@ import { Occurrence } from '@models/occurrence.model';
 import { SingleOccurrence } from '@models/single-occurrence.model';
 import { CollectionTableOfContentsService } from '@services/collection-toc.service';
 import { NamedEntityService } from '@services/named-entity.service';
-import { flattenObjectTree, sortArrayOfObjectsAlphabetically } from '@utility-functions';
+import { sortArrayOfObjectsAlphabetically } from '@utility-functions';
 
 
 @Component({
@@ -188,14 +188,11 @@ export class OccurrencesAccordionComponent implements OnInit {
     // update publication names from TOC-files. Finally, sort the publication names.
     this.groupedTexts.forEach((item: any) => {
       if (item.collection_id && item.publications) {
-        this.tocService.getTableOfContents(item.collection_id).subscribe(
+        this.tocService.getFlattenedTableOfContents(item.collection_id).subscribe(
           (tocData: any) => {
-            const flattenedTocData: any[] = flattenObjectTree(
-              tocData, 'children', 'itemId'
-            );
             item.publications.forEach((pub: any) => {
               const id = item.collection_id + '_' + pub.publication_id;
-              flattenedTocData.forEach((tocItem: any) => {
+              tocData.children.forEach((tocItem: any) => {
                 if (id === tocItem['itemId']) {
                   pub.occurrences[0].displayName = String(tocItem['text']);
                   pub.name = String(tocItem['text']);

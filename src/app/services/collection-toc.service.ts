@@ -51,6 +51,24 @@ export class CollectionTableOfContentsService {
     }
   }
 
+  getFlattenedTableOfContents(id: string): Observable<any> {
+    if (this.currentUnorderedFlattenedToc?.collectionId === id) {
+      return of(this.currentUnorderedFlattenedToc);
+    } else {
+      return this.getTableOfContents(id).pipe(
+        map((toc: any) => {
+          if (toc?.children?.length) {
+            toc = {
+              ...toc,
+              children: flattenObjectTree(toc, 'children', 'itemId')
+            };
+          }
+          return toc;
+        })
+      );
+    }
+  }
+
   /**
    * Get first TOC item which has 'itemId' property and 'type' property
    * has value other than 'subtitle' and 'section_title'.
