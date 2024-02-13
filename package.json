@@ -35,7 +35,7 @@
     "express": "^4.18.2",
     "htmlparser2": "^9.1.0",
     "ionicons": "^7.2.2",
-    "marked": "^11.2.0",
+    "marked": "^12.0.0",
     "rxjs": "~7.8.1",
     "tslib": "^2.6.2",
     "xliff": "^6.2.0",
