@@ -23,7 +23,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 - Refactor requests for flattened collection table of contents to use function in the collection TOC service.
 - Refactor the download texts modal to get the current text title from the document head service.
 - Updated the development notes with brief descriptions of dependencies.
-- Deps: update `@angular` to 17.1.3.
+- Deps: update `@angular` to 17.2.1.
 - Deps: update `@ionic` to 7.7.1.
 - Deps: update `marked` to 12.0.0.
 - Deps: update `zone.js` to 0.14.4.
