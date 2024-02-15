@@ -37,9 +37,24 @@ ion-content.portrait-mode::part(scroll) {
 		float: left;
 		left: 50%;
 		position: relative;
-		top: 50%;
 		text-align: center;
+		top: 50%;
 		transform: translate(-50%, -50%);
+	}
+
+	.landscape-picture {
+		display: block;
+		height: 100%;
+		position: absolute;
+		width: 100%;
+		z-index: -1;
+
+		img {
+			height: 100%;
+			object-fit: cover;
+			position: relative;
+			width: 100%;
+		}
 	}
 }
 
@@ -114,9 +129,9 @@ ion-content.portrait-mode::part(scroll) {
 		min-width: 370px;
 		position: sticky;
 		top: 0;
-		width: 28.2%;
+		width: 27.5vw;
 
-		.portrait-image-wrapper > img {
+		.portrait-image-wrapper img {
 			display: block;
 			height: auto;
 			width: 100%;
@@ -177,6 +192,11 @@ ion-content.portrait-mode::part(scroll) {
 	}
 }
 
+/*
+	In portrait mode, the banner image occupies the full viewport
+  width when the viewport width is < 901px, and the text content
+	is displayed below the image.
+*/
 @media only screen and (max-width: 900px) {
 	ion-content.portrait-mode::part(scroll) {
 		flex-direction: column;
@@ -197,7 +217,7 @@ ion-content.portrait-mode::part(scroll) {
 				position: relative;
 				width: 100%;
 		
-				> img {
+				img {
 					height: 100%;
 					object-fit: cover;
 					position: absolute;

@@ -3,12 +3,35 @@
       [class.title-on-image]="titleOnImage"
 >
   <div class="banner" [class.image-on-right]="imageOnRight">
-    <span *ngIf="!imageOrientationPortrait"
-          class="landscape-background-image"
-          role="img"
-          [style.background-image]="imageURLStyle"
-          [attr.aria-label]="imageAltText"
-    > </span>
+    @if (!imageOrientationPortrait && imageSources.length < 1) {
+      <span
+            class="landscape-background-image"
+            role="img"
+            [style.background-image]="imageURLStyle"
+            [attr.aria-label]="imageAltText"
+      > </span>
+    } @else if (!imageOrientationPortrait) {
+      <picture class="landscape-picture">
+        @for (s of imageSources; track $index) {
+          @if (s.srcset || s.media || s.sizes || s.type) {
+            <source
+                  [attr.media]="s.media ? s.media : null"
+                  [attr.srcset]="s.srcset ? s.srcset : null"
+                  [attr.sizes]="s.sizes ? s.sizes : null"
+                  [attr.type]="s.type ? s.type : null"
+                  [attr.height]="s.height ? s.height : null"
+                  [attr.width]="s.width ? s.width : null"
+            >
+          }
+        }
+        <img
+              [src]="imageURL"
+              [alt]="imageAltText"
+              [attr.height]="imageHeight"
+              [attr.width]="imageWidth"
+        >
+      </picture>
+    }
 
     <div *ngIf="!imageOrientationPortrait || titleOnImage" class="title-wrapper">
       <h1 class="banner-title" i18n="@@Site.Title">Webbplatsens titel</h1>
@@ -17,13 +40,37 @@
     </div>
 
     <div *ngIf="imageOrientationPortrait" class="portrait-image-wrapper">
-      <img
-            [src]="imageURL"
-            [alt]="imageAltText"
-            [style.object-position]="portraitImageObjectPosition"
-            [attr.height]="imageHeight"
-            [attr.width]="imageWidth"
-      >
+      @if (imageSources.length < 1) {
+        <img
+              [src]="imageURL"
+              [alt]="imageAltText"
+              [style.object-position]="portraitImageObjectPosition"
+              [attr.height]="imageHeight"
+              [attr.width]="imageWidth"
+        >
+      } @else {
+        <picture>
+          @for (s of imageSources; track $index) {
+            @if (s.srcset || s.media || s.sizes || s.type) {
+              <source
+                    [attr.media]="s.media ? s.media : null"
+                    [attr.srcset]="s.srcset ? s.srcset : null"
+                    [attr.sizes]="s.sizes ? s.sizes : null"
+                    [attr.type]="s.type ? s.type : null"
+                    [attr.height]="s.height ? s.height : null"
+                    [attr.width]="s.width ? s.width : null"
+              >
+            }
+          }
+          <img
+                [src]="imageURL"
+                [alt]="imageAltText"
+                [style.object-position]="portraitImageObjectPosition"
+                [attr.height]="imageHeight"
+                [attr.width]="imageWidth"
+          >
+        </picture>
+      }
     </div>
   </div>
 

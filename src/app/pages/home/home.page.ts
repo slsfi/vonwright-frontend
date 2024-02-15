@@ -17,6 +17,7 @@ export class HomePage implements OnInit {
   imageAltText: string = '';
   imageOnRight: boolean = false;
   imageOrientationPortrait: boolean = false;
+  imageSources: any[] = [];
   imageURL: string = '';
   imageURLStyle: string = '';
   imageHeight: number | null = null;
@@ -45,6 +46,7 @@ export class HomePage implements OnInit {
     this.titleOnImage = config.page?.home?.portraitOrientationSettings?.siteTitleOnImageOnSmallScreens ?? false;
     this.imageHeight = config.page?.home?.bannerImage?.intrinsicSize?.height ?? null;
     this.imageWidth = config.page?.home?.bannerImage?.intrinsicSize?.width ?? null;
+    this.imageSources = config.page?.home?.bannerImage?.alternateSources ?? [];
 
     if (config.page?.home?.portraitOrientationSettings?.imagePlacement?.squareCroppedVerticalOffset) {
       this.portraitImageObjectPosition = '50% ' + config.page?.home?.portraitOrientationSettings?.imagePlacement?.squareCroppedVerticalOffset;

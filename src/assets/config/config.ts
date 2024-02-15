@@ -213,6 +213,7 @@ export const config: Config = {
           width: null
         },
         orientationPortrait: true,
+        alternateSources: [],
         URL: "assets/images/home-page-banner-portrait.jpg"
       },
       portraitOrientationSettings: {
