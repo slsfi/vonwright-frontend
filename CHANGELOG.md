@@ -24,7 +24,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 - Refactor the download texts modal to get the current text title from the document head service.
 - Updated the development notes with brief descriptions of dependencies.
 - Deps: update `@angular` to 17.2.1.
-- Deps: update `@ionic` to 7.7.1.
+- Deps: update `@ionic` to 7.7.2.
 - Deps: update `marked` to 12.0.0.
 - Deps: update `zone.js` to 0.14.4.
 - Deps: update `jasmine-core` to 5.1.2.
