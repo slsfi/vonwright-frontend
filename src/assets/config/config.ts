@@ -208,6 +208,10 @@ export const config: Config = {
           sv: "Porträtt av Zacharias Topelius",
           fi: "Zacharias Topeliuksen muotokuva"
         },
+        intrinsicSize: {
+          height: null,
+          width: null
+        },
         orientationPortrait: true,
         URL: "assets/images/home-page-banner-portrait.jpg"
       },

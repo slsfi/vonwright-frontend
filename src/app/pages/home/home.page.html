@@ -15,11 +15,14 @@
 
       <p *ngIf="siteHasSubtitle" role="doc-subtitle" class="banner-subtitle" i18n="@@Site.Subtitle">Webbplatsens undertitel</p>
     </div>
+
     <div *ngIf="imageOrientationPortrait" class="portrait-image-wrapper">
       <img
             [src]="imageURL"
             [alt]="imageAltText"
             [style.object-position]="portraitImageObjectPosition"
+            [attr.height]="imageHeight"
+            [attr.width]="imageWidth"
       >
     </div>
   </div>
