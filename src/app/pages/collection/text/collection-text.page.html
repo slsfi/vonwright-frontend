@@ -301,7 +301,7 @@
   ></comments>
 
   <ng-container *ngIf="view.type === 'facsimiles'">
-    @defer {
+    @defer (on immediate) {
       <facsimiles
             [textItemID]="textItemID"
             [facsID]="view.id"
