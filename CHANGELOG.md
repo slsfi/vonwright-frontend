@@ -30,7 +30,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 - Deps: update `zone.js` to 0.14.4.
 - Deps: update `jasmine-core` to 5.1.2.
 - Deps: update `ng-extract-i18n-merge` to 2.10.0.
-- Deps: update `@types/node` to 20.11.17.
+- Deps: update `@types/node` to 20.11.19.
 
 ### Fixed
 
