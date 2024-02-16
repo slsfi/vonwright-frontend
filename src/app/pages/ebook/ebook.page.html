@@ -1,19 +1,21 @@
-<epub-viewer *ngIf="(filename && ebookType === 'epub'); else pdf"
-      id="epub-page-container"
-      class="ion-page"
-      [epubFileName]="filename"
-></epub-viewer>
-
-<ng-template #pdf>
-      <pdf-viewer *ngIf="(filename && ebookType === 'pdf'); else invalidFilename"
-            id="pdf-page-container"
-            class="ion-page"
-            [pdfFileName]="filename"
-      ></pdf-viewer>
-</ng-template>
-
-<ng-template #invalidFilename>
-      <ion-content class="ebook-ion-content">
-            <p class="ebook-error-message" i18n="@@Ebook.InvalidFilename">Ogiltigt filnamn. E-boken kunde inte hittas.</p>
-      </ion-content>
-</ng-template>
+@if (filename && ebookType === 'epub') {
+  @defer (on immediate) {
+    <epub-viewer
+          id="epub-page-container"
+          class="ion-page"
+          [epubFileName]="filename"
+    ></epub-viewer>
+  } @placeholder {
+    <h1 class="screen-reader-only" [innerHTML]="title"></h1>
+  }
+} @else if (filename && ebookType === 'pdf') {
+  <pdf-viewer
+        id="pdf-page-container"
+        class="ion-page"
+        [pdfFileName]="filename"
+  ></pdf-viewer>
+} @else {
+  <ion-content class="ebook-ion-content">
+    <p class="ebook-error-message" i18n="@@Ebook.InvalidFilename">Ogiltigt filnamn. E-boken kunde inte hittas.</p>
+  </ion-content>
+}

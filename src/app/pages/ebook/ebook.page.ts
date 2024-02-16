@@ -12,6 +12,7 @@ import { config } from '@config';
 export class EbookPage implements OnInit {
   ebookType: string = '';
   filename: string = '';
+  title: string = '';
 
   constructor(
     private route: ActivatedRoute
@@ -23,8 +24,9 @@ export class EbookPage implements OnInit {
       this.ebookType = '';
       const availableEbooks: any[] = config.ebooks ?? [];
       for (const ebook of availableEbooks) {
-        if (ebook.filename === params['filename']) {
-          this.filename = params['filename'];
+        if (ebook.filename === params.filename) {
+          this.filename = ebook.filename;
+          this.title = ebook.title;
           this.ebookType = this.filename.substring(
             this.filename.lastIndexOf('.') + 1, this.filename.length
           ) || '';

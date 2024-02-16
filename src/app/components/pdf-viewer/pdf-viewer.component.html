@@ -84,7 +84,6 @@
 </ion-header>
 
 <ion-content class="no-padding" [scrollX]="false" [scrollY]="false">
-  
+  <h1 class="screen-reader-only" [innerHTML]="pdfData.title || ''"></h1>
   <object [data]="pdfURL" type="application/pdf"></object>
-
 </ion-content>

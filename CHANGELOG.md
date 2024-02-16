@@ -20,6 +20,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 - Defer loading of the facsimile component on the collection text page to the browser. This increases server-side rendering performance since the component isn’t rendered on the server.
 - Defer loading of the illustrations component on the collection text page to the browser. This increases server-side rendering performance since the component isn’t rendered on the server.
+- Defer loading of the epub viewer component to the browser, since it’s not SSR-compatible. The epub title is shown as a `<h1>` placeholder in the server response. Also show pdf title as `<h1>` in the pdf viewer component.
 - Refactor requests for flattened collection table of contents to use function in the collection TOC service.
 - Refactor the download texts modal to get the current text title from the document head service.
 - Updated the development notes with brief descriptions of dependencies.
