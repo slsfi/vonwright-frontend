@@ -52,6 +52,7 @@ export class DownloadTextsModal implements OnDestroy, OnInit {
   manuscriptsList$: Observable<any[]>;
   readTextLanguages: string[] = [];
   referenceData: any = null;
+  pageTitleSubscr: Subscription | null = null;
   printTextSubscription: Subscription | null = null;
   printTranslation: string = '';
   publicationData$: Observable<any>;
@@ -167,11 +168,13 @@ export class DownloadTextsModal implements OnDestroy, OnInit {
 
       if (this.readTextsMode) {
         // Get publication title
-        this.headService.getCurrentPageTitle().subscribe((pubTitle: string) => {
-          this.publicationTitle = pubTitle?.slice(-1) === '.'
-                ? pubTitle.slice(0, -1)
-                : pubTitle;
-        });
+        this.pageTitleSubscr = this.headService.getCurrentPageTitle().subscribe(
+          (pubTitle: string) => {
+            this.publicationTitle = pubTitle?.slice(-1) === '.'
+                  ? pubTitle.slice(0, -1)
+                  : pubTitle;
+          }
+        );
 
         if (this.downloadFormatsEst.length || this.downloadFormatsCom.length) {
           // Get publication data in order to determine if reading-texts and
@@ -214,6 +217,7 @@ export class DownloadTextsModal implements OnDestroy, OnInit {
   ngOnDestroy() {
     this.downloadTextSubscription?.unsubscribe();
     this.printTextSubscription?.unsubscribe();
+    this.pageTitleSubscr?.unsubscribe();
   }
 
   dismiss() {

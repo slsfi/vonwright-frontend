@@ -8,6 +8,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ## [Unreleased]
 
+### Fixes
+
+- Memory leak related to BehaviorSubject-subscription in the download-texts modal. Also, as a precation, unsubscribe from all route subscriptions on component destruction.
+
 
 
 ## [1.3.0] – 2024-02-16

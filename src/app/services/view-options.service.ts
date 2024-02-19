@@ -23,7 +23,7 @@ export class ViewOptionsService {
   };
 
   private epubAlertDismissed: boolean = false;
-  private textsizeSubject: BehaviorSubject<Textsize> = new BehaviorSubject<Textsize>(Textsize.Small);
+  private textsizeSubject$: BehaviorSubject<Textsize> = new BehaviorSubject<Textsize>(Textsize.Small);
 
   constructor() {
     const defaultViewOptions: string[] = config.page?.text?.defaultViewOptions ?? [];
@@ -35,11 +35,11 @@ export class ViewOptionsService {
   }
 
   getTextsize(): Observable<Textsize> {
-    return this.textsizeSubject.asObservable();
+    return this.textsizeSubject$.asObservable();
   }
 
   setTextsize(textsize: Textsize) {
-    this.textsizeSubject.next(textsize);
+    this.textsizeSubject$.next(textsize);
   }
 
   epubAlertIsDismissed() {

@@ -10,7 +10,7 @@ import { config } from '@config';
   providedIn: 'root',
 })
 export class DocumentHeadService {
-  private currentPageTitle: BehaviorSubject<string> = new BehaviorSubject('');
+  private currentPageTitle$: BehaviorSubject<string> = new BehaviorSubject('');
   private currentRouterUrl: string | undefined = undefined;
   private openGraphTags: any = undefined;
   private languages: any[] = [];
@@ -203,11 +203,11 @@ export class DocumentHeadService {
   }
 
   setCurrentPageTitle(newTitle: string) {
-    this.currentPageTitle.next(newTitle);
+    this.currentPageTitle$.next(newTitle);
   }
 
   getCurrentPageTitle(): Observable<string> {
-    return this.currentPageTitle.asObservable();
+    return this.currentPageTitle$.asObservable();
   }
 
 }

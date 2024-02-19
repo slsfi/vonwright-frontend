@@ -1,5 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import { Subscription } from 'rxjs';
 
 import { config } from '@config';
 
@@ -9,9 +10,10 @@ import { config } from '@config';
   templateUrl: './ebook.page.html',
   styleUrls: ['./ebook.page.scss'],
 })
-export class EbookPage implements OnInit {
+export class EbookPage implements OnDestroy, OnInit {
   ebookType: string = '';
   filename: string = '';
+  routeParamsSubscr: Subscription | null = null;
   title: string = '';
 
   constructor(
@@ -19,7 +21,7 @@ export class EbookPage implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.route.params.subscribe(params => {
+    this.routeParamsSubscr = this.route.params.subscribe(params => {
       this.filename = '';
       this.ebookType = '';
       const availableEbooks: any[] = config.ebooks ?? [];
@@ -34,6 +36,10 @@ export class EbookPage implements OnInit {
         }
       }
     });
+  }
+
+  ngOnDestroy() {
+    this.routeParamsSubscr?.unsubscribe();
   }
 
 }

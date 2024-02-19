@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { AsyncPipe, NgFor, NgIf } from '@angular/common';
 import { NavigationEnd, Router, RouterModule } from '@angular/router';
 import { IonicModule, ModalController } from '@ionic/angular';
@@ -18,7 +18,7 @@ import { isEmptyObject } from '@utility-functions';
   styleUrls: ['./named-entity.modal.scss'],
   imports: [AsyncPipe, NgFor, NgIf, IonicModule, OccurrencesAccordionComponent, RouterModule]
 })
-export class NamedEntityModal implements OnInit {
+export class NamedEntityModal implements OnDestroy, OnInit {
   @Input() id: string = '';
   @Input() type: string = '';
 
@@ -65,6 +65,10 @@ export class NamedEntityModal implements OnInit {
         modal?.dismiss();
       });
     });
+  }
+
+  ngOnDestroy() {
+    this.routerEventsSubscription?.unsubscribe();
   }
 
   ionViewWillLeave() {
