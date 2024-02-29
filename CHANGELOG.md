@@ -11,6 +11,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 ### Changed
 
 - Button labels in the secondary toolbar are hidden when the viewport is less than or equal to 960px wide, the same as for the labels in the top menu.
+- Set `fetchpriority` property to `high` on image element of home page banner image.
 - Deps: update `@angular` to 17.2.3.
 - Deps: update `@ionic` to 7.7.3.
 - Deps: update `express` to 4.18.3.

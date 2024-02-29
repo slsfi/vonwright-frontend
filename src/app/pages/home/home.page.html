@@ -29,6 +29,7 @@
               [alt]="imageAltText"
               [attr.height]="imageHeight"
               [attr.width]="imageWidth"
+              fetchpriority="high"
         >
       </picture>
     }
@@ -47,6 +48,7 @@
               [style.object-position]="portraitImageObjectPosition"
               [attr.height]="imageHeight"
               [attr.width]="imageWidth"
+              fetchpriority="high"
         >
       } @else {
         <picture>
@@ -68,6 +70,7 @@
                 [style.object-position]="portraitImageObjectPosition"
                 [attr.height]="imageHeight"
                 [attr.width]="imageWidth"
+                fetchpriority="high"
           >
         </picture>
       }
