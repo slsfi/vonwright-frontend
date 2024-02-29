@@ -8,19 +8,24 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ## [Unreleased]
 
+
+
+## [1.3.2] – 2024-02-29
+
 ### Changed
 
-- Button labels in the secondary toolbar are hidden when the viewport is less than or equal to 960px wide, the same as for the labels in the top menu.
-- Set `fetchpriority` property to `high` on image element of home page banner image.
-- Deps: update `@angular` to 17.2.3.
-- Deps: update `@ionic` to 7.7.3.
-- Deps: update `express` to 4.18.3.
-- Deps: update `@types/node` to 20.11.23.
-- Deps: update `karma` to 6.4.3.
+- Button labels in the secondary toolbar are hidden when the viewport is less than or equal to 960px wide, the same as for the labels in the top menu. ([79973f5](https://github.com/slsfi/digital-edition-frontend-ng/commit/79973f5f28a7c99a75b78cb208488e47ef89c092))
+- Set `fetchpriority` property to `high` on image element of home page banner image. ([942ec0d](https://github.com/slsfi/digital-edition-frontend-ng/commit/942ec0dbb20f2cc4bc81a473a35cea2e4aaa627e))
+- Deps: update `@angular` to 17.2.3. ([c9c28e9](https://github.com/slsfi/digital-edition-frontend-ng/commit/c9c28e96a061e8ae215daf189b9c0db5d3ea40b9), [7d76625](https://github.com/slsfi/digital-edition-frontend-ng/commit/7d76625d925f31c37223d37c5fb79852e2f4bb40))
+- Deps: update `@ionic` to 7.7.3. ([434306c](https://github.com/slsfi/digital-edition-frontend-ng/commit/434306c51a24ed1ea4fa5ab76a1ab2b58d989541))
+- Deps: update `express` to 4.18.3. ([19cd3a5](https://github.com/slsfi/digital-edition-frontend-ng/commit/19cd3a598e4b6a781675df9dc59b45f1c26ecbe3))
+- Deps: update `@types/node` to 20.11.23. ([1460e29](https://github.com/slsfi/digital-edition-frontend-ng/commit/1460e29ade3a53d6cb4c5c88be65f22223e73154), [5a0198a](https://github.com/slsfi/digital-edition-frontend-ng/commit/5a0198a89bec8c680610cf992104e2f195dc55fd))
+- Deps: update `karma` to 6.4.3. ([4e66d5d](https://github.com/slsfi/digital-edition-frontend-ng/commit/4e66d5ddb3cbd6d693d4657ca11f7b6694707662))
 
 ### Fixed
 
-- Missing collection menu when navigating backward using browser history if collection changes.
+- Missing collection menu when navigating backward using browser history if collection changes. ([11687bb](https://github.com/slsfi/digital-edition-frontend-ng/commit/11687bbf6d4859685550b75de7df3857fab963c1))
+
 
 
 ## [1.3.1] – 2024-02-19
@@ -238,6 +243,7 @@ siteLogoDimensions: {
 
 
 [unreleased]: https://github.com/slsfi/digital-edition-frontend-ng/compare/1.3.1...HEAD
+[1.3.2]: https://github.com/slsfi/digital-edition-frontend-ng/compare/1.3.1...1.3.2
 [1.3.1]: https://github.com/slsfi/digital-edition-frontend-ng/compare/1.3.0...1.3.1
 [1.3.0]: https://github.com/slsfi/digital-edition-frontend-ng/compare/1.2.3...1.3.0
 [1.2.3]: https://github.com/slsfi/digital-edition-frontend-ng/compare/1.2.2...1.2.3
