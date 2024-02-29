@@ -11,6 +11,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 ### Changed
 
 - Deps: update `@angular` to 17.2.3.
+- Deps: update `@ionic` to 7.7.3.
 
 
 
