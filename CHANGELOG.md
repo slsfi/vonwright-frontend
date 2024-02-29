@@ -13,7 +13,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 - Deps: update `@angular` to 17.2.3.
 - Deps: update `@ionic` to 7.7.3.
 - Deps: update `express` to 4.18.3.
-- Deps: update `@types/node` to 20.11.22.
+- Deps: update `@types/node` to 20.11.23.
 - Deps: update `karma` to 6.4.3.
 
 ### Fixed
