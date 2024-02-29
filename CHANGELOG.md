@@ -15,6 +15,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 - Deps: update `@types/node` to 20.11.22.
 - Deps: update `karma` to 6.4.3.
 
+### Fixed
+
+- Missing collection menu when navigating backward using browser history if collection changes.
 
 
 ## [1.3.1] – 2024-02-19

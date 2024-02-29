@@ -84,6 +84,7 @@ export class AppComponent implements OnDestroy, OnInit {
         // Clear the collection TOC loaded in the collection side menu
         // to prevent the previous TOC from flashing in view when
         // entering another collection.
+        this.collectionID = '';
         this.tocService.setCurrentCollectionToc('');
       }
 
