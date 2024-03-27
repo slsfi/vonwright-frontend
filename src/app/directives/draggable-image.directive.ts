@@ -14,6 +14,8 @@ export class DraggableImageDirective implements OnInit, OnDestroy {
 
   private activeDrag: boolean = false;
   private currentCoordinates: number[] = [0, 0];
+  private isMouseMoveListenerAdded: boolean = false;
+  private isTouchMoveListenerAdded: boolean = false;
   private offsetX: number = 0;
   private offsetY: number = 0;
 
@@ -34,18 +36,21 @@ export class DraggableImageDirective implements OnInit, OnDestroy {
     this.unlistenMouseDownEvents = this.renderer.listen(
       this.elRef.nativeElement, 'mousedown', (event: any) => {
         this.ngZone.runOutsideAngular(() => {
-          this.unlistenMouseMoveEvents = this.renderer.listen(
-            this.elRef.nativeElement, 'mousemove', (event: any) => {
-              this.dragElement(event);
-            }
-          );
+          if (!this.isMouseMoveListenerAdded) {
+            this.unlistenMouseMoveEvents = this.renderer.listen(
+              this.elRef.nativeElement, 'mousemove', (event: any) => {
+                this.dragElement(event);
+              }
+            );
+          }
+          this.isMouseMoveListenerAdded = true;
           this.startDrag(event);
         });
       }
     );
     this.unlistenMouseUpEvents = this.renderer.listen(
       this.elRef.nativeElement, 'mouseup', (event: any) => {
-        this.unlistenMouseMoveEvents?.();
+        this.removeMoveEventListeners();
         this.stopDrag(event);
       }
     );
@@ -54,18 +59,21 @@ export class DraggableImageDirective implements OnInit, OnDestroy {
       this.unlistenTouchStartEvents = this.renderer.listen(
         this.elRef.nativeElement, 'touchstart', (event: any) => {
           this.ngZone.runOutsideAngular(() => {
-            this.unlistenTouchMoveEvents = this.renderer.listen(
-              this.elRef.nativeElement, 'touchmove', (event: any) => {
-                this.dragElement(event);
-              }
-            );
+            if (!this.isTouchMoveListenerAdded) {
+              this.unlistenTouchMoveEvents = this.renderer.listen(
+                this.elRef.nativeElement, 'touchmove', (event: any) => {
+                  this.dragElement(event);
+                }
+              );
+            }
+            this.isTouchMoveListenerAdded = true;
             this.startDrag(event);
           });
         }
       );
       this.unlistenTouchEndEvents = this.renderer.listen(
         this.elRef.nativeElement, 'touchend', (event: any) => {
-          this.unlistenTouchMoveEvents?.();
+          this.removeMoveEventListeners();
           this.stopDrag(event);
         }
       );
@@ -74,11 +82,21 @@ export class DraggableImageDirective implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     this.unlistenMouseDownEvents?.();
-    this.unlistenMouseMoveEvents?.();
     this.unlistenMouseUpEvents?.();
     this.unlistenTouchStartEvents?.();
-    this.unlistenTouchMoveEvents?.();
     this.unlistenTouchEndEvents?.();
+    this.removeMoveEventListeners();
+  }
+
+  private removeMoveEventListeners(): void {
+    if (this.isMouseMoveListenerAdded) {
+      this.unlistenMouseMoveEvents?.();
+      this.isMouseMoveListenerAdded = false;
+    }
+    if (this.isTouchMoveListenerAdded) {
+      this.unlistenTouchMoveEvents?.();
+      this.isTouchMoveListenerAdded = false;
+    }
   }
 
   private startDrag(event: any) {
@@ -138,4 +156,5 @@ export class DraggableImageDirective implements OnInit, OnDestroy {
 
     return [x, y];
   }
+
 }

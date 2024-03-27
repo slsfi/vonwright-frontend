@@ -12,6 +12,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 - Link-elements added to the DOM using a custom renderer in the document head service are cleaned up when the service is destroyed. This fixes a potential memory leak in the SSR-app.
 - Return values of the RxJS `catchError` function.
+- Ensure cleanup of event listeners in the draggable-image directive.
 
 
 
