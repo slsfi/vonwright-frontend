@@ -55,7 +55,7 @@ export class TooltipService {
           return text || noInfoFound;
         }),
         catchError((e) => {
-          return noInfoFound;
+          return of(noInfoFound);
         })
       );
     } else {
@@ -79,7 +79,7 @@ export class TooltipService {
           return text || noInfoFound;
         }),
         catchError((e) => {
-          return noInfoFound;
+          return of(noInfoFound);
         })
       );
     }

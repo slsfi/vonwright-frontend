@@ -51,8 +51,7 @@ export class CommentService {
             this.cachedCollectionComments[textItemID] = body;
           }
           return body || '';
-        }),
-        catchError(this.handleError)
+        })
       );
     }
   }
@@ -152,18 +151,6 @@ export class CommentService {
         delete this.cachedCollectionComments[property];
       }
     }
-  }
-
-  private async handleError(error: Response | any) {
-    let errMsg: string;
-    if (error instanceof Response) {
-      const body = (await error.json()) || '';
-      const err = body.error || JSON.stringify(body);
-      errMsg = `${error.status} - ${error.statusText || ''} ${err}`;
-    } else {
-      errMsg = error.message ? error.message : error.toString();
-    }
-    throw errMsg;
   }
 
 }
