@@ -2,140 +2,140 @@ import { Directive, ElementRef, EventEmitter, Input, NgZone, OnDestroy, OnInit, 
 
 
 @Directive({
-    standalone: true,
-    selector: '[draggableImage]'
+  standalone: true,
+  selector: '[draggableImage]'
 })
 export class DraggableImageDirective implements OnInit, OnDestroy {
-    @Input('draggableImage') initialCoordinates: number[] = [0, 0];
-    @Input() angle: number = 0;
-    @Input() zoom: number = 1;
-    @Input() mouseOnly: boolean = false;
-    @Output() finalCoordinates = new EventEmitter<number[]>();
+  @Input('draggableImage') initialCoordinates: number[] = [0, 0];
+  @Input() angle: number = 0;
+  @Input() zoom: number = 1;
+  @Input() mouseOnly: boolean = false;
+  @Output() finalCoordinates = new EventEmitter<number[]>();
 
-    private activeDrag: boolean = false;
-    private currentCoordinates: number[] = [0, 0];
-    private offsetX: number = 0;
-    private offsetY: number = 0;
+  private activeDrag: boolean = false;
+  private currentCoordinates: number[] = [0, 0];
+  private offsetX: number = 0;
+  private offsetY: number = 0;
 
-    private unlistenMouseDownEvents: () => void;
-    private unlistenMouseMoveEvents: () => void;
-    private unlistenMouseUpEvents: () => void;
-    private unlistenTouchStartEvents: () => void;
-    private unlistenTouchMoveEvents: () => void;
-    private unlistenTouchEndEvents: () => void;
+  private unlistenMouseDownEvents: () => void;
+  private unlistenMouseMoveEvents: () => void;
+  private unlistenMouseUpEvents: () => void;
+  private unlistenTouchStartEvents: () => void;
+  private unlistenTouchMoveEvents: () => void;
+  private unlistenTouchEndEvents: () => void;
 
-    constructor(
-        private elRef: ElementRef,
-        private ngZone: NgZone,
-        private renderer: Renderer2
-    ) {}
+  constructor(
+    private elRef: ElementRef,
+    private ngZone: NgZone,
+    private renderer: Renderer2
+  ) {}
 
-    ngOnInit() {
-        this.unlistenMouseDownEvents = this.renderer.listen(
-            this.elRef.nativeElement, 'mousedown', (event: any) => {
-                this.ngZone.runOutsideAngular(() => {
-                    this.unlistenMouseMoveEvents = this.renderer.listen(
-                        this.elRef.nativeElement, 'mousemove', (event: any) => {
-                            this.dragElement(event);
-                        }
-                    );
-                    this.startDrag(event);
-                });
+  ngOnInit() {
+    this.unlistenMouseDownEvents = this.renderer.listen(
+      this.elRef.nativeElement, 'mousedown', (event: any) => {
+        this.ngZone.runOutsideAngular(() => {
+          this.unlistenMouseMoveEvents = this.renderer.listen(
+            this.elRef.nativeElement, 'mousemove', (event: any) => {
+              this.dragElement(event);
             }
-        );
-        this.unlistenMouseUpEvents = this.renderer.listen(
-            this.elRef.nativeElement, 'mouseup', (event: any) => {
-                this.unlistenMouseMoveEvents?.();
-                this.stopDrag(event);
-            }
-        );
-
-        if (!this.mouseOnly) {
-            this.unlistenTouchStartEvents = this.renderer.listen(
-                this.elRef.nativeElement, 'touchstart', (event: any) => {
-                    this.ngZone.runOutsideAngular(() => {
-                        this.unlistenTouchMoveEvents = this.renderer.listen(
-                            this.elRef.nativeElement, 'touchmove', (event: any) => {
-                                this.dragElement(event);
-                            }
-                        );
-                        this.startDrag(event);
-                    });
-                }
-            );
-            this.unlistenTouchEndEvents = this.renderer.listen(
-                this.elRef.nativeElement, 'touchend', (event: any) => {
-                    this.unlistenTouchMoveEvents?.();
-                    this.stopDrag(event);
-                }
-            );
-        }
-    }
-
-    ngOnDestroy() {
-        this.unlistenMouseDownEvents?.();
+          );
+          this.startDrag(event);
+        });
+      }
+    );
+    this.unlistenMouseUpEvents = this.renderer.listen(
+      this.elRef.nativeElement, 'mouseup', (event: any) => {
         this.unlistenMouseMoveEvents?.();
-        this.unlistenMouseUpEvents?.();
-        this.unlistenTouchStartEvents?.();
-        this.unlistenTouchMoveEvents?.();
-        this.unlistenTouchEndEvents?.();
-    }
+        this.stopDrag(event);
+      }
+    );
 
-    private startDrag(event: any) {
-        if (!this.activeDrag) {
-            if (event.preventDefault) {
-                event.preventDefault();
-            }
-
-            if (event.type === 'touchstart') {
-                this.offsetX = event.touches[0].clientX;
-                this.offsetY = event.touches[0].clientY;
-            } else {
-                this.offsetX = event.clientX;
-                this.offsetY = event.clientY;
-            }
-
-            this.activeDrag = true;
+    if (!this.mouseOnly) {
+      this.unlistenTouchStartEvents = this.renderer.listen(
+        this.elRef.nativeElement, 'touchstart', (event: any) => {
+          this.ngZone.runOutsideAngular(() => {
+            this.unlistenTouchMoveEvents = this.renderer.listen(
+              this.elRef.nativeElement, 'touchmove', (event: any) => {
+                this.dragElement(event);
+              }
+            );
+            this.startDrag(event);
+          });
         }
-    }
-
-    private dragElement(event: any) {
-        if (this.activeDrag) {
-            this.currentCoordinates = this.calculateCoordinates(event);
-            if (this.elRef.nativeElement) {
-                this.renderer.setStyle(
-                    this.elRef.nativeElement,
-                    'transform', 'scale('+this.zoom+') translate3d('+this.currentCoordinates[0]+'px, '+this.currentCoordinates[1]+'px, 0px) rotate('+this.angle+'deg)'
-                );
-            }
+      );
+      this.unlistenTouchEndEvents = this.renderer.listen(
+        this.elRef.nativeElement, 'touchend', (event: any) => {
+          this.unlistenTouchMoveEvents?.();
+          this.stopDrag(event);
         }
+      );
     }
-    
-    private stopDrag(event?: any) {
-        if (this.activeDrag) {
-            this.activeDrag = false;
-            this.finalCoordinates.emit([this.currentCoordinates[0], this.currentCoordinates[1]]);
-        }
+  }
+
+  ngOnDestroy() {
+    this.unlistenMouseDownEvents?.();
+    this.unlistenMouseMoveEvents?.();
+    this.unlistenMouseUpEvents?.();
+    this.unlistenTouchStartEvents?.();
+    this.unlistenTouchMoveEvents?.();
+    this.unlistenTouchEndEvents?.();
+  }
+
+  private startDrag(event: any) {
+    if (!this.activeDrag) {
+      if (event.preventDefault) {
+        event.preventDefault();
+      }
+
+      if (event.type === 'touchstart') {
+        this.offsetX = event.touches[0].clientX;
+        this.offsetY = event.touches[0].clientY;
+      } else {
+        this.offsetX = event.clientX;
+        this.offsetY = event.clientY;
+      }
+
+      this.activeDrag = true;
+    }
+  }
+
+  private dragElement(event: any) {
+    if (this.activeDrag) {
+      this.currentCoordinates = this.calculateCoordinates(event);
+      if (this.elRef.nativeElement) {
+        this.renderer.setStyle(
+          this.elRef.nativeElement,
+          'transform', 'scale(' + this.zoom + ') translate3d(' + this.currentCoordinates[0] + 'px, ' + this.currentCoordinates[1] + 'px, 0px) rotate(' + this.angle + 'deg)'
+        );
+      }
+    }
+  }
+
+  private stopDrag(event?: any) {
+    if (this.activeDrag) {
+      this.activeDrag = false;
+      this.finalCoordinates.emit([this.currentCoordinates[0], this.currentCoordinates[1]]);
+    }
+  }
+
+  private calculateCoordinates(event: any) {
+    let x = 0;
+    let y = 0;
+    let deltaX = 0;
+    let deltaY = 0;
+
+    if (event.type === "touchmove") {
+      deltaX = event.touches[0].clientX - this.offsetX;
+      deltaY = event.touches[0].clientY - this.offsetY;
+    } else if (event.type !== "touchend") {
+      // touchend event has no touches property
+      deltaX = event.clientX - this.offsetX;
+      deltaY = event.clientY - this.offsetY;
     }
 
-    private calculateCoordinates(event: any) {
-        let x = 0;
-        let y = 0;
-        let deltaX = 0;
-        let deltaY = 0;
+    x = this.initialCoordinates[0] + deltaX / this.zoom;
+    y = this.initialCoordinates[1] + deltaY / this.zoom;
 
-        if (event.type === "touchmove") {
-            deltaX = event.touches[0].clientX - this.offsetX;
-            deltaY = event.touches[0].clientY - this.offsetY;
-        } else if (event.type !== "touchend") {
-            // touchend event has no touches property
-            deltaX = event.clientX - this.offsetX;
-            deltaY = event.clientY - this.offsetY;
-        }
-
-        x = this.initialCoordinates[0] + deltaX / this.zoom;
-        y = this.initialCoordinates[1] + deltaY / this.zoom;
-
-        return [x, y];
-    }
+    return [x, y];
+  }
 }
