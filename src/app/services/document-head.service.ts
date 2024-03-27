@@ -1,4 +1,4 @@
-import { Inject, Injectable, LOCALE_ID, Renderer2, RendererFactory2 } from '@angular/core';
+import { Inject, Injectable, LOCALE_ID, OnDestroy, Renderer2, RendererFactory2 } from '@angular/core';
 import { DOCUMENT } from '@angular/common';
 import { Meta, Title } from '@angular/platform-browser';
 import { BehaviorSubject, Observable } from 'rxjs';
@@ -9,7 +9,8 @@ import { config } from '@config';
 @Injectable({
   providedIn: 'root',
 })
-export class DocumentHeadService {
+export class DocumentHeadService implements OnDestroy {
+  private addedHeadElements: HTMLElement[] = [];
   private currentPageTitle$: BehaviorSubject<string> = new BehaviorSubject('');
   private currentRouterUrl: string | undefined = undefined;
   private openGraphTags: any = undefined;
@@ -26,6 +27,10 @@ export class DocumentHeadService {
     this.openGraphTags = config.app?.openGraphMetaTags ?? undefined;
     this.languages = config.app?.i18n?.languages ?? [];
     this.renderer = this.rendererFactory.createRenderer(null, null);
+  }
+
+  ngOnDestroy(): void {
+    this.cleanupAddedHeadElements();
   }
 
   setTitle(pageTitleParts: string[] = []) {
@@ -182,6 +187,10 @@ export class DocumentHeadService {
     }
     this.renderer.setAttribute(tag, 'href', this.getAbsoluteURL(locale + routerURL));
     this.renderer.appendChild(this.document.head, tag);
+    // Add the element to the array keeping track of elements that have
+    // been added to the DOM so they can be cleaned up when the service is
+    // destroyed.
+    this.addedHeadElements.push(tag);
   }
 
   private removeLinkTags(relType: string, hreflang: boolean = false) {
@@ -192,6 +201,18 @@ export class DocumentHeadService {
     for (let i = 0; i < linkTags.length; i++) {
       this.renderer.removeChild(this.document.head, linkTags[i]);
     }
+
+    // The link tags that are removed from the DOM also need to be removed
+    // from the array keeping track of which elements have been added to
+    // the DOM, so they can be cleaned up when the service is destroyed.
+    this.addedHeadElements = this.addedHeadElements.filter((tag: HTMLElement) => {
+      // Keep the tag if it does not match the criteria for removal
+      return !(
+        tag.tagName === 'LINK' &&
+        tag.getAttribute('rel') === relType &&
+        (hreflang ? tag.hasAttribute('hreflang') : true)
+      );
+    });
   }
 
   private getAbsoluteURL(relativeURL: string) {
@@ -208,6 +229,13 @@ export class DocumentHeadService {
 
   getCurrentPageTitle(): Observable<string> {
     return this.currentPageTitle$.asObservable();
+  }
+
+  private cleanupAddedHeadElements() {
+    this.addedHeadElements.forEach(tag => {
+      this.renderer.removeChild(this.document.head, tag);
+    });
+    this.addedHeadElements = [];
   }
 
 }

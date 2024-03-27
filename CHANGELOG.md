@@ -8,6 +8,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ## [Unreleased]
 
+### Fixed
+
+- Link-elements added to the DOM using a custom renderer in the document head service are cleaned up when the service is destroyed. This fixes a potential memory leak in the SSR-app.
+
 
 
 ## [1.3.2] – 2024-02-29
@@ -242,7 +246,7 @@ siteLogoDimensions: {
 
 
 
-[unreleased]: https://github.com/slsfi/digital-edition-frontend-ng/compare/1.3.1...HEAD
+[unreleased]: https://github.com/slsfi/digital-edition-frontend-ng/compare/1.3.2...HEAD
 [1.3.2]: https://github.com/slsfi/digital-edition-frontend-ng/compare/1.3.1...1.3.2
 [1.3.1]: https://github.com/slsfi/digital-edition-frontend-ng/compare/1.3.0...1.3.1
 [1.3.0]: https://github.com/slsfi/digital-edition-frontend-ng/compare/1.2.3...1.3.0
