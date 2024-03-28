@@ -14,6 +14,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 - Deps: update `@angular` to 17.3.2.
 - Deps: update `@ionic` to 7.8.2.
 - Deps: update `express` to 4.19.2.
+- Deps: update `ionicons` to 7.3.1.
 - Deps: update `typescript` to 5.4.3.
 
 ### Fixed
