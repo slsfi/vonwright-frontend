@@ -137,7 +137,7 @@
         "extract-i18n": {
           "builder": "ng-extract-i18n-merge:ng-extract-i18n-merge",
           "options": {
-            "browserTarget": "app:build",
+            "buildTarget": "app:build",
             "format": "xlf2",
             "outputPath": "src/locale",
             "targetFiles": [
