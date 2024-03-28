@@ -17,6 +17,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 - Deps: update `ionicons` to 7.3.1.
 - Deps: update `marked` to 12.0.1.
 - Deps: update `@types/node` to 20.11.30.
+- Deps: update `ng-extract-i18n-merge` to 2.11.1.
 - Deps: update `typescript` to 5.4.3.
 
 ### Fixed
