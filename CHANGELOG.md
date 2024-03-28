@@ -8,6 +8,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ## [Unreleased]
 
+### Changed
+
+- Update `nginx` to 1.25.4.
+
 ### Fixed
 
 - Link-elements added to the DOM using a custom renderer in the document head service are cleaned up when the service is destroyed. This fixes a potential memory leak in the SSR-app.
