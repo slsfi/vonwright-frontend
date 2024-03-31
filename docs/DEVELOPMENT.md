@@ -3,6 +3,15 @@
 This document contains notes and tips on the development of the app.
 
 
+## Node.js version and building using GitHub Actions
+
+The Node.js Docker-image tag can be passed as a build argument to `Dockerfile` using the argument `NODE_IMAGE_TAG`. `Dockerfile` sets a default value for the argument if it is not passed.
+
+By default the app is built using GitHub Actions according to the workflow defined in `.github/workflows/docker-build-and-push.yml`, but you can also define your own build workflow. The Node.js image which is used as the base image for the build is defined in the workflow YAML-file and passed to `Dockerfile`.
+
+When updating which Node.js image is used for the build, remember to update both `docker-build-and-push.yml` and `Dockerfile`.
+
+
 ## Dependencies
 
 The app is built on Angular and uses many web components from Ionic. It also has a few other essential dependencies, which are briefly described below.

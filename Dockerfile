@@ -6,12 +6,14 @@
 # corresponding Angular CLI globally.
 ARG ANGULAR_MAJOR_VERSION=17
 
-# Define tag of official Node image to be used as the base image,
+# Enable passing the tag of the Node.js image as a build argument,
+# and define a default tag in case the build argument is not passed.
+# The Node.js image is used as the base image of the app,
 # https://hub.docker.com/_/node/.
 ARG NODE_IMAGE_TAG=20-alpine
 
 
-# 1. Create base image from official Node image.
+# 1. Create base image from official Node.js image.
 FROM node:${NODE_IMAGE_TAG} AS base
 # Change working directory.
 WORKDIR /digital-edition-frontend-ng

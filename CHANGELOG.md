@@ -11,6 +11,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 ### Changed
 
 - Replace deprecated `browserTarget` with `buildTarget` in `extract-i18n` options in `angular.json`.
+- Ensure build uses latest version of Node.js Docker-image. Remove unnecessary quotes around strings in GitHub Actions YAML build file.
 - Update `nginx` to 1.25.4.
 - Deps: update `@angular` to 17.3.2.
 - Deps: update `@ionic` to 7.8.2.
