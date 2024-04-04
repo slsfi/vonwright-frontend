@@ -57,41 +57,12 @@ Then redeploy the app.
 **Important!** Do not create a new release when rolling back to an earlier version.
 
 
-## Running Docker image locally for testing
-
-a) To locally run a Docker image, which has been automatically built and pushed to GitHub according to the description above:
-
-1. Start [Docker Desktop][docker_desktop] and log in.
-2. `cd` into the app repository folder.
-3. Run `docker run -it -p 4201:4201 --rm <image-url>` where `<image-url>` must be replaced with the URL to the image, for example `ghcr.io/slsfi/digital-edition-frontend-ng:main`.
-4. Open your browser on http://localhost:4201/.
-
-b) To first build and then run a Docker image of a local copy of the repository on your own machine:
-
-1. Start [Docker Desktop][docker_desktop] and log in.
-2. `cd` into the app repository folder.
-3. Run `docker build --no-cache -t name:tag .` (notice the dot at the end) to build the image from the current directory, where `name:tag` must be replaced with the name and tag of the image, for example `digital-edition-frontend-ng:latest`.
-4. Run `docker run -it -p 4201:4201 --rm name:tag` where `name:tag` must be replaced with the name and tag of the image that you specified in step 3.
-5. Open your browser on http://localhost:4201/.
-
-## Running Docker containers with nginx in front of app locally for testing
-
-In production, nginx is run in a Docker container in front of the app container so nginx, which is more performant than Node.js, can server static files. To run the app in this setup locally for testing purposes:
-
-1. Follow steps 1–3 under option b) in the previous section.
-2. Replace `image` in the `web` service in [`compose.yml`][docker_compose_file] with the `name:tag` you chose for the Docker image in step 3 in option b) above. **Do not commit this change!**
-3. Run `docker compose up -d`.
-4. Open your browser on http://localhost:2089/ (the port of the nginx service defined in [`compose.yml`][docker_compose_file]).
-5. Undo the changes in [`compose.yml`][docker_compose_file]).
-6. When you are done testing, stop the Docker containers in Docker Desktop and delete all containers and volumes that were created. Alternatively you can do this in the terminal by running `docker compose down --volumes`.
-
 
 [build_workflow]: ../.github/workflows/docker-build-and-push.yml
 [changelog]: ../CHANGELOG.md
 [digital-edition-frontend-ng]: https://github.com/slsfi/digital-edition-frontend-ng
 [docker_compose_file]: ../compose.yml
 [docker_compose_reference]: https://docs.docker.com/compose/
-[docker_desktop]: https://www.docker.com/products/docker-desktop/
 [docker_image_reference]: https://docs.docker.com/build/building/packaging/
 [docker_run_reference]: https://docs.docker.com/engine/reference/run/
 [docker_volume_reference]: https://docs.docker.com/storage/volumes/

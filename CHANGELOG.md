@@ -8,10 +8,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ## [Unreleased]
 
+### Added
+
+- Docs on how to run nginx in front of Node.js app locally.
+
 ### Changed
 
 - Replace deprecated `browserTarget` with `buildTarget` in `extract-i18n` options in `angular.json`.
 - Ensure build uses latest version of Node.js Docker-image. Remove unnecessary quotes around strings in GitHub Actions YAML build file.
+- Restructure docs on running app locally.
 - Update `nginx` to 1.25.4.
 - Deps: update `@angular` to 17.3.3.
 - Deps: update `@ionic` to 7.8.3.

@@ -3,6 +3,41 @@
 This document contains notes and tips on the development of the app.
 
 
+## Run locally on Windows
+
+### Remote Docker image of app
+
+To locally run a prebuilt Docker image, which has been pushed to an image repository like GitHub Packages or DockerHub:
+
+1. Start [Docker Desktop][docker_desktop] and log in with your credentials.
+2. In PowerShell, `cd` into the app repository folder.
+3. Run `docker run -it -p 4201:4201 --rm <image-url>` where `<image-url>` must be replaced with the URL to the remote image, for example `ghcr.io/slsfi/digital-edition-frontend-ng:main`.
+4. Open your browser on http://localhost:4201/.
+
+### Local Docker image of app
+
+To first build and then run a Docker image of a local copy of the repository on your own machine:
+
+1. Start [Docker Desktop][docker_desktop] and log in with your credentials.
+2. In PowerShell, `cd` into the app repository folder.
+3. Run `docker build --no-cache -t name:tag .` (notice the dot at the end) to build the image from the current directory, where `name:tag` must be replaced with the name and tag of the image, for example `digital-edition-frontend-ng:latest`.
+4. Run `docker run -it -p 4201:4201 --rm name:tag` where `name:tag` must be replaced with the name and tag of the image that you specified in step 3.
+5. Open your browser on http://localhost:4201/.
+
+### nginx in front of app image
+
+In production, nginx is run in a Docker container in front of the app container so nginx, which is more performant than Node.js, can server static files. To run the app in this setup locally:
+
+1. Start [Docker Desktop][docker_desktop] and log in with your credentials.
+2. In PowerShell, `cd` into the app repository folder.
+3. Run `docker build --no-cache -t name:tag .` (notice the dot at the end) to build the image from the current directory, where `name:tag` must be replaced with the name and tag of the image, for example `digital-edition-frontend-ng:latest`.
+4. Replace the URL of `image` in the `web` service in [`compose.yml`][docker_compose_file] with the `name:tag` you chose for the Docker image in step 3. **Do not commit this change!**
+5. Run `docker compose up -d`.
+6. Open your browser on http://localhost:2089/ (the port of the nginx service defined in [`compose.yml`][docker_compose_file]).
+7. Undo the changes in [`compose.yml`][docker_compose_file].
+8. When you are done testing, stop the Docker containers in Docker Desktop and delete all containers and volumes that were created. Alternatively you can do this in the terminal by running `docker compose down --volumes`.
+
+
 ## Node.js version and building using GitHub Actions
 
 The Node.js Docker-image tag can be passed as a build argument to `Dockerfile` using the argument `NODE_IMAGE_TAG`. `Dockerfile` sets a default value for the argument if it is not passed.
@@ -15,6 +50,7 @@ When updating which Node.js image is used for the build, remember to update both
 ## Dependencies
 
 The app is built on Angular and uses many web components from Ionic. It also has a few other essential dependencies, which are briefly described below.
+
 
 ### `@angular`
 
@@ -107,6 +143,8 @@ Testing frameworks.
 
 
 [angular_update_guide]: https://update.angular.io/
+[docker_compose_file]: ../compose.yml
+[docker_desktop]: https://www.docker.com/products/docker-desktop/
 [dockerfile]: ../Dockerfile
 [npm_epubjs]: https://www.npmjs.com/package/epubjs
 [npm_express]: https://www.npmjs.com/package/express
