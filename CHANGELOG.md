@@ -8,30 +8,36 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ## [Unreleased]
 
+
+
+## [1.3.3] – 2024-04-04
+
 ### Added
 
-- Docs on how to run nginx in front of Node.js app locally.
+- Docs: notes on how to run nginx in front of Node.js app locally. ([caf8d1e](https://github.com/slsfi/digital-edition-frontend-ng/commit/caf8d1eab58b3976d1f3941422ea7d707adc3b3d))
 
 ### Changed
 
-- Replace deprecated `browserTarget` with `buildTarget` in `extract-i18n` options in `angular.json`.
-- Ensure build uses latest version of Node.js Docker-image. Remove unnecessary quotes around strings in GitHub Actions YAML build file.
-- Restructure docs on running app locally.
-- Update `nginx` to 1.25.4.
-- Deps: update `@angular` to 17.3.3.
-- Deps: update `@ionic` to 7.8.3.
-- Deps: update `express` to 4.19.2.
-- Deps: update `ionicons` to 7.3.1.
-- Deps: update `marked` to 12.0.1.
-- Deps: update `@types/node` to 20.12.4.
-- Deps: update `ng-extract-i18n-merge` to 2.11.2.
-- Deps: update `typescript` to 5.4.3.
+- Replace deprecated `browserTarget` with `buildTarget` in `extract-i18n` options in `angular.json`. ([96c94fe](https://github.com/slsfi/digital-edition-frontend-ng/commit/96c94fe8aa278db0943d8e67fe907db83429f810))
+- Ensure build uses latest version of Node.js Docker-image. Remove unnecessary quotes around strings in GitHub Actions YAML build file. ([971e06e](https://github.com/slsfi/digital-edition-frontend-ng/commit/971e06e7f63a49cc86b75f81eb4afe5a8d07650a))
+- Docs: restructure notes on running app locally. ([a41dc7d](https://github.com/slsfi/digital-edition-frontend-ng/commit/a41dc7dbc79bb86915b6b5d14122fdd7b43d59bf))
+- Update `nginx` to 1.25.4. ([2ce5529](https://github.com/slsfi/digital-edition-frontend-ng/commit/2ce55297e8b100fed7d86735f0529a49d4265377))
+- Deps: update `@angular` to 17.3.3. ([e531f86](https://github.com/slsfi/digital-edition-frontend-ng/commit/e531f86ad64103c4e6e5c7502b48613a6bb9c994), [0873abb](https://github.com/slsfi/digital-edition-frontend-ng/commit/0873abbf59e55ae81b66e2cc0a0b31cfcd97a234))
+- Deps: update `@ionic` to 7.8.3. ([29bd2ae](https://github.com/slsfi/digital-edition-frontend-ng/commit/29bd2aee08a50bd8b1e583a04fbf8556fe50f49d), [aa69990](https://github.com/slsfi/digital-edition-frontend-ng/commit/aa69990b39dcafa527314a3ba07fff330897a184))
+- Deps: update `express` to 4.19.2. ([a4443eb](https://github.com/slsfi/digital-edition-frontend-ng/commit/a4443eb821bb2889ba82f31b0884ffd9b2d29e46))
+- Deps: update `ionicons` to 7.3.1. ([9d0bc07](https://github.com/slsfi/digital-edition-frontend-ng/commit/9d0bc0723c6bdea0be60fe424a37cb1071855450))
+- Deps: update `marked` to 12.0.1. ([2978215](https://github.com/slsfi/digital-edition-frontend-ng/commit/2978215d540529034f4edd6dcede40674041fdce))
+- Deps: update `@types/node` to 20.12.4. ([5987f3a](https://github.com/slsfi/digital-edition-frontend-ng/commit/5987f3a78ce7bdf2634fb136c511d771d7d3bcd8), [11f0385](https://github.com/slsfi/digital-edition-frontend-ng/commit/11f0385db2f690c10d6cb90413dd62311b48dd07))
+- Deps: update `ng-extract-i18n-merge` to 2.11.2. ([bd55fd0](https://github.com/slsfi/digital-edition-frontend-ng/commit/bd55fd08449ddc5b852ebf7a3e47c943ed40be29), [68d72fe](https://github.com/slsfi/digital-edition-frontend-ng/commit/68d72fe60cdfd0966aab19d28996047e140d3916))
+- Deps: update `typescript` to 5.4.3. ([fd5d49f](https://github.com/slsfi/digital-edition-frontend-ng/commit/fd5d49f9a8b3e32494aa949ebb475688946a422e))
+- Deps: update `es5-ext` to 0.10.64 ([e06c6d4](https://github.com/slsfi/digital-edition-frontend-ng/commit/e06c6d4dc3f835ef7d87add1a95288aca7cc97b6))
+- Deps: update `follow-redirects` to 1.15.6. ([82d4839](https://github.com/slsfi/digital-edition-frontend-ng/commit/82d4839f395b4d09aeaaa06ce2b787ffcb0472ff))
 
 ### Fixed
 
-- Link-elements added to the DOM using a custom renderer in the document head service are cleaned up when the service is destroyed. This fixes a potential memory leak in the SSR-app.
-- Return values of the RxJS `catchError` function.
-- Ensure cleanup of event listeners in the draggable-image directive.
+- Link-elements added to the DOM using a custom renderer in the document head service are cleaned up when the service is destroyed. This fixes a potential memory leak in the SSR-app. ([736195e](https://github.com/slsfi/digital-edition-frontend-ng/commit/736195e4e6097c24a6452ad5294ad29ea6e90293))
+- Return values of the RxJS `catchError` function. ([fb862c2](https://github.com/slsfi/digital-edition-frontend-ng/commit/fb862c2e801a9f232d3fc92d704e9bebc5bd632b))
+- Ensure cleanup of event listeners in the draggable-image directive. ([0b2f871](https://github.com/slsfi/digital-edition-frontend-ng/commit/0b2f871a737ec2daec91a08e3021289782f9dd41))
 
 
 
@@ -267,7 +273,8 @@ siteLogoDimensions: {
 
 
 
-[unreleased]: https://github.com/slsfi/digital-edition-frontend-ng/compare/1.3.2...HEAD
+[unreleased]: https://github.com/slsfi/digital-edition-frontend-ng/compare/1.3.3...HEAD
+[1.3.3]: https://github.com/slsfi/digital-edition-frontend-ng/compare/1.3.2...1.3.3
 [1.3.2]: https://github.com/slsfi/digital-edition-frontend-ng/compare/1.3.1...1.3.2
 [1.3.1]: https://github.com/slsfi/digital-edition-frontend-ng/compare/1.3.0...1.3.1
 [1.3.0]: https://github.com/slsfi/digital-edition-frontend-ng/compare/1.2.3...1.3.0
