@@ -12,6 +12,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 - Run app as non-root user to increase security.
 - Deps: update `@angular` to 17.3.7.
+- Deps: update `ionicons` to 7.4.0.
 - Deps: update `zone.js` to 0.14.5.
 - Deps: update `@types/node` to 20.12.8.
 
