@@ -11,7 +11,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 ### Changed
 
 - Run app as non-root user to increase security.
-
+- Deps: update `@angular` to 17.3.7.
 
 
 ## [1.3.3] – 2024-04-04
