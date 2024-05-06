@@ -50,6 +50,8 @@ RUN npm run compress
 
 # 3. Create final image, starting from base image.
 FROM base AS final
+# Create a non-root user with a dedicated user group.
+RUN addgroup -S appgroup && adduser -S appuser -G appgroup
 # Copy package.json and package-lock.json from the
 # source folder to the workdir in the container filesystem.
 COPY package.json package-lock.json ./
@@ -63,5 +65,7 @@ RUN npm install --omit=dev
 COPY --from=build /digital-edition-frontend-ng/dist /digital-edition-frontend-ng/dist
 # Set NODE_ENV environment variable to production.
 ENV NODE_ENV production
+# Switch to the non-root user before running the app.
+USER appuser
 # Run app.
 CMD ["node","dist/app/proxy-server.js"]

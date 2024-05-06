@@ -8,6 +8,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ## [Unreleased]
 
+### Changed
+
+- Run app as non-root user to increase security.
+
 
 
 ## [1.3.3] – 2024-04-04
