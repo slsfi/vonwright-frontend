@@ -18,6 +18,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 - Deps: update `zone.js` to 0.14.5.
 - Deps: update `@types/node` to 20.12.10.
 - Deps: update `typescript` to 5.4.5.
+- Update `nginx` to 1.26.0.
 
 
 ## [1.3.3] – 2024-04-04
