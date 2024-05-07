@@ -8,17 +8,22 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ## [Unreleased]
 
+
+
+## [1.3.4] – 2024-05-07
+
 ### Changed
 
-- Run app as non-root user to increase security.
-- Deps: update `@angular` to 17.3.7.
-- Deps: update `@ionic` to 8.1.0.
-- Deps: update `ionicons` to 7.4.0.
-- Deps: update `marked` to 12.0.2.
-- Deps: update `zone.js` to 0.14.5.
-- Deps: update `@types/node` to 20.12.10.
-- Deps: update `typescript` to 5.4.5.
-- Update `nginx` to 1.26.0.
+- Run app as non-root user to increase security. ([578937c](https://github.com/slsfi/digital-edition-frontend-ng/commit/578937ce7040914221d8bfd8893ea5cb620e32e7))
+- Deps: update `@angular` to 17.3.7. ([547c4e8](https://github.com/slsfi/digital-edition-frontend-ng/commit/547c4e8a55c2cc1952f6fd780645a39125e683af))
+- Deps: update `@ionic` to 8.1.0. ([8bde0a4](https://github.com/slsfi/digital-edition-frontend-ng/commit/8bde0a4d79648a22cb021d7ed8d51a8a41ed6641))
+- Deps: update `ionicons` to 7.4.0. ([1a4bb08](https://github.com/slsfi/digital-edition-frontend-ng/commit/1a4bb08a4ef936c6450a97db513dc629dbb7b80d))
+- Deps: update `marked` to 12.0.2. ([db5dc72](https://github.com/slsfi/digital-edition-frontend-ng/commit/db5dc72e25563d1962e2bf6e52794b3af1ab9f1c))
+- Deps: update `zone.js` to 0.14.5. ([412caa0](https://github.com/slsfi/digital-edition-frontend-ng/commit/412caa0a77abbbbb63b33363a43c8cacdeba9912))
+- Deps: update `@types/node` to 20.12.10. ([524024e](https://github.com/slsfi/digital-edition-frontend-ng/commit/524024e1c3848e76a81da157d5f4a512aae93f3b), [0508562](https://github.com/slsfi/digital-edition-frontend-ng/commit/0508562d47188e0d77115323d9c1bb7c926298b3))
+- Deps: update `typescript` to 5.4.5. ([4a8c95f](https://github.com/slsfi/digital-edition-frontend-ng/commit/4a8c95fd55f8ca549e1a13096052daf9d57d6caf))
+- Update `nginx` to 1.26.0. ([4e3bdfa](https://github.com/slsfi/digital-edition-frontend-ng/commit/4e3bdfabaee74d63bcde720d60f823e9d8f1000f))
+
 
 
 ## [1.3.3] – 2024-04-04
@@ -284,7 +289,8 @@ siteLogoDimensions: {
 
 
 
-[unreleased]: https://github.com/slsfi/digital-edition-frontend-ng/compare/1.3.3...HEAD
+[unreleased]: https://github.com/slsfi/digital-edition-frontend-ng/compare/1.3.4...HEAD
+[1.3.4]: https://github.com/slsfi/digital-edition-frontend-ng/compare/1.3.3...1.3.4
 [1.3.3]: https://github.com/slsfi/digital-edition-frontend-ng/compare/1.3.2...1.3.3
 [1.3.2]: https://github.com/slsfi/digital-edition-frontend-ng/compare/1.3.1...1.3.2
 [1.3.1]: https://github.com/slsfi/digital-edition-frontend-ng/compare/1.3.0...1.3.1
