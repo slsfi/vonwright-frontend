@@ -16,7 +16,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 - Deps: update `ionicons` to 7.4.0.
 - Deps: update `marked` to 12.0.2.
 - Deps: update `zone.js` to 0.14.5.
-- Deps: update `@types/node` to 20.12.8.
+- Deps: update `@types/node` to 20.12.10.
 - Deps: update `typescript` to 5.4.5.
 
 
