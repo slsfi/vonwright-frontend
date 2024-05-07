@@ -46,6 +46,7 @@
       font-size: 0.875rem;
       margin: 0;
       min-height: auto;
+      min-width: 1.5rem;
 
       &::part(native) {
         min-height: auto;
@@ -53,6 +54,10 @@
 
       &:focus {
         outline-style: auto;
+      }
+
+      ion-icon {
+        font-size: 1.8em;
       }
     }
   }

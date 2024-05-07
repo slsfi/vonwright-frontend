@@ -25,9 +25,14 @@ ion-item.item:last-child {
 ion-button.close {
 	--padding-start: 0.65em;
 	--padding-end: 0.65em;
+
 	&.ion-focused {
 		outline: solid;
 		outline-offset: -4px;
+	}
+
+	ion-icon {
+		font-size: 1.8em;
 	}
 }
 

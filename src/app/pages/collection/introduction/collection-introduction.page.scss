@@ -28,15 +28,21 @@
 #TOC #toc-close-button {
   display: flex;
   justify-content: flex-end;
-}
 
-#TOC #toc-close-button ion-button.close::part(native) {
-  padding: 0;
-}
+  ion-button.close {
+    margin-right: -0.35rem;
+    min-height: 2rem;
+    min-width: 2rem;
 
-#TOC #toc-close-button ion-button.close ion-icon {
-  color: var(--intro-toc-text-color);
-  font-size: 2rem;
+    &::part(native) {
+      padding: 0;
+    }
+
+    ion-icon {
+      color: var(--intro-toc-text-color);
+      font-size: 2rem;
+    }
+  }
 }
 
 /* On large screens: the intro-toc floats to the right of the text if not in mobile mode. */

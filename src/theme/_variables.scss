@@ -42,12 +42,12 @@
                                    Arial, sans-serif;
 
   // Override global Ionic CSS variables
-  --ion-backdrop-opacity:       0.3;
-  --ion-color-primary:          var(--primary-color);
-  --ion-color-primary-rgb:      var(--primary-color-rgb);
-  --ion-color-primary-contrast: var(--primary-color-contrast);
-  --ion-color-step-100:         #f4f4f4;
-  --ion-font-family:            var(--font-stack-app-base);
+  --ion-backdrop-opacity:           0.3;
+  --ion-color-primary:              var(--primary-color);
+  --ion-color-primary-rgb:          var(--primary-color-rgb);
+  --ion-color-primary-contrast:     var(--primary-color-contrast);
+  --ion-background-color-step-100:  #f4f4f4;
+  --ion-font-family:                var(--font-stack-app-base);
 }
 
 
