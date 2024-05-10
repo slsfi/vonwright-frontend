@@ -8,6 +8,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ## [Unreleased]
 
+### Changed
+
+- Change search method on the (named entity) index page from fuzzy to substring search when the provider is ElasticSearch.
+
 
 
 ## [1.3.4] – 2024-05-07

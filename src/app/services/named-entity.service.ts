@@ -254,11 +254,12 @@ export class NamedEntityService {
         },
       });
     } else if (searchText) {
-      // Fuzzy search in full tag name
+      // Substring search in full tag name
       payload.query.bool.must.push({
-        fuzzy: {
+        wildcard: {
           name: {
-            value: `${String(searchText)}`,
+            value: `*${String(searchText)}*`,
+            case_insensitive: true,
           },
         },
       });
@@ -387,10 +388,12 @@ export class NamedEntityService {
         },
       });
     } else if (searchText) {
+      // Substring search in full person name
       payload.query.bool.must.push({
-        fuzzy: {
+        wildcard: {
           full_name: {
-            value: `${String(searchText)}`,
+            value: `*${String(searchText)}*`,
+            case_insensitive: true,
           },
         },
       });
@@ -492,11 +495,12 @@ export class NamedEntityService {
         },
       });
     } else if (searchText) {
-      // Fuzzy search in full place name
+      // Substring search in full place name
       payload.query.bool.must.push({
-        fuzzy: {
+        wildcard: {
           name: {
-            value: `${String(searchText)}`,
+            value: `*${String(searchText)}*`,
+            case_insensitive: true,
           },
         },
       });
@@ -554,13 +558,16 @@ export class NamedEntityService {
     if (searchText) {
       payload.from = 0;
       payload.size = 5000;
+      // Substring search in the work title
       payload.query.bool.should[0].bool.must.push({
-        fuzzy: {
+        wildcard: {
           title: {
-            value: `${String(searchText)}`,
+            value: `*${String(searchText)}*`,
+            case_insensitive: true,
           },
         },
       });
+      // Substring search in author name starting from whole words
       payload.query.bool.should[1].bool.must.push({
         regexp: {
           'author_data.full_name': {
