@@ -11,6 +11,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 ### Changed
 
 - Change search method on the (named entity) index page from fuzzy to substring search when the provider is ElasticSearch.
+- Unwrap lone grouped collections in the main side menu: if a collection group contains just one collection, the group menu item will not be collapsible/expandable, instead the menu item will link directly into the collection. The menu item title will still be the title of the collection group (defined in translation xliff-files).
 
 
 

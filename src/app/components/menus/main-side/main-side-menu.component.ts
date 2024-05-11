@@ -175,7 +175,7 @@ export class MainSideMenuComponent implements OnInit, OnChanges {
       return this.collectionsService.getCollections().pipe(
         map((res: any) => {
           this.recursivelyAddParentPagePath(res, '/collection');
-          res = this.categorizeCollections(res);
+          res = this.groupCollections(res);
           let menu = [];
           for (let i = 0; i < res.length; i++) {
             let title = $localize`:@@MainSideMenu.CollectionsGroup1:Innehåll`;
@@ -186,7 +186,18 @@ export class MainSideMenuComponent implements OnInit, OnChanges {
               : i === 4 ? title = $localize`:@@MainSideMenu.CollectionsGroup5:Innehåll 5`
               : title = 'Error: out of category translations';
             }
-            menu.push({ title, children: res[i] });
+            if (res[i].length > 1) {
+              // The group contains several collections.
+              menu.push({ title, children: res[i] });
+            } else {
+              // The group contains just one collections, so unwrap it,
+              // meaning that the group menu item will not be collapsible,
+              // instead linking directly into the one collection in the
+              // group.
+              res[i][0].name = title;
+              res[i][0].title = title;
+              menu.push(res[i][0]);
+            }
           }
           return { menuType: 'collection', menuData: menu };
         }),
@@ -234,7 +245,7 @@ export class MainSideMenuComponent implements OnInit, OnChanges {
     return of({ menuType: indexType, menuData });
   }
 
-  private categorizeCollections(collections: any) {
+  private groupCollections(collections: any) {
     if (this._config.collections?.order) {
       let collectionsList = this._config.collections.order.map(() => []);
 
