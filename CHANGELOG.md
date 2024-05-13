@@ -8,6 +8,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ## [Unreleased]
 
+### Added
+
+- Support for showing a ”facsimile-only icon” next to items in the collection side menu that have the `facsimileOnly` property set to `true` in the collection table of contents file.
+
 ### Changed
 
 - Change search method on the (named entity) index page from fuzzy to substring search when the provider is ElasticSearch.

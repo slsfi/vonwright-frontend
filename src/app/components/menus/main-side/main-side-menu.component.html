@@ -37,7 +37,10 @@
 
 <ng-template #menuItemContent let-item>
     <span class="label">{{item.title}}</span>
-    <ion-icon *ngIf="item.children" name="chevron-forward-outline" class="toggle-icon"
+    <ion-icon *ngIf="item.children"
+          name="chevron-forward-outline"
+          class="item-icon-r toggle-icon"
+          aria-hidden="true"
           [class.open]="selectedMenu.includes(item.nodeId)"
     ></ion-icon>
 </ng-template>

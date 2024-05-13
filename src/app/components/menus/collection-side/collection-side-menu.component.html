@@ -101,7 +101,15 @@
       {{item.text}}
       <span class="description" *ngIf="item.description">{{item.description}}</span>
     </span>
-    <ion-icon *ngIf="item.children" name="chevron-forward-outline" class="toggle-icon"
+    <ion-icon *ngIf="!item.children && item.facsimileOnly"
+          name="image-outline"
+          class="item-icon-r facs-only-icon"
+          aria-hidden="true"
+    ></ion-icon>
+    <ion-icon *ngIf="item.children"
+          name="chevron-forward-outline"
+          class="item-icon-r toggle-icon"
+          aria-hidden="true"
           [class.open]="selectedMenu.includes(item.itemId) || selectedMenu.includes(item.nodeId)"
     ></ion-icon>
 </ng-template>

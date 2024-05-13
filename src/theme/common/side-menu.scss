@@ -50,7 +50,7 @@ li {
                 color: var(--side-menu-selected-description-text-color);
             }
 
-            ion-icon.toggle-icon {
+            ion-icon.item-icon-r {
                 color: var(--side-menu-selected-text-color);
             }
         }
@@ -71,16 +71,21 @@ li {
             margin-top: 5px;
         }
 
-        ion-icon.toggle-icon {
-            color: var(--side-menu-text-color);
-            font-size: 1.25rem;
-            flex-shrink: 0;
-            margin: 0 8px 0 auto;
-            transform: rotate(0);
-            transition: transform ease-in-out 0.2s;
+        ion-icon {
+            &.item-icon-r {
+                color: var(--side-menu-text-color);
+                font-size: 1.25rem;
+                flex-shrink: 0;
+                margin: 0 8px 0 auto;
+            }
 
-            &.open {
-                transform: rotate(90deg);
+            &.toggle-icon {
+                transform: rotate(0);
+                transition: transform ease-in-out 0.2s;
+    
+                &.open {
+                    transform: rotate(90deg);
+                }
             }
         }
     }
