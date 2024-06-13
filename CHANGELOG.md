@@ -17,6 +17,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 - Change search method on the (named entity) index page from fuzzy to substring search when the provider is ElasticSearch.
 - Unwrap lone grouped collections in the main side menu: if a collection group contains just one collection, the group menu item will not be collapsible/expandable, instead the menu item will link directly into the collection. The menu item title will still be the title of the collection group (defined in translation xliff-files).
 - Deps: update `@angular` to 17.3.11.
+- Deps: update `@ionic` to 8.2.2.
 - Deps: update `zone.js` to 0.14.7.
 - Deps (dev): update `braces` to 3.0.3.
 - Deps (dev): update `ng-extract-i18n-merge` to 2.12.0.
