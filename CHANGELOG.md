@@ -18,6 +18,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 - Unwrap lone grouped collections in the main side menu: if a collection group contains just one collection, the group menu item will not be collapsible/expandable, instead the menu item will link directly into the collection. The menu item title will still be the title of the collection group (defined in translation xliff-files).
 - Deps: update `@angular` to 17.3.11.
 - Deps: update `@ionic` to 8.2.2.
+- Deps: update `marked` to 13.0.0.
 - Deps: update `tslib` to 2.6.3.
 - Deps: update `zone.js` to 0.14.7.
 - Deps (dev): update `@types/node` to 20.14.2.
