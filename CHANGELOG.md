@@ -25,6 +25,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 - Deps (dev): update `braces` to 3.0.3.
 - Deps (dev): update `ng-extract-i18n-merge` to 2.12.0.
 - Update transitive dependencies by recreating `package-lock.json`.
+- Update `nginx` to 1.26.1.
 
 
 
