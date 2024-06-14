@@ -8,24 +8,28 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ## [Unreleased]
 
+
+
+## [1.4.0] – 2024-06-14
+
 ### Added
 
-- Support for showing a ”facsimile-only icon” next to items in the collection side menu that have the `facsimileOnly` property set to `true` in the collection table of contents file.
+- Support for showing a ”facsimile-only icon” next to items in the collection side menu that have the `facsimileOnly` property set to `true` in the collection table of contents file. ([fc7e0c6](https://github.com/slsfi/digital-edition-frontend-ng/commit/fc7e0c6818a2545dfa2914f9418a5ba274fc69f5))
 
 ### Changed
 
-- Change search method on the (named entity) index page from fuzzy to substring search when the provider is ElasticSearch.
-- Unwrap lone grouped collections in the main side menu: if a collection group contains just one collection, the group menu item will not be collapsible/expandable, instead the menu item will link directly into the collection. The menu item title will still be the title of the collection group (defined in translation xliff-files).
-- Deps: update `@angular` to 17.3.11.
-- Deps: update `@ionic` to 8.2.2.
-- Deps: update `marked` to 13.0.0.
-- Deps: update `tslib` to 2.6.3.
-- Deps: update `zone.js` to 0.14.7.
-- Deps (dev): update `@types/node` to 20.14.2.
-- Deps (dev): update `braces` to 3.0.3.
-- Deps (dev): update `ng-extract-i18n-merge` to 2.12.0.
-- Update transitive dependencies by recreating `package-lock.json`.
-- Update `nginx` to 1.26.1.
+- Change search method on the (named entity) index page from fuzzy to substring search when the provider is ElasticSearch. ([ce30c3e](https://github.com/slsfi/digital-edition-frontend-ng/commit/ce30c3e42dac5b46edd5b0c9f82f6f894f5f91e8))
+- Unwrap lone grouped collections in the main side menu: if a collection group contains just one collection, the group menu item will not be collapsible/expandable, instead the menu item will link directly into the collection. The menu item title will still be the title of the collection group (defined in translation xliff-files). ([ff7ac04](https://github.com/slsfi/digital-edition-frontend-ng/commit/ff7ac04bb3e5bd26648dfce9c2d1361b4ae83701))
+- Deps: update `@angular` to 17.3.11. ([dd7cbc5](https://github.com/slsfi/digital-edition-frontend-ng/commit/dd7cbc5cb295bce053c782d8503bf5d75f44ce44))
+- Deps: update `@ionic` to 8.2.2. ([746218a](https://github.com/slsfi/digital-edition-frontend-ng/commit/746218a82d0fd39e2ece3e21a1e5c2a77070c925))
+- Deps: update `marked` to 13.0.0. ([85699b3](https://github.com/slsfi/digital-edition-frontend-ng/commit/85699b37ac585955a28caf465ecbd41388fbd31d))
+- Deps: update `tslib` to 2.6.3. ([0065912](https://github.com/slsfi/digital-edition-frontend-ng/commit/0065912532533b05286971f385f8f817c384e7a0))
+- Deps: update `zone.js` to 0.14.7. ([1061fd3](https://github.com/slsfi/digital-edition-frontend-ng/commit/1061fd3f713c1b3b7bc8fff0c31ce595227e1560))
+- Deps (dev): update `@types/node` to 20.14.2. ([a2b72de](https://github.com/slsfi/digital-edition-frontend-ng/commit/a2b72deab51b3e54a616a0bbbfa9fa2ecc6be09c))
+- Deps (dev): update `braces` to 3.0.3. ([6a559f3](https://github.com/slsfi/digital-edition-frontend-ng/commit/6a559f3a3a5fc5e9d8708399850a14645a66c3f7))
+- Deps (dev): update `ng-extract-i18n-merge` to 2.12.0. ([62aa573](https://github.com/slsfi/digital-edition-frontend-ng/commit/62aa5731705c5355fdd8870f90038e9a18ff35f2))
+- Update transitive dependencies by recreating `package-lock.json`. ([2f6f6d6](https://github.com/slsfi/digital-edition-frontend-ng/commit/2f6f6d6dda8b93b00599b7631cae734eb4b63ee1))
+- Update `nginx` to 1.26.1. ([3fe3dd9](https://github.com/slsfi/digital-edition-frontend-ng/commit/3fe3dd9df4e230fe5fc5fd901b4e37812b64f038))
 
 
 
@@ -308,7 +312,8 @@ siteLogoDimensions: {
 
 
 
-[unreleased]: https://github.com/slsfi/digital-edition-frontend-ng/compare/1.3.4...HEAD
+[unreleased]: https://github.com/slsfi/digital-edition-frontend-ng/compare/1.4.0...HEAD
+[1.4.0]: https://github.com/slsfi/digital-edition-frontend-ng/compare/1.3.4...1.4.0
 [1.3.4]: https://github.com/slsfi/digital-edition-frontend-ng/compare/1.3.3...1.3.4
 [1.3.3]: https://github.com/slsfi/digital-edition-frontend-ng/compare/1.3.2...1.3.3
 [1.3.2]: https://github.com/slsfi/digital-edition-frontend-ng/compare/1.3.1...1.3.2
