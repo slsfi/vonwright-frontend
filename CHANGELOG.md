@@ -12,6 +12,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 - Deps: update `@angular` to 18.0.3.
 
+### Removed
+
+- Superfluous addition of `Title` service to providers in `AppModule`.
+
 
 
 ## [1.4.0] – 2024-06-14
