@@ -12,6 +12,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 - Deps: update `@angular` to 18.0.3.
 
+### Fixed
+
+- Active media collection filters do not clear properly when deselecting all filter options for a filter group.
+
 ### Removed
 
 - Superfluous addition of `Title` service to providers in `AppModule`.

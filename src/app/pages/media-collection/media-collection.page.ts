@@ -311,6 +311,11 @@ export class MediaCollectionPage implements OnDestroy, OnInit {
   private setActiveFiltersFromQueryParams(urlFilters: string) {
     const parsedActiveFilters = this.urlService.parse(urlFilters, true) || [];
 
+    // Clear the current active filters before setting them from queryparams
+    this.activePersonFilters = [];
+    this.activePlaceFilters = [];
+    this.activeKeywordFilters = [];
+
     parsedActiveFilters.forEach((filterGroup: any) => {
       if (filterGroup.person?.length) {
         this.activePersonFilters = filterGroup.person;
