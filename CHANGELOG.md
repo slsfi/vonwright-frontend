@@ -8,17 +8,21 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ## [Unreleased]
 
+
+
+## [1.4.1] – 2024-06-17
+
 ### Changed
 
-- Deps: update `@angular` to 18.0.3.
+- Deps: update `@angular` to 18.0.3. ([a18049e](https://github.com/slsfi/digital-edition-frontend-ng/commit/a18049ec7cd2e8adca45770319305d116af3d193))
 
 ### Fixed
 
-- Active media collection filters do not clear properly when deselecting all filter options for a filter group.
+- Active media collection filters do not clear properly when deselecting all filter options for a filter group. ([a708a0d](https://github.com/slsfi/digital-edition-frontend-ng/commit/a708a0d937058af9278105a3709a6e984061ff84))
 
 ### Removed
 
-- Superfluous addition of `Title` service to providers in `AppModule`.
+- Superfluous addition of `Title` service to providers in `AppModule`. ([06c141a](https://github.com/slsfi/digital-edition-frontend-ng/commit/06c141af3b24097f0e729a8be5f547f289dd0519))
 
 
 
@@ -324,7 +328,8 @@ siteLogoDimensions: {
 
 
 
-[unreleased]: https://github.com/slsfi/digital-edition-frontend-ng/compare/1.4.0...HEAD
+[unreleased]: https://github.com/slsfi/digital-edition-frontend-ng/compare/1.4.1...HEAD
+[1.4.1]: https://github.com/slsfi/digital-edition-frontend-ng/compare/1.4.0...1.4.1
 [1.4.0]: https://github.com/slsfi/digital-edition-frontend-ng/compare/1.3.4...1.4.0
 [1.3.4]: https://github.com/slsfi/digital-edition-frontend-ng/compare/1.3.3...1.3.4
 [1.3.3]: https://github.com/slsfi/digital-edition-frontend-ng/compare/1.3.2...1.3.3

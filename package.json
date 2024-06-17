@@ -1,6 +1,6 @@
 {
   "name": "sls-digital-edition-frontend",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "description": "Angular frontend app for the SLS Digital Edition Platform",
   "homepage": "https://github.com/slsfi/digital-edition-frontend-ng#readme",
   "license": "MIT",
