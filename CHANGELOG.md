@@ -8,9 +8,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ## [Unreleased]
 
-- Deps: update `@angular` to 18.0.5.
-- Deps: update `marked` to 13.0.1.
-- Deps (dev): update `@types/node` to 20.14.9.
+## [1.4.2] – 2024-07-02
+
+### Changed
+
+- Deps: update `@angular` to 18.0.5. ([f8129f1](https://github.com/slsfi/digital-edition-frontend-ng/commit/f8129f187c5ce3679fce24a69939bd25980bf341))
+- Deps: update `marked` to 13.0.1. ([f871a15](https://github.com/slsfi/digital-edition-frontend-ng/commit/f871a15523384f4709587c0e5fd436ca4d3fbd21))
+- Deps (dev): update `@types/node` to 20.14.9. ([154f481](https://github.com/slsfi/digital-edition-frontend-ng/commit/154f4814570ba6252345b2c4d2de3d0bf429f4f8))
+- Deps (dev): update `ws`, `engine.io-client`, `engine.io` and `socket.io-adapter`. ([09a926e](https://github.com/slsfi/digital-edition-frontend-ng/commit/09a926ed6796e6f60f2763f258794d454f44b88e))
 
 
 
@@ -332,7 +337,8 @@ siteLogoDimensions: {
 
 
 
-[unreleased]: https://github.com/slsfi/digital-edition-frontend-ng/compare/1.4.1...HEAD
+[unreleased]: https://github.com/slsfi/digital-edition-frontend-ng/compare/1.4.2...HEAD
+[1.4.2]: https://github.com/slsfi/digital-edition-frontend-ng/compare/1.4.1...1.4.2
 [1.4.1]: https://github.com/slsfi/digital-edition-frontend-ng/compare/1.4.0...1.4.1
 [1.4.0]: https://github.com/slsfi/digital-edition-frontend-ng/compare/1.3.4...1.4.0
 [1.3.4]: https://github.com/slsfi/digital-edition-frontend-ng/compare/1.3.3...1.3.4
