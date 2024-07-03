@@ -21,11 +21,7 @@ export const config: Config = {
       enabled: true,
       image: {
         sv: {
-          altText: "alt-text",
-          URL: "assets/images/home-page-banner.jpg"
-        },
-        fi: {
-          altText: "alt-teksti",
+          altText: "Svartvitt fotografi av Georg Henrik von Wright 1950",
           URL: "assets/images/home-page-banner.jpg"
         }
       }
@@ -106,21 +102,21 @@ export const config: Config = {
       }
     },
     foreword: {
-      showURNButton: true,
+      showURNButton: false,
       showViewOptionsButton: true
     },
     home: {
       bannerImage: {
         altTexts: {
-          sv: "Porträtt av Georg Henrik von Wright"
+          sv: "Svartvitt fotografi av Georg Henrik von Wright 1950"
         },
         intrinsicSize: {
-          height: null,
-          width: null
+          height: 713,
+          width: 1920
         },
         orientationPortrait: false,
         alternateSources: [],
-        URL: "assets/images/home-page-banner-portrait.jpg"
+        URL: "assets/images/vonwright-home-banner.jpg"
       },
       portraitOrientationSettings: {
         imagePlacement: {
@@ -157,7 +153,7 @@ export const config: Config = {
     introduction: {
       hasSeparateTOC: true,
       showTextDownloadButton: true,
-      showURNButton: true,
+      showURNButton: false,
       showViewOptionsButton: true,
       viewOptions: {
         personInfo: false,
@@ -168,13 +164,13 @@ export const config: Config = {
       }
     },
     mediaCollection: {
-      showURNButton: true
+      showURNButton: false
     },
     text: {
       defaultViews: ["readingtext", "comments"],
       defaultViewOptions: ["comments"],
       showTextDownloadButton: true,
-      showURNButton: true,
+      showURNButton: false,
       showViewOptionsButton: true,
       viewOptions: {
         comments: true,
@@ -202,7 +198,7 @@ export const config: Config = {
     },
     title: {
       loadContentFromMarkdown: false,
-      showURNButton: true,
+      showURNButton: false,
       showViewOptionsButton: true
     }
   },
@@ -225,7 +221,7 @@ export const config: Config = {
     },
     epub: {
       showTOCButton: true,
-      showURNButton: true,
+      showURNButton: false,
       showViewOptionsButton: true
     },
     facsimiles: {
@@ -257,8 +253,8 @@ export const config: Config = {
       showURNButton: false,
       showLanguageButton: false,
       showSiteLogo: true,
-      siteLogoDefaultImageURL: "assets/images/logo/SLS_logo_full_white_346x112.png",
-      siteLogoMobileImageURL: "assets/images/logo/SLS_logo_symbol_white_112x112.png",
+      siteLogoDefaultImageURL: "assets/images/logo/SLS_logo_full_black_346x112.png",
+      siteLogoMobileImageURL: "assets/images/logo/SLS_logo_symbol_black_112x112.png",
       siteLogoLinkURL: "https://www.sls.fi/",
       siteLogoDimensions: {
         default: {
