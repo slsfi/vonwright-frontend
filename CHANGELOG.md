@@ -8,6 +8,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ## [Unreleased]
 
+### Changed
+
+- Set up project files, config, custom CSS and translations for production site.
+
+
+
 ## [1.4.2] – 2024-07-02
 
 ### Changed

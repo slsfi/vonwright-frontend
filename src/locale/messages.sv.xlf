@@ -1497,19 +1497,19 @@
     <unit id="Site.MetaDescription.Home">
       <segment state="initial">
         <source>En generell beskrivning av webbplatsen för sökmotorer.</source>
-        <target>En generell beskrivning av webbplatsen för sökmotorer.</target>
+        <target>Filosofen Georg Henrik von Wrights brevväxling med Eino Kaila och skrifter om Wittgenstein.</target>
       </segment>
     </unit>
     <unit id="Site.Subtitle">
       <segment state="initial">
         <source>Webbplatsens undertitel</source>
-        <target>Webbplatsens undertitel</target>
+        <target></target>
       </segment>
     </unit>
     <unit id="Site.Title">
       <segment state="initial">
         <source>Webbplatsens titel</source>
-        <target>Webbplatsens titel</target>
+        <target>Den okände von Wright</target>
       </segment>
     </unit>
     <unit id="TopMenu.About">
@@ -1545,7 +1545,7 @@
     <unit id="TopMenu.LogoAltText">
       <segment state="initial">
         <source>Logo</source>
-        <target>Logo</target>
+        <target>Svenska litteratursällskapet i Finland r.f.</target>
       </segment>
     </unit>
     <unit id="TopMenu.Menu">
