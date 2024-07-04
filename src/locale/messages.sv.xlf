@@ -1509,7 +1509,8 @@
     <unit id="Site.Title">
       <segment state="initial">
         <source>Webbplatsens titel</source>
-        <target>Den okände von Wright</target>
+        <target>Den okände
+          von Wright</target>
       </segment>
     </unit>
     <unit id="TopMenu.About">
