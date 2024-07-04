@@ -138,12 +138,12 @@ export const config: Config = {
       persons: {
         database: "elastic",
         maxFetchSize: 500,
-        showFilter: true,
+        showFilter: false,
         publishedStatus: 2
       },
       places: {
         maxFetchSize: 500,
-        showFilter: true,
+        showFilter: false,
         publishedStatus: 2
       },
       works: {
