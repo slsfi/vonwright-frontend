@@ -21,8 +21,8 @@ export const config: Config = {
       enabled: true,
       image: {
         sv: {
-          altText: "Svartvitt fotografi av Georg Henrik von Wright 1950",
-          URL: "assets/images/vonwright_1920x713.jpg"
+          altText: "Svartvitt fotografi av 34-årig Georg Henrik von Wright i vit skjorta och svart slips (detalj)",
+          URL: "assets/images/open-graph/georg_henrik_von_wright_1950_foto_knut_erik_tranoy.jpg"
         }
       }
     },
@@ -35,7 +35,7 @@ export const config: Config = {
     }
   },
   collections: {
-    addTEIClassNames: true,
+    addTEIClassNames: false,
     replaceImageAssetsPaths: false,
     enableLegacyIDs: false,
     enableMathJax: true,
@@ -108,7 +108,7 @@ export const config: Config = {
     home: {
       bannerImage: {
         altTexts: {
-          sv: "Svartvitt fotografi av Georg Henrik von Wright 1950"
+          sv: "Svartvitt fotografi av 34-årig Georg Henrik von Wright i vit skjorta och svart slips (detalj)"
         },
         intrinsicSize: {
           height: 713,
