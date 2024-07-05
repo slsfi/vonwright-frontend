@@ -332,7 +332,13 @@ div.tei {
     font-size: 0.9em;
   }
 
-
+  /* Referenser i punktkommentarer, TA BORT NÄR BASEN UPPDATERATS! */
+  .teiComment.noteReference {
+    display: block;
+    font-size: 0.85em;
+    line-height: 1.55;
+    margin-top: 0.5em;
+  }
 }
 
 page-elastic-search {

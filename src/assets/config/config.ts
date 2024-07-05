@@ -22,7 +22,7 @@ export const config: Config = {
       image: {
         sv: {
           altText: "Svartvitt fotografi av Georg Henrik von Wright 1950",
-          URL: "assets/images/home-page-banner.jpg"
+          URL: "assets/images/vonwright_1920x713.jpg"
         }
       }
     },
@@ -36,7 +36,7 @@ export const config: Config = {
   },
   collections: {
     addTEIClassNames: true,
-    replaceImageAssetsPaths: true,
+    replaceImageAssetsPaths: false,
     enableLegacyIDs: false,
     enableMathJax: true,
     firstTextItem: {
@@ -115,8 +115,17 @@ export const config: Config = {
           width: 1920
         },
         orientationPortrait: false,
-        alternateSources: [],
-        URL: "assets/images/vonwright-home-banner.jpg"
+        alternateSources: [
+          {
+            srcset: "assets/images/vonwright_1920x713.avif 1920w",
+            type: "image/avif"
+          },
+          {
+            srcset: "assets/images/vonwright_1920x713.jpg 1920w",
+            type: "image/jpeg"
+          }
+        ],
+        URL: "assets/images/vonwright_1920x713.jpg"
       },
       portraitOrientationSettings: {
         imagePlacement: {
