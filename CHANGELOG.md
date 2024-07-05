@@ -8,6 +8,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ## [Unreleased]
 
+### Fixed
+
+- Incorrect CSS selector for references after comments.
+
+
+
 ## [1.4.2] – 2024-07-02
 
 ### Changed
