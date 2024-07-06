@@ -135,7 +135,7 @@ export const config: Config = {
         siteTitleOnImageOnSmallScreens: false
       },
       showContentGrid: false,
-      showFooter: false,
+      showFooter: true,
       showSearchbar: false
     },
     index: {
