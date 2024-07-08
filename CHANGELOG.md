@@ -8,9 +8,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ## [Unreleased]
 
+
+
+## [1.4.2-production.1] – 2024-07-08
+
 ### Changed
 
-- Set up project files, config, custom CSS and translations for production site.
+- Set up project files, config, custom CSS and translations for <https://vonwright.sls.fi/> production site.
 
 
 
@@ -362,3 +366,5 @@ siteLogoDimensions: {
 [1.0.2]: https://github.com/slsfi/digital-edition-frontend-ng/compare/v1.0.1...v1.0.2
 [1.0.1]: https://github.com/slsfi/digital-edition-frontend-ng/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/slsfi/digital-edition-frontend-ng/releases/tag/v1.0.0
+
+[1.4.2-production.1]: https://github.com/slsfi/vonwright-frontend/releases/tag/1.4.2-production.1
