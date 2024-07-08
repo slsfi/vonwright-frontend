@@ -22,8 +22,8 @@
  */
 @import "./theme/font-face/roboto";
 @import "./theme/font-face/source-serif";
-@import "./theme/font-face/mulish";
-@import "./theme/font-face/inter";
+// @import "./theme/font-face/mulish";
+// @import "./theme/font-face/inter";
 
 
 /* CSS and Sass variables. */
@@ -78,7 +78,7 @@
 // TEI styles for the collection title page.
 @import "./theme/TEI/tei-title";
 // TEI styles for the collection foreword page.
-@import "./theme/TEI/tei-foreword";
+// @import "./theme/TEI/tei-foreword";
 // TEI styles for the collection introduction page.
 @import "./theme/TEI/tei-introduction";
 // TEI styles for the collection reading text component.
@@ -86,9 +86,9 @@
 // TEI styles for the collection comments component.
 @import "./theme/TEI/tei-comments";
 // TEI styles for the collection manuscripts component.
-@import "./theme/TEI/tei-manuscripts";
+// @import "./theme/TEI/tei-manuscripts";
 // TEI styles for the collection variants component.
-@import "./theme/TEI/tei-variants";
+// @import "./theme/TEI/tei-variants";
 
 
 /**

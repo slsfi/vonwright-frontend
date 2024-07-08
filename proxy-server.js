@@ -4,7 +4,7 @@ const path = require("path");
 // * Define language codes of all languages the app is available in.
 // * A translated server will be started for each of these.
 // * The first language in the array is treated as default for the app.
-const languages = ["sv", "fi"];
+const languages = ["sv"];
 
 const getTranslatedServer = (lang) => {
   const distFolder = path.join(

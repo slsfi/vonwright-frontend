@@ -1,2 +1,5 @@
 User-agent: *
 Disallow: /search
+Crawl-delay: 10
+
+Sitemap: https://vonwright.sls.fi/sitemap.txt

@@ -2,15 +2,14 @@ type Config = { [key: string]: any }
 
 export const config: Config = {
   app: {
-    siteURLOrigin: "https://topelius.sls.fi",
-    projectNameDB: "topelius",
-    projectId: 10,
-    backendBaseURL: "https://testa-vonwright.sls.fi:8000/digitaledition",
+    siteURLOrigin: "https://vonwright.sls.fi",
+    projectNameDB: "vonwright",
+    projectId: 6,
+    backendBaseURL: "https://api.sls.fi/digitaledition",
     alternateFacsimileBaseURL: "",
     i18n: {
       languages: [
-        { code: "sv", label: "Svenska", region: "FI" },
-        { code: "fi", label: "Suomi", region: "FI" }
+        { code: "sv", label: "Svenska", region: "FI" }
       ],
       defaultLanguage: "sv",
       multilingualCollectionTableOfContents: false,
@@ -22,12 +21,8 @@ export const config: Config = {
       enabled: true,
       image: {
         sv: {
-          altText: "alt-text",
-          URL: "assets/images/home-page-banner.jpg"
-        },
-        fi: {
-          altText: "alt-teksti",
-          URL: "assets/images/home-page-banner.jpg"
+          altText: "Svartvitt fotografi av 34-årig Georg Henrik von Wright i vit skjorta och svart slips (detalj)",
+          URL: "assets/images/open-graph/georg_henrik_von_wright_1950_foto_knut_erik_tranoy.jpg"
         }
       }
     },
@@ -40,96 +35,42 @@ export const config: Config = {
     }
   },
   collections: {
-    addTEIClassNames: true,
-    replaceImageAssetsPaths: true,
-    enableLegacyIDs: true,
-    enableMathJax: false,
+    addTEIClassNames: false,
+    replaceImageAssetsPaths: false,
+    enableLegacyIDs: false,
+    enableMathJax: true,
     firstTextItem: {
-      216: "216_20280", 219: "219_19443", 220: "220_20122",
-      218: "218_20230_ch2", 210: "210_20548_ch1", 208: "208_18466_ch4",
-      207: "207_18464_ch1", 214: "214_20240_ch1", 203: "203_20217_ch1",
-      213: "213_18465_ch1", 202: "202_18467_ch1", 199: "199_18284",
-      221: "221_21422", 206: "206_20212_ch1", 201: "201_18471",
-      211: "211_20128", 200: "200_19870", 205: "205_20227_ch1",
-      215: "215_20568", 217: "217_20559_ch1", 204: "204_20322",
-      212: "212_20323", 209: "209_20479"
+      146: "146_11586", 225: "225_21793"
     },
     frontMatterPages: {
       cover: true,
       title: true,
-      foreword: true,
+      foreword: false,
       introduction: true
     },
     highlightSearchMatches: true,
-    inlineIllustrations: [206],
-    mediaCollectionMappings: { 214: 44, 206: 19, 218: 19 },
+    inlineIllustrations: [225],
+    mediaCollectionMappings: { 225: 46 },
     order: [
-      [216, 219, 220, 218, 210, 208, 207, 214, 203, 213,
-        202, 199, 221, 206, 201, 211, 200, 205, 215, 217,
-        204, 212, 209]
+      [146, 225]
     ]
   },
-  ebooks: [
-    {
-      title: "Bröd och bot",
-      filename: "norrback-brod-och-bot.epub",
-      externalFileURL: "",
-      coverURL: "",
-      downloadOptions: [
-        {
-          url: "https://www.sls.fi/sv/utgivning/historiska-recept",
-          label: ""
-        }
-      ]
-    },
-    {
-      title: "Marriage Conditions in a Palestinian Village I (epub)",
-      filename: "marriage-conditions-1.epub",
-      externalFileURL: "https://api.sls.fi/digitaledition/granqvist/files/30/epub/30_11672_Marriage_Conditions_1.epub/",
-      coverURL: "",
-      downloadOptions: [
-        {
-          url: "https://api.sls.fi/digitaledition/granqvist/files/30/epub/30_11672_Marriage_Conditions_1.epub/",
-          label: "EPUB"
-        },
-        {
-          url: "https://api.sls.fi/digitaledition/granqvist/files/30/pdf/30_11672_Marriage_Conditions_1.pdf/",
-          label: "PDF"
-        }
-      ]
-    },
-    {
-      title: "Marriage Conditions in a Palestinian Village I (pdf)",
-      filename: "marriage-conditions-1.pdf",
-      externalFileURL: "https://api.sls.fi/digitaledition/granqvist/files/30/pdf/30_11672_Marriage_Conditions_1.pdf/",
-      coverURL: "",
-      downloadOptions: [
-        {
-          url: "https://api.sls.fi/digitaledition/granqvist/files/30/epub/30_11672_Marriage_Conditions_1.epub/",
-          label: "EPUB"
-        },
-        {
-          url: "https://api.sls.fi/digitaledition/granqvist/files/30/pdf/30_11672_Marriage_Conditions_1.pdf/",
-          label: "PDF"
-        }
-      ]
-    }
-  ],
+  ebooks: [],
   page: {
     about: {
-      initialPageNode: "01-01"
+      initialPageNode: "01"
     },
     elasticSearch: {
       enableFilters: true,
-      enableSortOptions: true,
-      filterGroupsOpenByDefault: ["Years", "Type", "Genre", "Collection"],
+      enableSortOptions: false,
+      filterGroupsOpenByDefault: ["Type", "Collection"],
       hitsPerPage: 15,
-      indices: ["topelius"],
+      indices: ["vonwright"],
       openReadingTextWithComments: false,
       textHighlightFragmentSize: 150,
       textHighlightType: "fvh",
       textTitleHighlightType: "fvh",
-      typeFilterGroupOptions: ["est", "com", "var", "inl", "tit", "fore"],
+      typeFilterGroupOptions: ["est", "com", "inl", "tit"],
       fixedFilters: [
         {
           terms: {
@@ -144,23 +85,9 @@ export const config: Config = {
       ],
       additionalSourceFields: [],
       aggregations: {
-        Years: {
-          date_histogram: {
-            field: "orig_date_sort",
-            calendar_interval: "year",
-            format: "yyyy"
-          }
-        },
         Type: {
           terms: {
             field: "text_type",
-            size: 40,
-            order: {_key: "asc"}
-          }
-        },
-        Genre: {
-          terms: {
-            field: "publication_data.genre.keyword",
             size: 40,
             order: {_key: "asc"}
           }
@@ -171,50 +98,34 @@ export const config: Config = {
             size: 40,
             order: {_key: "asc"}
           }
-        },
-        LetterSenderName: {
-          terms: {
-            field: "sender_subject_name.keyword",
-            size: 100
-          }
-        },
-        LetterReceiverName: {
-          terms: {
-            field: "receiver_subject_name.keyword",
-            size: 100
-          }
-        },
-        LetterSenderLocation: {
-          terms: {
-            field: "sender_location_name.keyword",
-            size: 50
-          }
-        },
-        LetterReceiverLocation: {
-          terms: {
-            field: "receiver_location_name.keyword",
-            size: 50
-          }
         }
       }
     },
     foreword: {
-      showURNButton: true,
+      showURNButton: false,
       showViewOptionsButton: true
     },
     home: {
       bannerImage: {
         altTexts: {
-          sv: "Porträtt av Zacharias Topelius",
-          fi: "Zacharias Topeliuksen muotokuva"
+          sv: "Svartvitt fotografi av 34-årig Georg Henrik von Wright i vit skjorta och svart slips (detalj)"
         },
         intrinsicSize: {
-          height: null,
-          width: null
+          height: 713,
+          width: 1920
         },
-        orientationPortrait: true,
-        alternateSources: [],
-        URL: "assets/images/home-page-banner-portrait.jpg"
+        orientationPortrait: false,
+        alternateSources: [
+          {
+            srcset: "assets/images/vonwright_1920x713.avif 1920w",
+            type: "image/avif"
+          },
+          {
+            srcset: "assets/images/vonwright_1920x713.jpg 1920w",
+            type: "image/jpeg"
+          }
+        ],
+        URL: "assets/images/vonwright_1920x713.jpg"
       },
       portraitOrientationSettings: {
         imagePlacement: {
@@ -236,12 +147,12 @@ export const config: Config = {
       persons: {
         database: "elastic",
         maxFetchSize: 500,
-        showFilter: true,
+        showFilter: false,
         publishedStatus: 2
       },
       places: {
         maxFetchSize: 500,
-        showFilter: true,
+        showFilter: false,
         publishedStatus: 2
       },
       works: {
@@ -251,24 +162,24 @@ export const config: Config = {
     introduction: {
       hasSeparateTOC: true,
       showTextDownloadButton: true,
-      showURNButton: true,
+      showURNButton: false,
       showViewOptionsButton: true,
       viewOptions: {
-        personInfo: true,
+        personInfo: false,
         placeInfo: false,
-        workInfo: true,
+        workInfo: false,
         paragraphNumbering: true,
-        pageBreakEdition: true
+        pageBreakEdition: false
       }
     },
     mediaCollection: {
-      showURNButton: true
+      showURNButton: false
     },
     text: {
-      defaultViews: ["readingtext", "comments", "facsimiles"],
+      defaultViews: ["readingtext", "comments"],
       defaultViewOptions: ["comments"],
       showTextDownloadButton: true,
-      showURNButton: true,
+      showURNButton: false,
       showViewOptionsButton: true,
       viewOptions: {
         comments: true,
@@ -277,33 +188,33 @@ export const config: Config = {
         emendations: true,
         normalisations: true,
         workInfo: true,
-        abbreviations: true,
+        abbreviations: false,
         paragraphNumbering: true,
         pageBreakOriginal: true,
-        pageBreakEdition: true
+        pageBreakEdition: false
       },
       viewTypes: {
         showAll: true,
         readingtext: true,
         comments: true,
         facsimiles: true,
-        manuscripts: true,
-        variants: true,
-        illustrations: true,
-        legend: true,
+        manuscripts: false,
+        variants: false,
+        illustrations: false,
+        legend: false,
         metadata: false
       }
     },
     title: {
       loadContentFromMarkdown: false,
-      showURNButton: true,
+      showURNButton: false,
       showViewOptionsButton: true
     }
   },
   component: {
     collectionSideMenu: {
-      sortableCollectionsAlphabetical: ["211", "215", "219", "220"],
-      sortableCollectionsChronological: ["215", "219", "220"],
+      sortableCollectionsAlphabetical: [],
+      sortableCollectionsChronological: [],
       sortableCollectionsCategorical: [],
       categoricalSortingPrimaryKey: "",
       categoricalSortingSecondaryKey: ""
@@ -313,31 +224,30 @@ export const config: Config = {
       includeMediaCollection: false,
       mediaCollectionCoverURL: "",
       mediaCollectionCoverAltTexts: {
-        sv: "Alt-text",
-        fi: "Alt-teksti"
+        sv: "Alt-text"
       },
       showTitles: true
     },
     epub: {
       showTOCButton: true,
-      showURNButton: true,
+      showURNButton: false,
       showViewOptionsButton: true
     },
     facsimiles: {
       imageQuality: 4,
-      showTitle: true
+      showTitle: false
     },
     mainSideMenu: {
       items: {
         home: false,
         about: true,
-        ebooks: true,
+        ebooks: false,
         collections: true,
-        mediaCollections: true,
-        indexKeywords: false,
+        mediaCollections: false,
+        indexKeywords: true,
         indexPersons: true,
         indexPlaces: true,
-        indexWorks: false
+        indexWorks: true
       }
     },
     manuscripts: {
@@ -350,10 +260,10 @@ export const config: Config = {
       showContentButton: true,
       showElasticSearchButton: true,
       showURNButton: false,
-      showLanguageButton: true,
+      showLanguageButton: false,
       showSiteLogo: true,
-      siteLogoDefaultImageURL: "assets/images/logo/SLS_logo_full_white_346x112.png",
-      siteLogoMobileImageURL: "assets/images/logo/SLS_logo_symbol_white_112x112.png",
+      siteLogoDefaultImageURL: "assets/images/logo/SLS_logo_full_black_346x112.png",
+      siteLogoMobileImageURL: "assets/images/logo/SLS_logo_symbol_black_112x112.png",
       siteLogoLinkURL: "https://www.sls.fi/",
       siteLogoDimensions: {
         default: {
@@ -410,14 +320,14 @@ export const config: Config = {
     namedEntity: {
       showAliasAndPrevLastName: false,
       showArticleData: false,
-      showCityRegionCountry: false,
+      showCityRegionCountry: true,
       showDescriptionLabel: false,
       showGalleryOccurrences: false,
       showMediaData: false,
       showOccupation: false,
       showOccurrences: true,
       showType: false,
-      useSimpleWorkMetadata: true
+      useSimpleWorkMetadata: false
     }
   }
 }
