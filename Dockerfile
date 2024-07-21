@@ -64,7 +64,7 @@ RUN npm install --omit=dev
 # runtime image.
 COPY --from=build /digital-edition-frontend-ng/dist /digital-edition-frontend-ng/dist
 # Set NODE_ENV environment variable to production.
-ENV NODE_ENV production
+ENV NODE_ENV=production
 # Switch to the non-root user before running the app.
 USER appuser
 # Run app.
