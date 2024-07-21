@@ -11,6 +11,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 ### Changed
 
 - Deps: update `@angular` to 18.1.1.
+- Deps (dev): update `typescript` to 5.5.3.
 
 ### Fixed
 
