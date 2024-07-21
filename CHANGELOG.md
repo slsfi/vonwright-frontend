@@ -12,6 +12,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 - Deps: update `@angular` to 18.1.1.
 - Deps: update `marked` to 13.0.2.
+- Deps (dev): update `@types/node` to 20.14.11.
 - Deps (dev): update `jasmine-core` to 5.2.0.
 - Deps (dev): update `typescript` to 5.5.3.
 
