@@ -8,6 +8,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ## [Unreleased]
 
+### Changed
+
+- Deps: update `@angular` to 18.1.1.
+
 ### Fixed
 
 - Incorrect CSS selector for references after comments.
