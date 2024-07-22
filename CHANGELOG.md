@@ -11,6 +11,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 ### Changed
 
 - Legacy key-value format for `NODE_ENV` in `Dockerfile`.
+- Docs: refactor code snippets in the development notes and add note about NgModules.
 - Deps: update `@angular` to 18.1.1.
 - Deps: update `marked` to 13.0.2.
 - Deps: update `zone.js` to 0.14.8 (includes SSR memory leakage fix).

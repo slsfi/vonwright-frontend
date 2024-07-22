@@ -11,8 +11,15 @@ To locally run a prebuilt Docker image, which has been pushed to an image reposi
 
 1. Start [Docker Desktop][docker_desktop] and log in with your credentials.
 2. In PowerShell, `cd` into the app repository folder.
-3. Run `docker run -it -p 4201:4201 --rm <image-url>` where `<image-url>` must be replaced with the URL to the remote image, for example `ghcr.io/slsfi/digital-edition-frontend-ng:main`.
-4. Open your browser on http://localhost:4201/.
+3. Run
+
+```bash
+docker run -it -p 4201:4201 --rm ghcr.io/slsfi/digital-edition-frontend-ng:main
+```
+
+where you should replace `ghcr.io/slsfi/digital-edition-frontend-ng:main` with the URL to the remote image you want to run.
+
+4. Open your browser on <http://localhost:4201/>.
 
 ### Local Docker image of app
 
@@ -20,9 +27,23 @@ To first build and then run a Docker image of a local copy of the repository on 
 
 1. Start [Docker Desktop][docker_desktop] and log in with your credentials.
 2. In PowerShell, `cd` into the app repository folder.
-3. Run `docker build --no-cache -t name:tag .` (notice the dot at the end) to build the image from the current directory, where `name:tag` must be replaced with the name and tag of the image, for example `digital-edition-frontend-ng:latest`.
-4. Run `docker run -it -p 4201:4201 --rm name:tag` where `name:tag` must be replaced with the name and tag of the image that you specified in step 3.
-5. Open your browser on http://localhost:4201/.
+3. Run
+
+```bash
+docker build --no-cache -t digital-edition-frontend-ng:test .
+```
+
+(notice the dot at the end) to build the image from the current directory, where `digital-edition-frontend-ng:test` is the name and tag of the image. You can choose a different name and tag if you wish.
+
+4. Run
+
+```bash
+docker run -it -p 4201:4201 --rm digital-edition-frontend-ng:test
+```
+
+to run the image. If you built the image with a different name and tag in step 3, replace `digital-edition-frontend-ng:test` with your chosen `name:tag`.
+
+5. Open your browser on <http://localhost:4201/>.
 
 ### nginx in front of app image
 
@@ -30,12 +51,28 @@ In production, nginx is run in a Docker container in front of the app container 
 
 1. Start [Docker Desktop][docker_desktop] and log in with your credentials.
 2. In PowerShell, `cd` into the app repository folder.
-3. Run `docker build --no-cache -t name:tag .` (notice the dot at the end) to build the image from the current directory, where `name:tag` must be replaced with the name and tag of the image, for example `digital-edition-frontend-ng:latest`.
-4. Replace the URL of `image` in the `web` service in [`compose.yml`][docker_compose_file] with the `name:tag` you chose for the Docker image in step 3. **Do not commit this change!**
-5. Run `docker compose up -d`.
-6. Open your browser on http://localhost:2089/ (the port of the nginx service defined in [`compose.yml`][docker_compose_file]).
+3. Run
+
+```bash
+docker build --no-cache -t digital-edition-frontend-ng:test .
+```
+
+(notice the dot at the end) to build the image from the current directory, where `digital-edition-frontend-ng:test` is the name and tag of the image. You can choose a different name and tag if you wish.
+
+4. Replace the URL of `image` in the `web` service in [`compose.yml`][docker_compose_file] with `digital-edition-frontend-ng:test` (or the `name:tag` you built the image with in step 3). **Do not commit this change!**
+5. Run
+
+```bash
+docker compose up -d
+```
+
+6. Open your browser on <http://localhost:2089/> (the port of the nginx service defined in [`compose.yml`][docker_compose_file]).
 7. Undo the changes in [`compose.yml`][docker_compose_file].
-8. When you are done testing, stop the Docker containers in Docker Desktop and delete all containers and volumes that were created. Alternatively you can do this in the terminal by running `docker compose down --volumes`.
+8. When you are done testing, stop the Docker containers in Docker Desktop and delete all containers and volumes that were created. Alternatively you can do this in the terminal by running
+
+```bash
+docker compose down --volumes
+```
 
 
 ## Node.js version and building using GitHub Actions
@@ -54,13 +91,19 @@ The app is built on Angular and uses many web components from Ionic. It also has
 
 ### `@angular`
 
-The Angular documentation is available on https://angular.dev/.
+The Angular documentation is available on <https://angular.dev/>.
+
+At it’s root, the Angular app uses NgModules, even though all components except `pages` use the standalone API. This is because currently, another dependency, `Ionic`, doesn’t support the Angular standalone API for SSR apps.
 
 #### Updating Angular
 
-Run `ng update @angular/cli @angular/core`.
+Run
 
-For more detailed instructions see https://angular.dev/cli/update.
+```bash
+ng update @angular/cli @angular/core
+```
+
+For more detailed instructions see <https://angular.dev/cli/update>.
 
 When updating to a new major version of Angular:
 
@@ -70,11 +113,15 @@ When updating to a new major version of Angular:
 
 ### `@ionic`
 
-The Ionic Framework documentation is available on https://ionicframework.com/docs/
+The Ionic Framework documentation is available on <https://ionicframework.com/docs/>
 
 #### Updating Ionic
 
-Run `npm install @ionic/angular @ionic/angular-server`.
+Run
+
+```bash
+npm install @ionic/angular @ionic/angular-server
+```
 
 
 ### [`epubjs`][npm_epubjs]
