@@ -8,20 +8,24 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ## [Unreleased]
 
+
+
+## [1.4.3] – 2024-07-22
+
 ### Changed
 
-- Legacy key-value format for `NODE_ENV` in `Dockerfile`.
-- Docs: refactor code snippets in the development notes and add note about NgModules.
-- Deps: update `@angular` to 18.1.1.
-- Deps: update `marked` to 13.0.2.
-- Deps: update `zone.js` to 0.14.8 (includes SSR memory leakage fix).
-- Deps (dev): update `@types/node` to 20.14.11.
-- Deps (dev): update `jasmine-core` to 5.2.0.
-- Deps (dev): update `typescript` to 5.5.3.
+- Legacy key-value format for `NODE_ENV` in `Dockerfile`. ([385b67e](https://github.com/slsfi/digital-edition-frontend-ng/commit/385b67e3d0303b84dabe41185c5299ca19da4191))
+- Docs: refactor code snippets in the development notes and add note about NgModules. ([c3552a9](https://github.com/slsfi/digital-edition-frontend-ng/commit/c3552a9aa05dea9a2c56bc8da9cdc94b00f6589e))
+- Deps: update `@angular` to 18.1.1. ([9af16d9](https://github.com/slsfi/digital-edition-frontend-ng/commit/9af16d9e62e3785117e4179e8187a0de52a92182))
+- Deps: update `marked` to 13.0.2. ([6471779](https://github.com/slsfi/digital-edition-frontend-ng/commit/647177992e61b752eed1a1d460c7ce0dba5bf9fe))
+- Deps: update `zone.js` to 0.14.8 (includes SSR memory leakage fix). ([9eced7c](https://github.com/slsfi/digital-edition-frontend-ng/commit/9eced7caa4fb9bdbff0cc230e37678a72e7006f4))
+- Deps (dev): update `@types/node` to 20.14.11. ([0afdcc2](https://github.com/slsfi/digital-edition-frontend-ng/commit/0afdcc22e0346b2877021aecae14774aca1aac0b))
+- Deps (dev): update `jasmine-core` to 5.2.0. ([b107f9e](https://github.com/slsfi/digital-edition-frontend-ng/commit/b107f9e7c26205f42eb1171a9ef60686b0dc4200))
+- Deps (dev): update `typescript` to 5.5.3. ([5897905](https://github.com/slsfi/digital-edition-frontend-ng/commit/589790558aa92b58b7bc3550416e0eafb0a70076))
 
 ### Fixed
 
-- Incorrect CSS selector for references after comments.
+- Incorrect CSS selector for references after comments. ([898a2b7](https://github.com/slsfi/digital-edition-frontend-ng/commit/898a2b7bcbe27c13a31800ff8cbb789c29ecb6d7))
 
 
 
@@ -354,7 +358,8 @@ siteLogoDimensions: {
 
 
 
-[unreleased]: https://github.com/slsfi/digital-edition-frontend-ng/compare/1.4.2...HEAD
+[unreleased]: https://github.com/slsfi/digital-edition-frontend-ng/compare/1.4.3...HEAD
+[1.4.3]: https://github.com/slsfi/digital-edition-frontend-ng/compare/1.4.2...1.4.3
 [1.4.2]: https://github.com/slsfi/digital-edition-frontend-ng/compare/1.4.1...1.4.2
 [1.4.1]: https://github.com/slsfi/digital-edition-frontend-ng/compare/1.4.0...1.4.1
 [1.4.0]: https://github.com/slsfi/digital-edition-frontend-ng/compare/1.3.4...1.4.0
