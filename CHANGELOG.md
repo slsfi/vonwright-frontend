@@ -10,6 +10,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 
 
+## [1.4.3-production.1] – 2024-08-02
+
+### Changed
+
+- Update port mapping to free port on server. ([a06d054](https://github.com/slsfi/vonwright-frontend/commit/a06d05419419c792a023866e67a577e8c65ea4f1))
+- Merge release [`v1.4.3`](https://github.com/slsfi/digital-edition-frontend-ng/releases/tag/1.4.3) from upstream, original repository into `production` branch. ([c3678c8](https://github.com/slsfi/vonwright-frontend/commit/c3678c80910c07475bae0d3cfa6e1602adcaaca3))
+
+
+
 ## [1.4.3] – 2024-07-22
 
 ### Changed
@@ -387,4 +396,5 @@ siteLogoDimensions: {
 [1.0.1]: https://github.com/slsfi/digital-edition-frontend-ng/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/slsfi/digital-edition-frontend-ng/releases/tag/v1.0.0
 
+[1.4.3-production.1]: https://github.com/slsfi/vonwright-frontend/compare/1.4.2-production.1...1.4.3-production.1
 [1.4.2-production.1]: https://github.com/slsfi/vonwright-frontend/releases/tag/1.4.2-production.1
