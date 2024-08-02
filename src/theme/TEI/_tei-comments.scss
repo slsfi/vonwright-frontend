@@ -89,7 +89,7 @@ div.tei {
   }
 
   /* Style for references after comment notes. Used in vonwright.sls.fi */
-  div.tei .teiComment.noteReference {
+  .teiComment.noteReference {
     display: block;
     font-size: 0.85em;
     line-height: 1.55;
