@@ -11,6 +11,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 ### Fixed
 
 - Match type when comparing collection IDs in text-changer component (i.e. allow `collectionId` to be either string or number in table of content JSON-files).
+- Add missing `ngFor` import to `pdf-viewer.component`.
 
 
 
