@@ -52,7 +52,7 @@ By default, the app has Swedish and Finnish language versions enabled. See the d
 
 ### Prerequisites
 
-1. Install [Node.js][node.js] which includes [npm][npm]. The app is compatible with Node `^18.19.1`, `^20.11.1` and `^22.0.0`. Check your Node version with:
+1. Install [Node.js][node.js] which includes [npm][npm]. The app is compatible with Node `^18.19.1`, `^20.11.1` and `^22.0.0`. The app is currently configured to run on Node `20`. Check your Node version with:
 
 ```
 Node --version
