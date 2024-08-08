@@ -16,7 +16,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 - Docs: mention current Node version of app in README.
 - Deps: update `@angular` to 18.1.4.
-- Deps: update `marked` to 13.0.3.
+- Deps: update `marked` to 14.0.0.
 - Deps: update `zone.js` to 0.14.10.
 - Deps (dev): update `@types/node` to 20.14.14.
 - Deps (dev): update `karma` to 6.4.4.
