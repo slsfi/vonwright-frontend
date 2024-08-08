@@ -13,6 +13,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 - Match type when comparing collection IDs in text-changer component (i.e. allow `collectionId` to be either string or number in table of content JSON-files).
 - Add missing `ngFor` import to `pdf-viewer.component`.
 - Filter type headings should not be visible in index filter modal when no filter options available.
+- Home page banner image `min-height` set to `200px` in landscape image mode. This fixes an issue where the banner image height is too small on mobile phones in landscape orientation. You should adjust the `min-height` for the banner image in your project in `custom.scss` if necessary. You can use the selector `page-home div.banner.banner`.
 
 
 
