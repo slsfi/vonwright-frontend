@@ -15,6 +15,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 ### Changed
 
 - Docs: mention current Node version of app in README.
+- Deps: update `zone.js` to 0.14.10.
 
 ### Fixed
 
