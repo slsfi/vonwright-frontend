@@ -8,26 +8,30 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ## [Unreleased]
 
+
+
+## [1.4.4] – 2024-08-08
+
 ### Added
 
-- Configuration file for Dependabot version updates of packages.
+- Configuration file for Dependabot version updates of packages. ([741796c](https://github.com/slsfi/digital-edition-frontend-ng/commit/741796c70b4a7b04df8330fbe6e40114bbdc8453), [7f08e0b](https://github.com/slsfi/digital-edition-frontend-ng/commit/7f08e0b1036231d854dc5e687b66e25285d4cef1))
 
 ### Changed
 
-- Docs: mention current Node version of app in README.
-- Deps: update `@angular` to 18.1.4.
-- Deps: update `marked` to 14.0.0.
-- Deps: update `zone.js` to 0.14.10.
-- Deps (dev): update `@types/node` to 20.14.14.
-- Deps (dev): update `karma` to 6.4.4.
-- Deps (dev): update `typescript` to 5.5.4.
+- Docs: mention current Node version of app in README. ([a7f854d](https://github.com/slsfi/digital-edition-frontend-ng/commit/a7f854d0fb09fdea946023ad567b7303cd46ab86))
+- Deps: update `@angular` to 18.1.4. ([f6e829a](https://github.com/slsfi/digital-edition-frontend-ng/commit/f6e829a5116048f7c72de1307eafe6583ce209b4))
+- Deps: update `marked` to 14.0.0. ([d73fa2c](https://github.com/slsfi/digital-edition-frontend-ng/commit/d73fa2c6f2e3cf716c6c62c5834e860bf63c9a9f), [aa72d73](https://github.com/slsfi/digital-edition-frontend-ng/commit/aa72d73dffb22f1926b771d071e64a0a7f0e9151))
+- Deps: update `zone.js` to 0.14.10. ([26ce24e](https://github.com/slsfi/digital-edition-frontend-ng/commit/26ce24e0b83cf3273fc0fee17195623cae71c699))
+- Deps (dev): update `@types/node` to 20.14.14. ([bb6b347](https://github.com/slsfi/digital-edition-frontend-ng/commit/bb6b3476e05c4a8760c36d1eebdfc20fefa0f380))
+- Deps (dev): update `karma` to 6.4.4. ([7d7008f](https://github.com/slsfi/digital-edition-frontend-ng/commit/7d7008fbec1fa7cbc976af787760e918674aa87b))
+- Deps (dev): update `typescript` to 5.5.4. ([53679f7](https://github.com/slsfi/digital-edition-frontend-ng/commit/53679f7ea87cc09a58129d0ec4c70c46d5ea1e24))
 
 ### Fixed
 
-- Match type when comparing collection IDs in text-changer component (i.e. allow `collectionId` to be either string or number in table of content JSON-files).
-- Add missing `ngFor` import to `pdf-viewer.component`.
-- Filter type headings should not be visible in index filter modal when no filter options available.
-- Home page banner image `min-height` set to `200px` in landscape image mode. This fixes an issue where the banner image height is too small on mobile phones in landscape orientation. You should adjust the `min-height` for the banner image in your project in `custom.scss` if necessary. You can use the selector `page-home div.banner.banner`.
+- Match type when comparing collection IDs in text-changer component (i.e. allow `collectionId` to be either string or number in table of content JSON-files). ([8f3142d](https://github.com/slsfi/digital-edition-frontend-ng/commit/8f3142d9252e2014c3550223f62bf9676cfc8d5c))
+- Add missing `ngFor` import to `pdf-viewer.component`. ([b751172](https://github.com/slsfi/digital-edition-frontend-ng/commit/b75117289732e5f4b00b4ac4d885b3f420498183))
+- Filter type headings should not be visible in index filter modal when no filter options available. ([ff975df](https://github.com/slsfi/digital-edition-frontend-ng/commit/ff975dfacc50f3f71c2295b7553fdbcfa9f05b3e))
+- Home page banner image `min-height` set to `200px` in landscape image mode. This fixes an issue where the banner image height is too small on mobile phones in landscape orientation. You should adjust the `min-height` for the banner image in your project in `custom.scss` if necessary. You can use the selector `page-home div.banner.banner`. ([d5b717d](https://github.com/slsfi/digital-edition-frontend-ng/commit/d5b717d22d0a2e57325f8090b10006248627965b))
 
 
 
@@ -379,7 +383,8 @@ siteLogoDimensions: {
 
 
 
-[unreleased]: https://github.com/slsfi/digital-edition-frontend-ng/compare/1.4.3...HEAD
+[unreleased]: https://github.com/slsfi/digital-edition-frontend-ng/compare/1.4.4...HEAD
+[1.4.4]: https://github.com/slsfi/digital-edition-frontend-ng/compare/1.4.3...1.4.4
 [1.4.3]: https://github.com/slsfi/digital-edition-frontend-ng/compare/1.4.2...1.4.3
 [1.4.2]: https://github.com/slsfi/digital-edition-frontend-ng/compare/1.4.1...1.4.2
 [1.4.1]: https://github.com/slsfi/digital-edition-frontend-ng/compare/1.4.0...1.4.1
