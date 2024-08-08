@@ -8,6 +8,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ## [Unreleased]
 
+### Added
+
+- Configuration file for Dependabot version updates of packages.
+
 ### Fixed
 
 - Match type when comparing collection IDs in text-changer component (i.e. allow `collectionId` to be either string or number in table of content JSON-files).
