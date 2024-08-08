@@ -22,7 +22,7 @@ updates:
         - "@ionic/*"
     ignore:
       # Do not update @angular dependencies at all; these are updated manually
-      - dependency-name: "@angular/*"
+      - dependency-name: "@angular*"
       # Do not update major versions
       - dependency-name: "*"
         update-types: ["version-update:semver-major"]
