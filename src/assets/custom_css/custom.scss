@@ -282,13 +282,11 @@ page-home {
   @media screen and (max-width: 1100px) {
     div.banner.banner {
       height: 40%;
-      min-height: 40%;
     }
   }
   @media screen and (max-width: 600px) {
     div.banner.banner {
       height: 30%;
-      min-height: 30%;
 
       /* Preserve newline character in title */
       .title-wrapper .banner-title {
