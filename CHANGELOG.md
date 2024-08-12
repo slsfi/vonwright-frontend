@@ -8,6 +8,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ## [Unreleased]
 
+### Fixed
+
+- Home page banner min-height on small screens.
+
 
 
 ## [1.4.4] – 2024-08-08
