@@ -26,7 +26,7 @@
         </div>
       </ion-list>
 
-      <ion-list *ngIf="filterPersonTypes">
+      <ion-list *ngIf="filterPersonTypes?.length">
         <ion-list-header>
           <ion-label i18n="@@IndexFilter.PersonTypes">Personkategorier</ion-label>
         </ion-list-header>
@@ -35,7 +35,7 @@
         </ion-item>
       </ion-list>
 
-      <ion-list *ngIf="filterCategoryTypes">
+      <ion-list *ngIf="filterCategoryTypes?.length">
         <ion-list-header>
           <ion-label i18n="@@IndexFilter.KeywordTypes">Ämneskategorier</ion-label>
         </ion-list-header>
@@ -44,7 +44,7 @@
         </ion-item>
       </ion-list>
 
-      <ion-list *ngIf="filterPlaceCountries">
+      <ion-list *ngIf="filterPlaceCountries?.length">
         <ion-list-header>
           <ion-label i18n="@@IndexFilter.Countries">Länder</ion-label>
         </ion-list-header>

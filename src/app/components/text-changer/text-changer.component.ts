@@ -83,7 +83,7 @@ export class TextChangerComponent implements OnChanges, OnDestroy, OnInit {
       (toc: any) => {
         if (
           toc?.children?.length &&
-          this.collectionId === toc?.collectionId
+          this.collectionId === String(toc?.collectionId)
         ) {
           this.collectionTitle = toc.text || '';
           // Prepend the frontmatter pages to the TOC array
