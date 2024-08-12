@@ -8,9 +8,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ## [Unreleased]
 
+
+
+## [1.4.4-production.1] – 2024-08-12
+
+### Changed
+
+- Merge release [`v1.4.4`](https://github.com/slsfi/digital-edition-frontend-ng/releases/tag/1.4.4) from upstream, original repository into `production` branch. ([9716ed1](https://github.com/slsfi/vonwright-frontend/commit/9716ed10c2a5b03944dd35473e73d77fd35aabcd))
+
 ### Fixed
 
-- Home page banner min-height on small screens.
+- Home page banner min-height on small screens. ([8e7b360](https://github.com/slsfi/vonwright-frontend/commit/8e7b360835da0b2d9b8e3c3dd2d44a20cb64f04f))
 
 
 
@@ -426,5 +434,6 @@ siteLogoDimensions: {
 [1.0.1]: https://github.com/slsfi/digital-edition-frontend-ng/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/slsfi/digital-edition-frontend-ng/releases/tag/v1.0.0
 
+[1.4.4-production.1]: https://github.com/slsfi/vonwright-frontend/compare/1.4.3-production.1...1.4.4-production.1
 [1.4.3-production.1]: https://github.com/slsfi/vonwright-frontend/compare/1.4.2-production.1...1.4.3-production.1
 [1.4.2-production.1]: https://github.com/slsfi/vonwright-frontend/releases/tag/1.4.2-production.1
