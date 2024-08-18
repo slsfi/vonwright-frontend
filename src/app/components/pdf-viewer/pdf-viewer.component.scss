@@ -1,6 +1,24 @@
 // Import general styles for the secondary toolbar
 @import "src/theme/common/secondary-toolbar.scss";
 
+.pdf-title-wrapper {
+  align-items: center;
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: center;
+  padding: 0 0.875rem;
+
+  h1 {
+    font-size: 1rem;
+    font-weight: bold;
+    margin: 0;
+    overflow: hidden;
+    text-align: center;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
 object {
   height: 100%;
   width: 100%;

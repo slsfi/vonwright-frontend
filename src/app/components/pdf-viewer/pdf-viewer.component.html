@@ -1,6 +1,12 @@
 <ion-header class="ion-no-border">
   <ion-toolbar class="secondary">
 
+    @if (pdfData.title) {
+      <div class="pdf-title-wrapper">
+        <h1>{{ pdfData.title }}</h1>
+      </div>
+    }
+
     <ng-container>
       <ion-buttons slot="end" class="secondary-toolbar-buttons-wrapper">
 
@@ -84,6 +90,5 @@
 </ion-header>
 
 <ion-content class="no-padding" [scrollX]="false" [scrollY]="false">
-  <h1 class="screen-reader-only" [innerHTML]="pdfData.title || ''"></h1>
   <object [data]="pdfURL" type="application/pdf"></object>
 </ion-content>
