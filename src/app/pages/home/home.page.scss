@@ -22,6 +22,11 @@ ion-content.portrait-mode::part(scroll) {
 	padding: 0;
 	position: relative;
 
+	// Reduce banner height on narrow screens in landscape mode
+	@media screen and (max-width: 1100px) {
+		height: 40%;
+	}
+
 	.landscape-background-image {
 		background-position: 50% 50%;
 		background-repeat: no-repeat;

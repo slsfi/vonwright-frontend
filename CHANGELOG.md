@@ -8,6 +8,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ## [Unreleased]
 
+### Changed
+
+- Home page: reduce landscape banner image height to 40% on viewport widths less than 1100px.
+
 
 
 ## [1.4.4] – 2024-08-08
