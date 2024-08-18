@@ -12,6 +12,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 - Home page: reduce landscape banner image height to 40% on viewport widths less than 1100px.
 
+### Fixed
+
+- Media collections: reduce filter select widths to prevent clear button from wrapping to a new line when all three filter categories are available
+
 
 
 ## [1.4.4] – 2024-08-08
