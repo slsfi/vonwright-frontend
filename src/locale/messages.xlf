@@ -1161,6 +1161,16 @@
         <source>Något gick fel. Vi kan inte hitta sidan du försökte nå. Du kan gå tillbaka till föregående sida med hjälp av webbläsarens tillbaka-knapp, eller försöka rätta adressen i webbläsarens adressfält.</source>
       </segment>
     </unit>
+    <unit id="PdfViewer.DownloadPdf">
+      <segment>
+        <source>ladda ner PDF</source>
+      </segment>
+    </unit>
+    <unit id="PdfViewer.NoBrowserSupport">
+      <segment>
+        <source>Din webbläsare stöder inte PDF-filer. Ladda ner PDF:en för att läsa den:</source>
+      </segment>
+    </unit>
     <unit id="ReadingText.Error">
       <segment>
         <source>Ett fel har uppstått. Lästexten kunde inte hämtas.</source>

@@ -1392,6 +1392,18 @@
         <target>Något gick fel. Vi kan inte hitta sidan du försökte nå. Du kan gå tillbaka till föregående sida med hjälp av webbläsarens tillbaka-knapp, eller försöka rätta adressen i webbläsarens adressfält.</target>
       </segment>
     </unit>
+    <unit id="PdfViewer.DownloadPdf">
+      <segment state="initial">
+        <source>download PDF</source>
+        <target>ladda ner PDF</target>
+      </segment>
+    </unit>
+    <unit id="PdfViewer.NoBrowserSupport">
+      <segment state="initial">
+        <source>Your browser does not support PDFs. Please download the PDF to view it:</source>
+        <target>Din webbläsare stöder inte PDF-filer. Ladda ner PDF:en för att läsa den:</target>
+      </segment>
+    </unit>
     <unit id="ReadingText.Error">
       <segment state="initial">
         <source>Ett fel har uppstått. Lästexten kunde inte hämtas.</source>

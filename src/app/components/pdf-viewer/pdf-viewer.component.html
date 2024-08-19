@@ -90,5 +90,9 @@
 </ion-header>
 
 <ion-content class="no-padding" [scrollX]="false" [scrollY]="false">
-  <object [data]="pdfURL" type="application/pdf"></object>
+  <object [data]="pdfURL" type="application/pdf">
+    <p><ng-container i18n="@@PdfViewer.NoBrowserSupport">Din webbläsare stöder inte PDF-filer. Ladda ner PDF:en för att läsa den:</ng-container>
+      <a [href]="pdfURL" i18n="@@PdfViewer.DownloadPdf">ladda ner PDF</a>.
+    </p>
+  </object>
 </ion-content>

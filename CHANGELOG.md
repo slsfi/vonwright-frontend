@@ -8,14 +8,18 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ## [Unreleased]
 
+### Added
+
+- PDF viewer on ebooks page: PDF title to secondary toolbar.
+- PDF viewer on ebooks page: message and download link to PDF as fallback if the user’s browser doesn’t support viewing embedded PDFs.
+
 ### Changed
 
 - Home page: reduce landscape banner image height to 40% on viewport widths less than 1100px.
-- PDF viewer on ebooks page: add PDF title to secondary toolbar.
 
 ### Fixed
 
-- Media collections: reduce filter select widths to prevent clear button from wrapping to a new line when all three filter categories are available
+- Media collections: reduce filter select widths to prevent clear button from wrapping to a new line when all three filter categories are available.
 
 
 
