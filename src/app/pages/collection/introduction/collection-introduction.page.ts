@@ -26,6 +26,7 @@ import { isBrowser } from '@utility-functions';
   styleUrls: ['./collection-introduction.page.scss']
 })
 export class CollectionIntroductionPage implements OnInit, OnDestroy {
+  _activeComponent: boolean = true;
   collectionID: string = '';
   collectionLegacyId: string = '';
   hasSeparateIntroToc: boolean = false;
@@ -181,6 +182,14 @@ export class CollectionIntroductionPage implements OnInit, OnDestroy {
     this.unlistenMouseoverEvents?.();
     this.unlistenMouseoutEvents?.();
     this.unlistenFirstTouchStartEvent?.();
+  }
+
+  ionViewWillEnter() {
+    this._activeComponent = true;
+  }
+
+  ionViewWillLeave() {
+    this._activeComponent = false;
   }
 
   private loadIntroduction(id: string, lang: string) {

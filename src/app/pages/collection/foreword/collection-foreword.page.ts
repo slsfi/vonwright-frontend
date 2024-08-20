@@ -20,6 +20,7 @@ import { ViewOptionsService } from '@services/view-options.service';
   styleUrls: ['./collection-foreword.page.scss']
 })
 export class CollectionForewordPage implements OnDestroy, OnInit {
+  _activeComponent: boolean = true;
   collectionID: string = '';
   intervalTimerId: number = 0;
   mobileMode: boolean = false;
@@ -80,6 +81,14 @@ export class CollectionForewordPage implements OnDestroy, OnInit {
 
   ngOnDestroy() {
     this.textsizeSubscription?.unsubscribe();
+  }
+
+  ionViewWillEnter() {
+    this._activeComponent = true;
+  }
+
+  ionViewWillLeave() {
+    this._activeComponent = false;
   }
 
   private loadForeword(id: string, lang: string): Observable<string> {

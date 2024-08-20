@@ -21,6 +21,7 @@ import { ViewOptionsService } from '@services/view-options.service';
   styleUrls: ['./collection-title.page.scss'],
 })
 export class CollectionTitlePage implements OnDestroy, OnInit {
+  _activeComponent: boolean = true;
   collectionID: string = '';
   intervalTimerId: number = 0;
   loadContentFromMarkdown: boolean = false;
@@ -84,6 +85,14 @@ export class CollectionTitlePage implements OnDestroy, OnInit {
 
   ngOnDestroy() {
     this.textsizeSubscription?.unsubscribe();
+  }
+
+  ionViewWillEnter() {
+    this._activeComponent = true;
+  }
+
+  ionViewWillLeave() {
+    this._activeComponent = false;
   }
 
   private loadTitle(id: string, lang: string): Observable<string | null> {

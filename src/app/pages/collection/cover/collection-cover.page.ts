@@ -12,6 +12,7 @@ import { PlatformService } from '@services/platform.service';
   styleUrls: ['./collection-cover.page.scss']
 })
 export class CollectionCoverPage implements OnInit {
+  _activeComponent: boolean = true;
   collectionID: string = '';
   coverData$: Observable<any>;
   mobileMode: boolean = false;
@@ -36,6 +37,14 @@ export class CollectionCoverPage implements OnInit {
         );
       })
     );
+  }
+
+  ionViewWillEnter() {
+    this._activeComponent = true;
+  }
+
+  ionViewWillLeave() {
+    this._activeComponent = false;
   }
 
   private getCoverDataFromMdContent(fileID: string): Observable<any> {
