@@ -62,16 +62,33 @@ export class PdfViewerComponent implements OnInit {
 
     this.pdfURL$ = this.route.queryParamMap.pipe(
       map(paramMap => {
+        // Check if 'page' queryParam set to display a specific
+        // page in the PDF
         let pageNumber: number | null = null;
-        const pageParam = paramMap.get('page');
-
+        const pageParam: string | null = paramMap.get('page');
         if (pageParam) {
           pageNumber = parseInt(pageParam, 10);  
         }
         this.pageNumber = pageNumber;
 
-        const pdfURL: string = pageNumber ? pdfFilePath + '#page=' + pageNumber : pdfFilePath;
-        return this.sanitizer.bypassSecurityTrustResourceUrl(pdfURL);
+        // Check if 'q' queryParams set to highlight search terms
+        // in the PDF
+        const searchTerm: string = paramMap.getAll('q').join(' ');
+
+        let pdfParams: string = pageNumber || searchTerm ? '#' : '';
+        if (pdfParams) {
+          if (pageNumber) {
+            pdfParams += 'page=' + pageNumber;
+            if (searchTerm) {
+              pdfParams += '&'
+            }
+          }
+          if (searchTerm) {
+            pdfParams += 'search=' + searchTerm;
+          }
+        }
+
+        return this.sanitizer.bypassSecurityTrustResourceUrl(pdfFilePath + pdfParams);
       })
     );
   }
