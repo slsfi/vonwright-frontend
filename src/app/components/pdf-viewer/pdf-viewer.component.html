@@ -4,6 +4,9 @@
     @if (pdfData.title) {
       <div class="pdf-title-wrapper">
         <h1>{{ pdfData.title }}</h1>
+        @if (pageNumber) {
+          <p><ng-container i18n="@@PdfViewer.Page">sida</ng-container> {{pageNumber}}</p>
+        }
       </div>
     }
 
@@ -90,9 +93,11 @@
 </ion-header>
 
 <ion-content class="no-padding" [scrollX]="false" [scrollY]="false">
-  <object [data]="pdfURL" type="application/pdf">
-    <p><ng-container i18n="@@PdfViewer.NoBrowserSupport">Din webbläsare stöder inte PDF-filer. Ladda ner PDF:en för att läsa den:</ng-container>
-      <a [href]="pdfURL" i18n="@@PdfViewer.DownloadPdf">ladda ner PDF</a>.
-    </p>
-  </object>
+  <ng-container *ngIf="pdfURL$ | async as pdfURL">
+    <object [data]="pdfURL" type="application/pdf">
+      <p class="no-support"><ng-container i18n="@@PdfViewer.NoBrowserSupport">Din webbläsare stöder inte PDF-filer. Ladda ner PDF:en för att läsa den:</ng-container>
+        &nbsp;<a [href]="pdfURL" i18n="@@PdfViewer.DownloadPdf" [download]="pdfFileName">ladda ner PDF</a>.
+      </p>
+    </object>
+  </ng-container>
 </ion-content>

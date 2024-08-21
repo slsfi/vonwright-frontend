@@ -12,6 +12,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 - PDF viewer on ebooks page: PDF title to secondary toolbar.
 - PDF viewer on ebooks page: message and download link to PDF as fallback if the user’s browser doesn’t support viewing embedded PDFs.
+- PDF viewer on ebooks page: support navigating to specific page in PDF. Fixes incorrect translations for the component.
 
 ### Changed
 

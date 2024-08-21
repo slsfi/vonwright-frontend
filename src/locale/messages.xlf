@@ -1171,6 +1171,11 @@
         <source>Din webbläsare stöder inte PDF-filer. Ladda ner PDF:en för att läsa den:</source>
       </segment>
     </unit>
+    <unit id="PdfViewer.Page">
+      <segment>
+        <source>sida</source>
+      </segment>
+    </unit>
     <unit id="ReadingText.Error">
       <segment>
         <source>Ett fel har uppstått. Lästexten kunde inte hämtas.</source>

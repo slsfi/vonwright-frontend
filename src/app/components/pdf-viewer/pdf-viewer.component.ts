@@ -1,7 +1,9 @@
 import { Component, Inject, Input, LOCALE_ID, OnInit, ViewChild } from '@angular/core';
-import { DOCUMENT, NgFor, NgIf, NgStyle } from '@angular/common';
-import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
+import { AsyncPipe, DOCUMENT, NgFor, NgIf, NgStyle } from '@angular/common';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import { ActivatedRoute } from '@angular/router';
 import { IonicModule, ModalController } from '@ionic/angular';
+import { map, Observable } from 'rxjs';
 
 import { config } from '@config';
 import { IsExternalURLPipe } from '@pipes/is-external-url.pipe';
@@ -13,7 +15,7 @@ import { ReferenceDataModal } from '@modals/reference-data/reference-data.modal'
   selector: 'pdf-viewer',
   templateUrl: './pdf-viewer.component.html',
   styleUrls: ['./pdf-viewer.component.scss'],
-  imports: [NgFor, NgIf, NgStyle, IonicModule, IsExternalURLPipe],
+  imports: [AsyncPipe, NgFor, NgIf, NgStyle, IonicModule, IsExternalURLPipe],
   host: {ngSkipHydration: 'true'}
 })
 export class PdfViewerComponent implements OnInit {
@@ -21,13 +23,15 @@ export class PdfViewerComponent implements OnInit {
   @ViewChild('downloadOptionsPopover') downloadOptionsPopover: any;
   
   downloadPopoverIsOpen: boolean = false;
+  pageNumber: number | null = null;
   pdfData: Record<string, any> = {};
-  pdfURL: SafeUrl;
+  pdfURL$: Observable<SafeResourceUrl | undefined>;
   showURNButton: boolean = false;
   _window: Window | null = null;
 
   constructor(
     private modalController: ModalController,
+    private route: ActivatedRoute,
     private sanitizer: DomSanitizer,
     @Inject(LOCALE_ID) private activeLocale: string,
     @Inject(DOCUMENT) private document: Document
@@ -45,17 +49,31 @@ export class PdfViewerComponent implements OnInit {
       }
     }
 
-    let pdfFilePath = (this._window?.location.origin ?? '')
-          + (this._window?.location.pathname.split('/')[1] === this.activeLocale ? '/' + this.activeLocale : '')
-          + '/assets/ebooks/'
-          + this.pdfFileName;
-    
-    if (this.pdfData.externalFileURL) {
-      pdfFilePath = this.pdfData.externalFileURL;
-    }
+    const pdfFilePath = this.pdfData.externalFileURL
+          ? this.pdfData.externalFileURL
+          : (
+              (this._window?.location.origin ?? '')
+              + (
+                  this._window?.location.pathname.split('/')[1] === this.activeLocale
+                  ? '/' + this.activeLocale : ''
+                )
+              + '/assets/ebooks/' + this.pdfFileName
+            );
 
-    // console.log('Loading pdf from ', pdfFilePath);
-    this.pdfURL = this.sanitizer.bypassSecurityTrustResourceUrl(pdfFilePath);
+    this.pdfURL$ = this.route.queryParamMap.pipe(
+      map(paramMap => {
+        let pageNumber: number | null = null;
+        const pageParam = paramMap.get('page');
+
+        if (pageParam) {
+          pageNumber = parseInt(pageParam, 10);  
+        }
+        this.pageNumber = pageNumber;
+
+        const pdfURL: string = pageNumber ? pdfFilePath + '#page=' + pageNumber : pdfFilePath;
+        return this.sanitizer.bypassSecurityTrustResourceUrl(pdfURL);
+      })
+    );
   }
 
   openDownloadPopover(event: any) {

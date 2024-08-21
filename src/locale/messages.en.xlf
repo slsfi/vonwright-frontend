@@ -1394,14 +1394,20 @@
     </unit>
     <unit id="PdfViewer.DownloadPdf">
       <segment state="initial">
-        <source>download PDF</source>
+        <source>ladda ner PDF</source>
         <target>download PDF</target>
       </segment>
     </unit>
     <unit id="PdfViewer.NoBrowserSupport">
       <segment state="initial">
-        <source>Your browser does not support PDFs. Please download the PDF to view it:</source>
+        <source>Din webbläsare stöder inte PDF-filer. Ladda ner PDF:en för att läsa den:</source>
         <target>Your browser does not support PDFs. Please download the PDF to view it:</target>
+      </segment>
+    </unit>
+    <unit id="PdfViewer.Page">
+      <segment state="initial">
+        <source>sida</source>
+        <target>page</target>
       </segment>
     </unit>
     <unit id="ReadingText.Error">

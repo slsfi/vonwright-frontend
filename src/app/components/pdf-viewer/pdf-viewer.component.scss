@@ -17,9 +17,24 @@
     text-overflow: ellipsis;
     white-space: nowrap;
   }
+
+  p {
+    margin: 0 0 0 0.5em;
+
+    &::before {
+      content: "–";
+      margin: 0 0.5em 0 0;
+    }
+  }
 }
 
 object {
   height: 100%;
   width: 100%;
+}
+
+.no-support {
+  line-height: 1.5;
+  padding: 1rem;
+  text-align: center;
 }
