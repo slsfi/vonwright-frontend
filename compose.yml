@@ -1,6 +1,6 @@
 services:
   nginx:
-    image: docker.io/library/nginx:1.26.1
+    image: docker.io/library/nginx:1.26.2
     depends_on:
       - web
     ports:
