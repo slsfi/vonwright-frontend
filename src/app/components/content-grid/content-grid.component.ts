@@ -2,7 +2,7 @@ import { Component, Inject, LOCALE_ID, OnInit } from '@angular/core';
 import { AsyncPipe, NgFor, NgIf } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { IonicModule } from '@ionic/angular';
-import { catchError, forkJoin, from, map, mergeMap, Observable, of, toArray } from 'rxjs';
+import { catchError, filter, forkJoin, from, map, mergeMap, Observable, of, toArray } from 'rxjs';
 
 import { config } from '@config';
 import { ContentItem } from '@models/content-item.model';
@@ -20,7 +20,7 @@ import { MarkdownService } from '@services/markdown.service';
 })
 export class ContentGridComponent implements OnInit {
   availableEbooks: any[] = [];
-  collectionSortOrder: any[] = [];
+  flattenedCollectionSortOrder: number[] = [];
   contentItems$: Observable<ContentItem[]>;
   includeEbooks: boolean = false;
   includeMediaCollection: boolean = false;
@@ -32,7 +32,7 @@ export class ContentGridComponent implements OnInit {
     @Inject(LOCALE_ID) private activeLocale: string
   ) {
     this.availableEbooks = config.ebooks ?? [];
-    this.collectionSortOrder = config.collections?.order ?? [];
+    this.flattenedCollectionSortOrder = (config.collections?.order ?? []).flat();
     this.includeEbooks = config.component?.contentGrid?.includeEbooks ?? false;
     this.includeMediaCollection = config.component?.contentGrid?.includeMediaCollection ?? false;
     this.showTitles = config.component?.contentGrid?.showTitles ?? true;
@@ -74,45 +74,55 @@ export class ContentGridComponent implements OnInit {
   private getCollections(): Observable<ContentItem[]> {
     // Adapted from https://stackoverflow.com/a/55517145
     // First get list of collections, then for each collection,
-    // get it's cover image URL and alt-text and append this information
-    // to the collection data
+    // get it's cover image URL and alt-text (if they pass the filter
+    // which checks that they are included in the collections in config)
+    // and append this information to the collection data
     return this.collectionsService.getCollections().pipe(
       mergeMap((collectionsList: any[]) =>
         // 'from' emits each collection separately
         from(collectionsList).pipe(
-          // load cover info for each collection (mergeMap fetches in
-          // parallell, to fetch sequentially you'd use concatMap)
-          mergeMap(
-            (collection: any) => 
-              this.mdService.getMdContent(`${this.activeLocale}-08-${collection.id}`).pipe(
-                // add image alt-text and cover URL from response to collection data
-                map((coverRes: any) => ({
+          // Filter collections to include only those with IDs in
+          // this.flattenedCollectionSortOrder, which comes from config
+          filter((collection: any) =>
+            this.flattenedCollectionSortOrder.includes(collection.id)
+          ),
+          // load cover info for each collection that passes the filter
+          // (mergeMap fetches in parallell, to fetch sequentially you'd
+          // use concatMap)
+          mergeMap((collection: any) => 
+            this.mdService.getMdContent(
+              `${this.activeLocale}-08-${collection.id}`
+            ).pipe(
+              // add image alt-text and cover URL from response to
+              // collection data
+              map((coverRes: any) => ({
+                ...collection,
+                imageAltText: coverRes.content.match(/!\[(.*?)\]\(.*?\)/)[1] || undefined,
+                imageURL: coverRes.content.match(/!\[.*?\]\((.*?)\)/)[1] || undefined
+              })),
+              catchError((error: any) => {
+                // error getting collection cover URL, so add collection
+                // with placeholder cover image
+                return of({
                   ...collection,
-                  imageAltText: coverRes.content.match(/!\[(.*?)\]\(.*?\)/)[1] || undefined,
-                  imageURL: coverRes.content.match(/!\[.*?\]\((.*?)\)/)[1] || undefined
-                })),
-                catchError((error: any) => {
-                  // error getting collection cover URL, so add collection with placeholder cover image
-                  return of({
-                    ...collection,
-                    imageAltText: 'Collection cover image',
-                    imageURL: 'assets/images/collection-cover-placeholder.jpg'
-                  });
-                })
-              ),
+                  imageAltText: 'Collection cover image',
+                  imageURL: 'assets/images/collection-cover-placeholder.jpg'
+                });
+              })
+            ),
           ),
           map((collection: any) => {
             return new ContentItem(collection);
           }),
           // collect all collections into an array
           toArray(),
-          // sort array of collections
+          // sort array of collections to correspond to the collection
+          // order specified in config
           map((collectionItemsList: ContentItem[]) => {
-            if (
-              this.collectionSortOrder.length &&
-              this.collectionSortOrder[0].length
-            )  {
-              return this.sortCollectionsList(collectionItemsList, this.collectionSortOrder);
+            if (this.flattenedCollectionSortOrder.length > 0)  {
+              return this.sortCollectionsList(
+                collectionItemsList, this.flattenedCollectionSortOrder
+              );
             } else {
               return collectionItemsList;
             }
@@ -143,15 +153,10 @@ export class ContentGridComponent implements OnInit {
     return of(itemsList);
   }
 
-  private sortCollectionsList(collectionsList: ContentItem[], sortList: any[]): ContentItem[] {
-    let collectionOrderList: any[] = [];
+  private sortCollectionsList(collectionsList: ContentItem[], flattenedSortList: number[]): ContentItem[] {
     let orderedCollectionsList: ContentItem[] = [];
-    
-    for (let i = 0; i < sortList.length; i++) {
-      collectionOrderList = collectionOrderList.concat(sortList[i]);
-    }
 
-    for (const id of collectionOrderList) {
+    for (const id of flattenedSortList) {
       for (let x = 0; x < collectionsList.length; x++) {
         if (collectionsList[x].id && String(collectionsList[x].id) === String(id)) {
           orderedCollectionsList.push(collectionsList[x]);
