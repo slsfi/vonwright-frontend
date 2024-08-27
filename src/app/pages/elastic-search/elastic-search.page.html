@@ -72,6 +72,12 @@
                   <ng-container *ngIf="activeFilterGroup.name === 'LetterReceiverLocation'">
                     <ng-container i18n="@@ElasticSearch.LetterReceiverLocation">Mottagarort (brev)</ng-container>:
                   </ng-container>
+                  <ng-container *ngIf="activeFilterGroup.name === 'Region'">
+                    <ng-container i18n="@@ElasticSearch.Region">Landskap</ng-container>:
+                  </ng-container>
+                  <ng-container *ngIf="activeFilterGroup.name === 'Signum'">
+                    <ng-container i18n="@@ElasticSearch.Signum">Arkivsignum</ng-container>:
+                  </ng-container>
                 </p>
                 <ul>
                   <li *ngFor="let filterKey of activeFilterGroup.keys">
@@ -268,6 +274,12 @@
                 </ng-container>
                 <ng-container *ngIf="filterGroup.name === 'LetterReceiverLocation'">
                   <ng-container i18n="@@ElasticSearch.LetterReceiverLocation">Mottagarort (brev)</ng-container>:
+                </ng-container>
+                <ng-container *ngIf="filterGroup.name === 'Region'">
+                  <ng-container i18n="@@ElasticSearch.Region">Landskap</ng-container>:
+                </ng-container>
+                <ng-container *ngIf="filterGroup.name === 'Signum'">
+                  <ng-container i18n="@@ElasticSearch.Signum">Arkivsignum</ng-container>:
                 </ng-container>
               </h3>
               <ion-icon id="arrow-{{filterGroup.name}}" name="chevron-forward" [class.open]="filterGroup.open"></ion-icon>

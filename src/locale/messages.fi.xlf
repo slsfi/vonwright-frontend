@@ -564,6 +564,12 @@
         <target>Vanhimmat ensin</target>
       </segment>
     </unit>
+    <unit id="ElasticSearch.Region">
+      <segment state="initial">
+        <source>Landskap</source>
+        <target>Maakunta</target>
+      </segment>
+    </unit>
     <unit id="ElasticSearch.Relevance">
       <segment state="initial">
         <source>Relevans</source>
@@ -604,6 +610,12 @@
       <segment state="initial">
         <source>Visa fler sökträffar</source>
         <target>Näytä lisää hakutuloksia</target>
+      </segment>
+    </unit>
+    <unit id="ElasticSearch.Signum">
+      <segment state="initial">
+        <source>Arkivsignum</source>
+        <target>Arkistotunnus</target>
       </segment>
     </unit>
     <unit id="ElasticSearch.SortBy">

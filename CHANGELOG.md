@@ -15,6 +15,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 - PDF viewer on ebooks page: support navigating to specific page in PDF. Fixes incorrect translations for the component.
 - PDF viewer on ebooks page: support search term highlighting in PDF (dependent on browser support, which currently includes only Firefox).
 - The SLS logo in various sizes as PNG images.
+- Elasticsearch page: filter labels for regions and reference numbers.
 
 ### Changed
 

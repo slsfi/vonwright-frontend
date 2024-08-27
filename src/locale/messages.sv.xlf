@@ -564,6 +564,12 @@
         <target>Äldst först</target>
       </segment>
     </unit>
+    <unit id="ElasticSearch.Region">
+      <segment state="initial">
+        <source>Landskap</source>
+        <target>Landskap</target>
+      </segment>
+    </unit>
     <unit id="ElasticSearch.Relevance">
       <segment state="initial">
         <source>Relevans</source>
@@ -604,6 +610,12 @@
       <segment state="initial">
         <source>Visa fler sökträffar</source>
         <target>Visa fler sökträffar</target>
+      </segment>
+    </unit>
+    <unit id="ElasticSearch.Signum">
+      <segment state="initial">
+        <source>Arkivsignum</source>
+        <target>Arkivsignum</target>
       </segment>
     </unit>
     <unit id="ElasticSearch.SortBy">
