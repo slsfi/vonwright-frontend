@@ -20,6 +20,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ### Changed
 
+- `backendBaseURL` in config set to `https://api.sls.fi/digitaledition` by default.
 - Home page: reduce landscape banner image height to 40% on viewport widths less than 1100px.
 - Content grid: fetch collection cover image data only for collections included in the config.
 - Elasticsearch page: rename Elastic hit path and queryparams pipes.

@@ -5,7 +5,7 @@ export const config: Config = {
     siteURLOrigin: "https://topelius.sls.fi",
     projectNameDB: "topelius",
     projectId: 10,
-    backendBaseURL: "https://testa-vonwright.sls.fi:8000/digitaledition",
+    backendBaseURL: "https://api.sls.fi/digitaledition",
     alternateFacsimileBaseURL: "",
     i18n: {
       languages: [
