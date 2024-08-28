@@ -67,15 +67,18 @@ async function generateStaticCollectionMenus() {
       if (multilingualCollectionTOC) {
         collectionsEndpoint += '/' + locale;
       }
+
       const collections = await common.fetchFromAPI(collectionsEndpoint);
+      const includedCollections = config.collections.order.flat();
+
       if (collections) {
         // Loop through all collections
         for (let i = 0; i < collections.length; i++) {
           const collectionId = collections[i]['id'] || 0;
           const collectionTitle = collections[i]['title'] || '';
 
-          if (!collectionId) {
-            break;
+          if (!collectionId || !includedCollections.includes(collectionId)) {
+            continue;
           }
 
           // Get collection TOC
@@ -83,10 +86,11 @@ async function generateStaticCollectionMenus() {
           if (multilingualCollectionTOC) {
             tocEndpoint += '/' + locale;
           }
+          
           const tocJSON = await common.fetchFromAPI(tocEndpoint);
 
           if (tocJSON == null) {
-            console.log('Unable to fetch TOC for collection ', collectionId);
+            console.log('Error: unable to fetch TOC for collection ', collectionId);
             break;
           }
 
