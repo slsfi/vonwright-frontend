@@ -25,6 +25,7 @@ export class ElasticHitCollectionPageQueryparamsPipe implements PipeTransform {
     let text_type = elasticHit?.source?.text_type ?? '';
     const views: any[] = [];
     const unique_matches: string[] = [];
+    let page: string | null = null;
 
     // Add views to query params if est, com, var or ms text type
     if (
@@ -57,6 +58,8 @@ export class ElasticHitCollectionPageQueryparamsPipe implements PipeTransform {
           }
         );
       }
+    } else if (text_type === 'pdf') {
+      page = elasticHit.source.text_title || null;
     }
 
     // Add search match strings to query params
@@ -80,6 +83,7 @@ export class ElasticHitCollectionPageQueryparamsPipe implements PipeTransform {
 
     // Construct final query params object
     const params: any = {
+      page,
       views: views.length ? this.urlService.stringify(views, true) : null,
       q: unique_matches.length ? unique_matches : null
     }

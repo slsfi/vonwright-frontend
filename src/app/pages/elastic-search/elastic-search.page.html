@@ -178,7 +178,15 @@
                 <a [routerLink]="hit | elasticHitCollectionPagePath" [queryParams]="hit | elasticHitCollectionPageQueryparams">
                   <div>
                     <h3>
-                      <span *ngIf="hit.source.text_type === 'com'" class="comment-prepend" i18n="@@ElasticSearch.CommentaryTo">Kommentar till</span> <span [innerHTML]="getHeading(hit)"></span>
+                      <span *ngIf="hit.source.text_type === 'com'"
+                            class="hit-heading-prefix"
+                            i18n="@@ElasticSearch.CommentaryTo"
+                      >Kommentar till</span>
+                      <span *ngIf="hit.source.text_type === 'pdf'"
+                            class="hit-heading-prefix"
+                            i18n="@@ElasticSearch.Page"
+                      >Sida</span>
+                      <span [innerHTML]="getHeading(hit)"></span>
                     </h3>
                     <p>{{getPublicationCollectionName(hit.source)}}</p>
                   </div>
@@ -193,6 +201,7 @@
                           <ng-container *ngSwitchCase="'tit'" i18n="@@CollectionTitle.TitlePage">Titelblad</ng-container>
                           <ng-container *ngSwitchCase="'fore'" i18n="@@CollectionForeword.Foreword">Förord</ng-container>
                           <ng-container *ngSwitchCase="'inl'" i18n="@@CollectionIntroduction.Introduction">Inledning</ng-container>
+                          <ng-container *ngSwitchCase="'pdf'" i18n="@@ElasticSearch.PdfType">E-bok</ng-container>
                           <ng-container *ngSwitchDefault>{{hit.source.text_type}}</ng-container>
                         </ng-container>
                       </span>

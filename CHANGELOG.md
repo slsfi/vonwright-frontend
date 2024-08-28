@@ -16,6 +16,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 - PDF viewer on ebooks page: support search term highlighting in PDF (dependent on browser support, which currently includes only Firefox).
 - The SLS logo in various sizes as PNG images.
 - Elasticsearch page: filter labels for regions and reference numbers.
+- Elasticsearch page: support PDF type search results for PDFs ingested in Elasticsearch as one page in plain text format per document. For links from the search results to correctly map to PDFs on the ebook pages, you need to enter the PDFs as collections in the database, and add a `collectionId` property to each ebook object in the ebooks array in `config.ts`.
 
 ### Changed
 

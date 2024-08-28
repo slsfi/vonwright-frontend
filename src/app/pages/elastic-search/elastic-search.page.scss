@@ -395,7 +395,7 @@ li.hit-item {
           vertical-align: text-bottom;
         }
 
-        .comment-prepend::after {
+        .hit-heading-prefix::after {
           content: "\0020";
           white-space: pre;
         }

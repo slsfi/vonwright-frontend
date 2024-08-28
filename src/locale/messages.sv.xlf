@@ -564,6 +564,18 @@
         <target>Äldst först</target>
       </segment>
     </unit>
+    <unit id="ElasticSearch.Page">
+      <segment state="initial">
+        <source>Sida</source>
+        <target>Sida</target>
+      </segment>
+    </unit>
+    <unit id="ElasticSearch.PdfType">
+      <segment state="initial">
+        <source>E-bok</source>
+        <target>E-bok</target>
+      </segment>
+    </unit>
     <unit id="ElasticSearch.Region">
       <segment state="initial">
         <source>Landskap</source>
