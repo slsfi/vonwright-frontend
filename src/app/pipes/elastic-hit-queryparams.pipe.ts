@@ -9,10 +9,10 @@ import { UrlService } from '@services/url.service';
  * ElasticSearch hit item.
  */
 @Pipe({
-  name: 'elasticHitCollectionPageQueryparams',
+  name: 'elasticHitQueryparams',
   standalone: true
 })
-export class ElasticHitCollectionPageQueryparamsPipe implements PipeTransform {
+export class ElasticHitQueryparamsPipe implements PipeTransform {
   highlightSearchMatches: boolean = true;
   openReadingTextWithCommentsHit: boolean = false;
 

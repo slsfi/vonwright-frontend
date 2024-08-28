@@ -22,6 +22,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 - Home page: reduce landscape banner image height to 40% on viewport widths less than 1100px.
 - Content grid: fetch collection cover image data only for collections included in the config.
+- Elasticsearch page: rename Elastic hit path and queryparams pipes.
 - Update `nginx` to 1.26.2.
 
 ### Fixed

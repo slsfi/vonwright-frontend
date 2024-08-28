@@ -8,10 +8,10 @@ import { config } from '@config';
  * ElasticSearch hit item.
  */
 @Pipe({
-  name: 'elasticHitCollectionPagePath',
+  name: 'elasticHitPagePath',
   standalone: true
 })
-export class ElasticHitCollectionPagePathPipe implements PipeTransform {
+export class ElasticHitPagePathPipe implements PipeTransform {
   ebooks: any[] = [];
 
   constructor() {

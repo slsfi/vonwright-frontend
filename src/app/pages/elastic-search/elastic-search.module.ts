@@ -4,8 +4,8 @@ import { FormsModule } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
 
 import { DateHistogramComponent } from '@components/date-histogram/date-histogram.component';
-import { ElasticHitCollectionPagePathPipe } from '@pipes/elastic-hit-collection-page-path.pipe';
-import { ElasticHitCollectionPageQueryparamsPipe } from '@pipes/elastic-hit-collection-page-queryparams.pipe';
+import { ElasticHitPagePathPipe } from '@pipes/elastic-hit-page-path.pipe';
+import { ElasticHitQueryparamsPipe } from '@pipes/elastic-hit-queryparams.pipe';
 import { TrustHtmlPipe } from '@pipes/trust-html-pipe';
 import { ElasticSearchPageRoutingModule } from './elastic-search-routing.module';
 import { ElasticSearchPage } from './elastic-search.page';
@@ -20,8 +20,8 @@ import { ElasticSearchPage } from './elastic-search.page';
     FormsModule,
     IonicModule,
     DateHistogramComponent,
-    ElasticHitCollectionPagePathPipe,
-    ElasticHitCollectionPageQueryparamsPipe,
+    ElasticHitPagePathPipe,
+    ElasticHitQueryparamsPipe,
     TrustHtmlPipe,
     ElasticSearchPageRoutingModule
   ]

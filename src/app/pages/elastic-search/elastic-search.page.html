@@ -175,7 +175,7 @@
 
               <p>#{{n+1}}</p>
               <div>
-                <a [routerLink]="hit | elasticHitCollectionPagePath" [queryParams]="hit | elasticHitCollectionPageQueryparams">
+                <a [routerLink]="hit | elasticHitPagePath" [queryParams]="hit | elasticHitQueryparams">
                   <div>
                     <h3>
                       <span *ngIf="hit.source.text_type === 'com'"
