@@ -27,6 +27,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 - Rename trust HTML pipe file.
 - Update `nginx` to 1.26.2.
 - Deps: update `@angular` to 18.2.1.
+- Deps: update `marked` to 14.1.0.
 
 ### Fixed
 
