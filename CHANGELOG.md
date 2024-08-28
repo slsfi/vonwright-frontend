@@ -26,6 +26,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 - Elasticsearch page: rename Elastic hit path and queryparams pipes.
 - Rename trust HTML pipe file.
 - Update `nginx` to 1.26.2.
+- Deps: update `@angular` to 18.2.1.
 
 ### Fixed
 
