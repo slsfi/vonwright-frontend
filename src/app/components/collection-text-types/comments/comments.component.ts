@@ -3,7 +3,7 @@ import { NgIf } from '@angular/common';
 import { IonicModule, ModalController } from '@ionic/angular';
 
 import { IllustrationModal } from '@modals/illustration/illustration.modal';
-import { TrustHtmlPipe } from '@pipes/trust-html-pipe';
+import { TrustHtmlPipe } from '@pipes/trust-html.pipe';
 import { CommentService } from '@services/comment.service';
 import { HtmlParserService } from '@services/html-parser.service';
 import { PlatformService } from '@services/platform.service';

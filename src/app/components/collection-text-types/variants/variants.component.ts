@@ -3,7 +3,7 @@ import { NgIf } from '@angular/common';
 import { AlertButton, AlertController, AlertInput, IonicModule } from '@ionic/angular';
 
 import { config } from '@config';
-import { TrustHtmlPipe } from '@pipes/trust-html-pipe';
+import { TrustHtmlPipe } from '@pipes/trust-html.pipe';
 import { CollectionContentService } from '@services/collection-content.service';
 import { HtmlParserService } from '@services/html-parser.service';
 import { ScrollService } from '@services/scroll.service';
