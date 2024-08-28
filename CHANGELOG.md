@@ -30,6 +30,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 - Media collections: reduce filter select widths to prevent clear button from wrapping to a new line when all three filter categories are available.
 - Document title set correctly when going back to previous collection pages in nav stack.
 
+### Removed
+
+- `index.html`: deprecated and outdated meta tags.
+
 
 
 ## [1.4.4] – 2024-08-08
