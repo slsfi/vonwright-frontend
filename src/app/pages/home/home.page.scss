@@ -155,13 +155,13 @@ ion-content.portrait-mode::part(scroll) {
 
 		.site-presentation {
 			margin: 0 0 3rem 0;
-			text-align: left;
+			text-align: start;
 		}
 
 		.footer {
 			margin-left: 0;
 			margin-right: 0;
-			text-align: left;
+			text-align: start;
 		}
 	}
 
@@ -175,7 +175,7 @@ ion-content.portrait-mode::part(scroll) {
 		margin-top: 1.2rem;
 		margin-bottom: 1rem;
 		padding: 0 0 0.5rem 0;
-		text-align: left;
+		text-align: start;
 	}
 
 	.site-subtitle {

@@ -12,6 +12,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 - Generate static collection menus prebuild script: skip collections that are not included according to the config.
 - Generate sitemap prebuild script: skip collections that are not included according to the config.
+- Home page: start-aligned instead of left-aligned text.
 
 
 
