@@ -18,6 +18,8 @@ generateSitemap();
  * - Ebook
  * - Collection
  * - Media collection
+ * Because the sitemap is a plain text file, only the URLs to pages
+ * in the default language are generated.
  */
 async function generateSitemap() {
   const config = common.getConfig(configFilepath);
@@ -65,18 +67,24 @@ async function generateSitemap() {
     }
   }
 
-  // Get ebook-pages URLs
+  // Get ebook URLs
   if (config.component?.mainSideMenu?.items?.ebooks && config.ebooks?.length) {
     urlCounter += generateEbookURLs(config.ebooks, urlOrigin, locale);
   }
 
-  // Get collections URLs
+  // Get collection URLs
   if (config.collections?.order?.length) {
     let collectionsEndpoint = APIBase + '/collections';
     if (multilingualCollectionTOC) {
       collectionsEndpoint += '/' + locale;
     }
-    const collections = await common.fetchFromAPI(collectionsEndpoint);
+
+    // Fetch all collections from the backend
+    const allCollections = await common.fetchFromAPI(collectionsEndpoint);
+    const includedCollectionIds = config.collections.order.flat();
+    // Filter out the collections that are not included according to the config
+    const collections = allCollections.filter(coll => includedCollectionIds.includes(coll.id));
+
     if (collections) {
       if (collectionCovers) {
         urlCounter += await generateCollectionURLs(collections, 'cover', urlOrigin, locale);
@@ -95,6 +103,7 @@ async function generateSitemap() {
     }
   }
 
+  // Get media collection URLs
   if (config.component?.mainSideMenu?.items?.mediaCollections) {
     const mediaCollections = await common.fetchFromAPI(APIBase + '/gallery/data/' + locale);
     if (mediaCollections && mediaCollections.length) {

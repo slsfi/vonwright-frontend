@@ -11,6 +11,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 ### Fixed
 
 - Generate static collection menus prebuild script: skip collections that are not included according to the config.
+- Generate sitemap prebuild script: skip collections that are not included according to the config.
 
 
 
