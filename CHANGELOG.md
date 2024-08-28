@@ -8,11 +8,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ## [Unreleased]
 
+
+
+## [1.5.1] – 2024-08-28
+
 ### Fixed
 
-- Generate static collection menus prebuild script: skip collections that are not included according to the config.
-- Generate sitemap prebuild script: skip collections that are not included according to the config.
-- Home page: start-aligned instead of left-aligned text.
+- Generate static collection menus prebuild script: skip collections that are not included according to the config. ([6a5a339](https://github.com/slsfi/digital-edition-frontend-ng/commit/6a5a339c01beae2ea5155a099c9910f978636b0e))
+- Generate sitemap prebuild script: skip collections that are not included according to the config. ([b5b84a2](https://github.com/slsfi/digital-edition-frontend-ng/commit/b5b84a2b07f3cd801fbc8112fa0d80b7eb557dc8))
+- Home page: start-aligned instead of left-aligned text. ([f714e09](https://github.com/slsfi/digital-edition-frontend-ng/commit/f714e09589fa9336e3296aa34772889e13bdada6))
 
 
 
@@ -427,7 +431,8 @@ siteLogoDimensions: {
 
 
 
-[unreleased]: https://github.com/slsfi/digital-edition-frontend-ng/compare/1.5.0...HEAD
+[unreleased]: https://github.com/slsfi/digital-edition-frontend-ng/compare/1.5.1...HEAD
+[1.5.1]: https://github.com/slsfi/digital-edition-frontend-ng/compare/1.5.0...1.5.1
 [1.5.0]: https://github.com/slsfi/digital-edition-frontend-ng/compare/1.4.4...1.5.0
 [1.4.4]: https://github.com/slsfi/digital-edition-frontend-ng/compare/1.4.3...1.4.4
 [1.4.3]: https://github.com/slsfi/digital-edition-frontend-ng/compare/1.4.2...1.4.3
