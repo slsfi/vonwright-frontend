@@ -33,6 +33,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 ### Removed
 
 - `index.html`: deprecated and outdated meta tags.
+- `compose.yml`: testa-vonwright.sls.fi from extra hosts.
 
 
 
