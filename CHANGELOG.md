@@ -8,13 +8,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ## Unreleased
 
+
+
+## [1.5.2-production.1] – 2024-08-30
+
 ### Changed
 
-- Merge release [`v1.5.2`](https://github.com/slsfi/digital-edition-frontend-ng/releases/tag/1.5.2) from upstream, original repository into `production` branch.
+- Merge release [`v1.5.2`](https://github.com/slsfi/digital-edition-frontend-ng/releases/tag/1.5.2) from upstream, original repository into `production` branch. ([59d3910](https://github.com/slsfi/vonwright-frontend/commit/59d39105b2541d17738d3f5193c57d0d6b686732))
 
 ### Removed
 
-- Superfluous styles from `custom.scss`.
+- Superfluous styles from `custom.scss`. ([15f2f36](https://github.com/slsfi/vonwright-frontend/commit/15f2f368363bbf4a1411b9c8b0493842b4d7db32))
 
 
 
@@ -507,6 +511,7 @@ siteLogoDimensions: {
 [1.0.1]: https://github.com/slsfi/digital-edition-frontend-ng/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/slsfi/digital-edition-frontend-ng/releases/tag/v1.0.0
 
+[1.5.2-production.1]: https://github.com/slsfi/vonwright-frontend/compare/1.4.4-production.1...1.5.2-production.1
 [1.4.4-production.1]: https://github.com/slsfi/vonwright-frontend/compare/1.4.3-production.1...1.4.4-production.1
 [1.4.3-production.1]: https://github.com/slsfi/vonwright-frontend/compare/1.4.2-production.1...1.4.3-production.1
 [1.4.2-production.1]: https://github.com/slsfi/vonwright-frontend/releases/tag/1.4.2-production.1
