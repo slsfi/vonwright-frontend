@@ -278,12 +278,7 @@ page-home {
     }
   }
 
-  /* Reducera höjden på startsidans banner på smala skärmar */
-  @media screen and (max-width: 1100px) {
-    div.banner.banner {
-      height: 40%;
-    }
-  }
+  /* Reduce banner height on very small screens */
   @media screen and (max-width: 600px) {
     div.banner.banner {
       height: 30%;
