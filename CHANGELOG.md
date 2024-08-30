@@ -12,6 +12,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 - Merge release [`v1.5.2`](https://github.com/slsfi/digital-edition-frontend-ng/releases/tag/1.5.2) from upstream, original repository into `production` branch.
 
+### Removed
+
+- Superfluous styles from `custom.scss`.
+
 
 
 ## [1.5.2] – 2024-08-30
