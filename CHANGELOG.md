@@ -8,6 +8,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ## [Unreleased]
 
+### Fixed
+
+- Named entity modal: prevent text wrapping in labels.
+
 ### Changed
 
 - Dependabot configuration: allow security updates of `@angular` packages.
