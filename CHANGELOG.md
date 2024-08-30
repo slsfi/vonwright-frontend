@@ -10,6 +10,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ### Changed
 
+- Dependabot configuration: allow security updates of `@angular` packages.
 - Deps: update `@angular` to 18.2.2.
 - Deps (transitive): update `micromatch` to 4.0.8.
 
