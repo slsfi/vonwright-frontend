@@ -8,15 +8,19 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ## [Unreleased]
 
+
+
+## [1.5.2] – 2024-08-30
+
 ### Fixed
 
-- Named entity modal: prevent text wrapping in labels.
+- Named entity modal: prevent text wrapping in labels. ([dd0664a](https://github.com/slsfi/digital-edition-frontend-ng/commit/dd0664a6f61ba0328e587c1e7a0ebf29e01df957))
 
 ### Changed
 
-- Dependabot configuration: allow security updates of `@angular` packages.
-- Deps: update `@angular` to 18.2.2.
-- Deps (transitive): update `micromatch` to 4.0.8.
+- Dependabot configuration: allow security updates of `@angular` packages. ([066d45e](https://github.com/slsfi/digital-edition-frontend-ng/commit/066d45e931ec96db562d7a26de31451c4e4fe7f0))
+- Deps: update `@angular` to 18.2.2. ([2ff2b72](https://github.com/slsfi/digital-edition-frontend-ng/commit/2ff2b72ab4a3d50750d1396f71bb8713d1652d0e))
+- Deps (transitive): update `micromatch` to 4.0.8. ([a74b1d7](https://github.com/slsfi/digital-edition-frontend-ng/commit/a74b1d793c8d0e571d3b74669416ddec4c6d06d4))
 
 
 
@@ -441,7 +445,8 @@ siteLogoDimensions: {
 
 
 
-[unreleased]: https://github.com/slsfi/digital-edition-frontend-ng/compare/1.5.1...HEAD
+[unreleased]: https://github.com/slsfi/digital-edition-frontend-ng/compare/1.5.2...HEAD
+[1.5.2]: https://github.com/slsfi/digital-edition-frontend-ng/compare/1.5.1...1.5.2
 [1.5.1]: https://github.com/slsfi/digital-edition-frontend-ng/compare/1.5.0...1.5.1
 [1.5.0]: https://github.com/slsfi/digital-edition-frontend-ng/compare/1.4.4...1.5.0
 [1.4.4]: https://github.com/slsfi/digital-edition-frontend-ng/compare/1.4.3...1.4.4
