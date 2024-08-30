@@ -471,6 +471,21 @@
         <source>Äldst först</source>
       </segment>
     </unit>
+    <unit id="ElasticSearch.Page">
+      <segment>
+        <source>Sida</source>
+      </segment>
+    </unit>
+    <unit id="ElasticSearch.PdfType">
+      <segment>
+        <source>E-bok</source>
+      </segment>
+    </unit>
+    <unit id="ElasticSearch.Region">
+      <segment>
+        <source>Landskap</source>
+      </segment>
+    </unit>
     <unit id="ElasticSearch.Relevance">
       <segment>
         <source>Relevans</source>
@@ -504,6 +519,11 @@
     <unit id="ElasticSearch.ShowMoreHits">
       <segment>
         <source>Visa fler sökträffar</source>
+      </segment>
+    </unit>
+    <unit id="ElasticSearch.Signum">
+      <segment>
+        <source>Arkivsignum</source>
       </segment>
     </unit>
     <unit id="ElasticSearch.SortBy">
@@ -1159,6 +1179,21 @@
     <unit id="PageNotFound.DefaultMessage">
       <segment>
         <source>Något gick fel. Vi kan inte hitta sidan du försökte nå. Du kan gå tillbaka till föregående sida med hjälp av webbläsarens tillbaka-knapp, eller försöka rätta adressen i webbläsarens adressfält.</source>
+      </segment>
+    </unit>
+    <unit id="PdfViewer.DownloadPdf">
+      <segment>
+        <source>ladda ner PDF</source>
+      </segment>
+    </unit>
+    <unit id="PdfViewer.NoBrowserSupport">
+      <segment>
+        <source>Din webbläsare stöder inte PDF-filer. Ladda ner PDF:en för att läsa den:</source>
+      </segment>
+    </unit>
+    <unit id="PdfViewer.Page">
+      <segment>
+        <source>sida</source>
       </segment>
     </unit>
     <unit id="ReadingText.Error">

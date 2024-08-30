@@ -564,6 +564,24 @@
         <target>Vanhimmat ensin</target>
       </segment>
     </unit>
+    <unit id="ElasticSearch.Page">
+      <segment state="initial">
+        <source>Sida</source>
+        <target>Sivu</target>
+      </segment>
+    </unit>
+    <unit id="ElasticSearch.PdfType">
+      <segment state="initial">
+        <source>E-bok</source>
+        <target>E-kirja</target>
+      </segment>
+    </unit>
+    <unit id="ElasticSearch.Region">
+      <segment state="initial">
+        <source>Landskap</source>
+        <target>Maakunta</target>
+      </segment>
+    </unit>
     <unit id="ElasticSearch.Relevance">
       <segment state="initial">
         <source>Relevans</source>
@@ -604,6 +622,12 @@
       <segment state="initial">
         <source>Visa fler sökträffar</source>
         <target>Näytä lisää hakutuloksia</target>
+      </segment>
+    </unit>
+    <unit id="ElasticSearch.Signum">
+      <segment state="initial">
+        <source>Arkivsignum</source>
+        <target>Arkistotunnus</target>
       </segment>
     </unit>
     <unit id="ElasticSearch.SortBy">
@@ -1390,6 +1414,24 @@
       <segment state="initial">
         <source>Något gick fel. Vi kan inte hitta sidan du försökte nå. Du kan gå tillbaka till föregående sida med hjälp av webbläsarens tillbaka-knapp, eller försöka rätta adressen i webbläsarens adressfält.</source>
         <target>Tapahtui virhe. Emme löydä hakemaasi sivua. Voit palata edelliselle sivulle selaimen näppäimestä, tai yrittää korjata selaimen osoiterivillä olevaa verkko-osoitetta.</target>
+      </segment>
+    </unit>
+    <unit id="PdfViewer.DownloadPdf">
+      <segment state="initial">
+        <source>ladda ner PDF</source>
+        <target>lataa PDF</target>
+      </segment>
+    </unit>
+    <unit id="PdfViewer.NoBrowserSupport">
+      <segment state="initial">
+        <source>Din webbläsare stöder inte PDF-filer. Ladda ner PDF:en för att läsa den:</source>
+        <target>Selaimesi ei tue PDF-tiedostoja. Lataa PDF lukeaksesi sen:</target>
+      </segment>
+    </unit>
+    <unit id="PdfViewer.Page">
+      <segment state="initial">
+        <source>sida</source>
+        <target>sivu</target>
       </segment>
     </unit>
     <unit id="ReadingText.Error">

@@ -48,18 +48,24 @@ export class DocumentHeadService implements OnDestroy {
       }
     }
 
-    if (this.openGraphTags?.enabled) {
-      const ogTitle = compositePageTitle
-        ? compositePageTitle
-        : $localize`:@@Site.Title:Webbplatsens titel`;
-      this.setMetaTag('property', 'og:title', ogTitle.replaceAll(' - ', ' – '));
-    }
-
-    compositePageTitle = compositePageTitle
+    // Construct the final title for the document head
+    const headTitle = compositePageTitle
       ? compositePageTitle + ' - ' + $localize`:@@Site.Title:Webbplatsens titel`
       : $localize`:@@Site.Title:Webbplatsens titel`;
 
-    this.title.setTitle(compositePageTitle);
+    // Set the document title only if it has changed
+    if (this.title.getTitle() !== headTitle) {
+      this.title.setTitle(headTitle);
+
+      // If Open Graph tags are enabled, set the title in the meta tags too.
+      // (hyphens are replaced by dashes)
+      if (this.openGraphTags?.enabled) {
+        const ogTitle = compositePageTitle
+          ? compositePageTitle
+          : $localize`:@@Site.Title:Webbplatsens titel`;
+        this.setMetaTag('property', 'og:title', ogTitle.replaceAll(' - ', ' – '));
+      }
+    }
   }
 
   setLinks(routerURL: string) {

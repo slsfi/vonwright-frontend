@@ -7,7 +7,7 @@ import { config } from '@config';
 import { DraggableImageDirective } from '@directives/draggable-image.directive';
 import { FullscreenImageViewerModal } from '@modals/fullscreen-image-viewer/fullscreen-image-viewer.modal';
 import { Facsimile } from '@models/facsimile.model';
-import { TrustHtmlPipe } from '@pipes/trust-html-pipe';
+import { TrustHtmlPipe } from '@pipes/trust-html.pipe';
 import { CollectionContentService } from '@services/collection-content.service';
 import { PlatformService } from '@services/platform.service';
 import { sortArrayOfObjectsNumerically } from '@utility-functions';

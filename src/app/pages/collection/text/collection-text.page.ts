@@ -31,6 +31,7 @@ export class CollectionTextPage implements OnDestroy, OnInit {
   @ViewChildren('fabColumnOptions') fabColumnOptions: QueryList<IonFabList>;
   @ViewChildren('fabColumnOptionsButton') fabColumnOptionsButton: QueryList<IonFabButton>;
 
+  _activeComponent: boolean = true;
   activeMobileModeViewIndex: number = 0;
   addViewPopoverisOpen: boolean = false;
   collectionAndPublicationLegacyId: string = '';
@@ -233,6 +234,14 @@ export class CollectionTextPage implements OnDestroy, OnInit {
     this.unlistenMouseoverEvents?.();
     this.unlistenMouseoutEvents?.();
     this.unlistenFirstTouchStartEvent?.();
+  }
+
+  ionViewWillEnter() {
+    this._activeComponent = true;
+  }
+
+  ionViewWillLeave() {
+    this._activeComponent = false;
   }
 
   private setViews() {

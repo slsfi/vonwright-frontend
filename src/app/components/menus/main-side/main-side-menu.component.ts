@@ -328,7 +328,7 @@ export class MainSideMenuComponent implements OnInit, OnChanges {
           this.headService.setTitle([String(item.title), $localize`:@@MainSideMenu.MediaCollections:Bildbank`]);
         } else if (!this.topMenuItems.includes(item.parentPath) && this.urlSegments[0]?.path !== 'collection') {
           // For top menu items the title is set by app.component, and
-          // for collections the title is set by the collection side menu
+          // for collections the title is set by the text-changer component
           this.headService.setTitle([String(item.title)]);
         }
         return item;

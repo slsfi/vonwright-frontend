@@ -22,6 +22,11 @@ ion-content.portrait-mode::part(scroll) {
 	padding: 0;
 	position: relative;
 
+	// Reduce banner height on narrow screens in landscape mode
+	@media screen and (max-width: 1100px) {
+		height: 40%;
+	}
+
 	.landscape-background-image {
 		background-position: 50% 50%;
 		background-repeat: no-repeat;
@@ -81,7 +86,9 @@ ion-content.portrait-mode::part(scroll) {
 .text-content {
 	display: flex;
 	flex-direction: column;
-	margin: 1.5rem 3rem 0 3rem;
+	height: 100%;
+	margin: 0 3rem;
+	padding: 1.5rem 0 0 0;
 
 	.site-presentation {
 		margin: 0 auto 3rem auto;
@@ -148,13 +155,13 @@ ion-content.portrait-mode::part(scroll) {
 
 		.site-presentation {
 			margin: 0 0 3rem 0;
-			text-align: left;
+			text-align: start;
 		}
 
 		.footer {
 			margin-left: 0;
 			margin-right: 0;
-			text-align: left;
+			text-align: start;
 		}
 	}
 
@@ -168,7 +175,7 @@ ion-content.portrait-mode::part(scroll) {
 		margin-top: 1.2rem;
 		margin-bottom: 1rem;
 		padding: 0 0 0.5rem 0;
-		text-align: left;
+		text-align: start;
 	}
 
 	.site-subtitle {

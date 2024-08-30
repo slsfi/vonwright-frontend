@@ -3,7 +3,7 @@ import { AsyncPipe, NgIf } from '@angular/common';
 import { IonicModule } from '@ionic/angular';
 import { catchError, map, Observable, of } from 'rxjs';
 
-import { TrustHtmlPipe } from '@pipes/trust-html-pipe';
+import { TrustHtmlPipe } from '@pipes/trust-html.pipe';
 import { MarkdownService } from '@services/markdown.service';
 import { ScrollService } from '@services/scroll.service';
 import { isBrowser } from '@utility-functions';

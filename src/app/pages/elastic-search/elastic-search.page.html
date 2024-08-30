@@ -72,6 +72,12 @@
                   <ng-container *ngIf="activeFilterGroup.name === 'LetterReceiverLocation'">
                     <ng-container i18n="@@ElasticSearch.LetterReceiverLocation">Mottagarort (brev)</ng-container>:
                   </ng-container>
+                  <ng-container *ngIf="activeFilterGroup.name === 'Region'">
+                    <ng-container i18n="@@ElasticSearch.Region">Landskap</ng-container>:
+                  </ng-container>
+                  <ng-container *ngIf="activeFilterGroup.name === 'Signum'">
+                    <ng-container i18n="@@ElasticSearch.Signum">Arkivsignum</ng-container>:
+                  </ng-container>
                 </p>
                 <ul>
                   <li *ngFor="let filterKey of activeFilterGroup.keys">
@@ -169,10 +175,18 @@
 
               <p>#{{n+1}}</p>
               <div>
-                <a [routerLink]="hit | elasticHitCollectionPagePath" [queryParams]="hit | elasticHitCollectionPageQueryparams">
+                <a [routerLink]="hit | elasticHitPagePath" [queryParams]="hit | elasticHitQueryparams">
                   <div>
                     <h3>
-                      <span *ngIf="hit.source.text_type === 'com'" class="comment-prepend" i18n="@@ElasticSearch.CommentaryTo">Kommentar till</span> <span [innerHTML]="getHeading(hit)"></span>
+                      <span *ngIf="hit.source.text_type === 'com'"
+                            class="hit-heading-prefix"
+                            i18n="@@ElasticSearch.CommentaryTo"
+                      >Kommentar till</span>
+                      <span *ngIf="hit.source.text_type === 'pdf'"
+                            class="hit-heading-prefix"
+                            i18n="@@ElasticSearch.Page"
+                      >Sida</span>
+                      <span [innerHTML]="getHeading(hit)"></span>
                     </h3>
                     <p>{{getPublicationCollectionName(hit.source)}}</p>
                   </div>
@@ -187,6 +201,7 @@
                           <ng-container *ngSwitchCase="'tit'" i18n="@@CollectionTitle.TitlePage">Titelblad</ng-container>
                           <ng-container *ngSwitchCase="'fore'" i18n="@@CollectionForeword.Foreword">Förord</ng-container>
                           <ng-container *ngSwitchCase="'inl'" i18n="@@CollectionIntroduction.Introduction">Inledning</ng-container>
+                          <ng-container *ngSwitchCase="'pdf'" i18n="@@ElasticSearch.PdfType">E-bok</ng-container>
                           <ng-container *ngSwitchDefault>{{hit.source.text_type}}</ng-container>
                         </ng-container>
                       </span>
@@ -268,6 +283,12 @@
                 </ng-container>
                 <ng-container *ngIf="filterGroup.name === 'LetterReceiverLocation'">
                   <ng-container i18n="@@ElasticSearch.LetterReceiverLocation">Mottagarort (brev)</ng-container>:
+                </ng-container>
+                <ng-container *ngIf="filterGroup.name === 'Region'">
+                  <ng-container i18n="@@ElasticSearch.Region">Landskap</ng-container>:
+                </ng-container>
+                <ng-container *ngIf="filterGroup.name === 'Signum'">
+                  <ng-container i18n="@@ElasticSearch.Signum">Arkivsignum</ng-container>:
                 </ng-container>
               </h3>
               <ion-icon id="arrow-{{filterGroup.name}}" name="chevron-forward" [class.open]="filterGroup.open"></ion-icon>

@@ -6,7 +6,73 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 
 
-## [Unreleased]
+## Unreleased
+
+### Changed
+
+- Merge release [`v1.5.2`](https://github.com/slsfi/digital-edition-frontend-ng/releases/tag/1.5.2) from upstream, original repository into `production` branch.
+
+
+
+## [1.5.2] – 2024-08-30
+
+### Fixed
+
+- Named entity modal: prevent text wrapping in labels. ([dd0664a](https://github.com/slsfi/digital-edition-frontend-ng/commit/dd0664a6f61ba0328e587c1e7a0ebf29e01df957))
+
+### Changed
+
+- Dependabot configuration: allow security updates of `@angular` packages. ([066d45e](https://github.com/slsfi/digital-edition-frontend-ng/commit/066d45e931ec96db562d7a26de31451c4e4fe7f0))
+- Deps: update `@angular` to 18.2.2. ([2ff2b72](https://github.com/slsfi/digital-edition-frontend-ng/commit/2ff2b72ab4a3d50750d1396f71bb8713d1652d0e))
+- Deps (transitive): update `micromatch` to 4.0.8. ([a74b1d7](https://github.com/slsfi/digital-edition-frontend-ng/commit/a74b1d793c8d0e571d3b74669416ddec4c6d06d4))
+
+
+
+## [1.5.1] – 2024-08-28
+
+### Fixed
+
+- Generate static collection menus prebuild script: skip collections that are not included according to the config. ([6a5a339](https://github.com/slsfi/digital-edition-frontend-ng/commit/6a5a339c01beae2ea5155a099c9910f978636b0e))
+- Generate sitemap prebuild script: skip collections that are not included according to the config. ([b5b84a2](https://github.com/slsfi/digital-edition-frontend-ng/commit/b5b84a2b07f3cd801fbc8112fa0d80b7eb557dc8))
+- Home page: start-aligned instead of left-aligned text. ([f714e09](https://github.com/slsfi/digital-edition-frontend-ng/commit/f714e09589fa9336e3296aa34772889e13bdada6))
+
+
+
+## [1.5.0] – 2024-08-28
+
+### Added
+
+- PDF viewer on ebooks page: PDF title to secondary toolbar. ([4351a3f](https://github.com/slsfi/digital-edition-frontend-ng/commit/4351a3f177abb0f6626845722b2d61ba4899fa60))
+- PDF viewer on ebooks page: message and download link to PDF as fallback if the user’s browser doesn’t support viewing embedded PDFs. ([7aa557c](https://github.com/slsfi/digital-edition-frontend-ng/commit/7aa557ccf9fc4f2f889ce6f1c5b06b1ba5482800))
+- PDF viewer on ebooks page: support navigating to specific page in PDF. Fixes incorrect translations for the component. ([8250ca9](https://github.com/slsfi/digital-edition-frontend-ng/commit/8250ca9db471110ed0c3098fc0bebf0dc77530d4))
+- PDF viewer on ebooks page: support search term highlighting in PDF (dependent on browser support, which currently includes only Firefox). ([118e7b0](https://github.com/slsfi/digital-edition-frontend-ng/commit/118e7b059f7c19c0d90bfd7eff218a2019d0a6fe))
+- Assets: the SLS logo in various sizes as PNG images. ([33fe8b4](https://github.com/slsfi/digital-edition-frontend-ng/commit/33fe8b42541517483bedf4a4f455891bbdc6185a))
+- Elasticsearch page: filter labels for regions and reference numbers. ([6e52f09](https://github.com/slsfi/digital-edition-frontend-ng/commit/6e52f09268abee44cf2b8f6e9b6ff406a5d2baae))
+- Elasticsearch page: support PDF type search results for PDFs ingested in Elasticsearch as one page in plain text format per document. For links from the search results to correctly map to PDFs on the ebook pages, you need to enter the PDFs as collections in the database, and add a `collectionId` property to each ebook object in the ebooks array in the config. ([c3d8695](https://github.com/slsfi/digital-edition-frontend-ng/commit/c3d86952a4b59bd07f6196d686ae852faf3384b6))
+
+### Changed
+
+- `backendBaseURL` in config set to `https://api.sls.fi/digitaledition` by default. ([7cea657](https://github.com/slsfi/digital-edition-frontend-ng/commit/7cea657bdb2f14f7b6664bb336a40f5078042a38))
+- Home page: reduce landscape banner image height to 40% on viewport widths less than 1100px. ([e6cbab6](https://github.com/slsfi/digital-edition-frontend-ng/commit/e6cbab65e66dd7daaaf3077360c1f3e71d30102e))
+- Content grid: fetch collection cover image data only for collections included in the config. ([f2028fa](https://github.com/slsfi/digital-edition-frontend-ng/commit/f2028fa772314e8fd3d55ba2296fe92cfc0fcdef))
+- Elasticsearch page: rename Elastic hit path and queryparams pipes. ([c9d9606](https://github.com/slsfi/digital-edition-frontend-ng/commit/c9d9606bdf53219311bbcdf192e5d5e18b1233c9))
+- Rename trust HTML pipe file. ([bb2ab6c](https://github.com/slsfi/digital-edition-frontend-ng/commit/bb2ab6cbef633685012dd62f11db8dc53fd382e7))
+- Update `nginx` to 1.26.2. ([58d5bf2](https://github.com/slsfi/digital-edition-frontend-ng/commit/58d5bf2b909620547182630814b8366aaf720d90))
+- Deps: update `@angular` to 18.2.1. ([d1508ea](https://github.com/slsfi/digital-edition-frontend-ng/commit/d1508ea155b681fb8c3910b79d5d817d297b17ca))
+- Deps: update `marked` to 14.1.0. ([210b9a7](https://github.com/slsfi/digital-edition-frontend-ng/commit/210b9a7615f794be2da73fdd0e1f4b083f657f28))
+- Deps: update `tslib` to 2.7.0. ([cc67715](https://github.com/slsfi/digital-edition-frontend-ng/commit/cc6771522669bb00759be59f5df7d40426458f8f))
+- Deps (dev): update `@types/node` to 20.16.2. ([ce75cd8](https://github.com/slsfi/digital-edition-frontend-ng/commit/ce75cd8d3fde1f8a9d478fe984ff866a18b3fa59))
+
+### Fixed
+
+- Media collections: reduce filter select widths to prevent clear button from wrapping to a new line when all three filter categories are available. ([a33b48a](https://github.com/slsfi/digital-edition-frontend-ng/commit/a33b48a0565114c75cfd7c65fd3723d48d59617b))
+- Document title set correctly when going back to previous collection pages in nav stack. ([36d4839](https://github.com/slsfi/digital-edition-frontend-ng/commit/36d4839eaac13c805f15a1036d72af43202629fd))
+- Home page: sticky footer. ([bab6d0d](https://github.com/slsfi/digital-edition-frontend-ng/commit/bab6d0d07c73bb2bad07f14d017e2b9cdc7b1a93))
+
+### Removed
+
+- `index.html`: deprecated and outdated meta tags. ([2bf9c2e](https://github.com/slsfi/digital-edition-frontend-ng/commit/2bf9c2ee1061eda3c8be9d285d9c216a7a26ba49))
+- `compose.yml`: testa-vonwright.sls.fi from extra hosts. ([5bb6ff8](https://github.com/slsfi/digital-edition-frontend-ng/commit/5bb6ff836fc58fe1aa5545226e1816b44ebe88e8))
 
 
 
@@ -412,7 +478,10 @@ siteLogoDimensions: {
 
 
 
-[unreleased]: https://github.com/slsfi/digital-edition-frontend-ng/compare/1.4.4...HEAD
+[unreleased]: https://github.com/slsfi/digital-edition-frontend-ng/compare/1.5.2...HEAD
+[1.5.2]: https://github.com/slsfi/digital-edition-frontend-ng/compare/1.5.1...1.5.2
+[1.5.1]: https://github.com/slsfi/digital-edition-frontend-ng/compare/1.5.0...1.5.1
+[1.5.0]: https://github.com/slsfi/digital-edition-frontend-ng/compare/1.4.4...1.5.0
 [1.4.4]: https://github.com/slsfi/digital-edition-frontend-ng/compare/1.4.3...1.4.4
 [1.4.3]: https://github.com/slsfi/digital-edition-frontend-ng/compare/1.4.2...1.4.3
 [1.4.2]: https://github.com/slsfi/digital-edition-frontend-ng/compare/1.4.1...1.4.2

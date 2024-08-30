@@ -63,10 +63,12 @@
                 }
     
                 dt {
-                    padding-right: 1.5em;
+                    padding-right: 0.75em;
+                    white-space: nowrap;
     
                     &::after {
                         content: ": ";
+                        white-space: pre;
                     }
                 }
     

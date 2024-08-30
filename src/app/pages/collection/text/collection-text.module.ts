@@ -13,7 +13,7 @@ import { MetadataComponent } from '@components/collection-text-types/metadata/me
 import { ReadingTextComponent } from '@components/collection-text-types/reading-text/reading-text.component';
 import { TextChangerComponent } from '@components/text-changer/text-changer.component';
 import { VariantsComponent } from '@components/collection-text-types/variants/variants.component';
-import { TrustHtmlPipe } from '@pipes/trust-html-pipe';
+import { TrustHtmlPipe } from '@pipes/trust-html.pipe';
 import { CollectionTextPage } from './collection-text.page';
 import { CollectionTextPageRoutingModule } from './collection-text-routing.module';
 
