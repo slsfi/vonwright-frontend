@@ -8,13 +8,18 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ## [Unreleased]
 
-- Deps: update `@angular` to 18.2.6.
-- Deps: update `express` to 4.21.0.
-- Deps: update `marked` to 14.1.2.
-- Deps (dev): update `@types/node` to 20.16.9.
-- Deps (dev): update `jasmine-core` to 5.3.0.
-- Deps (transitive): update `browser-sync` to 3.0.3.
-- Deps (transitive): update `serve-static` to 1.16.2.
+
+
+## [1.5.3] – 2024-09-26
+
+### Changed
+
+- Deps: update `@angular` to 18.2.6. ([112623d](https://github.com/slsfi/digital-edition-frontend-ng/commit/112623d7935a45c049871c01a14d69cbda839e51))
+- Deps: update `express` to 4.21.0. ([ccbe649](https://github.com/slsfi/digital-edition-frontend-ng/commit/ccbe649304e9d2db74a448e1d13a54cc1be90196))
+- Deps: update `marked` to 14.1.2. ([70e6fb7](https://github.com/slsfi/digital-edition-frontend-ng/commit/70e6fb75c5d87d4a4664c16ac4789bb09b18afd1))
+- Deps (dev): update `@types/node` to 20.16.9. ([1ec69f7](https://github.com/slsfi/digital-edition-frontend-ng/commit/1ec69f7261474461b673d54fc6ea3f7b7c2f3ae4))
+- Deps (dev): update `jasmine-core` to 5.3.0. ([7d72e39](https://github.com/slsfi/digital-edition-frontend-ng/commit/7d72e39287ed5a3af06f87eecf8e76069c49826d))
+- Deps (transitive): update `browser-sync` to 3.0.3 and `serve-static` to 1.16.2. ([04a421d](https://github.com/slsfi/digital-edition-frontend-ng/commit/04a421dad2ac9239921712bed85ac988b68f9bf1))
 
 
 
@@ -453,7 +458,8 @@ siteLogoDimensions: {
 
 
 
-[unreleased]: https://github.com/slsfi/digital-edition-frontend-ng/compare/1.5.2...HEAD
+[unreleased]: https://github.com/slsfi/digital-edition-frontend-ng/compare/1.5.3...HEAD
+[1.5.3]: https://github.com/slsfi/digital-edition-frontend-ng/compare/1.5.2...1.5.3
 [1.5.2]: https://github.com/slsfi/digital-edition-frontend-ng/compare/1.5.1...1.5.2
 [1.5.1]: https://github.com/slsfi/digital-edition-frontend-ng/compare/1.5.0...1.5.1
 [1.5.0]: https://github.com/slsfi/digital-edition-frontend-ng/compare/1.4.4...1.5.0
