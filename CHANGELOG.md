@@ -13,6 +13,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 - Deps: update `marked` to 14.1.2.
 - Deps (dev): update `@types/node` to 20.16.9.
 - Deps (dev): update `jasmine-core` to 5.3.0.
+- Deps (transitive): update `browser-sync` to 3.0.3.
+- Deps (transitive): update `serve-static` to 1.16.2.
+
 
 
 ## [1.5.2] – 2024-08-30
