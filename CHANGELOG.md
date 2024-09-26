@@ -12,7 +12,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 - Deps: update `express` to 4.21.0.
 - Deps: update `marked` to 14.1.2.
 - Deps (dev): update `@types/node` to 20.16.9.
-
+- Deps (dev): update `jasmine-core` to 5.3.0.
 
 
 ## [1.5.2] – 2024-08-30
