@@ -10,15 +10,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 
 
-## [1.5.2-production.1] – 2024-08-30
+## [1.5.3-production.1] – 2024-10-08
 
 ### Changed
 
-- Merge release [`v1.5.2`](https://github.com/slsfi/digital-edition-frontend-ng/releases/tag/1.5.2) from upstream, original repository into `production` branch. ([59d3910](https://github.com/slsfi/vonwright-frontend/commit/59d39105b2541d17738d3f5193c57d0d6b686732))
-
-### Removed
-
-- Superfluous styles from `custom.scss`. ([15f2f36](https://github.com/slsfi/vonwright-frontend/commit/15f2f368363bbf4a1411b9c8b0493842b4d7db32))
+- Merge release [`v1.5.3`](https://github.com/slsfi/digital-edition-frontend-ng/releases/tag/1.5.3) from upstream, original repository into `production` branch. ([2017e3d](https://github.com/slsfi/vonwright-frontend/commit/2017e3d30f29cfdd55ee8ee4bd1bbf3f7efb1b7c))
 
 
 
@@ -32,6 +28,18 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 - Deps (dev): update `@types/node` to 20.16.9. ([1ec69f7](https://github.com/slsfi/digital-edition-frontend-ng/commit/1ec69f7261474461b673d54fc6ea3f7b7c2f3ae4))
 - Deps (dev): update `jasmine-core` to 5.3.0. ([7d72e39](https://github.com/slsfi/digital-edition-frontend-ng/commit/7d72e39287ed5a3af06f87eecf8e76069c49826d))
 - Deps (transitive): update `browser-sync` to 3.0.3 and `serve-static` to 1.16.2. ([04a421d](https://github.com/slsfi/digital-edition-frontend-ng/commit/04a421dad2ac9239921712bed85ac988b68f9bf1))
+
+
+
+## [1.5.2-production.1] – 2024-08-30
+
+### Changed
+
+- Merge release [`v1.5.2`](https://github.com/slsfi/digital-edition-frontend-ng/releases/tag/1.5.2) from upstream, original repository into `production` branch. ([59d3910](https://github.com/slsfi/vonwright-frontend/commit/59d39105b2541d17738d3f5193c57d0d6b686732))
+
+### Removed
+
+- Superfluous styles from `custom.scss`. ([15f2f36](https://github.com/slsfi/vonwright-frontend/commit/15f2f368363bbf4a1411b9c8b0493842b4d7db32))
 
 
 
@@ -525,6 +533,7 @@ siteLogoDimensions: {
 [1.0.1]: https://github.com/slsfi/digital-edition-frontend-ng/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/slsfi/digital-edition-frontend-ng/releases/tag/v1.0.0
 
+[1.5.3-production.1]: https://github.com/slsfi/vonwright-frontend/compare/1.5.2-production.1...1.5.3-production.1
 [1.5.2-production.1]: https://github.com/slsfi/vonwright-frontend/compare/1.4.4-production.1...1.5.2-production.1
 [1.4.4-production.1]: https://github.com/slsfi/vonwright-frontend/compare/1.4.3-production.1...1.4.4-production.1
 [1.4.3-production.1]: https://github.com/slsfi/vonwright-frontend/compare/1.4.2-production.1...1.4.3-production.1
