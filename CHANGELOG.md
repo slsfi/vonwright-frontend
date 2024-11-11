@@ -15,6 +15,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 - Deps: update `marked` to 15.0.0.
 - Deps: update `tslib` to 2.8.1.
 - Deps (dev): update `@types/node` to 20.17.6.
+- Deps (dev): update `jasmine-core` to 5.4.0.
 
 
 ## [1.5.3] – 2024-09-26
