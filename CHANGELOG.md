@@ -11,6 +11,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 ### Changed
 
 - Deps: update `@angular` to 18.2.11.
+- Deps: update `marked` to 15.0.0.
 
 
 
