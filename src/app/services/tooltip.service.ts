@@ -103,10 +103,9 @@ export class TooltipService {
       map((comment: any) => {
         this.cachedTooltips.comments.size > this.maxTooltipCacheSize && this.cachedTooltips.comments.clear();
         !this.platformService.isMobile() && this.cachedTooltips.comments.set(elementID, comment);
-        return (
-          { name: 'Comment', description: comment } ||
-          { name: 'Error', description: '' }
-        );
+        return comment ?
+          { name: 'Comment', description: comment } :
+          { name: 'Error', description: '' };
       })
     );
   }
