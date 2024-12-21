@@ -5,9 +5,10 @@ import { MarkdownService } from '@services/markdown.service';
 
 
 @Component({
-  selector: 'page-not-found',
-  templateUrl: './page-not-found.page.html',
-  styleUrls: ['./page-not-found.page.scss'],
+    selector: 'page-not-found',
+    templateUrl: './page-not-found.page.html',
+    styleUrls: ['./page-not-found.page.scss'],
+    standalone: false
 })
 export class PageNotFoundPage implements OnInit {
   markdownText$: Observable<string | null>;

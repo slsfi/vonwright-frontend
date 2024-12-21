@@ -15,11 +15,10 @@ import { isBrowser } from '@utility-functions';
 
 
 @Component({
-  standalone: true,
-  selector: 'reading-text',
-  templateUrl: './reading-text.component.html',
-  styleUrls: ['./reading-text.component.scss'],
-  imports: [NgIf, IonicModule, MathJaxDirective, TrustHtmlPipe]
+    selector: 'reading-text',
+    templateUrl: './reading-text.component.html',
+    styleUrls: ['./reading-text.component.scss'],
+    imports: [NgIf, IonicModule, MathJaxDirective, TrustHtmlPipe]
 })
 export class ReadingTextComponent implements OnChanges, OnDestroy, OnInit {
   @Input() language: string = '';

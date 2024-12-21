@@ -11,11 +11,10 @@ import { ViewOptionsService } from '@services/view-options.service';
 
 
 @Component({
-  standalone: true,
-  selector: 'variants',
-  templateUrl: './variants.component.html',
-  styleUrls: ['./variants.component.scss'],
-  imports: [NgIf, IonicModule, TrustHtmlPipe]
+    selector: 'variants',
+    templateUrl: './variants.component.html',
+    styleUrls: ['./variants.component.scss'],
+    imports: [NgIf, IonicModule, TrustHtmlPipe]
 })
 export class VariantsComponent implements OnInit {
   @Input() searchMatches: Array<string> = [];

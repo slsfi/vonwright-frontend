@@ -9,11 +9,10 @@ import { ScrollService } from '@services/scroll.service';
 
 
 @Component({
-  standalone: true,
-  selector: 'illustrations',
-  templateUrl: './illustrations.component.html',
-  styleUrls: ['./illustrations.component.scss'],
-  imports: [NgClass, NgFor, NgIf, IonicModule]
+    selector: 'illustrations',
+    templateUrl: './illustrations.component.html',
+    styleUrls: ['./illustrations.component.scss'],
+    imports: [NgClass, NgFor, NgIf, IonicModule]
 })
 export class IllustrationsComponent implements OnChanges, OnInit {
   @Input() singleImage: Record<string, any> | undefined = undefined;

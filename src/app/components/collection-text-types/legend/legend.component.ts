@@ -10,11 +10,10 @@ import { isBrowser } from '@utility-functions';
 
 
 @Component({
-  standalone: true,
-  selector: 'text-legend',
-  templateUrl: './legend.component.html',
-  styleUrls: ['./legend.component.scss'],
-  imports: [AsyncPipe, NgIf, IonicModule, TrustHtmlPipe]
+    selector: 'text-legend',
+    templateUrl: './legend.component.html',
+    styleUrls: ['./legend.component.scss'],
+    imports: [AsyncPipe, NgIf, IonicModule, TrustHtmlPipe]
 })
 export class LegendComponent implements OnDestroy, OnInit {
   @Input() itemId?: string;

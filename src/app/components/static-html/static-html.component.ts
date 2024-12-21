@@ -8,11 +8,10 @@ import { isBrowser } from '@utility-functions';
 
 
 @Component({
-  selector: 'static-html',
-  standalone: true,
-  imports: [AsyncPipe],
-  templateUrl: './static-html.component.html',
-  styleUrl: './static-html.component.scss'
+    selector: 'static-html',
+    imports: [AsyncPipe],
+    templateUrl: './static-html.component.html',
+    styleUrl: './static-html.component.scss'
 })
 export class StaticHtmlComponent implements OnChanges {
   @Input() type: string = '';

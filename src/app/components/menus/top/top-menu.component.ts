@@ -9,11 +9,10 @@ import { isBrowser } from '@utility-functions';
 
 
 @Component({
-  standalone: true,
-  selector: 'top-menu',
-  templateUrl: './top-menu.component.html',
-  styleUrls: ['./top-menu.component.scss'],
-  imports: [NgFor, NgIf, NgStyle, IonicModule, RouterLink]
+    selector: 'top-menu',
+    templateUrl: './top-menu.component.html',
+    styleUrls: ['./top-menu.component.scss'],
+    imports: [NgFor, NgIf, NgStyle, IonicModule, RouterLink]
 })
 export class TopMenuComponent implements OnDestroy, OnInit {
   @Input() currentRouterUrl: string = '';

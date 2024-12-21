@@ -19,11 +19,10 @@ import { concatenateNames } from '@utility-functions';
 
 
 @Component({
-  standalone: true,
-  selector: 'modal-download-texts',
-  templateUrl: './download-texts.modal.html',
-  styleUrls: ['./download-texts.modal.scss'],
-  imports: [AsyncPipe, NgClass, NgFor, NgIf, NgStyle, NgTemplateOutlet, IonicModule, TrustHtmlPipe]
+    selector: 'modal-download-texts',
+    templateUrl: './download-texts.modal.html',
+    styleUrls: ['./download-texts.modal.scss'],
+    imports: [AsyncPipe, NgClass, NgFor, NgIf, NgStyle, NgTemplateOutlet, IonicModule, TrustHtmlPipe]
 })
 export class DownloadTextsModal implements OnDestroy, OnInit {
   @Input() origin: string = '';

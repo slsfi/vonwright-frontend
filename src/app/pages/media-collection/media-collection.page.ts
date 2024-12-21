@@ -15,10 +15,11 @@ import { isEmptyObject, sortArrayOfObjectsAlphabetically, sortArrayOfObjectsNume
 
 
 @Component({
-  selector: 'page-media-collection',
-  templateUrl: './media-collection.page.html',
-  styleUrls: ['./media-collection.page.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+    selector: 'page-media-collection',
+    templateUrl: './media-collection.page.html',
+    styleUrls: ['./media-collection.page.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class MediaCollectionPage implements OnDestroy, OnInit {
   activeKeywordFilters: number[] = [];

@@ -9,11 +9,10 @@ import { IonicModule } from '@ionic/angular';
  * ! throws a runtime error on the server side.
  */
 @Component({
-  standalone: true,
-  selector: 'date-histogram',
-  templateUrl: './date-histogram.component.html',
-  styleUrls: ['./date-histogram.component.scss'],
-  imports: [NgClass, NgFor, NgIf, FormsModule, IonicModule]
+    selector: 'date-histogram',
+    templateUrl: './date-histogram.component.html',
+    styleUrls: ['./date-histogram.component.scss'],
+    imports: [NgClass, NgFor, NgIf, FormsModule, IonicModule]
 })
 export class DateHistogramComponent implements OnChanges {
   @Input() selectedRange?: any = undefined;

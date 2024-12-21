@@ -13,10 +13,11 @@ import { isBrowser, isEmptyObject, sortArrayOfObjectsNumerically } from '@utilit
 
 
 @Component({
-  selector: 'page-elastic-search',
-  templateUrl: './elastic-search.page.html',
-  styleUrls: ['./elastic-search.page.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+    selector: 'page-elastic-search',
+    templateUrl: './elastic-search.page.html',
+    styleUrls: ['./elastic-search.page.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class ElasticSearchPage implements OnDestroy, OnInit {
   @ViewChild(IonContent) content: IonContent;
