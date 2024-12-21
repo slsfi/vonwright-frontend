@@ -12,7 +12,7 @@ import { config } from '@config';
     selector: 'modal-illustration',
     templateUrl: './illustration.modal.html',
     styleUrls: ['./illustration.modal.scss'],
-    imports: [NgIf, RouterModule, IonicModule, FullscreenImageViewerModal]
+    imports: [NgIf, RouterModule, IonicModule]
 })
 export class IllustrationModal implements OnInit {
   @Input() imageNumber: string = '';
