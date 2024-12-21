@@ -19,6 +19,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 - Deps (dev): update `jasmine-core` to 5.5.0.
 - Deps (dev): update `ng-extract-i18n-merge` to 2.13.1.
 - Deps (dev): update `typescript` to 5.6.3.
+- Deps (transitive): update `nanoid` to 3.3.8.
 
 
 
