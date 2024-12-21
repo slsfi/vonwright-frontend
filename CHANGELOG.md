@@ -14,6 +14,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 - Deps: update `@angular/core` to 19.0.5 and `@angular/cli` to 19.0.6.
 - Deps: update `marked` to 15.0.4.
 - Deps (dev): update `@types/node` to 20.17.10.
+- Deps (dev): update `jasmine-core` to 5.5.0.
 - Deps (dev): update `ng-extract-i18n-merge` to 2.13.1.
 
 
