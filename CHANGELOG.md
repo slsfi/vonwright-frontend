@@ -12,6 +12,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 - Illustration modal component: remove unused import component.
 - Deps: update `@angular/core` to 19.0.5 and `@angular/cli` to 19.0.6.
+- Deps: update `express` to 4.21.2 and `path-to-regexp` to 0.1.12.
 - Deps: update `marked` to 15.0.4.
 - Deps (dev): update `@types/jasmine` to 5.1.5.
 - Deps (dev): update `@types/node` to 20.17.10.
