@@ -20,6 +20,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 - Deps (dev): update `ng-extract-i18n-merge` to 2.13.1.
 - Deps (dev): update `typescript` to 5.6.3.
 - Deps (transitive): update `nanoid` to 3.3.8.
+- Deps (transitive): update multiple by recreating `package-lock.json`.
 
 
 
