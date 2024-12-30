@@ -1,8 +1,8 @@
 // Import general styles for the secondary toolbar
-@import "src/theme/common/secondary-toolbar.scss";
+@use "../../../../theme/common/secondary-toolbar.scss";
 
 // Import general styles for the collection-ion-content class
-@import "src/theme/common/collection-ion-content.scss";
+@use "../../../../theme/common/collection-ion-content.scss";
 
 .cover-image-wrapper {
   width: 100%;
