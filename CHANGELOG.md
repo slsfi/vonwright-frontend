@@ -8,20 +8,24 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ## [Unreleased]
 
+
+
+## [1.5.5] – 2024-12-30
+
 ### Changed
 
-- Illustration modal component: remove unused import component.
-- Migrate deprecated Sass `@import` rules and built-in global functions. Some `@import` rules in `global.scss` have not yet been migrated to avoid breaking changes in projects. These rules will be migrated in the next major version.
-- Deps: update `@angular/core` to 19.0.5 and `@angular/cli` to 19.0.6.
-- Deps: update `express` to 4.21.2 and `path-to-regexp` to 0.1.12.
-- Deps: update `marked` to 15.0.4.
-- Deps (dev): update `@types/jasmine` to 5.1.5.
-- Deps (dev): update `@types/node` to 20.17.10.
-- Deps (dev): update `jasmine-core` to 5.5.0.
-- Deps (dev): update `ng-extract-i18n-merge` to 2.13.1.
-- Deps (dev): update `typescript` to 5.6.3.
-- Deps (transitive): update `nanoid` to 3.3.8.
-- Deps (transitive): update multiple by recreating `package-lock.json`.
+- Illustration modal component: remove unused import component. ([3e47941](https://github.com/slsfi/digital-edition-frontend-ng/commit/3e479415a7b1dea9e0c4b3ad4eec2caa136a8078))
+- Migrate deprecated Sass `@import` rules and built-in global functions. Some `@import` rules in `global.scss` have not yet been migrated to avoid breaking changes in projects. These rules will be migrated in the next major version. ([2fb5830](https://github.com/slsfi/digital-edition-frontend-ng/commit/2fb583046a69d14fbb9f3c86d601cf88c6f0fb8e))
+- Deps: update `@angular/core` to 19.0.5 and `@angular/cli` to 19.0.6. ([2507ab7](https://github.com/slsfi/digital-edition-frontend-ng/commit/2507ab754f951c3e44701c437eca8734c5a01e26))
+- Deps: update `express` to 4.21.2 and `path-to-regexp` to 0.1.12. ([3bb136a](https://github.com/slsfi/digital-edition-frontend-ng/commit/3bb136aa88be9c64f78cba84b25b065441f4d7b9))
+- Deps: update `marked` to 15.0.4. ([8c79846](https://github.com/slsfi/digital-edition-frontend-ng/commit/8c79846933df2e5793ff810298c4e18666905a27))
+- Deps (dev): update `@types/jasmine` to 5.1.5. ([546201a](https://github.com/slsfi/digital-edition-frontend-ng/commit/546201a6168ec678893127abc663b3620cbe8e51))
+- Deps (dev): update `@types/node` to 20.17.10. ([8b9f4bf](https://github.com/slsfi/digital-edition-frontend-ng/commit/8b9f4bf7963c8172ebe40fbe92d6be9523cc0610))
+- Deps (dev): update `jasmine-core` to 5.5.0. ([79e21a6](https://github.com/slsfi/digital-edition-frontend-ng/commit/79e21a6b201861a99e7d4cb0329caf3fede00204))
+- Deps (dev): update `ng-extract-i18n-merge` to 2.13.1. ([14c38a7](https://github.com/slsfi/digital-edition-frontend-ng/commit/14c38a7f8c7cd41e724ffbf0b4d9a089db43f7b6))
+- Deps (dev): update `typescript` to 5.6.3. ([633c344](https://github.com/slsfi/digital-edition-frontend-ng/commit/633c344f921d7a53c6fe456e533984a9542dea75))
+- Deps (transitive): update `nanoid` to 3.3.8. ([cd6287e](https://github.com/slsfi/digital-edition-frontend-ng/commit/cd6287e52b13958e9dde1daa3d462f7e872df378))
+- Deps (transitive): update multiple by recreating `package-lock.json`. ([bac3a84](https://github.com/slsfi/digital-edition-frontend-ng/commit/bac3a84b5827b4dbe0983d5b545cfd14880a71bd))
 
 
 
@@ -488,7 +492,8 @@ siteLogoDimensions: {
 
 
 
-[unreleased]: https://github.com/slsfi/digital-edition-frontend-ng/compare/1.5.4...HEAD
+[unreleased]: https://github.com/slsfi/digital-edition-frontend-ng/compare/1.5.5...HEAD
+[1.5.5]: https://github.com/slsfi/digital-edition-frontend-ng/compare/1.5.4...1.5.5
 [1.5.4]: https://github.com/slsfi/digital-edition-frontend-ng/compare/1.5.3...1.5.4
 [1.5.3]: https://github.com/slsfi/digital-edition-frontend-ng/compare/1.5.2...1.5.3
 [1.5.2]: https://github.com/slsfi/digital-edition-frontend-ng/compare/1.5.1...1.5.2
