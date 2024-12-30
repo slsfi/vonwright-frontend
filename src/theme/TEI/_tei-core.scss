@@ -2,6 +2,7 @@
  * TEI CORE
  * Necessary core styles.
  */
+@use "sass:math";
 
 /*
 Base style for the div element that always contains the text.
@@ -102,46 +103,46 @@ div.tei img.inl_ms_arrow {
 }
 .miniFontSize div.tei span.anchor_lemma img,
 .miniFontSize div.tei img.inl_ms_arrow {
-  width: ceil(0.75 * $text-fontsize-mini);
-  height: ceil(0.75 * $text-fontsize-mini);
+  width: math.ceil(0.75 * $text-fontsize-mini);
+  height: math.ceil(0.75 * $text-fontsize-mini);
 }
 .tinyFontSize div.tei span.anchor_lemma img,
 .tinyFontSize div.tei img.inl_ms_arrow {
-  width: ceil(0.75 * $text-fontsize-tiny);
-  height: ceil(0.75 * $text-fontsize-tiny);
+  width: math.ceil(0.75 * $text-fontsize-tiny);
+  height: math.ceil(0.75 * $text-fontsize-tiny);
 }
 .xxxsmallFontSize div.tei span.anchor_lemma img,
 .xxxsmallFontSize div.tei img.inl_ms_arrow {
-  width: ceil(0.75 * $text-fontsize-xxxsmall);
-  height: ceil(0.75 * $text-fontsize-xxxsmall);
+  width: math.ceil(0.75 * $text-fontsize-xxxsmall);
+  height: math.ceil(0.75 * $text-fontsize-xxxsmall);
 }
 .xxsmallFontSize div.tei span.anchor_lemma img,
 .xxsmallFontSize div.tei img.inl_ms_arrow {
-  width: ceil(0.75 * $text-fontsize-xxsmall);
-  height: ceil(0.75 * $text-fontsize-xxsmall);
+  width: math.ceil(0.75 * $text-fontsize-xxsmall);
+  height: math.ceil(0.75 * $text-fontsize-xxsmall);
 }
 .xsmallFontSize div.tei span.anchor_lemma img,
 .xsmallFontSize div.tei img.inl_ms_arrow {
-  width: ceil(0.75 * $text-fontsize-xsmall);
-  height: ceil(0.75 * $text-fontsize-xsmall);
+  width: math.ceil(0.75 * $text-fontsize-xsmall);
+  height: math.ceil(0.75 * $text-fontsize-xsmall);
 }
 .smallFontSize div.tei span.anchor_lemma img,
 .smallFontSize div.tei img.inl_ms_arrow {
-  width: ceil(0.75 * $text-fontsize-small);
-  height: ceil(0.75 * $text-fontsize-small);
+  width: math.ceil(0.75 * $text-fontsize-small);
+  height: math.ceil(0.75 * $text-fontsize-small);
 }
 .mediumFontSize div.tei span.anchor_lemma img,
 .mediumFontSize div.tei img.inl_ms_arrow {
-  width: ceil(0.75 * $text-fontsize-medium);
-  height: ceil(0.75 * $text-fontsize-medium);
+  width: math.ceil(0.75 * $text-fontsize-medium);
+  height: math.ceil(0.75 * $text-fontsize-medium);
 }
 .largeFontSize div.tei span.anchor_lemma img,
 .largeFontSize div.tei img.inl_ms_arrow {
-  width: ceil(0.75 * $text-fontsize-large);
-  height: ceil(0.75 * $text-fontsize-large);
+  width: math.ceil(0.75 * $text-fontsize-large);
+  height: math.ceil(0.75 * $text-fontsize-large);
 }
 .xlargeFontSize div.tei span.anchor_lemma img,
 .xlargeFontSize div.tei img.inl_ms_arrow {
-  width: ceil(0.75 * $text-fontsize-xlarge);
-  height: ceil(0.75 * $text-fontsize-xlarge);
+  width: math.ceil(0.75 * $text-fontsize-xlarge);
+  height: math.ceil(0.75 * $text-fontsize-xlarge);
 }

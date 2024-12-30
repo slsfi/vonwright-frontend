@@ -2,6 +2,7 @@
  * TEI SEMANTIC EXTRAS
  * Styles for semantic code and icons.
  */
+@use "sass:math";
 
 /*
 Size of, among others, the red triangle that indicates the
@@ -27,72 +28,72 @@ div.tei span.extVariantsTrigger.highlight img {
 .miniFontSize div.tei span.anchorScrollTarget img,
 .miniFontSize div.tei a.ref_variant img,
 .miniFontSize div.tei span.extVariantsTrigger img {
-    width:  ceil(0.75 * $text-fontsize-mini);
-    height: ceil(0.75 * $text-fontsize-mini);
+    width:  math.ceil(0.75 * $text-fontsize-mini);
+    height: math.ceil(0.75 * $text-fontsize-mini);
 }
 .tinyFontSize div.tei span.add_margin img,
 .tinyFontSize div.tei img.doodle,
 .tinyFontSize div.tei span.anchorScrollTarget img,
 .tinyFontSize div.tei a.ref_variant img,
 .tinyFontSize div.tei span.extVariantsTrigger img {
-    width:  ceil(0.75 * $text-fontsize-tiny);
-    height: ceil(0.75 * $text-fontsize-tiny);
+    width:  math.ceil(0.75 * $text-fontsize-tiny);
+    height: math.ceil(0.75 * $text-fontsize-tiny);
 }
 .xxxsmallFontSize div.tei span.add_margin img,
 .xxxsmallFontSize div.tei img.doodle,
 .xxxsmallFontSize div.tei span.anchorScrollTarget img,
 .xxxsmallFontSize div.tei a.ref_variant img,
 .xxxsmallFontSize div.tei span.extVariantsTrigger img {
-    width:  ceil(0.75 * $text-fontsize-xxxsmall);
-    height: ceil(0.75 * $text-fontsize-xxxsmall);
+    width:  math.ceil(0.75 * $text-fontsize-xxxsmall);
+    height: math.ceil(0.75 * $text-fontsize-xxxsmall);
 }
 .xxsmallFontSize div.tei span.add_margin img,
 .xxsmallFontSize div.tei img.doodle,
 .xxsmallFontSize div.tei span.anchorScrollTarget img,
 .xxsmallFontSize div.tei a.ref_variant img,
 .xxsmallFontSize div.tei span.extVariantsTrigger img {
-    width:  ceil(0.75 * $text-fontsize-xxsmall);
-    height: ceil(0.75 * $text-fontsize-xxsmall);
+    width:  math.ceil(0.75 * $text-fontsize-xxsmall);
+    height: math.ceil(0.75 * $text-fontsize-xxsmall);
 }
 .xsmallFontSize div.tei span.add_margin img,
 .xsmallFontSize div.tei img.doodle,
 .xsmallFontSize div.tei span.anchorScrollTarget img,
 .xsmallFontSize div.tei a.ref_variant img,
 .xsmallFontSize div.tei span.extVariantsTrigger img {
-    width:  ceil(0.75 * $text-fontsize-xsmall);
-    height: ceil(0.75 * $text-fontsize-xsmall);
+    width:  math.ceil(0.75 * $text-fontsize-xsmall);
+    height: math.ceil(0.75 * $text-fontsize-xsmall);
 }
 .smallFontSize div.tei span.add_margin img,
 .smallFontSize div.tei img.doodle,
 .smallFontSize div.tei span.anchorScrollTarget img,
 .smallFontSize div.tei a.ref_variant img,
 .smallFontSize div.tei span.extVariantsTrigger img {
-    width:  ceil(0.75 * $text-fontsize-small);
-    height: ceil(0.75 * $text-fontsize-small);
+    width:  math.ceil(0.75 * $text-fontsize-small);
+    height: math.ceil(0.75 * $text-fontsize-small);
 }
 .mediumFontSize div.tei span.add_margin img,
 .mediumFontSize div.tei img.doodle,
 .mediumFontSize div.tei span.anchorScrollTarget img,
 .mediumFontSize div.tei a.ref_variant img,
 .mediumFontSize div.tei span.extVariantsTrigger img {
-    width:  ceil(0.75 * $text-fontsize-medium);
-    height: ceil(0.75 * $text-fontsize-medium);
+    width:  math.ceil(0.75 * $text-fontsize-medium);
+    height: math.ceil(0.75 * $text-fontsize-medium);
 }
 .largeFontSize div.tei span.add_margin img,
 .largeFontSize div.tei img.doodle,
 .largeFontSize div.tei span.anchorScrollTarget img,
 .largeFontSize div.tei a.ref_variant img,
 .largeFontSize div.tei span.extVariantsTrigger img {
-    width:  ceil(0.75 * $text-fontsize-large);
-    height: ceil(0.75 * $text-fontsize-large);
+    width:  math.ceil(0.75 * $text-fontsize-large);
+    height: math.ceil(0.75 * $text-fontsize-large);
 }
 .xlargeFontSize div.tei span.add_margin img,
 .xlargeFontSize div.tei img.doodle,
 .xlargeFontSize div.tei span.anchorScrollTarget img,
 .xlargeFontSize div.tei a.ref_variant img,
 .xlargeFontSize div.tei span.extVariantsTrigger img {
-    width:  ceil(0.75 * $text-fontsize-xlarge);
-    height: ceil(0.75 * $text-fontsize-xlarge);
+    width:  math.ceil(0.75 * $text-fontsize-xlarge);
+    height: math.ceil(0.75 * $text-fontsize-xlarge);
 }
 
 /*
@@ -111,50 +112,50 @@ div.tei span.seg img {
 .miniFontSize div.tei.show_normalisations span.reg_hide img,
 .miniFontSize div.tei.show_emendations span.corr_hide img,
 .miniFontSize div.tei span.seg img {
-    width:  ceil(0.585 * $text-fontsize-mini);
-    height: ceil(0.585 * $text-fontsize-mini);
+    width:  math.ceil(0.585 * $text-fontsize-mini);
+    height: math.ceil(0.585 * $text-fontsize-mini);
 }
 .tinyFontSize div.tei.show_normalisations span.reg_hide img,
 .tinyFontSize div.tei.show_emendations span.corr_hide img,
 .tinyFontSize div.tei span.seg img {
-    width:  ceil(0.585 * $text-fontsize-tiny);
-    height: ceil(0.585 * $text-fontsize-tiny);
+    width:  math.ceil(0.585 * $text-fontsize-tiny);
+    height: math.ceil(0.585 * $text-fontsize-tiny);
 }
 .xxsmallFontSize div.tei.show_normalisations span.reg_hide img,
 .xxsmallFontSize div.tei.show_emendations span.corr_hide img,
 .xxsmallFontSize div.tei span.seg img {
-    width:  ceil(0.585 * $text-fontsize-xxsmall);
-    height: ceil(0.585 * $text-fontsize-xxsmall);
+    width:  math.ceil(0.585 * $text-fontsize-xxsmall);
+    height: math.ceil(0.585 * $text-fontsize-xxsmall);
 }
 .xsmallFontSize div.tei.show_normalisations span.reg_hide img,
 .xsmallFontSize div.tei.show_emendations span.corr_hide img,
 .xsmallFontSize div.tei span.seg img {
-    width:  ceil(0.585 * $text-fontsize-xsmall);
-    height: ceil(0.585 * $text-fontsize-xsmall);
+    width:  math.ceil(0.585 * $text-fontsize-xsmall);
+    height: math.ceil(0.585 * $text-fontsize-xsmall);
 }
 .smallFontSize div.tei.show_normalisations span.reg_hide img,
 .smallFontSize div.tei.show_emendations span.corr_hide img,
 .smallFontSize div.tei span.seg img {
-    width:  ceil(0.585 * $text-fontsize-small);
-    height: ceil(0.585 * $text-fontsize-small);
+    width:  math.ceil(0.585 * $text-fontsize-small);
+    height: math.ceil(0.585 * $text-fontsize-small);
 }
 .mediumFontSize div.tei.show_normalisations span.reg_hide img,
 .mediumFontSize div.tei.show_emendations span.corr_hide img,
 .mediumFontSize div.tei span.seg img {
-    width:  ceil(0.585 * $text-fontsize-medium);
-    height: ceil(0.585 * $text-fontsize-medium);
+    width:  math.ceil(0.585 * $text-fontsize-medium);
+    height: math.ceil(0.585 * $text-fontsize-medium);
 }
 .largeFontSize div.tei.show_normalisations span.reg_hide img,
 .largeFontSize div.tei.show_emendations span.corr_hide img,
 .largeFontSize div.tei span.seg img {
-    width:  ceil(0.585 * $text-fontsize-large);
-    height: ceil(0.585 * $text-fontsize-large);
+    width:  math.ceil(0.585 * $text-fontsize-large);
+    height: math.ceil(0.585 * $text-fontsize-large);
 }
 .xlargeFontSize div.tei.show_normalisations span.reg_hide img,
 .xlargeFontSize div.tei.show_emendations span.corr_hide img,
 .xlargeFontSize div.tei span.seg img {
-    width:  ceil(0.585 * $text-fontsize-xlarge);
-    height: ceil(0.585 * $text-fontsize-xlarge);
+    width:  math.ceil(0.585 * $text-fontsize-xlarge);
+    height: math.ceil(0.585 * $text-fontsize-xlarge);
 }
 
 /* Symbol/icon representing a drawing etc. */
@@ -165,49 +166,49 @@ div.tei img.symbol {
     width: 1.235em; // default
 }
 .miniFontSize div.tei img.symbol {
-    width:  ceil(1.235 * $text-fontsize-mini);
-    height: ceil(1.235 * $text-fontsize-mini);
-    vertical-align: floor(-0.2 * $text-fontsize-mini);
+    width:  math.ceil(1.235 * $text-fontsize-mini);
+    height: math.ceil(1.235 * $text-fontsize-mini);
+    vertical-align: math.floor(-0.2 * $text-fontsize-mini);
 }
 .tinyFontSize div.tei img.symbol {
-    width:  ceil(1.235 * $text-fontsize-tiny);
-    height: ceil(1.235 * $text-fontsize-tiny);
-    vertical-align: floor(-0.2 * $text-fontsize-tiny);
+    width:  math.ceil(1.235 * $text-fontsize-tiny);
+    height: math.ceil(1.235 * $text-fontsize-tiny);
+    vertical-align: math.floor(-0.2 * $text-fontsize-tiny);
 }
 .xxxsmallFontSize div.tei img.symbol {
-    width:  ceil(1.235 * $text-fontsize-xxxsmall);
-    height: ceil(1.235 * $text-fontsize-xxxsmall);
-    vertical-align: floor(-0.2 * $text-fontsize-xxxsmall);
+    width:  math.ceil(1.235 * $text-fontsize-xxxsmall);
+    height: math.ceil(1.235 * $text-fontsize-xxxsmall);
+    vertical-align: math.floor(-0.2 * $text-fontsize-xxxsmall);
 }
 .xxsmallFontSize div.tei img.symbol {
-    width:  ceil(1.235 * $text-fontsize-xxsmall);
-    height: ceil(1.235 * $text-fontsize-xxsmall);
-    vertical-align: floor(-0.2 * $text-fontsize-xxsmall);
+    width:  math.ceil(1.235 * $text-fontsize-xxsmall);
+    height: math.ceil(1.235 * $text-fontsize-xxsmall);
+    vertical-align: math.floor(-0.2 * $text-fontsize-xxsmall);
 }
 .xsmallFontSize div.tei img.symbol {
-    width:  ceil(1.235 * $text-fontsize-xsmall);
-    height: ceil(1.235 * $text-fontsize-xsmall);
-    vertical-align: floor(-0.2 * $text-fontsize-xsmall);
+    width:  math.ceil(1.235 * $text-fontsize-xsmall);
+    height: math.ceil(1.235 * $text-fontsize-xsmall);
+    vertical-align: math.floor(-0.2 * $text-fontsize-xsmall);
 }
 .smallFontSize div.tei img.symbol {
-    width:  ceil(1.235 * $text-fontsize-small);
-    height: ceil(1.235 * $text-fontsize-small);
-    vertical-align: floor(-0.2 * $text-fontsize-small);
+    width:  math.ceil(1.235 * $text-fontsize-small);
+    height: math.ceil(1.235 * $text-fontsize-small);
+    vertical-align: math.floor(-0.2 * $text-fontsize-small);
 }
 .mediumFontSize div.tei img.symbol {
-    width:  ceil(1.235 * $text-fontsize-medium);
-    height: ceil(1.235 * $text-fontsize-medium);
-    vertical-align: floor(-0.2 * $text-fontsize-medium);
+    width:  math.ceil(1.235 * $text-fontsize-medium);
+    height: math.ceil(1.235 * $text-fontsize-medium);
+    vertical-align: math.floor(-0.2 * $text-fontsize-medium);
 }
 .largeFontSize div.tei img.symbol {
-    width:  ceil(1.235 * $text-fontsize-large);
-    height: ceil(1.235 * $text-fontsize-large);
-    vertical-align: floor(-0.2 * $text-fontsize-large);
+    width:  math.ceil(1.235 * $text-fontsize-large);
+    height: math.ceil(1.235 * $text-fontsize-large);
+    vertical-align: math.floor(-0.2 * $text-fontsize-large);
 }
 .xlargeFontSize div.tei img.symbol {
-    width:  ceil(1.235 * $text-fontsize-xlarge);
-    height: ceil(1.235 * $text-fontsize-xlarge);
-    vertical-align: floor(-0.2 * $text-fontsize-xlarge);
+    width:  math.ceil(1.235 * $text-fontsize-xlarge);
+    height: math.ceil(1.235 * $text-fontsize-xlarge);
+    vertical-align: math.floor(-0.2 * $text-fontsize-xlarge);
 }
 
 /* Named entities and other semantic elements. */

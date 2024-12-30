@@ -6,9 +6,10 @@ import { MarkdownService } from '@services/markdown.service';
 
 
 @Component({
-  selector: 'page-about',
-  templateUrl: './about.page.html',
-  styleUrls: ['./about.page.scss']
+    selector: 'page-about',
+    templateUrl: './about.page.html',
+    styleUrls: ['./about.page.scss'],
+    standalone: false
 })
 export class AboutPage implements OnInit {
   markdownText$: Observable<string | null>;

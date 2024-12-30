@@ -1,5 +1,5 @@
 // Import general styles for modal with inner wrapper
-@import "src/theme/common/modal-inner-wrapper.scss";
+@use "../../../../theme/common/modal-inner-wrapper.scss";
 
 .modal-inner-wrapper {
     .illustration-thumb {

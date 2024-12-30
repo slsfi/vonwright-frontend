@@ -1,5 +1,5 @@
 // Import general styles for the side menu, these are common with the main-side-menu
-@import "src/theme/common/side-menu.scss";
+@use "../../../../theme/common/side-menu.scss";
 
 .menu-header {
   display: flex;

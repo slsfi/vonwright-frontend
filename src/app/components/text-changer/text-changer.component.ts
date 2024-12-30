@@ -20,11 +20,10 @@ import { PlatformService } from '@services/platform.service';
  * Thus this component must always be server-side rendered.
  */
 @Component({
-  standalone: true,
-  selector: 'text-changer',
-  templateUrl: './text-changer.component.html',
-  styleUrls: ['./text-changer.component.scss'],
-  imports: [NgIf, RouterLink, IonicModule, CollectionPagePathPipe, CollectionPagePositionQueryparamPipe]
+    selector: 'text-changer',
+    templateUrl: './text-changer.component.html',
+    styleUrls: ['./text-changer.component.scss'],
+    imports: [NgIf, RouterLink, IonicModule, CollectionPagePathPipe, CollectionPagePositionQueryparamPipe]
 })
 export class TextChangerComponent implements OnChanges, OnDestroy, OnInit {
   @Input() parentPageType: string = 'text';

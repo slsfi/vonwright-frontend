@@ -12,11 +12,10 @@ import { isEmptyObject } from '@utility-functions';
 
 
 @Component({
-  standalone: true,
-  selector: 'modal-named-entity',
-  templateUrl: './named-entity.modal.html',
-  styleUrls: ['./named-entity.modal.scss'],
-  imports: [AsyncPipe, NgFor, NgIf, IonicModule, OccurrencesAccordionComponent, RouterModule]
+    selector: 'modal-named-entity',
+    templateUrl: './named-entity.modal.html',
+    styleUrls: ['./named-entity.modal.scss'],
+    imports: [AsyncPipe, NgFor, NgIf, IonicModule, OccurrencesAccordionComponent, RouterModule]
 })
 export class NamedEntityModal implements OnDestroy, OnInit {
   @Input() id: string = '';

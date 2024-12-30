@@ -1,5 +1,5 @@
 // Import general styles for modal with inner wrapper and box
-@import "src/theme/common/modal-inner-wrapper.scss";
+@use "../../../../theme/common/modal-inner-wrapper.scss";
 
 .modal-inner-box {
 	h3 {

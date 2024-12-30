@@ -6,9 +6,10 @@ import { config } from '@config';
 
 
 @Component({
-  selector: 'page-ebook',
-  templateUrl: './ebook.page.html',
-  styleUrls: ['./ebook.page.scss'],
+    selector: 'page-ebook',
+    templateUrl: './ebook.page.html',
+    styleUrls: ['./ebook.page.scss'],
+    standalone: false
 })
 export class EbookPage implements OnDestroy, OnInit {
   ebookType: string = '';

@@ -5,6 +5,7 @@
  * that should be applied globally. These styles are for the entire app and
  * not just one component.
  */
+@use "sass:meta";
 
 /* Core CSS required for Ionic components to work properly. */
 @import "~@ionic/angular/css/core.css";
@@ -31,31 +32,31 @@
 
 
 /* General global styles. */
-@import "./theme/general";
+@include meta.load-css("theme/general");
 
 
 /* Styles for markdown content. */
-@import "./theme/markdown";
+@include meta.load-css("theme/markdown");
 
 
 /* Style overrides to Ionic components. */
-@import "./theme/ionic/ion-alert";
-@import "./theme/ionic/ion-button";
-@import "./theme/ionic/ion-content";
-@import "./theme/ionic/ion-datetime";
-@import "./theme/ionic/ion-header";
-@import "./theme/ionic/ion-input";
-@import "./theme/ionic/ion-modal";
-@import "./theme/ionic/ion-popover";
-@import "./theme/ionic/ion-radio";
-@import "./theme/ionic/ion-searchbar";
-@import "./theme/ionic/ion-spinner";
-@import "./theme/ionic/ion-toggle";
-@import "./theme/ionic/ion-toolbar";
+@include meta.load-css("theme/ionic/ion-alert");
+@include meta.load-css("theme/ionic/ion-button");
+@include meta.load-css("theme/ionic/ion-content");
+@include meta.load-css("theme/ionic/ion-datetime");
+@include meta.load-css("theme/ionic/ion-header");
+@include meta.load-css("theme/ionic/ion-input");
+@include meta.load-css("theme/ionic/ion-modal");
+@include meta.load-css("theme/ionic/ion-popover");
+@include meta.load-css("theme/ionic/ion-radio");
+@include meta.load-css("theme/ionic/ion-searchbar");
+@include meta.load-css("theme/ionic/ion-spinner");
+@include meta.load-css("theme/ionic/ion-toggle");
+@include meta.load-css("theme/ionic/ion-toolbar");
 
 
 /* Misc. global styles. */
-@import "./theme/misc";
+@include meta.load-css("theme/misc");
 
 
 /**

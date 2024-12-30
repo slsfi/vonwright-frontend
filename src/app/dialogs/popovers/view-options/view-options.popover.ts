@@ -10,11 +10,10 @@ import { ViewOptionsService } from '@services/view-options.service';
 
 
 @Component({
-  standalone: true,
-  selector: 'popover-view-options',
-  templateUrl: './view-options.popover.html',
-  styleUrls: ['./view-options.popover.scss'],
-  imports: [NgIf, FormsModule, IonicModule]
+    selector: 'popover-view-options',
+    templateUrl: './view-options.popover.html',
+    styleUrls: ['./view-options.popover.scss'],
+    imports: [NgIf, FormsModule, IonicModule]
 })
 export class ViewOptionsPopover implements OnDestroy, OnInit {
   @Input() toggles: any = undefined;

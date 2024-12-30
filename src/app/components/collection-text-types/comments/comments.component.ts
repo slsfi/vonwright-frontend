@@ -13,11 +13,10 @@ import { concatenateNames, isBrowser } from '@utility-functions';
 
 
 @Component({
-  standalone: true,
-  selector: 'comments',
-  templateUrl: './comments.component.html',
-  styleUrls: ['./comments.component.scss'],
-  imports: [NgIf, IonicModule, TrustHtmlPipe]
+    selector: 'comments',
+    templateUrl: './comments.component.html',
+    styleUrls: ['./comments.component.scss'],
+    imports: [NgIf, IonicModule, TrustHtmlPipe]
 })
 export class CommentsComponent implements OnInit, OnDestroy {
   @Input() searchMatches: string[] = [];

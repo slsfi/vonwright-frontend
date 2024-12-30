@@ -15,9 +15,10 @@ import { ViewOptionsService } from '@services/view-options.service';
 
 
 @Component({
-  selector: 'page-foreword',
-  templateUrl: './collection-foreword.page.html',
-  styleUrls: ['./collection-foreword.page.scss']
+    selector: 'page-foreword',
+    templateUrl: './collection-foreword.page.html',
+    styleUrls: ['./collection-foreword.page.scss'],
+    standalone: false
 })
 export class CollectionForewordPage implements OnDestroy, OnInit {
   _activeComponent: boolean = true;

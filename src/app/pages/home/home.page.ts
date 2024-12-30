@@ -7,9 +7,10 @@ import { MarkdownService } from '@services/markdown.service';
 
 
 @Component({
-  selector: 'page-home',
-  templateUrl: './home.page.html',
-  styleUrls: ['./home.page.scss'],
+    selector: 'page-home',
+    templateUrl: './home.page.html',
+    styleUrls: ['./home.page.scss'],
+    standalone: false
 })
 export class HomePage implements OnInit {
   descriptionText$: Observable<string | null>;

@@ -11,11 +11,10 @@ import { ViewOptionsService } from '@services/view-options.service';
 
 
 @Component({
-  standalone: true,
-  selector: 'manuscripts',
-  templateUrl: './manuscripts.component.html',
-  styleUrls: ['./manuscripts.component.scss'],
-  imports: [NgIf, IonicModule, TrustHtmlPipe]
+    selector: 'manuscripts',
+    templateUrl: './manuscripts.component.html',
+    styleUrls: ['./manuscripts.component.scss'],
+    imports: [NgIf, IonicModule, TrustHtmlPipe]
 })
 export class ManuscriptsComponent implements OnInit {
   @Input() msID: number | undefined = undefined;

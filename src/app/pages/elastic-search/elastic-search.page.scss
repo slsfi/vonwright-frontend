@@ -1,5 +1,5 @@
 // Import scoped CSS variables
-@import "src/theme/scoped-variables/page-elastic-search-variables.scss";
+@use "../../../theme/scoped-variables/page-elastic-search-variables.scss";
 
 ion-content {
   --padding-bottom: 5rem;

@@ -7,11 +7,10 @@ import { CollectionContentService } from '@services/collection-content.service';
 
 
 @Component({
-  standalone: true,
-  selector: 'text-metadata',
-  templateUrl: './metadata.component.html',
-  styleUrls: ['./metadata.component.scss'],
-  imports: [AsyncPipe, NgFor, NgIf, IonicModule]
+    selector: 'text-metadata',
+    templateUrl: './metadata.component.html',
+    styleUrls: ['./metadata.component.scss'],
+    imports: [AsyncPipe, NgFor, NgIf, IonicModule]
 })
 export class MetadataComponent implements OnInit {
   @Input() textItemID: string = '';

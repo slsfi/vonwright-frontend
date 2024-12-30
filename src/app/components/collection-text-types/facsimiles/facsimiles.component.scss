@@ -1,10 +1,10 @@
+// Import styles for the text-select-wrapper class
+@use "../../../../theme/common/text-select-wrapper.scss";
+
 :host {
     display: block;
     height: 100%;
 }
-
-// Import styles for the text-select-wrapper class
-@import "src/theme/common/text-select-wrapper.scss";
 
 .external-urls-header {
     .flex-buttons {

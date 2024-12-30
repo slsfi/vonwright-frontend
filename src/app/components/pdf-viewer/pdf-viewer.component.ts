@@ -11,12 +11,11 @@ import { ReferenceDataModal } from '@modals/reference-data/reference-data.modal'
 
 
 @Component({
-  standalone: true,
-  selector: 'pdf-viewer',
-  templateUrl: './pdf-viewer.component.html',
-  styleUrls: ['./pdf-viewer.component.scss'],
-  imports: [AsyncPipe, NgFor, NgIf, NgStyle, IonicModule, IsExternalURLPipe],
-  host: {ngSkipHydration: 'true'}
+    selector: 'pdf-viewer',
+    templateUrl: './pdf-viewer.component.html',
+    styleUrls: ['./pdf-viewer.component.scss'],
+    imports: [AsyncPipe, NgFor, NgIf, NgStyle, IonicModule, IsExternalURLPipe],
+    host: { ngSkipHydration: 'true' }
 })
 export class PdfViewerComponent implements OnInit {
   @Input() pdfFileName: string = '';

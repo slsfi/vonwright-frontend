@@ -5,7 +5,7 @@ import '@angular/localize/init';
 import 'zone.js/node';
 import { LOCALE_ID } from '@angular/core';
 import { APP_BASE_HREF } from '@angular/common';
-import { CommonEngine } from '@angular/ssr';
+import { CommonEngine } from '@angular/ssr/node';
 import * as express from 'express';
 import { existsSync } from 'fs';
 import { join } from 'path';

@@ -1,5 +1,5 @@
 // Import general styles for the secondary toolbar
-@import "src/theme/common/secondary-toolbar.scss";
+@use "../../../theme/common/secondary-toolbar.scss";
 
 .pdf-title-wrapper {
   align-items: center;

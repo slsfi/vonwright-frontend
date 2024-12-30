@@ -14,11 +14,10 @@ import { addOrRemoveValueInArray, sortArrayOfObjectsAlphabetically } from '@util
 
 
 @Component({
-  standalone: true,
-  selector: 'main-side-menu',
-  templateUrl: './main-side-menu.component.html',
-  styleUrls: ['./main-side-menu.component.scss'],
-  imports: [NgFor, NgIf, NgTemplateOutlet, IonicModule, RouterLink, ParentChildPagePathPipe]
+    selector: 'main-side-menu',
+    templateUrl: './main-side-menu.component.html',
+    styleUrls: ['./main-side-menu.component.scss'],
+    imports: [NgFor, NgIf, NgTemplateOutlet, IonicModule, RouterLink, ParentChildPagePathPipe]
 })
 export class MainSideMenuComponent implements OnInit, OnChanges {
   @Input() urlSegments: UrlSegment[] = [];

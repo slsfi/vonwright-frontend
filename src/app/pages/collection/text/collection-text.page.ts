@@ -22,9 +22,10 @@ import { isBrowser, moveArrayItem } from '@utility-functions';
 
 
 @Component({
-  selector: 'page-text',
-  templateUrl: './collection-text.page.html',
-  styleUrls: ['./collection-text.page.scss'],
+    selector: 'page-text',
+    templateUrl: './collection-text.page.html',
+    styleUrls: ['./collection-text.page.scss'],
+    standalone: false
 })
 export class CollectionTextPage implements OnDestroy, OnInit {
   @ViewChild('addViewPopover') addViewPopover: IonPopover;

@@ -16,9 +16,10 @@ import { sortArrayOfObjectsAlphabetically } from '@utility-functions';
  * TODO: Add filters and search term to queryParams; refactor index for works
  */
 @Component({
-  selector: 'page-index',
-  templateUrl: './index.page.html',
-  styleUrls: ['./index.page.scss']
+    selector: 'page-index',
+    templateUrl: './index.page.html',
+    styleUrls: ['./index.page.scss'],
+    standalone: false
 })
 export class IndexPage implements OnInit {
   @ViewChild(IonContent) content: IonContent;

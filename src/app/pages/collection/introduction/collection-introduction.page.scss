@@ -1,14 +1,14 @@
 // Import scoped CSS variables
-@import "src/theme/scoped-variables/page-introduction-variables.scss";
+@use "../../../../theme/scoped-variables/page-introduction-variables.scss";
 
 // Import general styles for the secondary toolbar
-@import "src/theme/common/secondary-toolbar.scss";
+@use "../../../../theme/common/secondary-toolbar.scss";
 
 // Import general styles for the collection-ion-content class
-@import "src/theme/common/collection-ion-content.scss";
+@use "../../../../theme/common/collection-ion-content.scss";
 
 // Import general styles for the scroll-content-container class
-@import "src/theme/common/scroll-content-container.scss";
+@use "../../../../theme/common/scroll-content-container.scss";
 
 #TOC {
   background-color: var(--intro-toc-background-color);
