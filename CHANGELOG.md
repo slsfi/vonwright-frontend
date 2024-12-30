@@ -10,11 +10,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 
 
-## [1.5.4-production.1] – 2024-12-02
+## [1.5.5-production.1] – 2024-12-30
 
 ### Changed
 
-- Merge release [`v1.5.4`](https://github.com/slsfi/digital-edition-frontend-ng/releases/tag/1.5.4) from upstream, original repository into `production` branch. ([81b4b5d](https://github.com/slsfi/vonwright-frontend/commit/81b4b5d82a341e810a1d2df02d6f6b843c29d738))
+- Merge release [`v1.5.5`](https://github.com/slsfi/digital-edition-frontend-ng/releases/tag/1.5.5) from upstream, original repository into `production` branch. ([816a587](https://github.com/slsfi/vonwright-frontend/commit/816a587bc5f28e23c792fd30a9abf31ff9669145))
 
 
 
@@ -34,6 +34,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 - Deps (dev): update `typescript` to 5.6.3. ([633c344](https://github.com/slsfi/digital-edition-frontend-ng/commit/633c344f921d7a53c6fe456e533984a9542dea75))
 - Deps (transitive): update `nanoid` to 3.3.8. ([cd6287e](https://github.com/slsfi/digital-edition-frontend-ng/commit/cd6287e52b13958e9dde1daa3d462f7e872df378))
 - Deps (transitive): update multiple by recreating `package-lock.json`. ([bac3a84](https://github.com/slsfi/digital-edition-frontend-ng/commit/bac3a84b5827b4dbe0983d5b545cfd14880a71bd))
+
+
+
+## [1.5.4-production.1] – 2024-12-02
+
+### Changed
+
+- Merge release [`v1.5.4`](https://github.com/slsfi/digital-edition-frontend-ng/releases/tag/1.5.4) from upstream, original repository into `production` branch. ([81b4b5d](https://github.com/slsfi/vonwright-frontend/commit/81b4b5d82a341e810a1d2df02d6f6b843c29d738))
 
 
 
@@ -577,6 +585,7 @@ siteLogoDimensions: {
 [1.0.1]: https://github.com/slsfi/digital-edition-frontend-ng/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/slsfi/digital-edition-frontend-ng/releases/tag/v1.0.0
 
+[1.5.5-production.1]: https://github.com/slsfi/vonwright-frontend/compare/1.5.4-production.1...1.5.5-production.1
 [1.5.4-production.1]: https://github.com/slsfi/vonwright-frontend/compare/1.5.3-production.1...1.5.4-production.1
 [1.5.3-production.1]: https://github.com/slsfi/vonwright-frontend/compare/1.5.2-production.1...1.5.3-production.1
 [1.5.2-production.1]: https://github.com/slsfi/vonwright-frontend/compare/1.4.4-production.1...1.5.2-production.1
