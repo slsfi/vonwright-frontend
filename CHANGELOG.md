@@ -11,6 +11,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 ### Changed
 
 - Replace `copyfiles` package with a custom script to copy `proxy-server.js` to `dist/app` after the Angular build.
+- Deps: update `@angular/core` to 19.1.4 and `@angular/cli` to 19.1.5.
 - Deps (dev): update `ng-extract-i18n-merge` to 2.14.1.
 
 
