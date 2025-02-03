@@ -8,6 +8,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ## [Unreleased]
 
+### Changed
+
+- Replace `copyfiles` package with a custom script to copy `proxy-server.js` to `dist/app` after the Angular build.
+
 
 
 ## [1.5.5] – 2024-12-30
