@@ -1,6 +1,6 @@
 {
   "name": "vonwright.sls.fi",
-  "version": "1.5.5-production.1",
+  "version": "1.5.6-production.1",
   "description": "Frontend of vonwright.sls.fi based on the Angular web app for the SLS Digital Edition Platform",
   "homepage": "https://github.com/slsfi/vonwright-frontend#readme",
   "license": "MIT",
