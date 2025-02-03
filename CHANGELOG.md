@@ -8,14 +8,18 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ## [Unreleased]
 
+
+
+## [1.5.6] – 2025-02-03
+
 ### Changed
 
-- Replace `copyfiles` package with a custom script to copy `proxy-server.js` to `dist/app` after the Angular build.
-- Deps: update `@angular/core` to 19.1.4 and `@angular/cli` to 19.1.5.
-- Deps: update `marked` to 15.0.6.
-- Deps (dev): update `@types/node` to 20.17.16.
-- Deps (dev): update `ng-extract-i18n-merge` to 2.14.1.
-- Deps (dev): update `typescript` to 5.7.3.
+- Replace `copyfiles` package with a custom script to copy `proxy-server.js` to `dist/app` after the Angular build. ([8b5048e](https://github.com/slsfi/digital-edition-frontend-ng/commit/8b5048ec1b4bdccb7563e02acdb17c9a7f7b59b3))
+- Deps: update `@angular/core` to 19.1.4 and `@angular/cli` to 19.1.5. ([517274e](https://github.com/slsfi/digital-edition-frontend-ng/commit/517274eed889886c925ebbd531c0f3dc2197ab7b))
+- Deps: update `marked` to 15.0.6. ([01ec3f0](https://github.com/slsfi/digital-edition-frontend-ng/commit/01ec3f0a925d273150316f713629726b4c34f315))
+- Deps (dev): update `@types/node` to 20.17.16. ([8e773f7](https://github.com/slsfi/digital-edition-frontend-ng/commit/8e773f7bcb3cbf9f9d601a2166b7cb3ea782fdba))
+- Deps (dev): update `ng-extract-i18n-merge` to 2.14.1. ([8968b72](https://github.com/slsfi/digital-edition-frontend-ng/commit/8968b7237d59eacc9aff2bff6a4fcf60e2d9cdd3))
+- Deps (dev): update `typescript` to 5.7.3. ([c701917](https://github.com/slsfi/digital-edition-frontend-ng/commit/c7019176b057ea607d7bc18448b7af92b0441515))
 
 
 
@@ -501,7 +505,8 @@ siteLogoDimensions: {
 
 
 
-[unreleased]: https://github.com/slsfi/digital-edition-frontend-ng/compare/1.5.5...HEAD
+[unreleased]: https://github.com/slsfi/digital-edition-frontend-ng/compare/1.5.6...HEAD
+[1.5.6]: https://github.com/slsfi/digital-edition-frontend-ng/compare/1.5.5...1.5.6
 [1.5.5]: https://github.com/slsfi/digital-edition-frontend-ng/compare/1.5.4...1.5.5
 [1.5.4]: https://github.com/slsfi/digital-edition-frontend-ng/compare/1.5.3...1.5.4
 [1.5.3]: https://github.com/slsfi/digital-edition-frontend-ng/compare/1.5.2...1.5.3
