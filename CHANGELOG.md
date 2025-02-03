@@ -15,6 +15,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 - Deps: update `marked` to 15.0.6.
 - Deps (dev): update `@types/node` to 20.17.16.
 - Deps (dev): update `ng-extract-i18n-merge` to 2.14.1.
+- Deps (dev): update `typescript` to 5.7.3.
 
 
 
