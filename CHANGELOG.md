@@ -8,9 +8,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ## Unreleased
 
+
+
+## [1.6.3-production.1] – 2025-05-14
+
 ### Changed
 
-- Update disallow rules in `robots.txt`.
+- Update disallow rules in `robots.txt`. ([56db43a](https://github.com/slsfi/vonwright-frontend/commit/56db43ac1c7bf54c7f5b15e8e173fca81f96cd11))
+- Merge release [`v1.6.3`](https://github.com/slsfi/digital-edition-frontend-ng/releases/tag/1.6.3) from upstream, original repository into `production` branch. ([7fb618a](https://github.com/slsfi/vonwright-frontend/commit/7fb618a829bee03279e59ab5dff68acc4a1861c5))
 
 
 
@@ -714,6 +719,7 @@ siteLogoDimensions: {
 [1.0.1]: https://github.com/slsfi/digital-edition-frontend-ng/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/slsfi/digital-edition-frontend-ng/releases/tag/v1.0.0
 
+[1.6.3-production.1]: https://github.com/slsfi/vonwright-frontend/compare/1.5.7-production.1...1.6.3-production.1
 [1.5.7-production.1]: https://github.com/slsfi/vonwright-frontend/compare/1.5.6-production.1...1.5.7-production.1
 [1.5.6-production.1]: https://github.com/slsfi/vonwright-frontend/compare/1.5.5-production.1...1.5.6-production.1
 [1.5.5-production.1]: https://github.com/slsfi/vonwright-frontend/compare/1.5.4-production.1...1.5.5-production.1
