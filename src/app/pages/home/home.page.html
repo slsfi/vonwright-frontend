@@ -34,36 +34,18 @@
       </picture>
     }
 
-    <div *ngIf="!imageOrientationPortrait || titleOnImage" class="title-wrapper">
-      <h1 class="banner-title" i18n="@@Site.Title">Webbplatsens titel</h1>
+    @if (!imageOrientationPortrait || titleOnImage) {
+      <div class="title-wrapper">
+        <h1 class="banner-title" i18n="@@Site.Title">Webbplatsens titel</h1>
+        @if (siteHasSubtitle) {
+          <p role="doc-subtitle" class="banner-subtitle" i18n="@@Site.Subtitle">Webbplatsens undertitel</p>
+        }
+      </div>
+    }
 
-      <p *ngIf="siteHasSubtitle" role="doc-subtitle" class="banner-subtitle" i18n="@@Site.Subtitle">Webbplatsens undertitel</p>
-    </div>
-
-    <div *ngIf="imageOrientationPortrait" class="portrait-image-wrapper">
-      @if (imageSources.length < 1) {
-        <img
-              [src]="imageURL"
-              [alt]="imageAltText"
-              [style.object-position]="portraitImageObjectPosition"
-              [attr.height]="imageHeight"
-              [attr.width]="imageWidth"
-              fetchpriority="high"
-        >
-      } @else {
-        <picture>
-          @for (s of imageSources; track $index) {
-            @if (s.srcset || s.media || s.sizes || s.type) {
-              <source
-                    [attr.media]="s.media ? s.media : null"
-                    [attr.srcset]="s.srcset ? s.srcset : null"
-                    [attr.sizes]="s.sizes ? s.sizes : null"
-                    [attr.type]="s.type ? s.type : null"
-                    [attr.height]="s.height ? s.height : null"
-                    [attr.width]="s.width ? s.width : null"
-              >
-            }
-          }
+    @if (imageOrientationPortrait) {
+      <div class="portrait-image-wrapper">
+        @if (imageSources.length < 1) {
           <img
                 [src]="imageURL"
                 [alt]="imageAltText"
@@ -72,42 +54,74 @@
                 [attr.width]="imageWidth"
                 fetchpriority="high"
           >
-        </picture>
-      }
-    </div>
+        } @else {
+          <picture>
+            @for (s of imageSources; track $index) {
+              @if (s.srcset || s.media || s.sizes || s.type) {
+                <source
+                      [attr.media]="s.media ? s.media : null"
+                      [attr.srcset]="s.srcset ? s.srcset : null"
+                      [attr.sizes]="s.sizes ? s.sizes : null"
+                      [attr.type]="s.type ? s.type : null"
+                      [attr.height]="s.height ? s.height : null"
+                      [attr.width]="s.width ? s.width : null"
+                >
+              }
+            }
+            <img
+                  [src]="imageURL"
+                  [alt]="imageAltText"
+                  [style.object-position]="portraitImageObjectPosition"
+                  [attr.height]="imageHeight"
+                  [attr.width]="imageWidth"
+                  fetchpriority="high"
+            >
+          </picture>
+        }
+      </div>
+    }
   </div>
 
   <div class="text-content">
-    <div *ngIf="imageOrientationPortrait" class="title-wrapper">
-      <h1 class="site-title" i18n="@@Site.Title">Webbplatsens titel</h1>
-      <p *ngIf="siteHasSubtitle" role="doc-subtitle" class="site-subtitle" i18n="@@Site.Subtitle">Webbplatsens undertitel</p>
-    </div>
+    @if (imageOrientationPortrait) {
+      <div class="title-wrapper">
+        <h1 class="site-title" i18n="@@Site.Title">Webbplatsens titel</h1>
+        @if (siteHasSubtitle) {
+          <p role="doc-subtitle" class="site-subtitle" i18n="@@Site.Subtitle">Webbplatsens undertitel</p>
+        }
+      </div>
+    }
 
-    <div *ngIf="showSearchbar" class="search-bar-wrapper">
-      <ion-searchbar
-            class="custom-searchbar manual-exec"
-            [class.highlight]="searchQuery"
-            placeholder="Sök ..."
-            i18n-placeholder="@@BasicActions.SearchEllipsis"
-            show-clear-button="always"
-            enterkeyhint="search"
-            inputmode="search"
-            [searchIcon]="undefined"
-            [(ngModel)]="searchQuery"
-            (ionClear)="clearSearchQuery()"
-            (keyup.enter)="submitSearchQuery()"
-      ></ion-searchbar>
-      <ion-button (click)="submitSearchQuery()">
-        <ion-icon slot="icon-only" name="search" aria-label="Sök" i18n-aria-label="@@BasicActions.Search"></ion-icon>
-      </ion-button>
-    </div>
+    @if (showSearchbar) {
+      <div class="search-bar-wrapper">
+        <ion-searchbar class="custom-searchbar manual-exec"
+              [class.highlight]="searchQuery"
+              placeholder="Sök ..."
+              i18n-placeholder="@@BasicActions.SearchEllipsis"
+              show-clear-button="always"
+              enterkeyhint="search"
+              inputmode="search"
+              [searchIcon]="undefined"
+              [(ngModel)]="searchQuery"
+              (ionClear)="clearSearchQuery()"
+              (keyup.enter)="submitSearchQuery()"
+        ></ion-searchbar>
+        <ion-button (click)="submitSearchQuery()">
+          <ion-icon slot="icon-only" name="search" aria-label="Sök" i18n-aria-label="@@BasicActions.Search"></ion-icon>
+        </ion-button>
+      </div>
+    }
 
     <div class="site-presentation markdown" [innerHTML]="(descriptionText$ | async) | trustHtml"></div>
 
-    <div *ngIf="showContentGrid" class="content-grid-wrapper">
-      <content-grid></content-grid>
-    </div>
+    @if (showContentGrid) {
+      <div class="content-grid-wrapper">
+        <content-grid></content-grid>
+      </div>
+    }
 
-    <footer *ngIf="showFooter" class="footer markdown" [innerHTML]="(footerText$ | async) | trustHtml"></footer>
+    @if (showFooter) {
+      <footer class="footer markdown" [innerHTML]="(footerText$ | async) | trustHtml"></footer>
+    }
   </div>
 </ion-content>

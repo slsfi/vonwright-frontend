@@ -1,5 +1,5 @@
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
-import { AsyncPipe, NgFor, NgIf } from '@angular/common';
+import { AsyncPipe } from '@angular/common';
 import { NavigationEnd, Router, RouterModule } from '@angular/router';
 import { IonicModule, ModalController } from '@ionic/angular';
 import { catchError, defaultIfEmpty, filter, forkJoin, map, Observable, of, Subject, Subscription, timeout } from 'rxjs';
@@ -12,10 +12,10 @@ import { isEmptyObject } from '@utility-functions';
 
 
 @Component({
-    selector: 'modal-named-entity',
-    templateUrl: './named-entity.modal.html',
-    styleUrls: ['./named-entity.modal.scss'],
-    imports: [AsyncPipe, NgFor, NgIf, IonicModule, OccurrencesAccordionComponent, RouterModule]
+  selector: 'modal-named-entity',
+  templateUrl: './named-entity.modal.html',
+  styleUrls: ['./named-entity.modal.scss'],
+  imports: [AsyncPipe, IonicModule, OccurrencesAccordionComponent, RouterModule]
 })
 export class NamedEntityModal implements OnDestroy, OnInit {
   @Input() id: string = '';

@@ -1,43 +1,63 @@
-<ion-spinner *ngIf="isLoading" class="loading" name="crescent"></ion-spinner>
+@if (isLoading) {
+  <ion-spinner class="loading" name="crescent"></ion-spinner>
+}
 
-<ul *ngIf="occurrenceData.length" class="sd-occurrences" role="menu">
-  <li *ngFor="let collection of occurrenceData"
-        [attr.aria-expanded]="!collection.hidden"
-        [attr.aria-haspopup]="'menu'"
-        role="menuitem"
-  >
-    <button (click)="toggleList(collection.collection_id)">
-      <span class="coll-name">{{collection.name}}</span>
-      <ion-icon [class.open]="!collection.hidden" name="chevron-forward-outline" class="toggle-icon"></ion-icon>
-    </button>
-    <ul *ngIf="!collection.hidden" role="menu">
-      <li *ngFor="let publication of collection['publications']" role="menuitem">
-        <span class="text-name">{{publication.occurrences[0].displayName}}<ng-container
-            *ngIf="publication.occurrences.length > 1"> ({{publication.occurrences.length}}&nbsp;<ng-container
-              i18n="@@NamedEntity.OccurrencesLowercase">förekomster</ng-container>)</ng-container></span>
-
-        <div class="text-links">
-          <ng-container *ngFor="let occ of publication.occurrences; index as i">
-            <a *ngIf="i < 1 || (i > 0 && (publication.occurrences[i].textType === 'facs' || publication.occurrences[i].textType !== publication.occurrences[i-1].textType))"
-                  class="button-link" [routerLink]="occ.linkID | collectionPagePath"
-                  [queryParams]="occ | occurrenceCollectionTextPageQueryparams"
-            >
-              <ng-container *ngIf="occ.textType == 'ms'" i18n="@@Manuscripts.Manuscript">Manuskript</ng-container>
-              <ng-container *ngIf="occ.textType == 'var'" i18n="@@Variants.Variant">Tryckt variant</ng-container>
-              <ng-container *ngIf="occ.textType == 'com'" i18n="@@Commentary.Commentary">Kommentar</ng-container>
-              <ng-container *ngIf="occ.textType == 'facs'" i18n="@@Facsimiles.Facsimile">Faksimil</ng-container><ng-container *ngIf="occ.facsimilePage">:&nbsp;{{occ.facsimilePage}}</ng-container>
-              <ng-container *ngIf="occ.textType == 'rt'" i18n="@@ReadingText.ReadingText">Lästext</ng-container>
-            </a>
-          </ng-container>
-        </div>
+@if (occurrenceData.length) {
+  <ul class="sd-occurrences" role="menu">
+    @for (collection of occurrenceData; track collection.collection_id) {
+      <li
+            [attr.aria-expanded]="!collection.hidden"
+            [attr.aria-haspopup]="'menu'"
+            role="menuitem"
+      >
+        <button (click)="toggleList(collection.collection_id)">
+          <span class="coll-name">{{collection.name}}</span>
+          <ion-icon [class.open]="!collection.hidden" name="chevron-forward-outline" class="toggle-icon"></ion-icon>
+        </button>
+        @if (!collection.hidden) {
+          <ul role="menu">
+            @for (publication of collection['publications']; track publication.publication_id) {
+              <li role="menuitem">
+                <span class="text-name">{{publication.occurrences[0].displayName}}
+                  @if (publication.occurrences.length > 1) {
+                    ({{publication.occurrences.length}}&nbsp;<ng-container i18n="@@NamedEntity.OccurrencesLowercase">förekomster</ng-container>)
+                  }
+                </span>
+                <div class="text-links">
+                  @for (occ of publication.occurrences; track $index; let i = $index) {
+                    @if (i < 1 || (i > 0 && (publication.occurrences[i].textType === 'facs' || publication.occurrences[i].textType !== publication.occurrences[i-1].textType))) {
+                      <a class="button-link"
+                            [routerLink]="occ.linkID | collectionPagePath"
+                            [queryParams]="occ | occurrenceCollectionTextPageQueryparams"
+                      >
+                        @if (occ.textType == 'ms') {
+                          <ng-container i18n="@@Manuscripts.Manuscript">Manuskript</ng-container>
+                        } @else if (occ.textType == 'var') {
+                          <ng-container i18n="@@Variants.Variant">Tryckt variant</ng-container>
+                        } @else if (occ.textType == 'com') {
+                          <ng-container i18n="@@Commentary.Commentary">Kommentar</ng-container>
+                        } @else if (occ.textType == 'facs') {
+                          <ng-container i18n="@@Facsimiles.Facsimile">Faksimil</ng-container>@if (occ.facsimilePage) {:&nbsp;{{occ.facsimilePage}}}
+                        } @else if (occ.textType == 'rt') {
+                          <ng-container i18n="@@ReadingText.ReadingText">Lästext</ng-container>
+                        }
+                      </a>
+                    }
+                  }
+                </div>
+              </li>
+            }
+          </ul>
+        }
       </li>
-    </ul>
-  </li>
-</ul>
+    }
+  </ul>
+}
 
-<p *ngIf="simpleWorkMetadata && (type === 'work' || type === 'work_manifestation'); else noOccurrences"
-  i18n="@@NamedEntity.WorkOccurrencesUnavailable">Förekomster för verk är inte tillgängliga.</p>
-
-<ng-template #noOccurrences>
-  <p *ngIf="!isLoading && occurrenceData.length < 1" i18n="@@NamedEntity.NoInfoFound">Ingen information hittades.</p>
-</ng-template>
+@if (simpleWorkMetadata && (type === 'work' || type === 'work_manifestation')) {
+  <p i18n="@@NamedEntity.WorkOccurrencesUnavailable">Förekomster för verk är inte tillgängliga.</p>
+} @else {
+  @if (!isLoading && occurrenceData.length < 1) {
+    <p i18n="@@NamedEntity.NoInfoFound">Ingen information hittades.</p>
+  }
+}

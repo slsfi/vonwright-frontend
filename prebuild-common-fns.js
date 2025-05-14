@@ -45,11 +45,19 @@ function getConfig(configFilepath) {
 }
 
 async function fetchFromAPI(endpoint) {
-  const res = await fetch(endpoint);
-  if (res.ok) {
-    return await res.json();
-  } else {
-    console.error(res);
+  try {
+    const res = await fetch(endpoint);
+    if (res.ok) {
+      return await res.json();
+    } else if (res.status === 404) {
+      // console.warn(`Warning: API returned 404 for ${endpoint}`);
+      return null; // Gracefully return null instead of throwing
+    } else {
+      console.warn(`Warning: API returned status ${res.status} for ${endpoint}`);
+      return null;
+    }
+  } catch (err) {
+    console.error(`Error while fetching ${endpoint}:`, err);
     return null;
   }
 }

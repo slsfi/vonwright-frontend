@@ -9,17 +9,17 @@ import { NamedEntityModal } from '@modals/named-entity/named-entity.modal';
 import { MarkdownService } from '@services/markdown.service';
 import { NamedEntityService } from '@services/named-entity.service';
 import { TooltipService } from '@services/tooltip.service';
-import { sortArrayOfObjectsAlphabetically } from '@utility-functions';
+import { isBrowser, sortArrayOfObjectsAlphabetically } from '@utility-functions';
 
 
 /**
  * TODO: Add filters and search term to queryParams; refactor index for works
  */
 @Component({
-    selector: 'page-index',
-    templateUrl: './index.page.html',
-    styleUrls: ['./index.page.scss'],
-    standalone: false
+  selector: 'page-index',
+  templateUrl: './index.page.html',
+  styleUrls: ['./index.page.scss'],
+  standalone: false
 })
 export class IndexPage implements OnInit {
   @ViewChild(IonContent) content: IonContent;
@@ -57,58 +57,30 @@ export class IndexPage implements OnInit {
 
   ngOnInit() {
     this.routeParamsSubscription = this.route.params.subscribe(params => {
-      this.data = [];
-      this.cachedData = [];
-      this.filters = {};
-      this.searchText = '';
-      this.agg_after_key = {};
       this.indexType = params['type'] ?? '';
-      let indexTypeMdNodeID = '';
+      this.setUpIndexConfig();
 
-      if (this.indexType === 'persons') {
-        this.itemType = 'person';
-        indexTypeMdNodeID = '12-02';
-        this.indexDatabase = config.page?.index?.persons?.database ?? 'elastic';
-        this.showFilter = config.page?.index?.persons?.showFilter ?? false;
-        this.maxFetchSize = config.page?.index?.persons?.maxFetchSize ?? 500;
-
-      } else if (this.indexType === 'places') {
-        this.itemType = 'place';
-        indexTypeMdNodeID = '12-03';
-        this.showFilter = config.page?.index?.places?.showFilter ?? false;
-        this.maxFetchSize = config.page?.index?.persons?.maxFetchSize ?? 500;
-
-      } else if (this.indexType === 'keywords') {
-        this.itemType = 'keyword';
-        indexTypeMdNodeID = '12-04';
-        this.showFilter = config.page?.index?.keywords?.showFilter ?? false;
-        this.maxFetchSize = config.page?.index?.keywords?.maxFetchSize ?? 500;
-
-      } else if (this.indexType === 'works') {
-        this.itemType = 'work';
-        indexTypeMdNodeID = '12-05';
-        this.showFilter = false;
-        this.maxFetchSize = 500;
-      }
-
-      if (this.maxFetchSize > 10000) {
-        this.maxFetchSize = 10000;
-      }
-
-      if (indexTypeMdNodeID) {
+      const mdNodeId = this.getMdNodeId(this.indexType);
+      if (mdNodeId) {
         this.mdContent$ = this.mdService.getParsedMdContent(
-          this.activeLocale + '-' + indexTypeMdNodeID
+          this.activeLocale + '-' + mdNodeId
         );
       }
 
-      if (this.indexType) {
+      // Check if queryParams includes 'id' before deciding to load list:
+      // 1. In a browser, the list is always loaded.
+      // 2. On the server, the list is only loaded if no modal is open.
+      //    This reduces CPU load.
+      const id = this.route.snapshot.queryParams?.id;
+      if (this.indexType && (isBrowser() || !id)) {
         this.getIndexData();
       }
     });
 
     this.routeQueryParamsSubscription = this.route.queryParams.subscribe(queryParams => {
-      if (queryParams['id'] && this.itemType) {
-        this.openSemanticDataObjectModal(queryParams['id'], this.itemType);
+      // Load modal with named entity data only in browser
+      if (queryParams['id'] && this.itemType && isBrowser()) {
+        this.openNamedEntityModal(queryParams['id'], this.itemType);
       }
     });
   }
@@ -116,6 +88,50 @@ export class IndexPage implements OnInit {
   ngOnDestroy() {
     this.routeParamsSubscription?.unsubscribe();
     this.routeQueryParamsSubscription?.unsubscribe();
+  }
+
+  private setUpIndexConfig() {
+    this.data = [];
+    this.cachedData = [];
+    this.filters = {};
+    this.searchText = '';
+    this.agg_after_key = {};
+
+    if (this.indexType === 'persons') {
+      this.itemType = 'person';
+      this.indexDatabase = config.page?.index?.persons?.database ?? 'elastic';
+      this.showFilter = config.page?.index?.persons?.showFilter ?? false;
+      this.maxFetchSize = config.page?.index?.persons?.maxFetchSize ?? 500;
+
+    } else if (this.indexType === 'places') {
+      this.itemType = 'place';
+      this.showFilter = config.page?.index?.places?.showFilter ?? false;
+      this.maxFetchSize = config.page?.index?.places?.maxFetchSize ?? 500;
+
+    } else if (this.indexType === 'keywords') {
+      this.itemType = 'keyword';
+      this.showFilter = config.page?.index?.keywords?.showFilter ?? false;
+      this.maxFetchSize = config.page?.index?.keywords?.maxFetchSize ?? 500;
+
+    } else if (this.indexType === 'works') {
+      this.itemType = 'work';
+      this.showFilter = false;
+      this.maxFetchSize = 500;
+    }
+
+    if (this.maxFetchSize > 10000) {
+      this.maxFetchSize = 10000;
+    }
+  }
+
+  private getMdNodeId(indexType: string): string {
+    switch (indexType) {
+      case 'persons': return '12-02';
+      case 'places': return '12-03';
+      case 'keywords': return '12-04';
+      case 'works': return '12-05';
+      default: return '';
+    }
   }
 
   private getIndexData() {
@@ -431,7 +447,7 @@ export class IndexPage implements OnInit {
     }
   }
 
-  async openSemanticDataObjectModal(id: string | number, type: string) {
+  async openNamedEntityModal(id: string | number, type: string) {
     const modal = await this.modalCtrl.create({
       component: NamedEntityModal,
       componentProps: {
@@ -490,10 +506,6 @@ export class IndexPage implements OnInit {
     }
 
     return data;
-  }
-
-  trackData(index: number, dataItem: any) {
-    return dataItem ? dataItem.id : undefined;
   }
 
 }

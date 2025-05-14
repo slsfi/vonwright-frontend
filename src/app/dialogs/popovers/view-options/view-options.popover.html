@@ -1,45 +1,40 @@
 <ion-list lines="full">
   <ion-list-header>
     <ion-label i18n="@@ViewOptions.Textsize">Textstorlek</ion-label>
-      <ion-button class="close" (click)="close()">
-        <ion-icon slot="icon-only" name="close" aria-label="Stäng" i18n-aria-label="@@BasicActions.Close"></ion-icon>
-      </ion-button>
+    <ion-button class="close" (click)="close()">
+      <ion-icon slot="icon-only" name="close" aria-label="Stäng" i18n-aria-label="@@BasicActions.Close"></ion-icon>
+    </ion-button>
   </ion-list-header>
   <div class="font-size-buttons-wrapper">
-    <ion-button
-          class="text-button text-xsmall"
+    <ion-button class="text-button text-xsmall"
           [class.selected-font-size]="textsize == TextsizeEnum.XSmall"
           [attr.aria-pressed]="textsize == TextsizeEnum.XSmall"
           (click)="setTextSize(TextsizeEnum.XSmall)"
           aria-label="Textstorlek: liten"
           i18n-aria-label="@@ViewOptions.TextsizeXSmall"
     >A</ion-button>
-    <ion-button
-          class="text-button text-small"
+    <ion-button class="text-button text-small"
           [class.selected-font-size]="textsize == TextsizeEnum.Small"
           [attr.aria-pressed]="textsize == TextsizeEnum.Small"
           (click)="setTextSize(TextsizeEnum.Small)"
           aria-label="Textstorlek: normal"
           i18n-aria-label="@@ViewOptions.TextsizeSmall"
     >A</ion-button>
-    <ion-button
-          class="text-button text-medium"
+    <ion-button class="text-button text-medium"
           [class.selected-font-size]="textsize == TextsizeEnum.Medium"
           [attr.aria-pressed]="textsize == TextsizeEnum.Medium"
           (click)="setTextSize(TextsizeEnum.Medium)"
           aria-label="Textstorlek: stor"
           i18n-aria-label="@@ViewOptions.TextsizeMedium"
     >A</ion-button>
-    <ion-button
-          class="text-button text-large"
+    <ion-button class="text-button text-large"
           [class.selected-font-size]="textsize == TextsizeEnum.Large"
           [attr.aria-pressed]="textsize == TextsizeEnum.Large"
           (click)="setTextSize(TextsizeEnum.Large)"
           aria-label="Textstorlek: mycket stor"
           i18n-aria-label="@@ViewOptions.TextsizeLarge"
     >A</ion-button>
-    <ion-button
-          class="text-button text-xlarge"
+    <ion-button class="text-button text-xlarge"
           [class.selected-font-size]="textsize == TextsizeEnum.XLarge"
           [attr.aria-pressed]="textsize == TextsizeEnum.XLarge"
           (click)="setTextSize(TextsizeEnum.XLarge)"
@@ -49,52 +44,65 @@
   </div>
 </ion-list>
 
-<ion-list *ngIf="togglesCounter > 0" lines="full">
-  <ion-list-header>
-    <ion-label i18n="@@ViewOptions.Options">Visningsalternativ</ion-label>
-  </ion-list-header>
-
-  <ion-item *ngIf="togglesCounter > 1">
-    <ion-toggle (ionChange)="toggleAll($event)" [checked]="checkedToggles > togglesCounter-1" justify="space-between" [enableOnOffLabels]="true" i18n="@@ViewOptions.ToggleAll">Välj alla</ion-toggle>
-  </ion-item>
-
-  <ion-item *ngIf="availableToggles.comments">
-    <ion-toggle class="show_comments" [(ngModel)]="show.comments" (ionChange)="toggleOption('comments')" justify="space-between" [enableOnOffLabels]="true"><img alt="Röd asterisk" i18n-alt="@@ViewOptions.ExplanatoryNotesAltText" src="assets/images/asterisk.svg" class="asterisk"><ng-container i18n="@@ViewOptions.ExplanatoryNotes">Punktkommentarer</ng-container></ion-toggle>
-  </ion-item>
-
-  <ion-item *ngIf="availableToggles.personInfo">
-    <ion-toggle class="show_personInfo" [(ngModel)]="show.personInfo" (ionChange)="toggleOption('personInfo')" justify="space-between" [enableOnOffLabels]="true" i18n="@@ViewOptions.PersonInfo">Personupplysningar</ion-toggle>
-  </ion-item>
-
-  <ion-item *ngIf="availableToggles.placeInfo">
-    <ion-toggle class="show_placeInfo" [(ngModel)]="show.placeInfo" (ionChange)="toggleOption('placeInfo')" justify="space-between" [enableOnOffLabels]="true" i18n="@@ViewOptions.PlaceInfo">Platsupplysningar</ion-toggle>
-  </ion-item>
-
-  <ion-item *ngIf="availableToggles.workInfo">
-    <ion-toggle class="show_workInfo" [(ngModel)]="show.workInfo" (ionChange)="toggleOption('workInfo')" justify="space-between" [enableOnOffLabels]="true" i18n="@@ViewOptions.WorkInfo">Verkupplysningar</ion-toggle>
-  </ion-item>
-
-  <ion-item *ngIf="availableToggles.abbreviations">
-    <ion-toggle class="show_abbreviations" [(ngModel)]="show.abbreviations" (ionChange)="toggleOption('abbreviations')" justify="space-between" [enableOnOffLabels]="true" i18n="@@ViewOptions.Abbreviations">Förkortningar</ion-toggle>
-  </ion-item>
-
-  <ion-item *ngIf="availableToggles.emendations">
-    <ion-toggle class="show_emendationsInfo" [(ngModel)]="show.emendations" (ionChange)="toggleOption('emendations')" justify="space-between" [enableOnOffLabels]="true" i18n="@@ViewOptions.Emendations">Utgivarens ändringar</ion-toggle>
-  </ion-item>
-
-  <ion-item *ngIf="availableToggles.normalisations">
-    <ion-toggle class="show_normalisationsInfo" [(ngModel)]="show.normalisations" (ionChange)="toggleOption('normalisations')" justify="space-between" [enableOnOffLabels]="true" i18n="@@ViewOptions.Normalisations">Normaliseringar</ion-toggle>
-  </ion-item>
-
-  <ion-item *ngIf="availableToggles.paragraphNumbering">
-    <ion-toggle [(ngModel)]="show.paragraphNumbering" (ionChange)="toggleOption('paragraphNumbering')" justify="space-between" [enableOnOffLabels]="true" i18n="@@ViewOptions.ParagraphNumbering">Stycke-/radnumrering</ion-toggle>
-  </ion-item>
-
-  <ion-item *ngIf="availableToggles.pageBreakOriginal">
-    <ion-toggle class="show_pageBreakOriginal" [(ngModel)]="show.pageBreakOriginal" (ionChange)="toggleOption('pageBreakOriginal')" justify="space-between" [enableOnOffLabels]="true" i18n="@@ViewOptions.PageBreakOriginal">Sidnummer, original</ion-toggle>
-  </ion-item>
-
-  <ion-item *ngIf="availableToggles.pageBreakEdition">
-    <ion-toggle class="show_pageBreakEdition" [(ngModel)]="show.pageBreakEdition" (ionChange)="toggleOption('pageBreakEdition')" justify="space-between" [enableOnOffLabels]="true" i18n="@@ViewOptions.PageBreakEdition">Sidnummer, tryckt utgåva</ion-toggle>
-  </ion-item>
-</ion-list>
+@if (togglesCounter > 0) {
+  <ion-list lines="full">
+    <ion-list-header>
+      <ion-label i18n="@@ViewOptions.Options">Visningsalternativ</ion-label>
+    </ion-list-header>
+    @if (togglesCounter > 1) {
+      <ion-item>
+        <ion-toggle (ionChange)="toggleAll($event)" [checked]="checkedToggles > togglesCounter-1" justify="space-between" [enableOnOffLabels]="true" i18n="@@ViewOptions.ToggleAll">Välj alla</ion-toggle>
+      </ion-item>
+    }
+    @if (availableToggles.comments) {
+      <ion-item>
+        <ion-toggle class="show_comments" [(ngModel)]="show.comments" (ionChange)="toggleOption('comments')" justify="space-between" [enableOnOffLabels]="true"><img alt="Röd asterisk" i18n-alt="@@ViewOptions.ExplanatoryNotesAltText" src="assets/images/asterisk.svg" class="asterisk"><ng-container i18n="@@ViewOptions.ExplanatoryNotes">Punktkommentarer</ng-container></ion-toggle>
+      </ion-item>
+    }
+    @if (availableToggles.personInfo) {
+      <ion-item>
+        <ion-toggle class="show_personInfo" [(ngModel)]="show.personInfo" (ionChange)="toggleOption('personInfo')" justify="space-between" [enableOnOffLabels]="true" i18n="@@ViewOptions.PersonInfo">Personupplysningar</ion-toggle>
+      </ion-item>
+    }
+    @if (availableToggles.placeInfo) {
+      <ion-item>
+        <ion-toggle class="show_placeInfo" [(ngModel)]="show.placeInfo" (ionChange)="toggleOption('placeInfo')" justify="space-between" [enableOnOffLabels]="true" i18n="@@ViewOptions.PlaceInfo">Platsupplysningar</ion-toggle>
+      </ion-item>
+    }
+    @if (availableToggles.workInfo) {
+      <ion-item>
+        <ion-toggle class="show_workInfo" [(ngModel)]="show.workInfo" (ionChange)="toggleOption('workInfo')" justify="space-between" [enableOnOffLabels]="true" i18n="@@ViewOptions.WorkInfo">Verkupplysningar</ion-toggle>
+      </ion-item>
+    }
+    @if (availableToggles.abbreviations) {
+      <ion-item>
+        <ion-toggle class="show_abbreviations" [(ngModel)]="show.abbreviations" (ionChange)="toggleOption('abbreviations')" justify="space-between" [enableOnOffLabels]="true" i18n="@@ViewOptions.Abbreviations">Förkortningar</ion-toggle>
+      </ion-item>
+    }
+    @if (availableToggles.emendations) {
+      <ion-item>
+        <ion-toggle class="show_emendationsInfo" [(ngModel)]="show.emendations" (ionChange)="toggleOption('emendations')" justify="space-between" [enableOnOffLabels]="true" i18n="@@ViewOptions.Emendations">Utgivarens ändringar</ion-toggle>
+      </ion-item>
+    }
+    @if (availableToggles.normalisations) {
+      <ion-item>
+        <ion-toggle class="show_normalisationsInfo" [(ngModel)]="show.normalisations" (ionChange)="toggleOption('normalisations')" justify="space-between" [enableOnOffLabels]="true" i18n="@@ViewOptions.Normalisations">Normaliseringar</ion-toggle>
+      </ion-item>
+    }
+    @if (availableToggles.paragraphNumbering) {
+      <ion-item>
+        <ion-toggle [(ngModel)]="show.paragraphNumbering" (ionChange)="toggleOption('paragraphNumbering')" justify="space-between" [enableOnOffLabels]="true" i18n="@@ViewOptions.ParagraphNumbering">Stycke-/radnumrering</ion-toggle>
+      </ion-item>
+    }
+    @if (availableToggles.pageBreakOriginal) {
+      <ion-item>
+        <ion-toggle class="show_pageBreakOriginal" [(ngModel)]="show.pageBreakOriginal" (ionChange)="toggleOption('pageBreakOriginal')" justify="space-between" [enableOnOffLabels]="true" i18n="@@ViewOptions.PageBreakOriginal">Sidnummer, original</ion-toggle>
+      </ion-item>
+    }
+    @if (availableToggles.pageBreakEdition) {
+      <ion-item>
+        <ion-toggle class="show_pageBreakEdition" [(ngModel)]="show.pageBreakEdition" (ionChange)="toggleOption('pageBreakEdition')" justify="space-between" [enableOnOffLabels]="true" i18n="@@ViewOptions.PageBreakEdition">Sidnummer, tryckt utgåva</ion-toggle>
+      </ion-item>
+    }
+  </ion-list>
+}

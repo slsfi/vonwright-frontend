@@ -1,4 +1,4 @@
-<ng-container *ngIf="!isLoading">
+@if (!isLoading) {
   <div class="menu-header">
     <a class="go-back-menu-item" [routerLink]="['/content']" [queryParams]="{ menu: 'open' }">
       <ion-icon aria-hidden="true" name="chevron-back-outline"></ion-icon>
@@ -6,110 +6,134 @@
     </a>
     <h2 id="side-menu-collection-title">{{collectionTitle}}</h2>
   </div>
-  <div class="sort-select-wrapper" *ngIf="sortOptions.length > 0">
-    <ion-select
-          class="sort-select"
-          label="Sortering"
-          i18n-label="@@CollectionSideMenu.SortOptions.Sorting"
-          label-placement="floating"
-          fill="outline"
-          okText="Ok"
-          i18n-okText="@@BasicActions.Ok"
-          cancelText="Avbryt"
-          i18n-cancelText="@@BasicActions.Cancel"
-          [interfaceOptions]="sortSelectOptions"
-          (ionChange)="setActiveMenuSorting($event)"
-          [value]="activeMenuOrder"
-    >
-      <ion-select-option
-            value="default"
-            i18n="@@CollectionSideMenu.SortOptions.Default"
-      >Standard</ion-select-option>
-      <ion-select-option *ngIf="sortOptions.includes('alphabetical')"
-            value="alphabetical"
-            i18n="@@CollectionSideMenu.SortOptions.Alphabetical"
-      >Alfabetisk</ion-select-option>
-      <ion-select-option *ngIf="sortOptions.includes('chronological')"
-            value="chronological"
-            i18n="@@CollectionSideMenu.SortOptions.Chronological"
-      >Kronologisk</ion-select-option>
-      <ion-select-option *ngIf="sortOptions.includes('categorical')"
-            value="categorical"
-            i18n="@@CollectionSideMenu.SortOptions.Categorical"
-      >Kategorivis</ion-select-option>
-    </ion-select>
-  </div>
+  @if (sortOptions.length > 0) {
+    <div class="sort-select-wrapper">
+      <ion-select class="sort-select"
+            label="Sortering"
+            i18n-label="@@CollectionSideMenu.SortOptions.Sorting"
+            label-placement="floating"
+            fill="outline"
+            okText="Ok"
+            i18n-okText="@@BasicActions.Ok"
+            cancelText="Avbryt"
+            i18n-cancelText="@@BasicActions.Cancel"
+            [interfaceOptions]="sortSelectOptions"
+            (ionChange)="setActiveMenuSorting($event)"
+            [value]="activeMenuOrder"
+      >
+        <ion-select-option
+              value="default"
+              i18n="@@CollectionSideMenu.SortOptions.Default"
+        >Standard</ion-select-option>
+        @if (sortOptions.includes('alphabetical')) {
+          <ion-select-option
+                value="alphabetical"
+                i18n="@@CollectionSideMenu.SortOptions.Alphabetical"
+          >Alfabetisk</ion-select-option>
+        }
+        @if (sortOptions.includes('chronological')) {
+          <ion-select-option
+                value="chronological"
+                i18n="@@CollectionSideMenu.SortOptions.Chronological"
+          >Kronologisk</ion-select-option>
+        }
+        @if (sortOptions.includes('categorical')) {
+          <ion-select-option
+                value="categorical"
+                i18n="@@CollectionSideMenu.SortOptions.Categorical"
+          >Kategorivis</ion-select-option>
+        }
+      </ion-select>
+    </div>
+  }
   <ul role="menu" [ngClass]="activeMenuOrder + '-menu-sorting'">
-    <li *ngIf="enableCover" [attr.aria-current]="routeUrlSegments[2].path === 'cover' ? 'page' : null" role="menuitem" data-id="toc_cover">
-      <a routerLink="{{collectionID | collectionPagePath: 'cover'}}" [class.menu-highlight]="routeUrlSegments[2].path === 'cover'">
-        <span class="label" i18n="@@CollectionCover.Cover">Omslag</span>
-      </a>
-    </li>
-    <li *ngIf="enableTitle" [attr.aria-current]="routeUrlSegments[2].path === 'title' ? 'page' : null" role="menuitem" data-id="toc_title">
-      <a routerLink="{{collectionID | collectionPagePath: 'title'}}" [class.menu-highlight]="routeUrlSegments[2].path === 'title'">
-        <span class="label" i18n="@@CollectionTitle.TitlePage">Titelblad</span>
-      </a>
-    </li>
-    <li *ngIf="enableForeword" [attr.aria-current]="routeUrlSegments[2].path === 'foreword' ? 'page' : null" role="menuitem" data-id="toc_foreword">
-      <a routerLink="{{collectionID | collectionPagePath: 'foreword'}}" [class.menu-highlight]="routeUrlSegments[2].path === 'foreword'">
-        <span class="label" i18n="@@CollectionForeword.Foreword">Förord</span>
-      </a>
-    </li>
-    <li *ngIf="enableIntroduction" [attr.aria-current]="routeUrlSegments[2].path === 'introduction' ? 'page' : null" role="menuitem" data-id="toc_introduction">
-      <a routerLink="{{collectionID | collectionPagePath: 'introduction'}}" [class.menu-highlight]="routeUrlSegments[2].path === 'introduction'">
-        <span class="label" i18n="@@CollectionIntroduction.Introduction">Inledning</span>
-      </a>
-    </li>
+    @if (enableCover) {
+      <li [attr.aria-current]="routeUrlSegments[2].path === 'cover' ? 'page' : null" role="menuitem" data-id="toc_cover">
+        <a routerLink="{{collectionID | collectionPagePath: 'cover'}}" [class.menu-highlight]="routeUrlSegments[2].path === 'cover'">
+          <span class="label" i18n="@@CollectionCover.Cover">Omslag</span>
+        </a>
+      </li>
+    }
+    @if (enableTitle) {
+      <li [attr.aria-current]="routeUrlSegments[2].path === 'title' ? 'page' : null" role="menuitem" data-id="toc_title">
+        <a routerLink="{{collectionID | collectionPagePath: 'title'}}" [class.menu-highlight]="routeUrlSegments[2].path === 'title'">
+          <span class="label" i18n="@@CollectionTitle.TitlePage">Titelblad</span>
+        </a>
+      </li>
+    }
+    @if (enableForeword) {
+      <li [attr.aria-current]="routeUrlSegments[2].path === 'foreword' ? 'page' : null" role="menuitem" data-id="toc_foreword">
+        <a routerLink="{{collectionID | collectionPagePath: 'foreword'}}" [class.menu-highlight]="routeUrlSegments[2].path === 'foreword'">
+          <span class="label" i18n="@@CollectionForeword.Foreword">Förord</span>
+        </a>
+      </li>
+    }
+    @if (enableIntroduction) {
+      <li [attr.aria-current]="routeUrlSegments[2].path === 'introduction' ? 'page' : null" role="menuitem" data-id="toc_introduction">
+        <a routerLink="{{collectionID | collectionPagePath: 'introduction'}}" [class.menu-highlight]="routeUrlSegments[2].path === 'introduction'">
+          <span class="label" i18n="@@CollectionIntroduction.Introduction">Inledning</span>
+        </a>
+      </li>
+    }
     <ng-container *ngTemplateOutlet="recursiveMenu; context: {$implicit: collectionMenu}"/>
   </ul>
-</ng-container>
+}
 
 <ng-template #recursiveMenu let-list>
-  <ng-container *ngFor="let item of list">
-    <li 
+  @for (item of list; track item) {
+    <li
           [attr.data-id]="item.itemId ? 'toc_' + item.itemId : ''"
           [attr.aria-current]="currentMenuItemId === item.itemId ? 'page' : null"
           [attr.aria-haspopup]="item.children ? 'menu' : null"
           [attr.aria-expanded]="item.children ? selectedMenu.includes(item.itemId) || selectedMenu.includes(item.nodeId) : null"
           role="menuitem"
     >
-      <a *ngIf="item.itemId"
-            [routerLink]="item.itemId | collectionPagePath"
-            [queryParams]="item.itemId | collectionPagePositionQueryparam"
-            [class.menu-highlight]="currentMenuItemId === item.itemId"
-            [class.submenu-label]="item.children"
-      >
-        <ng-container *ngTemplateOutlet="menuItemContent; context: {$implicit: item}"/>
-      </a>
-      <button *ngIf="!item.itemId"
-            (click)="toggle(item)"
-            [class.submenu-label]="item.children"
-      >
-        <ng-container *ngTemplateOutlet="menuItemContent; context: {$implicit: item}"/>
-      </button>
-      <ul *ngIf="item.children" role="menu"
-            [class.open]="selectedMenu.includes(item.itemId) || selectedMenu.includes(item.nodeId)"
-      >
-        <ng-container *ngTemplateOutlet="recursiveMenu; context: {$implicit: item.children}"/>
-      </ul>
+      @if (item.itemId) {
+        <a
+              [routerLink]="item.itemId | collectionPagePath"
+              [queryParams]="item.itemId | collectionPagePositionQueryparam"
+              [class.menu-highlight]="currentMenuItemId === item.itemId"
+              [class.submenu-label]="item.children"
+        >
+          <ng-container *ngTemplateOutlet="menuItemContent; context: {$implicit: item}"/>
+        </a>
+      } @else {
+        <button
+              (click)="toggle(item)"
+              [class.submenu-label]="item.children"
+        >
+          <ng-container *ngTemplateOutlet="menuItemContent; context: {$implicit: item}"/>
+        </button>
+      }
+      @if (item.children) {
+        <ul role="menu"
+              [class.open]="selectedMenu.includes(item.itemId) || selectedMenu.includes(item.nodeId)"
+        >
+          <ng-container *ngTemplateOutlet="recursiveMenu; context: {$implicit: item.children}"/>
+        </ul>
+      }
     </li>
-  </ng-container>
+  }
 </ng-template>
 
 <ng-template #menuItemContent let-item>
-    <span class="label">
-      {{item.text}}
-      <span class="description" *ngIf="item.description">{{item.description}}</span>
-    </span>
-    <ion-icon *ngIf="!item.children && item.facsimileOnly"
-          name="image-outline"
+  <span class="label">
+    {{item.text}}
+    @if (item.description) {
+      <span class="description">{{item.description}}</span>
+    }
+  </span>
+  @if (!item.children && item.facsimileOnly) {
+    <ion-icon name="image-outline"
           class="item-icon-r facs-only-icon"
           aria-hidden="true"
     ></ion-icon>
-    <ion-icon *ngIf="item.children"
-          name="chevron-forward-outline"
+  }
+  @if (item.children) {
+    <ion-icon name="chevron-forward-outline"
           class="item-icon-r toggle-icon"
           aria-hidden="true"
           [class.open]="selectedMenu.includes(item.itemId) || selectedMenu.includes(item.nodeId)"
     ></ion-icon>
+  }
 </ng-template>

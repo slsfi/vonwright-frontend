@@ -1,26 +1,28 @@
-<ng-container *ngIf="images.length > 0 && !imgLoading; then illustrations; else none"></ng-container>
-
-<ng-template #illustrations>
-  <ion-button *ngIf="!viewAll && imageCountTotal > 1"
-        class="custom-button view-all-button"
-        (click)="viewAllIllustrations()"
-        i18n="@@Illustrations.ShowAll"
-  >Visa alla</ion-button>
-  <div class="illustration-image-wrapper" *ngFor="let image of images">
-    <img [src]="image.src"
-          (click)="zoomImage(image.src)"
-          alt="illustration"
-          loading="lazy"
-          [ngClass]="image.class ? image.class : ''"
-    >
-    <ion-button class="custom-button"
-          (click)="scrollToPositionInText(image)"
-          i18n="@@Illustrations.ShowInReadingText"
-    >Visa position i lästext</ion-button>
-  </div>
-</ng-template>
-
-<ng-template #none>
-  <div *ngIf="!imgLoading" class="tei teiContainer" i18n="@@Illustrations.None">Inga illustrationer.</div>
-  <ion-spinner *ngIf="imgLoading" class="loading" name="crescent"></ion-spinner>
-</ng-template>
+@if (images.length > 0 && !imgLoading) {
+  @if (!viewAll && imageCountTotal > 1) {
+    <ion-button class="custom-button view-all-button"
+          (click)="viewAllIllustrations()"
+          i18n="@@Illustrations.ShowAll"
+    >Visa alla</ion-button>
+  }
+  @for (image of images; track image.src) {
+    <div class="illustration-image-wrapper">
+      <img [src]="image.src"
+            (click)="zoomImage(image.src)"
+            alt="illustration"
+            loading="lazy"
+            [ngClass]="image.class ? image.class : ''"
+      >
+      <ion-button class="custom-button"
+            (click)="scrollToPositionInText(image)"
+            i18n="@@Illustrations.ShowInReadingText"
+      >Visa position i lästext</ion-button>
+    </div>
+  }
+} @else {
+  @if (!imgLoading) {
+    <div class="tei teiContainer" i18n="@@Illustrations.None">Inga illustrationer.</div>
+  } @else {
+    <ion-spinner class="loading" name="crescent"></ion-spinner>
+  }
+}

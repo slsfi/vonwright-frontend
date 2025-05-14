@@ -11,163 +11,218 @@
 
 <ion-content>
   <div class="modal-inner-wrapper">
-    <h2 *ngIf="collectionTitle || publicationTitle"
-          [ngClass]="introductionMode ? 'introductionMode' : 'readTextsMode'"
-    >
-      <span class="header-pub-title" [innerHTML]="publicationTitle"></span>
-      <span class="header-coll-title" [innerHTML]="collectionTitle"></span>
-    </h2>
+    @if (collectionTitle || publicationTitle) {
+      <h2 [ngClass]="introductionMode ? 'introductionMode' : 'readTextsMode'">
+        <span class="header-pub-title" [innerHTML]="publicationTitle"></span>
+        <span class="header-coll-title" [innerHTML]="collectionTitle"></span>
+      </h2>
+    }
 
-    <p *ngIf="showLoadingError" class="errorMessage" i18n="@@DownloadTexts.TextLoadingError">Nedladdningen misslyckades. Vänligen försök igen och tillåt popup-fönster för webbplatsen.</p>
-    <p *ngIf="showMissingTextError" class="errorMessage" i18n="@@DownloadTexts.MissingTextError">Texten saknas och går inte att ladda ner eller skriva ut.</p>
-    <p *ngIf="showPrintError" class="errorMessage" i18n="@@DownloadTexts.OpenPrintError">Utskriftsversionen kunde inte öppnas i ett nytt fönster. Vänligen försök igen och tillåt popup-fönster för webbplatsen.</p>
+    @if (showLoadingError) {
+      <p class="errorMessage" i18n="@@DownloadTexts.TextLoadingError">Nedladdningen misslyckades. Vänligen försök igen och tillåt popup-fönster för webbplatsen.</p>
+    }
+    @if (showMissingTextError) {
+      <p class="errorMessage" i18n="@@DownloadTexts.MissingTextError">Texten saknas och går inte att ladda ner eller skriva ut.</p>
+    }
+    @if (showPrintError) {
+      <p class="errorMessage" i18n="@@DownloadTexts.OpenPrintError">Utskriftsversionen kunde inte öppnas i ett nytt fönster. Vänligen försök igen och tillåt popup-fönster för webbplatsen.</p>
+    }
 
     <div class="modal-inner-box">
-      <div *ngIf="introductionMode && downloadFormatsIntro.length" class="dlt-group">
-        <h3 i18n="@@CollectionIntroduction.Introduction">Inledning</h3>
-        <ion-buttons class="download-buttons">
-          <ng-container *ngFor="let format of downloadFormatsIntro">
-            <ion-button *ngIf="format !== 'print'"
-                  class="custom-button"
-                  (click)="initiateDownload('intro', format)"
-            >
-              <ng-container *ngIf="format === 'xml'" i18n="@@DownloadTexts.Format.XML">XML</ng-container>
-              <ng-container *ngIf="format === 'html'" i18n="@@DownloadTexts.Format.HTML">HTML</ng-container>
-              <ng-container *ngIf="format === 'xhtml'" i18n="@@DownloadTexts.Format.XHTML">XHTML</ng-container>
-              <ng-container *ngIf="format === 'txt'" i18n="@@DownloadTexts.Format.TXT">TXT</ng-container>
-            </ion-button>
-            <ion-button *ngIf="format === 'print'"
-                  class="custom-outline-button"
-                  fill="outline"
-                  (click)="openPrintFriendlyText('intro')"
-                  i18n="@@DownloadTexts.Format.Print"
-            >Utskrift</ion-button>
-          </ng-container>
-          <ion-spinner *ngIf="loadingIntro" class="loading" name="crescent"></ion-spinner>
-        </ion-buttons>
-      </div>
-
-      <ng-container *ngIf="(publicationData$ | async) as publicationData">
-        <ng-container *ngIf="readTextsMode && downloadFormatsEst.length && publicationData.original_filename">
-          <ng-container *ngFor="let language of readTextLanguages; index as i">
-            <div *ngIf="readTextLanguages.length < 2 || (readTextLanguages.length > 1 && publicationData.original_filename?.[language])" class="dlt-group">
-              <h3 *ngIf="readTextLanguages.length < 2" i18n="@@ReadingText.ReadingText">Lästext</h3>
-              <h3 *ngIf="readTextLanguages.length > 1">
-                  <ng-container *ngIf="language === 'sv'" i18n="@@ReadingText.SwedishText">Svensk text</ng-container>
-                  <ng-container *ngIf="language === 'fi'" i18n="@@ReadingText.FinnishText">Finsk text</ng-container>
-              </h3>
-              <ion-buttons class="download-buttons">
-                <ng-container *ngFor="let format of downloadFormatsEst">
-                  <ion-button *ngIf="format !== 'print'"
-                        class="custom-button"
-                        (click)="loadingGroupIndex = i; initiateDownload('rt', format, language)"
-                  >
-                    <ng-container *ngIf="format === 'xml'" i18n="@@DownloadTexts.Format.XML">XML</ng-container>
-                    <ng-container *ngIf="format === 'html'" i18n="@@DownloadTexts.Format.HTML">HTML</ng-container>
-                    <ng-container *ngIf="format === 'xhtml'" i18n="@@DownloadTexts.Format.XHTML">XHTML</ng-container>
-                    <ng-container *ngIf="format === 'txt'" i18n="@@DownloadTexts.Format.TXT">TXT</ng-container>
-                  </ion-button>
-                  <ion-button *ngIf="format === 'print'"
-                        class="custom-outline-button"
-                        fill="outline"
-                        (click)="loadingGroupIndex = i; openPrintFriendlyText('rt', language)"
-                        i18n="@@DownloadTexts.Format.Print"
-                  >Utskrift</ion-button>
-                </ng-container>
-                <ion-spinner *ngIf="loadingEst && loadingGroupIndex === i" class="loading" name="crescent"></ion-spinner>
-              </ion-buttons>
-            </div>
-          </ng-container>
-        </ng-container>
-
-        <div *ngIf="readTextsMode &&
-                    downloadFormatsCom.length &&
-                    publicationData.publication_comment_id"
-              class="dlt-group"
-        >
-          <h3 i18n="@@Commentary.Commentary">Kommentar</h3>
+      @if (introductionMode && downloadFormatsIntro.length) {
+        <div class="dlt-group">
+          <h3 i18n="@@CollectionIntroduction.Introduction">Inledning</h3>
           <ion-buttons class="download-buttons">
-            <ng-container *ngFor="let format of downloadFormatsCom">
-              <ion-button *ngIf="format !== 'print'"
-                    class="custom-button"
-                    (click)="initiateDownload('com', format)"
-              >
-                <ng-container *ngIf="format === 'xml'" i18n="@@DownloadTexts.Format.XML">XML</ng-container>
-                <ng-container *ngIf="format === 'html'" i18n="@@DownloadTexts.Format.HTML">HTML</ng-container>
-                <ng-container *ngIf="format === 'xhtml'" i18n="@@DownloadTexts.Format.XHTML">XHTML</ng-container>
-                <ng-container *ngIf="format === 'txt'" i18n="@@DownloadTexts.Format.TXT">TXT</ng-container>
-              </ion-button>
-              <ion-button *ngIf="format === 'print'"
-                    class="custom-outline-button"
-                    fill="outline"
-                    (click)="openPrintFriendlyText('com')"
-                    i18n="@@DownloadTexts.Format.Print"
-              >Utskrift</ion-button>
-            </ng-container>
-            <ion-spinner *ngIf="loadingCom" class="loading" name="crescent"></ion-spinner>
-          </ion-buttons>
-        </div>
-      </ng-container>
-
-      <ng-container *ngIf="(manuscriptsList$ | async) as manuscripts">
-        <div *ngIf="readTextsMode && downloadFormatsMs.length" class="dlt-group">
-          <h3 i18n="@@Manuscripts.Manuscript">Manuskript</h3>
-          <ng-container *ngFor="let ms of manuscripts; index as i">
-            <h4 *ngIf="manuscripts.length > 1" [innerHTML]="ms.name"></h4>
-            <ion-buttons class="download-buttons">
-              <ng-container *ngFor="let format of downloadFormatsMs">
-                <ion-button *ngIf="format !== 'print'"
-                      class="custom-button"
-                      (click)="loadingGroupIndex = i; initiateDownload('ms', format, '', ms.id)"
+            @for (format of downloadFormatsIntro; track format) {
+              @if (format !== 'print') {
+                <ion-button class="custom-button"
+                      (click)="initiateDownload('intro', format)"
                 >
-                  <ng-container *ngIf="format === 'xml'" i18n="@@DownloadTexts.Format.XML">XML</ng-container>
-                  <ng-container *ngIf="format === 'html'" i18n="@@DownloadTexts.Format.HTML">HTML</ng-container>
-                  <ng-container *ngIf="format === 'xhtml'" i18n="@@DownloadTexts.Format.XHTML">XHTML</ng-container>
-                  <ng-container *ngIf="format === 'txt'" i18n="@@DownloadTexts.Format.TXT">TXT</ng-container>
+                  @if (format === 'xml') {
+                    <ng-container i18n="@@DownloadTexts.Format.XML">XML</ng-container>
+                  } @else if (format === 'html') {
+                    <ng-container i18n="@@DownloadTexts.Format.HTML">HTML</ng-container>
+                  } @else if (format === 'xhtml') {
+                    <ng-container i18n="@@DownloadTexts.Format.XHTML">XHTML</ng-container>
+                  } @else if (format === 'txt') {
+                    <ng-container i18n="@@DownloadTexts.Format.TXT">TXT</ng-container>
+                  }
                 </ion-button>
-                <ion-button *ngIf="format === 'print'"
-                      class="custom-outline-button"
+              } @else {
+                <ion-button class="custom-outline-button"
                       fill="outline"
-                      (click)="loadingGroupIndex = i; openPrintFriendlyText('ms', '', ms.id, ms.name)"
+                      (click)="openPrintFriendlyText('intro')"
                       i18n="@@DownloadTexts.Format.Print"
                 >Utskrift</ion-button>
-              </ng-container>
-              <ion-spinner *ngIf="loadingMs && loadingGroupIndex === i" class="loading" name="crescent"></ion-spinner>
-            </ion-buttons>
-          </ng-container>
+              }
+            }
+            @if (loadingIntro) {
+              <ion-spinner class="loading" name="crescent"></ion-spinner>
+            }
+          </ion-buttons>
         </div>
-      </ng-container>
+      }
 
-      <ng-container *ngIf="downloadOptionsExist; else noDownloads">
-        <ng-container *ngTemplateOutlet="showNotice; context: {$implicit: (instructionsText$ | async)}"/>
-
-        <ng-template #showNotice let-instructionsText>
-          <div *ngIf="copyrightText || instructionsText" class="notice">
-            <div *ngIf="instructionsText" class="markdown download-instructions" [innerHTML]="instructionsText | trustHtml"></div>
-            <p *ngIf="copyrightText && !copyrightURL" class="copyright-notice"><ng-container i18n="@@DownloadTexts.CopyrightNoticeLabel">Licens</ng-container>: <span [innerHTML]="copyrightText"></span></p>
-            <p *ngIf="copyrightText && copyrightURL" class="copyright-notice">
-              <ng-container i18n="@@DownloadTexts.CopyrightNoticeLabel">Licens</ng-container>: 
-              <a [href]="copyrightURL" target="_blank">
-                <span [innerHTML]="copyrightText"></span>
-                <ion-icon name="open-outline"
-                      [ngStyle]="{
-                        'font-size': '1.375rem',
-                        'padding-left': '0.125rem',
-                        'vertical-align': 'text-bottom'
-                      }"
-                      aria-label="Länken öppnas i ett nytt fönster"
-                      i18n-aria-label="@@BasicActions.OpenInNewWindow"
-                ></ion-icon>
-              </a>
-            </p>
+      @if ((publicationData$ | async); as publicationData) {
+        @if (readTextsMode && downloadFormatsEst.length && publicationData.original_filename) {
+          @for (language of readTextLanguages; track language; let i = $index) {
+            @if (readTextLanguages.length < 2 || (readTextLanguages.length > 1 && publicationData.original_filename?.[language])) {
+              <div class="dlt-group">
+                @if (readTextLanguages.length < 2) {
+                  <h3 i18n="@@ReadingText.ReadingText">Lästext</h3>
+                }
+                @if (readTextLanguages.length > 1) {
+                  <h3>
+                    @if (language === 'sv') {
+                      <ng-container i18n="@@ReadingText.SwedishText">Svensk text</ng-container>
+                    } @else if (language === 'fi') {
+                      <ng-container i18n="@@ReadingText.FinnishText">Finsk text</ng-container>
+                    }
+                  </h3>
+                }
+                <ion-buttons class="download-buttons">
+                  @for (format of downloadFormatsEst; track format) {
+                    @if (format !== 'print') {
+                      <ion-button class="custom-button"
+                            (click)="loadingGroupIndex = i; initiateDownload('rt', format, language)"
+                      >
+                        @if (format === 'xml') {
+                          <ng-container i18n="@@DownloadTexts.Format.XML">XML</ng-container>
+                        } @else if (format === 'html') {
+                          <ng-container i18n="@@DownloadTexts.Format.HTML">HTML</ng-container>
+                        } @else if (format === 'xhtml') {
+                          <ng-container i18n="@@DownloadTexts.Format.XHTML">XHTML</ng-container>
+                        } @else if (format === 'txt') {
+                          <ng-container i18n="@@DownloadTexts.Format.TXT">TXT</ng-container>
+                        }
+                      </ion-button>
+                    } @else {
+                      <ion-button class="custom-outline-button"
+                            fill="outline"
+                            (click)="loadingGroupIndex = i; openPrintFriendlyText('rt', language)"
+                            i18n="@@DownloadTexts.Format.Print"
+                      >Utskrift</ion-button>
+                    }
+                  }
+                  @if (loadingEst && loadingGroupIndex === i) {
+                    <ion-spinner class="loading" name="crescent"></ion-spinner>
+                  }
+                </ion-buttons>
+              </div>
+            }
+          }
+        }
+        @if (readTextsMode && downloadFormatsCom.length && publicationData.publication_comment_id) {
+          <div class="dlt-group">
+            <h3 i18n="@@Commentary.Commentary">Kommentar</h3>
+            <ion-buttons class="download-buttons">
+              @for (format of downloadFormatsCom; track format) {
+                @if (format !== 'print') {
+                  <ion-button class="custom-button"
+                        (click)="initiateDownload('com', format)"
+                  >
+                    @if (format === 'xml') {
+                      <ng-container i18n="@@DownloadTexts.Format.XML">XML</ng-container>
+                    } @else if (format === 'html') {
+                      <ng-container i18n="@@DownloadTexts.Format.HTML">HTML</ng-container>
+                    } @else if (format === 'xhtml') {
+                      <ng-container i18n="@@DownloadTexts.Format.XHTML">XHTML</ng-container>
+                    } @else if (format === 'txt') {
+                      <ng-container i18n="@@DownloadTexts.Format.TXT">TXT</ng-container>
+                    }
+                  </ion-button>
+                } @else {
+                  <ion-button class="custom-outline-button"
+                        fill="outline"
+                        (click)="openPrintFriendlyText('com')"
+                        i18n="@@DownloadTexts.Format.Print"
+                  >Utskrift</ion-button>
+                }
+              }
+              @if (loadingCom) {
+                <ion-spinner class="loading" name="crescent"></ion-spinner>
+              }
+            </ion-buttons>
           </div>
-        </ng-template>
-      </ng-container>
+        }
+      }
 
-      <ng-template #noDownloads>
+      @if ((manuscriptsList$ | async); as manuscripts) {
+        @if (readTextsMode && downloadFormatsMs.length) {
+          <div class="dlt-group">
+            <h3 i18n="@@Manuscripts.Manuscript">Manuskript</h3>
+            @for (ms of manuscripts; track ms.id; let i = $index) {
+              @if (manuscripts.length > 1) {
+                <h4 [innerHTML]="ms.name"></h4>
+              }
+              <ion-buttons class="download-buttons">
+                @for (format of downloadFormatsMs; track format) {
+                  @if (format !== 'print') {
+                    <ion-button class="custom-button"
+                          (click)="loadingGroupIndex = i; initiateDownload('ms', format, '', ms.id)"
+                    >
+                      @if (format === 'xml') {
+                        <ng-container i18n="@@DownloadTexts.Format.XML">XML</ng-container>
+                      } @else if (format === 'html') {
+                        <ng-container i18n="@@DownloadTexts.Format.HTML">HTML</ng-container>
+                      } @else if (format === 'xhtml') {
+                        <ng-container i18n="@@DownloadTexts.Format.XHTML">XHTML</ng-container>
+                      } @else if (format === 'txt') {
+                        <ng-container i18n="@@DownloadTexts.Format.TXT">TXT</ng-container>
+                      }
+                    </ion-button>
+                  } @else {
+                    <ion-button class="custom-outline-button"
+                          fill="outline"
+                          (click)="loadingGroupIndex = i; openPrintFriendlyText('ms', '', ms.id, ms.name)"
+                          i18n="@@DownloadTexts.Format.Print"
+                    >Utskrift</ion-button>
+                  }
+                }
+                @if (loadingMs && loadingGroupIndex === i) {
+                  <ion-spinner class="loading" name="crescent"></ion-spinner>
+                }
+              </ion-buttons>
+            }
+          </div>
+        }
+      }
+
+      @if (downloadOptionsExist) {
+        <ng-container *ngTemplateOutlet="showNotice; context: {$implicit: (instructionsText$ | async)}"/>
+        <ng-template #showNotice let-instructionsText>
+          @if (copyrightText || instructionsText) {
+            <div class="notice">
+              @if (instructionsText) {
+                <div class="markdown download-instructions" [innerHTML]="instructionsText | trustHtml"></div>
+              }
+              @if (copyrightText && !copyrightURL) {
+                <p class="copyright-notice"><ng-container i18n="@@DownloadTexts.CopyrightNoticeLabel">Licens</ng-container>: <span [innerHTML]="copyrightText"></span></p>
+              }
+              @if (copyrightText && copyrightURL) {
+                <p class="copyright-notice">
+                  <ng-container i18n="@@DownloadTexts.CopyrightNoticeLabel">Licens</ng-container>:
+                  <a [href]="copyrightURL" target="_blank">
+                    <span [innerHTML]="copyrightText"></span>
+                    <ion-icon name="open-outline"
+                          [ngStyle]="{
+                            'font-size': '1.375rem',
+                            'padding-left': '0.125rem',
+                            'vertical-align': 'text-bottom'
+                          }"
+                          aria-label="Länken öppnas i ett nytt fönster"
+                      i18n-aria-label="@@BasicActions.OpenInNewWindow"
+                    ></ion-icon>
+                  </a>
+                </p>
+              }
+            </div>
+          }
+        </ng-template>
+      } @else {
         <p class="no-dl-options" i18n="@@DownloadTexts.NoDownloads">Inga texter tillgängliga för nedladdning eller utskrift.</p>
-      </ng-template>
-      
+      }
+
     </div>
   </div>
 </ion-content>

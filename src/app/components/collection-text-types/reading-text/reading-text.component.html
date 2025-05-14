@@ -1,4 +1,6 @@
-<ion-spinner *ngIf="!text" class="loading" name="crescent"></ion-spinner>
+@if (!text) {
+  <ion-spinner class="loading" name="crescent"></ion-spinner>
+}
 <div class="tei teiContainer"
       [innerHTML]="text | trustHtml"
       [MathJax]="text"

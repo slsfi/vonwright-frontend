@@ -35,6 +35,12 @@ async function generateSitemap() {
   const projectName = config.app?.projectNameDB ?? '';
   const API = config.app?.backendBaseURL ?? '';
   let urlOrigin = config.app?.siteURLOrigin ?? '';
+
+  if (!projectName || !API || !urlOrigin) {
+    console.error('Critical config values are missing, cannot generate sitemap.');
+    process.exit(1); // Hard failure: something is wrong with core config
+  }
+
   const locale = config.app?.i18n?.defaultLanguage ?? 'sv';
   const multilingualCollectionTOC = config.app?.i18n?.multilingualCollectionTableOfContents ?? false;
   const collectionCovers = config.collections?.frontMatterPages?.cover ?? false;
@@ -81,25 +87,30 @@ async function generateSitemap() {
 
     // Fetch all collections from the backend
     const allCollections = await common.fetchFromAPI(collectionsEndpoint);
-    const includedCollectionIds = config.collections.order.flat();
-    // Filter out the collections that are not included according to the config
-    const collections = allCollections.filter(coll => includedCollectionIds.includes(coll.id));
 
-    if (collections) {
-      if (collectionCovers) {
-        urlCounter += await generateCollectionURLs(collections, 'cover', urlOrigin, locale);
-      }
-      if (collectionTitles) {
-        urlCounter += await generateCollectionURLs(collections, 'title', urlOrigin, locale);
-      }
-      if (collectionForewords) {
-        urlCounter += await generateCollectionURLs(collections, 'foreword', urlOrigin, locale);
-      }
-      if (collectionIntros) {
-        urlCounter += await generateCollectionURLs(collections, 'introduction', urlOrigin, locale);
-      }
+    if (!allCollections) {
+      console.warn(`Skipping collections: No data fetched from ${collectionsEndpoint}`);
+    } else {
+      const includedCollectionIds = config.collections.order.flat();
+      // Filter out the collections that are not included according to the config
+      const collections = allCollections.filter(coll => includedCollectionIds.includes(coll.id));
 
-      urlCounter += await generateCollectionURLs(collections, 'text', urlOrigin, locale, APIBase, multilingualCollectionTOC);
+      if (collections) {
+        if (collectionCovers) {
+          urlCounter += await generateCollectionURLs(collections, 'cover', urlOrigin, locale);
+        }
+        if (collectionTitles) {
+          urlCounter += await generateCollectionURLs(collections, 'title', urlOrigin, locale);
+        }
+        if (collectionForewords) {
+          urlCounter += await generateCollectionURLs(collections, 'foreword', urlOrigin, locale);
+        }
+        if (collectionIntros) {
+          urlCounter += await generateCollectionURLs(collections, 'introduction', urlOrigin, locale);
+        }
+
+        urlCounter += await generateCollectionURLs(collections, 'text', urlOrigin, locale, APIBase, multilingualCollectionTOC);
+      }
     }
   }
 
@@ -182,44 +193,44 @@ async function generateCollectionTextURLs(collection_id, urlOrigin, locale, API,
   if (multilingualTOC) {
     endpoint += '/' + locale;
   }
+
   const tocJSON = await common.fetchFromAPI(endpoint);
+
+  // Handle failed fetch
+  if (!tocJSON) {
+    console.warn(`Skipping collection ${collection_id}: No Table of Contents fetched from ${endpoint}`);
+    return 0;
+  }
+
+  // Flatten the TOC structure
   const toc = common.flattenObjectTree(tocJSON, 'children', 'itemId');
+  if (!toc || !toc.length) {
+    console.warn(`No items found in TOC for collection ${collection_id}`);
+    return 0;
+  }
 
   let counter = 0;
-  let addedUrls = [];
+  const addedUrls = new Set(); // use a Set to automatically prevent duplicates
 
   for (let i = 0; i < toc.length; i++) {
-    if (toc[i]['itemId']) {
-      const itemId = toc[i]['itemId'].split(';')[0];
-      let prevItemId = undefined;
-      if (i > 0 && toc[i - 1]['itemId']) {
-        prevItemId = toc[i - 1]['itemId'].split(';')[0];
-      }
+    const itemId = toc[i]?.itemId?.split(';')[0];
+    if (!itemId) continue;
 
-      if (itemId !== prevItemId) {
-        const itemIdParts = itemId.split('_');
-        if (itemIdParts.length > 1) {
-          const textId = itemIdParts[1];
-          const chapterId = itemIdParts[2] || '';
+    const prevItemId = toc[i - 1]?.itemId?.split(';')[0];
+    if (itemId === prevItemId) continue;
 
-          let url = `${urlOrigin}/${locale}/collection/${collection_id}/text/${textId}`;
-          if (chapterId) {
-            url += '/' + chapterId;
-          }
+    const parts = itemId.split('_');
+    if (parts.length > 1) {
+      const textId = parts[1];
+      const chapterId = parts[2] || '';
 
-          let newUrl = true;
-          for (let x = 0; x < addedUrls.length; x++) {
-            if (url === addedUrls[x]) {
-              newUrl = false;
-              break;
-            }
-          }
-          if (newUrl) {
-            addedUrls.push(url);
-            appendToSitemapFile(url + '\n');
-            counter++;
-          }
-        }
+      let url = `${urlOrigin}/${locale}/collection/${collection_id}/text/${textId}`;
+      if (chapterId) url += `/${chapterId}`;
+
+      if (!addedUrls.has(url)) {
+        appendToSitemapFile(url + '\n');
+        addedUrls.add(url);
+        counter++;
       }
     }
   }

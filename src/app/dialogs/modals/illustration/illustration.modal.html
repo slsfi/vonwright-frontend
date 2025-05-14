@@ -11,25 +11,42 @@
 
 <ion-content>
   <div class="modal-inner-wrapper">
-    <button *ngIf="imgPath"
-          class="illustration-thumb"
-          (click)="zoomImage()"
-          aria-haspopup="dialog"
-          aria-label="Zooma in"
-          i18n-aria-label="@@Facsimiles.ZoomIn"
-    >
-      <img [alt]="imgMetadata?.media_title_translation || 'Illustration'" [src]="imgPath">
-    </button>
-    <div *ngIf="imgMetadata" class="illustration-metadata">
-      <p *ngIf="imgMetadata.full_name || imgMetadata.media_title_translation"><b><ng-container *ngIf="imgMetadata.full_name">{{imgMetadata.full_name}}</ng-container><ng-container *ngIf="imgMetadata.full_name && imgMetadata.media_title_translation">, </ng-container><i *ngIf="imgMetadata.media_title_translation">{{imgMetadata.media_title_translation}}</i></b></p>
-      <p *ngIf="imgMetadata.media_art_technique_translation">{{imgMetadata.media_art_technique_translation}}</p>
-      <p *ngIf="imgMetadata.media_collection_title_translation">{{imgMetadata.media_collection_title_translation}}</p>
-      <p *ngIf="imgMetadata.art_location">{{imgMetadata.art_location}}</p>
-      <p class="media-collection-link" *ngIf="imgMetadata.media_collection_id">
-        <a [routerLink]="['/media-collection', imgMetadata.media_collection_id]">
-          <ion-icon name="images" aria-hidden="true"></ion-icon> <ng-container i18n="@@Illustrations.OpenMediaCollection">Öppna bildbanken</ng-container>
-        </a>
-      </p>
-    </div>
+    @if (imgPath) {
+      <button class="illustration-thumb"
+            (click)="zoomImage()"
+            aria-haspopup="dialog"
+            aria-label="Zooma in"
+            i18n-aria-label="@@Facsimiles.ZoomIn"
+      >
+        <img [alt]="imgMetadata?.media_title_translation || 'Illustration'" [src]="imgPath">
+      </button>
+    }
+    @if (imgMetadata) {
+      <div class="illustration-metadata">
+        @if (imgMetadata.full_name || imgMetadata.media_title_translation) {
+          <p><b>@if (imgMetadata.full_name) {
+            {{imgMetadata.full_name}}
+            }@if (imgMetadata.full_name && imgMetadata.media_title_translation) {, }@if (imgMetadata.media_title_translation) {
+            <i>{{imgMetadata.media_title_translation}}</i>
+          }</b></p>
+        }
+        @if (imgMetadata.media_art_technique_translation) {
+          <p>{{imgMetadata.media_art_technique_translation}}</p>
+        }
+        @if (imgMetadata.media_collection_title_translation) {
+          <p>{{imgMetadata.media_collection_title_translation}}</p>
+        }
+        @if (imgMetadata.art_location) {
+          <p>{{imgMetadata.art_location}}</p>
+        }
+        @if (imgMetadata.media_collection_id) {
+          <p class="media-collection-link">
+            <a [routerLink]="['/media-collection', imgMetadata.media_collection_id]">
+              <ion-icon name="images" aria-hidden="true"></ion-icon> <ng-container i18n="@@Illustrations.OpenMediaCollection">Öppna bildbanken</ng-container>
+            </a>
+          </p>
+        }
+      </div>
+    }
   </div>
 </ion-content>

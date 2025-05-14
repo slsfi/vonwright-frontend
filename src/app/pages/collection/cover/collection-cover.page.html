@@ -1,29 +1,36 @@
 <ion-header class="ion-no-border">
   <ion-toolbar class="secondary">
 
-    <text-changer *ngIf="!mobileMode"
-          [parentPageType]="'cover'"
-          [ionViewActive]="_activeComponent"
-          class="text-changer-desktop-mode"
-    ></text-changer>
+    @if (!mobileMode) {
+      <text-changer
+            [parentPageType]="'cover'"
+            [ionViewActive]="_activeComponent"
+            class="text-changer-desktop-mode"
+      ></text-changer>
+    }
 
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="collection-ion-content" [class.mobile-mode-content]="mobileMode" [scrollX]="false" [scrollY]="false">
-  <ng-container *ngIf="(coverData$ | async) as data; else loading">
+<ion-content class="collection-ion-content"
+      [class.mobile-mode-content]="mobileMode"
+      [scrollX]="false"
+      [scrollY]="false"
+>
+  @if ((coverData$ | async); as data) {
     <h1 class="screen-reader-only" i18n="@@CollectionCover.Cover">Omslag</h1>
     <div class="cover-image-wrapper" [class.mobile-mode-content]="mobileMode">
       <img class="cover-image" [src]="data.image_src" [alt]="data.image_alt" loading="lazy">
     </div>
-  </ng-container>
-  <ng-template #loading>
+  } @else {
     <ion-spinner class="loading" name="crescent"></ion-spinner>
-  </ng-template>
+  }
 </ion-content>
 
-<text-changer *ngIf="mobileMode"
-      [parentPageType]="'cover'"
-      [ionViewActive]="_activeComponent"
-      class="text-changer-mobile-mode"
-></text-changer>
+@if (mobileMode) {
+  <text-changer
+        [parentPageType]="'cover'"
+        [ionViewActive]="_activeComponent"
+        class="text-changer-mobile-mode"
+  ></text-changer>
+}

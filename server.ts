@@ -28,9 +28,10 @@ export function app(lang: string): express.Express {
   server.set('view engine', 'html');
   server.set('views', distFolder);
 
-  // Serve static files from /static-html
+  // Serve pre-rendered static HTML files from /static-html
+  // If the file is missing, the next middleware sends a 404
   server.use('/static-html', express.static(staticHtmlFolder, {
-    fallthrough: true // Allows the request to continue to the next middleware if no file is found
+    maxAge: '1d'
   }));
 
   // Handle 404 for /static-html, this is to prevent the built-in Angular wildcard route for
@@ -39,15 +40,42 @@ export function app(lang: string): express.Express {
     res.status(404).send('File not found');
   });
 
-  // Example Express Rest API endpoints
-  // server.get('/api/**', (req, res) => { });
-  // Serve static files from /browser
+  // Serve unversioned files (robots.txt, etc.) with no caching
+  server.get(['/robots.txt', '/sitemap.txt', '/favicon.ico'], express.static(distFolder, {
+    maxAge: 0
+  }));
+
+  // Serve assets (like images in /assets/) with short caching
+  server.use('/assets', express.static(join(distFolder, 'assets'), {
+    maxAge: '1d'
+  }));
+
+  // Serve other static files from /browser, these should be hashed so serve with long-term caching
   server.get('*.*', express.static(distFolder, {
     maxAge: '1y'
   }));
 
-  // All regular routes use the Angular engine
+  // Prevent Angular SSR from handling requests for known static file types (e.g. missing images or fonts)
+  // These files should either be served statically or return a fast 404 without bootstrapping Angular
+  const staticExtensions = new Set([
+    '.png', '.jpg', '.jpeg', '.gif', '.svg', '.webp', '.avif', '.ico',
+    '.woff', '.woff2', '.ttf', '.otf', '.eot',
+    '.mp4', '.webm', '.mp3', '.wav', '.ogg',
+    '.pdf', '.txt'
+  ]);
   server.get('*', (req, res, next) => {
+    const url = req.url.split(/[?#]/, 1)[0].toLowerCase();
+    const ext = url.slice(url.lastIndexOf('.'));
+    if (staticExtensions.has(ext)) {
+      res.status(404).send('File with ' + ext + ' extension not found');
+      return;
+    }
+    next();
+  });
+
+  // Catch-all route: render Angular app for non-static paths (SSR or client-side routes, including 404 pages)
+  server.get('*', (req, res, next) => {
+    // console.log(`[SSR] Rendering URL: ${req.url}`);
     const { protocol, originalUrl, baseUrl, headers } = req;
 
     // Set Vary: User-Agent header for dynamically rendered pages

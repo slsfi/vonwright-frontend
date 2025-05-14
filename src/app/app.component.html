@@ -8,11 +8,13 @@
             [currentRouterUrl]="currentRouterUrl"
       ></top-menu>
     </nav>
-    <ion-progress-bar *ngIf="enableRouterLoadingBar"
-          [class.showLoadingBar]="!loadingBarHidden"
-          type="indeterminate"
-          mode="ios"
-    ></ion-progress-bar>
+    @if (enableRouterLoadingBar) {
+      <ion-progress-bar
+            [class.showLoadingBar]="!loadingBarHidden"
+            type="indeterminate"
+            mode="ios"
+      ></ion-progress-bar>
+    }
   </header>
   <div class="content-container">
     <nav id="side-navigation"
@@ -20,20 +22,22 @@
           [class.visuallyhidden]="!showSideNav"
           [attr.aria-labelledby]="showCollectionSideMenu ? 'side-menu-collection-title' : 'main-side-menu-label'"
     >
-      <main-side-menu *ngIf="mountMainSideMenu"
-            [class.visuallyhidden]="showCollectionSideMenu"
-            [urlSegments]="currentUrlSegments"
-      ></main-side-menu>
+      @if (mountMainSideMenu) {
+        <main-side-menu
+              [class.visuallyhidden]="showCollectionSideMenu"
+              [urlSegments]="currentUrlSegments"
+        ></main-side-menu>
+      }
 
-      <ng-container *ngIf="showCollectionSideMenu && !enableCollectionSideMenuSSR">
+      @if (showCollectionSideMenu && !enableCollectionSideMenuSSR) {
         <!--
-          Server-side rendering of the collection side menu is disabled in the config.
-          Loading the collection side menu is deferred to the browser since it's a
-          very CPU-intensive process for collections with hundreds or thousands of
-          items. On the server, static prerendered versions of the collection menus
-          are loaded if they have been genereated by a pre-build script. This way all
-          items in a collection are crawlable by robots.
-          https://angular.io/guide/defer
+        Server-side rendering of the collection side menu is disabled in the config.
+        Loading the collection side menu is deferred to the browser since it's a
+        very CPU-intensive process for collections with hundreds or thousands of
+        items. On the server, static prerendered versions of the collection menus
+        are loaded if they have been genereated by a pre-build script. This way all
+        items in a collection are crawlable by robots.
+        https://angular.dev/api/core/@defer
         -->
         @defer {
           <collection-side-menu
@@ -47,15 +51,15 @@
         } @loading (minimum 1s) {
           <ion-spinner class="loading" name="crescent"></ion-spinner>
         }
-      </ng-container>
-      <ng-container *ngIf="showCollectionSideMenu && enableCollectionSideMenuSSR">
+      }
+      @if (showCollectionSideMenu && enableCollectionSideMenuSSR) {
         <collection-side-menu
               [collectionID]="collectionID"
               [routeQueryParams]="collSideMenuQueryParams"
               [routeUrlSegments]="collSideMenuUrlSegments"
               [sideMenuToggled]="showSideNav"
         ></collection-side-menu>
-      </ng-container>
+      }
     </nav>
     <div class="main-content">
       <ion-router-outlet
@@ -63,7 +67,9 @@
             (activate)="hideLoadingBar(true)"
             (deactivate)="hideLoadingBar(false)"
       ></ion-router-outlet>
-      <div *ngIf="mobileMode && showSideNav" class="backdrop-dismiss" (click)="toggleSideNav()"></div>
+      @if (mobileMode && showSideNav) {
+        <div class="backdrop-dismiss" (click)="toggleSideNav()"></div>
+      }
     </div>
   </div>
 

@@ -1,5 +1,5 @@
 import { Component, Inject, Input, LOCALE_ID, OnDestroy, OnInit } from '@angular/core';
-import { AsyncPipe, DOCUMENT, NgClass, NgFor, NgIf, NgStyle, NgTemplateOutlet } from '@angular/common';
+import { AsyncPipe, DOCUMENT, NgClass, NgStyle, NgTemplateOutlet } from '@angular/common';
 import { PRIMARY_OUTLET, Router, UrlSegment, UrlTree } from '@angular/router';
 import { IonicModule, ModalController } from '@ionic/angular';
 import { catchError, forkJoin, map, Observable, of, Subscription, tap } from 'rxjs';
@@ -19,10 +19,10 @@ import { concatenateNames } from '@utility-functions';
 
 
 @Component({
-    selector: 'modal-download-texts',
-    templateUrl: './download-texts.modal.html',
-    styleUrls: ['./download-texts.modal.scss'],
-    imports: [AsyncPipe, NgClass, NgFor, NgIf, NgStyle, NgTemplateOutlet, IonicModule, TrustHtmlPipe]
+  selector: 'modal-download-texts',
+  templateUrl: './download-texts.modal.html',
+  styleUrls: ['./download-texts.modal.scss'],
+  imports: [AsyncPipe, NgClass, NgStyle, NgTemplateOutlet, IonicModule, TrustHtmlPipe]
 })
 export class DownloadTextsModal implements OnDestroy, OnInit {
   @Input() origin: string = '';

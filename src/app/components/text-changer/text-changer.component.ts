@@ -1,5 +1,4 @@
 import { Component, Input, OnChanges, OnDestroy, OnInit, SimpleChanges } from '@angular/core';
-import { NgIf } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { IonicModule } from '@ionic/angular';
 import { combineLatest, distinctUntilChanged, map, Subscription, switchMap } from 'rxjs';
@@ -20,10 +19,10 @@ import { PlatformService } from '@services/platform.service';
  * Thus this component must always be server-side rendered.
  */
 @Component({
-    selector: 'text-changer',
-    templateUrl: './text-changer.component.html',
-    styleUrls: ['./text-changer.component.scss'],
-    imports: [NgIf, RouterLink, IonicModule, CollectionPagePathPipe, CollectionPagePositionQueryparamPipe]
+  selector: 'text-changer',
+  templateUrl: './text-changer.component.html',
+  styleUrls: ['./text-changer.component.scss'],
+  imports: [RouterLink, IonicModule, CollectionPagePathPipe, CollectionPagePositionQueryparamPipe]
 })
 export class TextChangerComponent implements OnChanges, OnDestroy, OnInit {
   @Input() parentPageType: string = 'text';

@@ -1,46 +1,53 @@
 <h2 id="main-side-menu-label" class="screen-reader-only" i18n="@@MainSideMenu.AriaLabel">Sekundär meny</h2>
-<ng-container *ngIf="mainMenu?.length">
+@if (mainMenu.length) {
   <ul role="menu">
     <ng-container *ngTemplateOutlet="recursiveMenu; context: {$implicit: mainMenu}"/>
   </ul>
-</ng-container>
+}
 
 <ng-template #recursiveMenu let-list>
-  <ng-container *ngFor="let item of list">
-    <li 
+  @for (item of list; track $index) {
+    <li
           [attr.aria-current]="highlightedMenu === item.nodeId ? 'page' : null"
           [attr.aria-haspopup]="item.children ? 'menu' : null"
           [attr.aria-expanded]="item.children ? selectedMenu.includes(item.nodeId) : null"
           role="menuitem"
     >
-      <a *ngIf="!item.children"
-            [routerLink]="item.parentPath | parentChildPagePath: item.id"
-            [class.menu-highlight]="highlightedMenu === item.nodeId"
-            [class.submenu-label]="item.children"
-      >
-        <ng-container *ngTemplateOutlet="menuItemContent; context: {$implicit: item}"/>
-      </a>
-      <button *ngIf="item.children"
-            (click)="toggle(item)"
-            [class.submenu-label]="item.children"
-      >
-        <ng-container *ngTemplateOutlet="menuItemContent; context: {$implicit: item}"/>
-      </button>
-      <ul *ngIf="item.children" role="menu"
-            [class.open]="selectedMenu.includes(item.nodeId)"
-      >
-        <ng-container *ngTemplateOutlet="recursiveMenu; context: {$implicit: item.children}"/>
-      </ul>
+      @if (!item.children) {
+        <a
+              [routerLink]="item.parentPath | parentChildPagePath: item.id"
+              [class.menu-highlight]="highlightedMenu === item.nodeId"
+              [class.submenu-label]="item.children"
+        >
+          <ng-container *ngTemplateOutlet="menuItemContent; context: {$implicit: item}"/>
+        </a>
+      }
+      @if (item.children) {
+        <button
+              (click)="toggle(item)"
+              [class.submenu-label]="item.children"
+        >
+          <ng-container *ngTemplateOutlet="menuItemContent; context: {$implicit: item}"/>
+        </button>
+      }
+      @if (item.children) {
+        <ul role="menu"
+              [class.open]="selectedMenu.includes(item.nodeId)"
+        >
+          <ng-container *ngTemplateOutlet="recursiveMenu; context: {$implicit: item.children}"/>
+        </ul>
+      }
     </li>
-  </ng-container>
+  }
 </ng-template>
 
 <ng-template #menuItemContent let-item>
-    <span class="label">{{item.title}}</span>
-    <ion-icon *ngIf="item.children"
-          name="chevron-forward-outline"
+  <span class="label">{{item.title}}</span>
+  @if (item.children) {
+    <ion-icon name="chevron-forward-outline"
           class="item-icon-r toggle-icon"
           aria-hidden="true"
           [class.open]="selectedMenu.includes(item.nodeId)"
     ></ion-icon>
+  }
 </ng-template>

@@ -1,5 +1,4 @@
 import { Component, ElementRef, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { NgIf } from '@angular/common';
 import { AlertButton, AlertController, AlertInput, IonicModule } from '@ionic/angular';
 
 import { config } from '@config';
@@ -11,10 +10,10 @@ import { ViewOptionsService } from '@services/view-options.service';
 
 
 @Component({
-    selector: 'manuscripts',
-    templateUrl: './manuscripts.component.html',
-    styleUrls: ['./manuscripts.component.scss'],
-    imports: [NgIf, IonicModule, TrustHtmlPipe]
+  selector: 'manuscripts',
+  templateUrl: './manuscripts.component.html',
+  styleUrls: ['./manuscripts.component.scss'],
+  imports: [IonicModule, TrustHtmlPipe]
 })
 export class ManuscriptsComponent implements OnInit {
   @Input() msID: number | undefined = undefined;

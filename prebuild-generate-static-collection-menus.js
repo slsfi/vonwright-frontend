@@ -37,17 +37,24 @@ async function generateStaticCollectionMenus() {
   const API = config.app?.backendBaseURL ?? '';
   const languages = config.app?.i18n?.languages ?? [];
   const multilingualCollectionTOC = config.app?.i18n?.multilingualCollectionTableOfContents ?? false;
-  const fmPages = config.collections?.frontMatterPages ?? {}
+  const fmPages = config.collections?.frontMatterPages ?? {};
+  const includedCollections = config.collections?.order?.flat() ?? [];
   const APIBase = API + '/' + projectName;
+
+  // Fail early if critical config is missing
+  if (!projectName || !API || !languages.length) {
+    console.error('Critical config values missing: cannot generate static collection menus.');
+    process.exit(1);
+  }
 
   let createdFilesCount = 0;
   let linksCount = 0;
 
-  // Loop through all languages/locales
-  for (let l = 0; l < languages.length; l++) {
-    const locale = languages[l]['code'];
+  // Loop through all locales
+  for (const lang of languages) {
+    const locale = lang.code;
 
-    // Get translations for front matter pages
+    // Load translations
     const transl = {};
     for (const [page, enabled] of Object.entries(fmPages)) {
       if (enabled) {
@@ -61,108 +68,99 @@ async function generateStaticCollectionMenus() {
       }
     }
 
-    // Get collections
-    if (config.collections?.order?.length) {
-      let collectionsEndpoint = APIBase + '/collections';
-      if (multilingualCollectionTOC) {
-        collectionsEndpoint += '/' + locale;
+    // Fetch collections
+    let collectionsEndpoint = APIBase + '/collections';
+    if (multilingualCollectionTOC) {
+      collectionsEndpoint += '/' + locale;
+    }
+
+    const collections = await common.fetchFromAPI(collectionsEndpoint);
+    if (!collections) {
+      console.warn(`Skipping locale "${locale}": could not fetch collections from ${collectionsEndpoint}`);
+      continue;
+    }
+
+    // Loop through each collection
+    for (const collection of collections) {
+      const collectionId = collection?.id;
+      const collectionTitle = collection?.title ?? '';
+
+      if (!collectionId || !includedCollections.includes(collectionId)) {
+        continue;
       }
 
-      const collections = await common.fetchFromAPI(collectionsEndpoint);
-      const includedCollections = config.collections.order.flat();
+      // Fetch TOC for collection
+      let tocEndpoint = APIBase + '/toc/' + collectionId;
+      if (multilingualCollectionTOC) {
+        tocEndpoint += '/' + locale;
+      }
 
-      if (collections) {
-        // Loop through all collections
-        for (let i = 0; i < collections.length; i++) {
-          const collectionId = collections[i]['id'] || 0;
-          const collectionTitle = collections[i]['title'] || '';
+      const tocJSON = await common.fetchFromAPI(tocEndpoint);
+      if (!tocJSON) {
+        console.warn(`Skipping collection ${collectionId} (${locale}): could not fetch TOC from ${tocEndpoint}`);
+        continue;
+      }
 
-          if (!collectionId || !includedCollections.includes(collectionId)) {
-            continue;
-          }
+      const toc = common.flattenObjectTree(tocJSON, 'children', 'itemId');
+      if (!toc || !toc.length) {
+        console.warn(`Collection ${collectionId} (${locale}) has empty TOC.`);
+        continue;
+      }
 
-          // Get collection TOC
-          let tocEndpoint = APIBase + '/toc/' + collectionId;
-          if (multilingualCollectionTOC) {
-            tocEndpoint += '/' + locale;
-          }
-          
-          const tocJSON = await common.fetchFromAPI(tocEndpoint);
+      // Generate HTML fragment
+      // The .htm file extension is used here on purpose so these
+      // files can be distinguished from other HTML files with
+      // .html extension. This way you can easily prevent the
+      // files from being gzipped by removing "htm" from the file
+      // formats that gzipper compresses in package.json. Serving
+      // gzipped versions of the static TOC files might put an
+      // unecessary load on the server.
+      const filename = `${collectionId}_${locale}.htm`;
+      let html = `<p><b>${collectionTitle}</b></p>\n`;
+      if (!initializeOutputFile(filename, html)) {
+        console.warn(`Could not initialize file ${outputPath + filename}`);
+        continue;
+      }
+      createdFilesCount++;
 
-          if (tocJSON == null) {
-            console.log('Error: unable to fetch TOC for collection ', collectionId);
-            break;
-          }
+      appendToFile(filename, '<ul>\n');
 
-          const toc = common.flattenObjectTree(tocJSON, 'children', 'itemId');
+      // Front matter links
+      for (const [page, text] of Object.entries(transl)) {
+        html = `<li><a href="/${locale}/collection/${collectionId}/${page}">${text}</a></li>\n`;
+        appendToFile(filename, html);
+        linksCount++;
+      }
 
-          if (toc.length < 1) {
-            break;
-          }
+      // TOC item links
+      for (const item of toc) {
+        const itemId = item?.itemId?.split(';')[0];
+        const posId = item?.itemId?.split(';')[1] ?? null;
+        if (!itemId) continue;
 
-          // Initialize output file and add collection title.
-          // The .htm file extension is used here on purpose so these
-          // files can be distinguished from other HTML files with
-          // .html extension. This way you can easily prevent the
-          // files from being gzipped by removing "htm" from the file
-          // formats that gzipper compresses in package.json. Serving
-          // gzipped versions of the static TOC files might put an
-          // unecessary load on the server.
-          const filename = collectionId + '_' + locale + '.htm';
-          let html = '<p><b>' + collectionTitle + '</b></p>\n';
-          const fileWriteSuccess = initializeOutputFile(filename, html);
-          if (!fileWriteSuccess) {
-            console.log('Error: unable to initialize collection toc file: ', outputPath + filename);
-            break;
-          } else {
-            createdFilesCount++;
-          }
+        const parts = itemId.split('_');
+        if (parts.length > 1) {
+          const textId = parts[1];
+          const chapterId = parts[2] || '';
 
-          // Add unordered list
-          appendToFile(filename, '<ul>\n');
+          let url = `/${locale}/collection/${collectionId}/text/${textId}`;
+          if (chapterId) url += `/${chapterId}`;
+          if (posId) url += `?position=${posId}`;
 
-          // Add links to front matter pages
-          for (const [page, text] of Object.entries(transl)) {
-            html = '<li><a href="' + `/${locale}/collection/${collectionId}/${page}` + '">' + text + '</a></li>\n';
-            appendToFile(filename, html);
-            linksCount++;
-          }
-
-          // Loop through collection TOC and add links to all items
-          for (let i = 0; i < toc.length; i++) {
-            if (toc[i]['itemId']) {
-              const itemId = toc[i]['itemId'].split(';')[0];
-              const posId = toc[i]['itemId'].split(';')[1] ?? null;
-              const itemIdParts = itemId.split('_');
-              if (itemIdParts.length > 1) {
-                const textId = itemIdParts[1];
-                const chapterId = itemIdParts[2] || '';
-      
-                let url = `/${locale}/collection/${collectionId}/text/${textId}`;
-                if (chapterId) {
-                  url += '/' + chapterId;
-                }
-                if (posId) {
-                  url += '?position=' + posId;
-                }
-
-                // Write to file
-                html = '<li><a href="' + url + '">' + (`${toc[i]['text']}`).trim() + '</a></li>\n';
-                appendToFile(filename, html);
-                linksCount++;
-              }
-            }
-          }
-
-          appendToFile(filename, '</ul>\n');
+          const linkText = String(item.text ?? '').trim();
+          html = `<li><a href="${url}">${linkText}</a></li>\n`;
+          appendToFile(filename, html);
+          linksCount++;
         }
       }
+
+      appendToFile(filename, '</ul>\n');
     }
   }
 
-  const summary = `Generated html files: ${createdFilesCount} (${languages.length} languages, ${linksCount} links)\n`;
-  console.log(summary);
+  console.log(`Generated html files: ${createdFilesCount} (${languages.length} languages, ${linksCount} links)`);
 }
+
 
 function initializeOutputFile(filename, content) {
   try {

@@ -4,19 +4,19 @@
   <ion-modal [keepContentsMounted]="true">
     <ng-template>
       <ion-datetime
-            id="yearFrom"
-            presentation="year"
-            [min]="firstYear"
-            [max]="lastYear"
-            [value]="firstYear"
-            [(ngModel)]="from"
-            [showDefaultButtons]="true"
-            doneText="Ok"
-            i18n-doneText="@@BasicActions.Ok"
-            cancelText="Avbryt"
-            i18n-cancelText="@@BasicActions.Cancel"
-            (ionChange)="updateYearFrom($event)"
-      >
+        id="yearFrom"
+        presentation="year"
+        [min]="firstYear"
+        [max]="lastYear"
+        [value]="firstYear"
+        [(ngModel)]="from"
+        [showDefaultButtons]="true"
+        doneText="Ok"
+        i18n-doneText="@@BasicActions.Ok"
+        cancelText="Avbryt"
+        i18n-cancelText="@@BasicActions.Cancel"
+        (ionChange)="updateYearFrom($event)"
+        >
         <span slot="title" i18n="DateHistogram.From">Från år</span>
       </ion-datetime>
     </ng-template>
@@ -26,65 +26,76 @@
   <ion-modal [keepContentsMounted]="true">
     <ng-template>
       <ion-datetime
-            id="yearTo"
-            presentation="year"
-            [min]="firstYear"
-            [max]="lastYear"
-            [value]="lastYear"
-            [(ngModel)]="to"
-            [showDefaultButtons]="true"
-            doneText="Ok"
-            i18n-doneText="@@BasicActions.Ok"
-            cancelText="Avbryt"
-            i18n-cancelText="@@BasicActions.Cancel"
-            (ionChange)="updateYearTo($event)"
-      >
-      <span slot="title" i18n="DateHistogram.From">Till år</span>
+        id="yearTo"
+        presentation="year"
+        [min]="firstYear"
+        [max]="lastYear"
+        [value]="lastYear"
+        [(ngModel)]="to"
+        [showDefaultButtons]="true"
+        doneText="Ok"
+        i18n-doneText="@@BasicActions.Ok"
+        cancelText="Avbryt"
+        i18n-cancelText="@@BasicActions.Cancel"
+        (ionChange)="updateYearTo($event)"
+        >
+        <span slot="title" i18n="DateHistogram.From">Till år</span>
       </ion-datetime>
     </ng-template>
   </ion-modal>
   <ion-button
-        fill="clear"
-        size="small"
-        (click)="onChange()"
-        title="Uppdatera"
-        i18n-title="@@DateHistogram.Refresh"
-  >
+    fill="clear"
+    size="small"
+    (click)="onChange()"
+    title="Uppdatera"
+    i18n-title="@@DateHistogram.Refresh"
+    >
     <ion-icon slot="icon-only" name="refresh" aria-label="Uppdatera" i18n-aria-label="@@DateHistogram.Refresh"></ion-icon>
   </ion-button>
   <ion-button
-        fill="clear"
-        size="small"
-        (click)="reset()"
-        title="Nollställ"
-        i18n-title="@@DateHistogram.Clear"
-  >
+    fill="clear"
+    size="small"
+    (click)="reset()"
+    title="Nollställ"
+    i18n-title="@@DateHistogram.Clear"
+    >
     <ion-icon slot="icon-only" name="close" aria-label="Nollställ" i18n-aria-label="@@DateHistogram.Clear"></ion-icon>
   </ion-button>
   -->
-  <span class="current-year-range"><span *ngIf="from">{{from}}</span></span><span class="dash">–</span><span class="current-year-range"><span *ngIf="to">{{to}}</span></span>
-  <ion-button
-        fill="clear"
+  <span class="current-year-range">
+    @if (from) {
+      <span>{{from}}</span>
+    }</span><span class="dash">–</span><span class="current-year-range">
+      @if (to) {
+        <span>{{to}}</span>
+    }</span>
+  <ion-button fill="clear"
         size="small"
         (click)="reset()"
         title="Nollställ"
         i18n-title="@@DateHistogram.Clear"
   >
-    <ion-icon slot="icon-only" name="close" aria-label="Nollställ" i18n-aria-label="@@DateHistogram.Clear"></ion-icon>
+    <ion-icon slot="icon-only"
+          name="close"
+          aria-label="Nollställ"
+          i18n-aria-label="@@DateHistogram.Clear"
+    ></ion-icon>
   </ion-button>
 </div>
 
 <div class="histogram-wrapper">
   <div class="diagram">
-    <ng-container *ngFor="let year of yearsAll">
-      <div class="year" [ngClass]="{'yearIsDecade': isDecade(year)}" (click)="selectYear(year)" >
+    @for (year of yearsAll; track year.key_as_string) {
+      <div class="year" [ngClass]="{'yearIsDecade': isDecade(year)}" (click)="selectYear(year)">
         <div class="yearBar" [ngClass]="{'yearBarInRange': isYearInRange(year)}" [style.width]="getYearRelativeToMax(year)"></div>
         <div class="yearDetails">{{year.key_as_string}}: {{year.doc_count_current}}</div>
       </div>
-      <div class="decadeMarker" *ngIf="isDecade(year)">
-        <div class="decade">{{year.key_as_string}}</div>
-      </div>
-    </ng-container>
+      @if (isDecade(year)) {
+        <div class="decadeMarker">
+          <div class="decade">{{year.key_as_string}}</div>
+        </div>
+      }
+    }
   </div>
   <div class="doc-count-line">
     <span>0</span>

@@ -24,65 +24,79 @@
       <span class="side-title" i18n="@@TopMenu.Content">Innehåll</span>
     </a>
   </li>
-  <li *ngIf="showTopAboutButton" class="about-button" role="menuitem">
-    <a [routerLink]="['/about', firstAboutPageId]">
-      <ion-icon name="information-circle-sharp"></ion-icon>
-      <span class="side-title" i18n="@@TopMenu.About">Om utgåvan</span>
-    </a>
-  </li>
-  <li *ngIf="showTopSearchButton" class="search-button" role="menuitem">
-    <a [routerLink]="['/search']">
-      <ion-icon name="search-sharp"></ion-icon>
-      <span class="side-title" i18n="@@TopMenu.Search">Sök</span>
-    </a>
-  </li>
-  <li *ngIf="showTopURNButton" class="reference-button" role="menuitem">
-    <button (click)="showReference($event)" type="button" aria-haspopup="dialog">
-      <ion-icon name="arrow-redo-sharp"></ion-icon>
-      <span class="side-title" i18n="@@Reference.Refer">Hänvisa</span>
-    </button>
-  </li>
-  <li *ngIf="showLanguageButton && currentLanguageLabel && languages.length > 1" class="language-menu-button" role="menuitem">
-    <button (click)="toggleLanguageMenu($event)"
-          type="button"
-          id="language-menu-toggle-button"
-          [attr.aria-expanded]="languageMenuOpen"
-          aria-haspopup="menu"
-          aria-controls="language-menu"
-          aria-label="Välj språk. Nuvarande språk:"
-          i18n-aria-label="@@TopMenu.ChooseLanguage"
-    >
-      <ion-icon name="language-sharp"></ion-icon>
-      <span class="current-language"><span class="current-language-label">{{currentLanguageLabel}} </span>({{activeLocale}})</span>
-      <ion-icon class="toggle-language-menu-icon" [class.hide-icon]="languageMenuOpen" name="chevron-down-sharp" aria-hidden="true"></ion-icon>
-      <ion-icon class="toggle-language-menu-icon" [class.hide-icon]="!languageMenuOpen" name="chevron-up-sharp" aria-hidden="true"></ion-icon>
-    </button>
-    <ul id="language-menu" role="menu" [class.open]="languageMenuOpen" [ngStyle]="{'min-width': languageMenuWidth + 'px'}">
-      <ng-container *ngFor="let lang of languages">
-        <li *ngIf="lang.code !== activeLocale" lang="{{lang.code}}" role="menuitem">
-          <a href="{{_window.location.origin + '/' + lang.code + currentRouterUrl}}">{{lang.label}} ({{lang.code}})</a>
-        </li>
-      </ng-container>
-    </ul>
-  </li>
-  <li *ngIf="showSiteLogo" class="site-logo" role="menuitem">
-    <a href="{{siteLogoLinkUrl}}">
-      <img *ngIf="siteLogoDefaultImageUrl"
-            class="default-logo"
-            alt="Logo"
-            i18n-alt="@@TopMenu.LogoAltText"
-            [attr.height]="siteLogoDimensions?.default?.height ? siteLogoDimensions.default.height : null"
-            [attr.width]="siteLogoDimensions?.default?.width ? siteLogoDimensions.default.width : null"
-            [src]="siteLogoDefaultImageUrl"
+  @if (showTopAboutButton) {
+    <li class="about-button" role="menuitem">
+      <a [routerLink]="['/about', firstAboutPageId]">
+        <ion-icon name="information-circle-sharp"></ion-icon>
+        <span class="side-title" i18n="@@TopMenu.About">Om utgåvan</span>
+      </a>
+    </li>
+  }
+  @if (showTopSearchButton) {
+    <li class="search-button" role="menuitem">
+      <a [routerLink]="['/search']">
+        <ion-icon name="search-sharp"></ion-icon>
+        <span class="side-title" i18n="@@TopMenu.Search">Sök</span>
+      </a>
+    </li>
+  }
+  @if (showTopURNButton) {
+    <li class="reference-button" role="menuitem">
+      <button (click)="showReference($event)" type="button" aria-haspopup="dialog">
+        <ion-icon name="arrow-redo-sharp"></ion-icon>
+        <span class="side-title" i18n="@@Reference.Refer">Hänvisa</span>
+      </button>
+    </li>
+  }
+  @if (showLanguageButton && currentLanguageLabel && languages.length > 1) {
+    <li class="language-menu-button" role="menuitem">
+      <button (click)="toggleLanguageMenu($event)"
+            type="button"
+            id="language-menu-toggle-button"
+            [attr.aria-expanded]="languageMenuOpen"
+            aria-haspopup="menu"
+            aria-controls="language-menu"
+            aria-label="Välj språk. Nuvarande språk:"
+            i18n-aria-label="@@TopMenu.ChooseLanguage"
       >
-      <img *ngIf="siteLogoMobileImageUrl"
-            class="mobile-logo"
-            alt="Logo"
-            i18n-alt="@@TopMenu.LogoAltText"
-            [attr.height]="siteLogoDimensions?.mobile?.height ? siteLogoDimensions.mobile.height : null"
-            [attr.width]="siteLogoDimensions?.mobile?.width ? siteLogoDimensions.mobile.width : null"
-            [src]="siteLogoMobileImageUrl"
-      >
-    </a>
-  </li>
+        <ion-icon name="language-sharp"></ion-icon>
+        <span class="current-language"><span class="current-language-label">{{currentLanguageLabel}} </span>({{activeLocale}})</span>
+        <ion-icon class="toggle-language-menu-icon" [class.hide-icon]="languageMenuOpen" name="chevron-down-sharp" aria-hidden="true"></ion-icon>
+        <ion-icon class="toggle-language-menu-icon" [class.hide-icon]="!languageMenuOpen" name="chevron-up-sharp" aria-hidden="true"></ion-icon>
+      </button>
+      <ul id="language-menu" role="menu" [class.open]="languageMenuOpen" [ngStyle]="{'min-width': languageMenuWidth + 'px'}">
+        @for (lang of languages; track lang.code) {
+          @if (lang.code !== activeLocale) {
+            <li lang="{{lang.code}}" role="menuitem">
+              <a href="{{_window.location.origin + '/' + lang.code + currentRouterUrl}}">{{lang.label}} ({{lang.code}})</a>
+            </li>
+          }
+        }
+      </ul>
+    </li>
+  }
+  @if (showSiteLogo) {
+    <li class="site-logo" role="menuitem">
+      <a href="{{siteLogoLinkUrl}}">
+        @if (siteLogoDefaultImageUrl) {
+          <img class="default-logo"
+                alt="Logo"
+                i18n-alt="@@TopMenu.LogoAltText"
+                [attr.height]="siteLogoDimensions?.default?.height ? siteLogoDimensions.default.height : null"
+                [attr.width]="siteLogoDimensions?.default?.width ? siteLogoDimensions.default.width : null"
+                [src]="siteLogoDefaultImageUrl"
+          >
+        }
+        @if (siteLogoMobileImageUrl) {
+          <img class="mobile-logo"
+                alt="Logo"
+                i18n-alt="@@TopMenu.LogoAltText"
+                [attr.height]="siteLogoDimensions?.mobile?.height ? siteLogoDimensions.mobile.height : null"
+                [attr.width]="siteLogoDimensions?.mobile?.width ? siteLogoDimensions.mobile.width : null"
+                [src]="siteLogoMobileImageUrl"
+          >
+        }
+      </a>
+    </li>
+  }
 </ul>

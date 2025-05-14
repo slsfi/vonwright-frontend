@@ -5,10 +5,10 @@ import { MarkdownService } from '@services/markdown.service';
 
 
 @Component({
-    selector: 'page-content',
-    templateUrl: './content.page.html',
-    styleUrls: ['./content.page.scss'],
-    standalone: false
+  selector: 'page-content',
+  templateUrl: './content.page.html',
+  styleUrls: ['./content.page.scss'],
+  standalone: false
 })
 export class ContentPage implements OnInit {
   mdContent$: Observable<string | null>;

@@ -1,6 +1,5 @@
-<ng-container *ngIf="(text$ | async) as text; else loading">
-    <div [innerHTML]="text | trustHtml" class="tei teiContainer legend-markdown-content markdown"></div>
-</ng-container>
-<ng-template #loading>
-    <ion-spinner class="loading" name="crescent"></ion-spinner>
-</ng-template>
+@if ((text$ | async); as text) {
+  <div [innerHTML]="text | trustHtml" class="tei teiContainer legend-markdown-content markdown"></div>
+} @else {
+  <ion-spinner class="loading" name="crescent"></ion-spinner>
+}

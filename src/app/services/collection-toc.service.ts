@@ -198,7 +198,7 @@ export class CollectionTableOfContentsService {
 
     return this.http.get(endpoint, {headers, responseType: 'text'}).pipe(
       catchError((error) => {
-        console.log('Error loading static html', error);
+        console.log(`Error loading static html of TOC for collection ${id} in '${this.activeLocale}' locale.`);
         return of('');
       })
     );

@@ -43,9 +43,8 @@
   }
 
   p {
-    line-height: 1.625rem;
-    margin-bottom: 0.8rem;
-    margin-top: 0.8rem;
+    line-height: 1.4444em;
+    margin: 0.7111em 0;
   }
 
   hr {
@@ -54,8 +53,12 @@
 
   td {
     padding: 0.5em;
-    line-height: 1.4;
+    line-height: 1.4444em;
     vertical-align: top;
+  }
+
+  ul, ol {
+    line-height: 1.4444em;
   }
 
   figure {

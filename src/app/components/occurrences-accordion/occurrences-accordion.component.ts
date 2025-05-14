@@ -1,7 +1,7 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { NgFor, NgIf } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { IonicModule } from '@ionic/angular';
+import { take } from 'rxjs';
 
 import { config } from '@config';
 import { CollectionPagePathPipe } from '@pipes/collection-page-path.pipe';
@@ -14,10 +14,10 @@ import { sortArrayOfObjectsAlphabetically } from '@utility-functions';
 
 
 @Component({
-    selector: 'occurrences-accordion',
-    templateUrl: './occurrences-accordion.component.html',
-    styleUrls: ['./occurrences-accordion.component.scss'],
-    imports: [NgFor, NgIf, IonicModule, RouterModule, CollectionPagePathPipe, OccurrenceCollectionTextPageQueryparamsPipe]
+  selector: 'occurrences-accordion',
+  templateUrl: './occurrences-accordion.component.html',
+  styleUrls: ['./occurrences-accordion.component.scss'],
+  imports: [IonicModule, RouterModule, CollectionPagePathPipe, OccurrenceCollectionTextPageQueryparamsPipe]
 })
 export class OccurrencesAccordionComponent implements OnInit {
   @Input() id: number | undefined = undefined;
@@ -187,11 +187,11 @@ export class OccurrencesAccordionComponent implements OnInit {
     // update publication names from TOC-files. Finally, sort the publication names.
     this.groupedTexts.forEach((item: any) => {
       if (item.collection_id && item.publications) {
-        this.tocService.getFlattenedTableOfContents(item.collection_id).subscribe(
+        this.tocService.getFlattenedTableOfContents(item.collection_id).pipe(take(1)).subscribe(
           (tocData: any) => {
             item.publications.forEach((pub: any) => {
               const id = item.collection_id + '_' + pub.publication_id;
-              tocData.children.forEach((tocItem: any) => {
+              tocData?.children?.forEach((tocItem: any) => {
                 if (id === tocItem['itemId']) {
                   pub.occurrences[0].displayName = String(tocItem['text']);
                   pub.name = String(tocItem['text']);

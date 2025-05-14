@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { NgFor, NgIf, NgStyle } from '@angular/common';
+import { NgStyle } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AlertButton, AlertController, AlertInput, IonicModule, ModalController } from '@ionic/angular';
 
@@ -14,10 +14,10 @@ import { sortArrayOfObjectsNumerically } from '@utility-functions';
 
 
 @Component({
-    selector: 'facsimiles',
-    templateUrl: './facsimiles.component.html',
-    styleUrls: ['./facsimiles.component.scss'],
-    imports: [NgFor, NgIf, NgStyle, FormsModule, IonicModule, DraggableImageDirective, TrustHtmlPipe]
+  selector: 'facsimiles',
+  templateUrl: './facsimiles.component.html',
+  styleUrls: ['./facsimiles.component.scss'],
+  imports: [NgStyle, FormsModule, IonicModule, DraggableImageDirective, TrustHtmlPipe]
 })
 export class FacsimilesComponent implements OnInit {
   @Input() facsID: number | undefined = undefined;

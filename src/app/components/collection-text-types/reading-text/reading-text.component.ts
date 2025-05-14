@@ -1,5 +1,4 @@
 import { Component, Input, ElementRef, EventEmitter, OnInit, Output, Renderer2, NgZone, SimpleChanges, OnChanges, OnDestroy } from '@angular/core';
-import { NgIf } from '@angular/common';
 import { IonicModule, ModalController } from '@ionic/angular';
 
 import { config } from '@config';
@@ -15,10 +14,10 @@ import { isBrowser } from '@utility-functions';
 
 
 @Component({
-    selector: 'reading-text',
-    templateUrl: './reading-text.component.html',
-    styleUrls: ['./reading-text.component.scss'],
-    imports: [NgIf, IonicModule, MathJaxDirective, TrustHtmlPipe]
+  selector: 'reading-text',
+  templateUrl: './reading-text.component.html',
+  styleUrls: ['./reading-text.component.scss'],
+  imports: [IonicModule, MathJaxDirective, TrustHtmlPipe]
 })
 export class ReadingTextComponent implements OnChanges, OnDestroy, OnInit {
   @Input() language: string = '';

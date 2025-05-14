@@ -1,5 +1,11 @@
 <xliff version="2.0" xmlns="urn:oasis:names:tc:xliff:document:2.0" srcLang="undefined">
   <file id="ngi18n" original="ng.template">
+    <unit id="About.FootnotesHeading">
+      <segment state="initial">
+        <source>Noter</source>
+        <target>Notes</target>
+      </segment>
+    </unit>
     <unit id="About.LoadingError">
       <segment state="initial">
         <source>Sidans innehåll kunde inte laddas.</source>

@@ -11,27 +11,42 @@
 
 <ion-content>
   <div class="modal-inner-wrapper">
-    <h2 *ngIf="thisPageTranslation" i18n="@@Reference.ReferToThisPage">Hänvisa till denna sida</h2>
+    @if (thisPageTranslation) {
+      <h2 i18n="@@Reference.ReferToThisPage">Hänvisa till denna sida</h2>
+    }
     <div class="modal-inner-box">
-      <h3 *ngIf="permaLinkTranslation && referenceData?.urn"><ng-container i18n="@@Reference.Permalink">Beständig webbadress</ng-container>:</h3>
-      <p class="urn" *ngIf="referenceData?.urn"><a target="_blank" [href]="urnResolverUrl + referenceData.urn">{{urnResolverUrl + referenceData.urn}}</a></p>
-      <p class="urn" *ngIf="!referenceData?.urn" i18n="@@Reference.None">Sidan saknar beständig webbadress</p>
+      @if (permaLinkTranslation && referenceData?.urn) {
+        <h3><ng-container i18n="@@Reference.Permalink">Beständig webbadress</ng-container>:</h3>
+      }
+      @if (referenceData?.urn) {
+        <p class="urn"><a target="_blank" [href]="urnResolverUrl + referenceData.urn">{{urnResolverUrl + referenceData.urn}}</a></p>
+      } @else {
+        <p class="urn" i18n="@@Reference.None">Sidan saknar beständig webbadress</p>
+      }
 
-      <ng-container *ngIf="referenceData?.reference_text">
-        <h3 *ngIf="origin === 'page-title'"><ng-container i18n="@@Reference.ReferToCollection">Hänvisa till denna delutgåva</ng-container>:</h3>
-        <h3 *ngIf="origin === 'page-foreword'"><ng-container i18n="@@Reference.ReferToForeword">Hänvisa till detta förord</ng-container>:</h3>
-        <h3 *ngIf="origin === 'page-introduction'"><ng-container i18n="@@Reference.ReferToIntroduction">Hänvisa till denna inledning</ng-container>:</h3>
-        <h3 *ngIf="origin === 'page-text'"><ng-container i18n="@@Reference.ReferToReadingText">Hänvisa till denna lästext</ng-container>:</h3>
-        <h3 *ngIf="origin === 'page-ebook'"><ng-container i18n="@@Reference.ReferToEbook">Hänvisa till denna text</ng-container>:</h3>
-        <h3 *ngIf="origin === 'media-collection'"><ng-container i18n="@@Reference.ReferToMediaCollection">Hänvisa till denna bildsamling</ng-container>:</h3>
-        <h3 *ngIf="origin === 'top-menu'"><ng-container i18n="@@Reference.ReferToEdition">Hänvisa till denna webbutgåva</ng-container>:</h3>
+      @if (referenceData?.reference_text) {
+        @if (origin === 'page-title') {
+          <h3><ng-container i18n="@@Reference.ReferToCollection">Hänvisa till denna delutgåva</ng-container>:</h3>
+        } @else if (origin === 'page-foreword') {
+          <h3><ng-container i18n="@@Reference.ReferToForeword">Hänvisa till detta förord</ng-container>:</h3>
+        } @else if (origin === 'page-introduction') {
+          <h3><ng-container i18n="@@Reference.ReferToIntroduction">Hänvisa till denna inledning</ng-container>:</h3>
+        } @else if (origin === 'page-text') {
+          <h3><ng-container i18n="@@Reference.ReferToReadingText">Hänvisa till denna lästext</ng-container>:</h3>
+        } @else if (origin === 'page-ebook') {
+          <h3><ng-container i18n="@@Reference.ReferToEbook">Hänvisa till denna text</ng-container>:</h3>
+        } @else if (origin === 'media-collection') {
+          <h3><ng-container i18n="@@Reference.ReferToMediaCollection">Hänvisa till denna bildsamling</ng-container>:</h3>
+        } @else if (origin === 'top-menu') {
+          <h3><ng-container i18n="@@Reference.ReferToEdition">Hänvisa till denna webbutgåva</ng-container>:</h3>
+        }
         <p [innerHTML]="referenceData.reference_text + (referenceData.urn ? ', ' + urnResolverUrl + referenceData.urn : currentUrl ? ', ' + currentUrl : '')"></p>
-      </ng-container>
+      }
 
-      <ng-container *ngIf="referenceData?.intro_reference_text && origin !== 'page-introduction'">
+      @if (referenceData?.intro_reference_text && origin !== 'page-introduction') {
         <h3><ng-container i18n="@@Reference.ReferToIntroduction">Hänvisa till denna inledning</ng-container>:</h3>
         <p [innerHTML]="referenceData.intro_reference_text"></p>
-      </ng-container>
+      }
     </div>
   </div>
 </ion-content>

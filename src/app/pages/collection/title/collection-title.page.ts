@@ -16,10 +16,10 @@ import { ViewOptionsService } from '@services/view-options.service';
 
 
 @Component({
-    selector: 'page-title',
-    templateUrl: './collection-title.page.html',
-    styleUrls: ['./collection-title.page.scss'],
-    standalone: false
+  selector: 'page-title',
+  templateUrl: './collection-title.page.html',
+  styleUrls: ['./collection-title.page.scss'],
+  standalone: false
 })
 export class CollectionTitlePage implements OnDestroy, OnInit {
   _activeComponent: boolean = true;

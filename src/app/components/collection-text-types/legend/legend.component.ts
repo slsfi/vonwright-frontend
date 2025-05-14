@@ -1,5 +1,5 @@
 import { Component, ElementRef, Inject, Input, LOCALE_ID, NgZone, OnDestroy, OnInit, Renderer2 } from '@angular/core';
-import { AsyncPipe, NgIf } from '@angular/common';
+import { AsyncPipe } from '@angular/common';
 import { IonicModule } from '@ionic/angular';
 import { catchError, map, Observable, of } from 'rxjs';
 
@@ -10,10 +10,10 @@ import { isBrowser } from '@utility-functions';
 
 
 @Component({
-    selector: 'text-legend',
-    templateUrl: './legend.component.html',
-    styleUrls: ['./legend.component.scss'],
-    imports: [AsyncPipe, NgIf, IonicModule, TrustHtmlPipe]
+  selector: 'text-legend',
+  templateUrl: './legend.component.html',
+  styleUrls: ['./legend.component.scss'],
+  imports: [AsyncPipe, IonicModule, TrustHtmlPipe]
 })
 export class LegendComponent implements OnDestroy, OnInit {
   @Input() itemId?: string;

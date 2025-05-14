@@ -1,5 +1,5 @@
 import { Component, Inject, LOCALE_ID, OnInit } from '@angular/core';
-import { AsyncPipe, NgFor, NgIf } from '@angular/common';
+import { AsyncPipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { IonicModule } from '@ionic/angular';
 import { catchError, filter, forkJoin, from, map, mergeMap, Observable, of, toArray } from 'rxjs';
@@ -12,10 +12,10 @@ import { MarkdownService } from '@services/markdown.service';
 
 
 @Component({
-    selector: 'content-grid',
-    templateUrl: './content-grid.component.html',
-    styleUrls: ['./content-grid.component.scss'],
-    imports: [AsyncPipe, NgFor, NgIf, IonicModule, RouterLink, ParentChildPagePathPipe]
+  selector: 'content-grid',
+  templateUrl: './content-grid.component.html',
+  styleUrls: ['./content-grid.component.scss'],
+  imports: [AsyncPipe, IonicModule, RouterLink, ParentChildPagePathPipe]
 })
 export class ContentGridComponent implements OnInit {
   availableEbooks: any[] = [];
@@ -165,10 +165,6 @@ export class ContentGridComponent implements OnInit {
     }
 
     return orderedCollectionsList;
-  }
-
-  trackById(index: number | string, item: any) {
-    return item.id;
   }
 
 }

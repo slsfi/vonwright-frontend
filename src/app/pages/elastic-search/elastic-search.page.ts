@@ -13,11 +13,11 @@ import { isBrowser, isEmptyObject, sortArrayOfObjectsNumerically } from '@utilit
 
 
 @Component({
-    selector: 'page-elastic-search',
-    templateUrl: './elastic-search.page.html',
-    styleUrls: ['./elastic-search.page.scss'],
-    changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: false
+  selector: 'page-elastic-search',
+  templateUrl: './elastic-search.page.html',
+  styleUrls: ['./elastic-search.page.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: false
 })
 export class ElasticSearchPage implements OnDestroy, OnInit {
   @ViewChild(IonContent) content: IonContent;
@@ -891,18 +891,6 @@ export class ElasticSearchPage implements OnDestroy, OnInit {
     } else {
       this.searchResultsColumnMinHeight = null;
     }
-  }
-
-  trackById(index: number, item: any) {
-    return item.id;
-  }
-
-  trackByKey(index: number, item: any) {
-    return item.key;
-  }
-
-  trackByName(index: number, item: any) {
-    return item.name;
   }
 
 }

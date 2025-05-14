@@ -21,10 +21,10 @@ import { isBrowser } from '@utility-functions';
 
 
 @Component({
-    selector: 'page-introduction',
-    templateUrl: './collection-introduction.page.html',
-    styleUrls: ['./collection-introduction.page.scss'],
-    standalone: false
+  selector: 'page-introduction',
+  templateUrl: './collection-introduction.page.html',
+  styleUrls: ['./collection-introduction.page.scss'],
+  standalone: false
 })
 export class CollectionIntroductionPage implements OnInit, OnDestroy {
   _activeComponent: boolean = true;

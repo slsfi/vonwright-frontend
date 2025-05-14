@@ -1,15 +1,34 @@
-<ion-spinner *ngIf="!text" class="loading" name="crescent"></ion-spinner>
+@if (!text) {
+  <ion-spinner class="loading" name="crescent"></ion-spinner>
+}
 
-<div *ngIf="text && variants.length>0" class="text-select-wrapper">
-  <h3 [innerHTML]="selectedVariant.name"></h3>
-  <div class="flex-buttons">
-    <ion-button class="custom-button" (click)="selectVariant($event)" i18n="@@Variants.ChangeVariant">Byt variant</ion-button>
-    <ion-button class="custom-outline-button" fill="outline" (click)="selectVariantForNewView()" i18n="@@Variants.OpenNewVariant">Öppna ny variant</ion-button>
-    <ion-button *ngIf="showOpenLegendButton" fill="outline" slot="icon-only" class="circular-icon-button align-right" (click)="openNewLegend($event)" title="Teckenförklaringar" i18n-title="@@Legend.Legend">
-      <ion-icon name="help-outline"></ion-icon>
-    </ion-button>
+@if (text && variants.length>0) {
+  <div class="text-select-wrapper">
+    <h3 [innerHTML]="selectedVariant.name"></h3>
+    <div class="flex-buttons">
+      <ion-button class="custom-button"
+            (click)="selectVariant($event)"
+            i18n="@@Variants.ChangeVariant"
+      >Byt variant</ion-button>
+      <ion-button class="custom-outline-button"
+            fill="outline"
+            (click)="selectVariantForNewView()"
+            i18n="@@Variants.OpenNewVariant"
+      >Öppna ny variant</ion-button>
+      @if (showOpenLegendButton) {
+        <ion-button class="circular-icon-button align-right"
+              fill="outline"
+              slot="icon-only"
+              (click)="openNewLegend($event)"
+              title="Teckenförklaringar"
+              i18n-title="@@Legend.Legend"
+        >
+          <ion-icon name="help-outline"></ion-icon>
+        </ion-button>
+      }
+    </div>
   </div>
-</div>
+}
 
 <div class="tei teiContainer teiVariant"
       [class.show_pageBreakOriginal]="viewOptionsService.show.pageBreakOriginal"

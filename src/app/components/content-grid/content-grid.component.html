@@ -1,25 +1,22 @@
-<ng-container *ngIf="(contentItems$ | async) as data; else loading">
+@if ((contentItems$ | async); as data) {
   <ion-grid>
     <ion-row>
-        <ion-col *ngFor="let item of data; trackBy: trackById"
-              size="12"
-              size-sm="6"
-              size-md="4"
-              size-xl="3"
-        >
+      @for (item of data; track item.id) {
+        <ion-col size="12" size-sm="6" size-md="4" size-xl="3">
           <a [routerLink]="item.type !== 'media-collection' ? ('/' + item.type | parentChildPagePath: item.id) : ('/' + item.type)" [title]="item.title">
-            <img *ngIf="item.imageURL"
-                  [src]="item.imageURL"
-                  [alt]="item.imageAltText"
-                  loading="lazy"
-            >
+            @if (item.imageURL) {
+              <img
+                    [src]="item.imageURL"
+                    [alt]="item.imageAltText"
+                    loading="lazy"
+              >
+            }
             <h2 [class.hide-title]="!showTitles" [innerHTML]="item.title"></h2>
           </a>
         </ion-col>
+      }
     </ion-row>
   </ion-grid>
-</ng-container>
-
-<ng-template #loading>
+} @else {
   <ion-spinner class="loading" name="crescent"></ion-spinner>
-</ng-template>
+}

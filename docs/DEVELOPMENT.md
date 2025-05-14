@@ -146,7 +146,12 @@ Iconset especially intended to be used with Ionic.
 
 ### [`marked`][npm_marked]
 
-SSR-compatible markdown parser. Parses markdown to HTML. Any HTML in the markdown is passed through as it is.
+SSR-compatible Markdown parser. Parses Markdown to HTML. Any HTML in the Markdown is passed through as it is.
+
+
+### [`marked-footnote`][npm_marked-footnote]
+
+An extension to `marked` supporting [GFM footnotes](https://docs.github.com/en/get-started/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax#footnotes) in Markdown.
 
 
 ### [`rxjs`][npm_rxjs]
@@ -169,11 +174,6 @@ Library for execution contexts (”zones”) that persist across async tasks. Re
 Required by the Angular builders.
 
 
-### [`copyfiles`][npm_copyfiles] (devDependency)
-
-Library for copying files. Used by the `build:ssr` script in `package.json` to copy the `proxy-server.js` file into the `dist/app` folder once the Angular app has been built.
-
-
 ### [`gzipper`][npm_gzipper] (devDependency)
 
 Library for compressing files. Used in `Dockerfile` in a post-build step to create compressed (gzip) versions of static files. It’s configured in the `compress` script in `package.json`.
@@ -186,7 +186,7 @@ Library for extracting and merging i18n xliff translation files for Angular proj
 
 ### `jasmine` and `karma`
 
-Testing frameworks.
+Angular testing frameworks, not in use.
 
 
 [angular_update_guide]: https://update.angular.io/
@@ -198,10 +198,10 @@ Testing frameworks.
 [npm_htmlparser2]: https://www.npmjs.com/package/htmlparser2
 [npm_ionicons]: https://www.npmjs.com/package/ionicons
 [npm_marked]: https://www.npmjs.com/package/marked
+[npm_marked-footnote]: https://www.npmjs.com/package/marked-footnote
 [npm_rxjs]: https://www.npmjs.com/package/rxjs
 [npm_tslib]: https://www.npmjs.com/package/tslib
 [npm_zone.js]: https://www.npmjs.com/package/zone.js
 [npm_browser-sync]: https://www.npmjs.com/package/browser-sync
-[npm_copyfiles]: https://www.npmjs.com/package/copyfiles
 [npm_gzipper]: https://www.npmjs.com/package/gzipper
 [npm_ng-extract-i18n-merge]: https://www.npmjs.com/package/ng-extract-i18n-merge

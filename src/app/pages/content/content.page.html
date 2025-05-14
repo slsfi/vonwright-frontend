@@ -2,9 +2,9 @@
 
   <h1 class="page-title" i18n="@@TopMenu.Content">Innehåll</h1>
 
-  <ng-container *ngIf="(mdContent$ | async) as mdContent">
+  @if ((mdContent$ | async); as mdContent) {
     <div class="info markdown" [innerHTML]="mdContent | trustHtml"></div>
-  </ng-container>
+  }
 
   <content-grid></content-grid>
 

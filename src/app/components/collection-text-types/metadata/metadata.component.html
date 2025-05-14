@@ -1,121 +1,179 @@
 <div class="tei teiContainer">
-    <ng-container *ngIf="(metadata$ | async) as metadata; else loadingOrError">
-        <h2 i18n="@@Metadata.Metadata">Metadata</h2>
-        <dl>
-            <div *ngIf="metadata.publication_title">
-                <dt i18n="@@Metadata.PublicationTitle">Dokumentets titel</dt>
-                <dd [innerHTML]="metadata.publication_title"></dd>
+  @if ((metadata$ | async); as metadata) {
+    <h2 i18n="@@Metadata.Metadata">Metadata</h2>
+    <dl>
+      @if (metadata.publication_title) {
+        <div>
+          <dt i18n="@@Metadata.PublicationTitle">Dokumentets titel</dt>
+          <dd [innerHTML]="metadata.publication_title"></dd>
+        </div>
+      }
+      @if (metadata.publication_subtitle) {
+        <div>
+          <dt i18n="@@Metadata.PublicationSubtitle">Undertitel</dt>
+          <dd [innerHTML]="metadata.publication_subtitle"></dd>
+        </div>
+      }
+      @if (metadata.published_by) {
+        <div>
+          <dt i18n="@@Metadata.PublishedBy">Publicerat i</dt>
+          <dd [innerHTML]="metadata.published_by"></dd>
+        </div>
+      }
+      @if (metadata.document_type) {
+        <div>
+          <dt i18n="@@Metadata.DocumentType">Dokumenttyp</dt>
+          <dd>{{metadata.document_type}}</dd>
+        </div>
+      }
+      @if (metadata.original_language) {
+        <div>
+          <dt i18n="@@Metadata.OriginalLanguage">Originalspråk</dt>
+          <dd>{{metadata.original_language}}</dd>
+        </div>
+      }
+      @if (metadata.publication_date) {
+        <div>
+          <dt i18n="@@Metadata.PublicationDate">Datering</dt>
+          <dd>{{metadata.publication_date}}</dd>
+        </div>
+      }
+      @if (metadata.author?.length) {
+        <div>
+          <dt>
+            @if (metadata.author.length < 2) {
+              <ng-container i18n="@@Metadata.Author">Författare</ng-container>
+            }
+            @if (metadata.author.length > 1) {
+              <ng-container i18n="@@Metadata.Authors">Författare</ng-container>
+            }
+          </dt>
+          <dd>
+            @for (a of metadata.author; track $index; let isLast = $last) {
+              {{a}}
+              @if (!isLast) {
+                <br>
+              }
+            }
+          </dd>
+        </div>
+      }
+      @if (metadata.sender?.length) {
+        <div>
+          <dt>
+            @if (metadata.sender.length < 2) {
+              <ng-container i18n="@@Metadata.Sender">Avsändare</ng-container>
+            }
+            @if (metadata.sender.length > 1) {
+              <ng-container i18n="@@Metadata.Senders">Avsändare</ng-container>
+            }
+          </dt>
+          <dd>
+            @for (s of metadata.sender; track $index; let isLast = $last) {
+              {{s}}
+              @if (!isLast) {
+                <br>
+              }
+            }
+          </dd>
+        </div>
+      }
+      @if (metadata.recipient?.length) {
+        <div>
+          <dt>
+            @if (metadata.recipient.length < 2) {
+              <ng-container i18n="@@Metadata.Recipient">Mottagare</ng-container>
+            }
+            @if (metadata.recipient.length > 1) {
+              <ng-container i18n="@@Metadata.Recipients">Mottagare</ng-container>
+            }
+          </dt>
+          <dd>
+            @for (r of metadata.recipient; track $index; let isLastRecipient = $last) {
+              {{r}}
+              @if (!isLastRecipient) {
+                <br>
+              }
+            }
+          </dd>
+        </div>
+      }
+      @if (metadata.translations?.length) {
+        <div>
+          <dt>
+            @if (metadata.translations.length < 2) {
+              <ng-container i18n="@@Metadata.Translation">Översättning</ng-container>
+            }
+            @if (metadata.translations.length > 1) {
+              <ng-container i18n="@@Metadata.Translations">Översättningar</ng-container>
+            }
+          </dt>
+          <dd>
+            @for (t of metadata.translations; track $index; let isLastTranslation = $last) {
+              @if (t.translators && t.translators.length) {
+                @for (tr of t.translators; track $index; let isLastTranslator = $last) {
+                  {{tr}} ({{t.translated_into}})@if (!isLastTranslator) {
+                  <br>
+                  }
+                }
+              }
+              @if (!isLastTranslation) {
+                <br>
+              }
+            }
+          </dd>
+        </div>
+      }
+    </dl>
+    @if (metadata.facsimiles?.length) {
+      <h3>
+        @if (metadata.facsimiles.length < 2) {
+          <ng-container i18n="@@Metadata.Facsimile">Faksimil</ng-container>
+        }
+        @if (metadata.facsimiles.length > 1) {
+          <ng-container i18n="@@Metadata.Facsimiles">Faksimil</ng-container>
+        }
+      </h3>
+      @for (f of metadata.facsimiles; track $index) {
+        <dl class="dl-group">
+          @if (f.facsimile_title && (f.facsimile_title !== metadata.publication_title || metadata.facsimiles.length > 1)) {
+            <div>
+              <dt i18n="@@Metadata.FacsimileTitle">Faksimilets titel</dt>
+              <dd [innerHTML]="f.facsimile_title"></dd>
             </div>
-            <div *ngIf="metadata.publication_subtitle">
-                <dt i18n="@@Metadata.PublicationSubtitle">Undertitel</dt>
-                <dd [innerHTML]="metadata.publication_subtitle"></dd>
+          }
+          @if (f.archive_info) {
+            <div>
+              <dt i18n="@@Metadata.ArchiveInfo">Arkivkälla för faksimilet</dt>
+              <dd>{{f.archive_info}}</dd>
             </div>
-            <div *ngIf="metadata.published_by">
-                <dt i18n="@@Metadata.PublishedBy">Publicerat i</dt>
-                <dd [innerHTML]="metadata.published_by"></dd>
+          }
+          @if (f.number_of_images) {
+            <div>
+              <dt i18n="@@Metadata.NumberOfImages">Antal bilder</dt>
+              <dd>{{f.number_of_images}}</dd>
             </div>
-            <div *ngIf="metadata.document_type">
-                <dt i18n="@@Metadata.DocumentType">Dokumenttyp</dt>
-                <dd>{{metadata.document_type}}</dd>
+          }
+          @if (f.image_number_info) {
+            <div>
+              <dt i18n="@@Metadata.ImageNumberInfo">Bildernas nummer i digitalarkivet</dt>
+              <dd>{{f.image_number_info}}</dd>
             </div>
-            <div *ngIf="metadata.original_language">
-                <dt i18n="@@Metadata.OriginalLanguage">Originalspråk</dt>
-                <dd>{{metadata.original_language}}</dd>
+          }
+          @if (f.external_url) {
+            <div>
+              <dt i18n="@@Metadata.ExternalUrl">Extern länk för faksimilet</dt>
+              <dd><a [href]="f.external_url">{{f.external_url}}</a></dd>
             </div>
-            <div *ngIf="metadata.publication_date">
-                <dt i18n="@@Metadata.PublicationDate">Datering</dt>
-                <dd>{{metadata.publication_date}}</dd>
-            </div>
-            <div *ngIf="metadata.author?.length">
-                <dt>
-                    <ng-container *ngIf="metadata.author.length < 2" i18n="@@Metadata.Author">Författare</ng-container>
-                    <ng-container *ngIf="metadata.author.length > 1" i18n="@@Metadata.Authors">Författare</ng-container>
-                </dt>
-                <dd>
-                    <ng-container *ngFor="let a of metadata.author; last as isLast">
-                        {{a}}<ng-container *ngIf="!isLast"><br></ng-container>
-                    </ng-container>
-                </dd>
-            </div>
-            <div *ngIf="metadata.sender?.length">
-                <dt>
-                    <ng-container *ngIf="metadata.sender.length < 2" i18n="@@Metadata.Sender">Avsändare</ng-container>
-                    <ng-container *ngIf="metadata.sender.length > 1" i18n="@@Metadata.Senders">Avsändare</ng-container>
-                </dt>
-                <dd>
-                    <ng-container *ngFor="let s of metadata.sender; last as isLast">
-                        {{s}}<ng-container *ngIf="!isLast"><br></ng-container>
-                    </ng-container>
-                </dd>
-            </div>
-            <div *ngIf="metadata.recipient?.length">
-                <dt>
-                    <ng-container *ngIf="metadata.recipient.length < 2" i18n="@@Metadata.Recipient">Mottagare</ng-container>
-                    <ng-container *ngIf="metadata.recipient.length > 1" i18n="@@Metadata.Recipients">Mottagare</ng-container>
-                </dt>
-                <dd>
-                    <ng-container *ngFor="let r of metadata.recipient; last as isLastRecipient">
-                        {{r}}<ng-container *ngIf="!isLastRecipient"><br></ng-container>
-                    </ng-container>
-                </dd>
-            </div>
-            <div *ngIf="metadata.translations?.length">
-                <dt>
-                    <ng-container *ngIf="metadata.translations.length < 2" i18n="@@Metadata.Translation">Översättning</ng-container>
-                    <ng-container *ngIf="metadata.translations.length > 1" i18n="@@Metadata.Translations">Översättningar</ng-container>
-                </dt>
-                <dd>
-                    <ng-container *ngFor="let t of metadata.translations; last as isLastTranslation">
-                        <ng-container *ngIf="t.translators && t.translators.length">
-                            <ng-container *ngFor="let tr of t.translators; last as isLastTranslator">
-                                {{tr}} ({{t.translated_into}})<ng-container *ngIf="!isLastTranslator"><br></ng-container>
-                            </ng-container>
-                        </ng-container>
-                        <ng-container *ngIf="!isLastTranslation">
-                            <br>
-                        </ng-container>
-                    </ng-container>
-                </dd>
-            </div>
+          }
         </dl>
-
-        <ng-container *ngIf="metadata.facsimiles?.length">
-            <h3>
-                <ng-container *ngIf="metadata.facsimiles.length < 2" i18n="@@Metadata.Facsimile">Faksimil</ng-container>
-                <ng-container *ngIf="metadata.facsimiles.length > 1" i18n="@@Metadata.Facsimiles">Faksimil</ng-container>
-            </h3>
-            <dl *ngFor="let f of metadata.facsimiles" class="dl-group">
-                <div *ngIf="f.facsimile_title && (f.facsimile_title !== metadata.publication_title || metadata.facsimiles.length > 1)">
-                    <dt i18n="@@Metadata.FacsimileTitle">Faksimilets titel</dt>
-                    <dd [innerHTML]="f.facsimile_title"></dd>
-                </div>
-                <div *ngIf="f.archive_info">
-                    <dt i18n="@@Metadata.ArchiveInfo">Arkivkälla för faksimilet</dt>
-                    <dd>{{f.archive_info}}</dd>
-                </div>
-                <div *ngIf="f.number_of_images">
-                    <dt i18n="@@Metadata.NumberOfImages">Antal bilder</dt>
-                    <dd>{{f.number_of_images}}</dd>
-                </div>
-                <div *ngIf="f.image_number_info">
-                    <dt i18n="@@Metadata.ImageNumberInfo">Bildernas nummer i digitalarkivet</dt>
-                    <dd>{{f.image_number_info}}</dd>
-                </div>
-                <div *ngIf="f.external_url">
-                    <dt i18n="@@Metadata.ExternalUrl">Extern länk för faksimilet</dt>
-                    <dd><a [href]="f.external_url">{{f.external_url}}</a></dd>
-                </div>
-            </dl>
-        </ng-container>
-    </ng-container>
-
-    <ng-template #loadingOrError>
-        <ng-container *ngIf="(loadingError$ | async); else loading">
-            <p class="noIndent" i18n="@@Metadata.None">Ingen metadata tillgänglig.</p>
-        </ng-container>
-    </ng-template>
-
-    <ng-template #loading>
-        <ion-spinner class="loading" name="crescent"></ion-spinner>
-    </ng-template>
+      }
+    }
+  } @else {
+    @if ((loadingError$ | async)) {
+      <p class="noIndent" i18n="@@Metadata.None">Ingen metadata tillgänglig.</p>
+    } @else {
+      <ion-spinner class="loading" name="crescent"></ion-spinner>
+    }
+  }
 </div>

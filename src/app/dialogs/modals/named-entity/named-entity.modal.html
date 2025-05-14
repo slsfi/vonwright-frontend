@@ -1,10 +1,15 @@
 <ion-header>
   <ion-toolbar>
     <ion-title>
-      <ng-container *ngIf="type === 'subject' || type === 'person'" i18n="@@NamedEntity.Person">Person</ng-container>
-      <ng-container *ngIf="type === 'location' || type === 'place'" i18n="@@NamedEntity.Place">Plats</ng-container>
-      <ng-container *ngIf="type === 'tag' || type === 'keyword'" i18n="@@NamedEntity.Keyword">Ämnesord</ng-container>
-      <ng-container *ngIf="type === 'work'" i18n="@@NamedEntity.work">Verk</ng-container>
+      @if (type === 'subject' || type === 'person') {
+        <ng-container i18n="@@NamedEntity.Person">Person</ng-container>
+      } @else if (type === 'location' || type === 'place') {
+        <ng-container i18n="@@NamedEntity.Place">Plats</ng-container>
+      } @else if (type === 'tag' || type === 'keyword') {
+        <ng-container i18n="@@NamedEntity.Keyword">Ämnesord</ng-container>
+      } @else if (type === 'work') {
+        <ng-container i18n="@@NamedEntity.work">Verk</ng-container>
+      }
     </ion-title>
     <ion-buttons slot="end">
       <ion-button class="close" fill="clear" (click)="cancel()">
@@ -16,114 +21,151 @@
 
 <ion-content>
   <div class="modal-inner-wrapper">
-    <ng-container *ngIf="(objectData$ | async) as data; else loadingOrError">
-
-      <div class="sd-header" *ngIf="data">
-        <h2>
-          <span *ngIf="data?.details?.occupation && showOccupation" class="occupation">{{data.details.occupation}} – </span><span class="title" [innerHTML]="data?.details?.title"></span><span *ngIf="data?.details?.year_born_deceased || data?.details?.lived_between" class="date" [innerHTML]="data?.details?.lived_between ? ' (' + data.details.lived_between + ')' : ' ' + data.details.year_born_deceased"></span><span *ngIf="data?.details?.latitude && data?.details?.longitude" class="coordinates"> (<a [href]="'https://www.openstreetmap.org/?mlat=' + data.details.latitude + '&mlon=' + data.details.longitude" target="_blank"><ng-container i18n="@@NamedEntity.Latitude">lat.</ng-container> {{data.details.latitude}}, <ng-container i18n="@@NamedEntity.Longitude">long.</ng-container> {{data.details.longitude}}</a>)</span>
-        </h2>
-        <div class="media_image_wrapper" *ngIf="data?.media?.imageUrl">
-          <img alt="occurrence image" [src]="data.media.imageUrl">
+    @if ((objectData$ | async); as data) {
+      @if (data) {
+        <div class="sd-header">
+          <h2>
+            @if (data?.details?.occupation && showOccupation) {<span class="occupation">{{data.details.occupation}} – </span>}<span class="title" [innerHTML]="data?.details?.title"></span>@if (data?.details?.year_born_deceased || data?.details?.lived_between) {<span class="date" [innerHTML]="data?.details?.lived_between ? ' (' + data.details.lived_between + ')' : ' ' + data.details.year_born_deceased"></span>}@if (data?.details?.latitude && data?.details?.longitude) {<span class="coordinates"> (<a [href]="'https://www.openstreetmap.org/?mlat=' + data.details.latitude + '&mlon=' + data.details.longitude" target="_blank"><ng-container i18n="@@NamedEntity.Latitude">lat.</ng-container> {{data.details.latitude}}, <ng-container i18n="@@NamedEntity.Longitude">long.</ng-container> {{data.details.longitude}}</a>)</span>}
+          </h2>
+          @if (data?.media?.imageUrl) {
+            <div class="media_image_wrapper">
+              <img alt="occurrence image" [src]="data.media.imageUrl">
+            </div>
+          }
+          @if (data?.media?.description) {
+            <div class="media_description">
+              {{data.media.description}}
+            </div>
+          }
         </div>
-        <div class="media_description" *ngIf="data?.media?.description">
-          {{data.media.description}}
+      }
+
+      @if ((showCityRegionCountry && (data?.details?.city || data?.details?.region || data?.details?.country)) || data?.details?.place_of_birth || (data?.details?.type && showType) || data?.details?.source || data?.details?.publisher || data?.details?.published_year || data?.details?.isbn || (data?.details?.author_data?.length && data?.details?.author_data[0]) || data?.details?.journal || data?.details?.description || data?.articles?.length || data?.galleryOccurrences?.length || (showAliasAndPrevLastName && (data?.details?.alias || data?.details?.previous_last_name))) {
+        <div class="modal-inner-box">
+          @if ((showCityRegionCountry && (data?.details?.city || data?.details?.region || data?.details?.country)) || data?.details?.place_of_birth || (data?.details?.type && showType) || data?.details?.source || data?.details?.publisher || data?.details?.published_year || data?.details?.isbn || (data?.details?.author_data?.length && data?.details?.author_data[0]) || data?.details?.journal || (data?.details?.description && showDescriptionLabel) || data?.articles?.length) {
+            <dl>
+              @if (data?.details?.city && showCityRegionCountry) {
+                <div class="city">
+                  <dt i18n="@@NamedEntity.City">Stad</dt>
+                  <dd>{{data.details.city}}</dd>
+                </div>
+              }
+              @if (data?.details?.region && showCityRegionCountry) {
+                <div class="region">
+                  <dt i18n="@@NamedEntity.Region">Region</dt>
+                  <dd>{{data.details.region}}</dd>
+                </div>
+              }
+              @if (data?.details?.country && showCityRegionCountry) {
+                <div class="country">
+                  <dt i18n="@@NamedEntity.Country">Land</dt>
+                  <dd>{{data.details.country}}</dd>
+                </div>
+              }
+              @if (data?.details?.place_of_birth) {
+                <div class="place_of_birth">
+                  <dt i18n="@@NamedEntity.PlaceOfBirth">Födelseort</dt>
+                  <dd>{{data.details.place_of_birth}}</dd>
+                </div>
+              }
+              @if (data?.details?.type && showType) {
+                <div class="type">
+                  <dt i18n="@@NamedEntity.Type">Typ</dt>
+                  <dd>{{data.details.type}}</dd>
+                </div>
+              }
+              @if (data?.details?.source) {
+                <div class="source">
+                  <dt i18n="@@NamedEntity.Source">Källa</dt>
+                  <dd><a [href]="data.details.source" target="_blank">{{data.details.source}}</a></dd>
+                </div>
+              }
+              @if (data?.details?.author_data?.length && data?.details?.author_data[0]) {
+                <div class="authors">
+                  <dt i18n="@@NamedEntity.Authors">Författare</dt>
+                  <dd>
+                      @for (author of data.details.author_data; track $index; let lastAuthor = $last) {
+                        {{author.full_name}}
+                        @if (!lastAuthor) {
+                          <br>
+                        }
+                      }
+                  </dd>
+                </div>
+              }
+              @if (data?.details?.publisher) {
+                <div class="publisher">
+                  <dt i18n="@@NamedEntity.Publisher">Utgivare</dt>
+                  <dd>{{data.details.publisher}}</dd>
+                </div>
+              }
+              @if (data?.details?.published_year) {
+                <div class="published_year">
+                  <dt i18n="@@NamedEntity.YearOfPublication">Utgivningsår</dt>
+                  <dd>{{data.details.published_year}}</dd>
+                </div>
+              }
+              @if (data?.details?.isbn) {
+                <div class="isbn">
+                  <dt i18n="@@NamedEntity.ISBN">ISBN</dt>
+                  <dd>{{data.details.isbn}}</dd>
+                </div>
+              }
+              @if (data?.details?.journal) {
+                <div class="journal">
+                  <dt i18n="@@NamedEntity.Journal">Journal</dt>
+                  <dd>{{data.details.journal}}</dd>
+                </div>
+              }
+              @if (data?.articleData?.length) {
+                <div class="articles">
+                  <dt i18n="@@NamedEntity.Articles">Artiklar</dt>
+                  <dd>
+                    @for (article of data.articleData; track $index; let i = $index; let lastArticle = $last) {
+                      <span class="article_count">{{i+1}}.</span> <span class="article_description">{{article.description}}</span><span class="article_link"> – <a [href]="article.pdf_path" target="_blank" i18n="@@NamedEntity.DownloadPDF">ladda ner pdf</a></span>
+                      @if (!lastArticle) {
+                        <br>
+                      }
+                    }
+                  </dd>
+                </div>
+              }
+              @if (data?.details?.description && showDescriptionLabel) {
+                <div class="description">
+                  <dt i18n="@@NamedEntity.Description">Beskrivning</dt>
+                  <dd>{{data.details.description}}</dd>
+                </div>
+              }
+            </dl>
+          }
+          @if (showAliasAndPrevLastName && (data?.details?.alias || data?.details?.previous_last_name)) {
+            <p class="alias" [innerHTML]="data?.details?.alias ? (data?.details?.previous_last_name ? data?.details?.alias + ', ' + data?.details?.previous_last_name : data?.details?.alias) : data?.details?.previous_last_name"></p>
+          }
+          @if (data?.details?.description && !showDescriptionLabel) {
+            <p class="description">{{data.details.description}}</p>
+          }
+          @if (data?.galleryOccurrences?.length) {
+            <ion-button class="custom-outline-button"
+                  fill="outline"
+                  [routerLink]="['/media-collection', 'entity']"
+                  [queryParams]="{ id: data.galleryOccurrences[0].id, type: type }"
+                  i18n="@@MainSideMenu.MediaCollections"
+            >Bildbank</ion-button>
+          }
         </div>
-      </div>
-
-      <div class="modal-inner-box"
-          *ngIf="(showCityRegionCountry && (data?.details?.city || data?.details?.region || data?.details?.country)) || data?.details?.place_of_birth || (data?.details?.type && showType) || data?.details?.source || data?.details?.publisher || data?.details?.published_year || data?.details?.isbn || (data?.details?.author_data?.length && data?.details?.author_data[0]) || data?.details?.journal || data?.details?.description || data?.articles?.length || data?.galleryOccurrences?.length || (showAliasAndPrevLastName && (data?.details?.alias || data?.details?.previous_last_name))"
-      >
-        <dl
-              *ngIf="(showCityRegionCountry && (data?.details?.city || data?.details?.region || data?.details?.country)) || data?.details?.place_of_birth || (data?.details?.type && showType) || data?.details?.source || data?.details?.publisher || data?.details?.published_year || data?.details?.isbn || (data?.details?.author_data?.length && data?.details?.author_data[0]) || data?.details?.journal || (data?.details?.description && showDescriptionLabel) || data?.articles?.length"
-        >
-          <div *ngIf="data?.details?.city && showCityRegionCountry" class="city">
-            <dt i18n="@@NamedEntity.City">Stad</dt>
-            <dd>{{data.details.city}}</dd>
-          </div>
-          <div *ngIf="data?.details?.region && showCityRegionCountry" class="region">
-            <dt i18n="@@NamedEntity.Region">Region</dt>
-            <dd>{{data.details.region}}</dd>
-          </div>
-          <div *ngIf="data?.details?.country && showCityRegionCountry" class="country">
-            <dt i18n="@@NamedEntity.Country">Land</dt>
-            <dd>{{data.details.country}}</dd>
-          </div>
-          <div *ngIf="data?.details?.place_of_birth" class="place_of_birth">
-            <dt i18n="@@NamedEntity.PlaceOfBirth">Födelseort</dt>
-            <dd>{{data.details.place_of_birth}}</dd>
-          </div>
-          <div *ngIf="data?.details?.type && showType" class="type">
-            <dt i18n="@@NamedEntity.Type">Typ</dt>
-            <dd>{{data.details.type}}</dd>
-          </div>
-          <div *ngIf="data?.details?.source" class="source">
-            <dt i18n="@@NamedEntity.Source">Källa</dt>
-            <dd><a [href]="data.details.source" target="_blank">{{data.details.source}}</a></dd>
-          </div>
-          <div *ngIf="data?.details?.author_data?.length && data?.details?.author_data[0]" class="authors">
-            <dt i18n="@@NamedEntity.Authors">Författare</dt>
-            <dd>
-                <ng-container *ngFor="let author of data.details.author_data; last as lastAuthor">
-                  {{author.full_name}}<ng-container *ngIf="!lastAuthor"><br></ng-container>
-                </ng-container>
-            </dd>
-          </div>
-          <div *ngIf="data?.details?.publisher" class="publisher">
-            <dt i18n="@@NamedEntity.Publisher">Utgivare</dt>
-            <dd>{{data.details.publisher}}</dd>
-          </div>
-          <div *ngIf="data?.details?.published_year" class="published_year">
-            <dt i18n="@@NamedEntity.YearOfPublication">Utgivningsår</dt>
-            <dd>{{data.details.published_year}}</dd>
-          </div>
-          <div *ngIf="data?.details?.isbn" class="isbn">
-            <dt i18n="@@NamedEntity.ISBN">ISBN</dt>
-            <dd>{{data.details.isbn}}</dd>
-          </div>
-          <div *ngIf="data?.details?.journal" class="journal">
-            <dt i18n="@@NamedEntity.Journal">Journal</dt>
-            <dd>{{data.details.journal}}</dd>
-          </div>
-          <div *ngIf="data?.articleData?.length" class="articles">
-            <dt i18n="@@NamedEntity.Articles">Artiklar</dt>
-            <dd>
-              <ng-container *ngFor="let article of data.articleData; let i = index; last as lastArticle">
-                <span class="article_count">{{i+1}}.</span> <span class="article_description">{{article.description}}</span><span class="article_link"> – <a [href]="article.pdf_path" target="_blank" i18n="@@NamedEntity.DownloadPDF">ladda ner pdf</a></span><ng-container *ngIf="!lastArticle"><br></ng-container>
-              </ng-container>
-          </dd>
-          </div>
-          <div *ngIf="data?.details?.description && showDescriptionLabel" class="description">
-            <dt i18n="@@NamedEntity.Description">Beskrivning</dt>
-            <dd>{{data.details.description}}</dd>
-          </div>
-        </dl>
-        <p *ngIf="showAliasAndPrevLastName && (data?.details?.alias || data?.details?.previous_last_name)" class="alias" [innerHTML]="data?.details?.alias ? (data?.details?.previous_last_name ? data?.details?.alias + ', ' + data?.details?.previous_last_name : data?.details?.alias) : data?.details?.previous_last_name"></p>
-        <p *ngIf="data?.details?.description && !showDescriptionLabel" class="description">{{data.details.description}}</p>
-        <ion-button *ngIf="data?.galleryOccurrences?.length"
-              class="custom-outline-button"
-              fill="outline"
-              [routerLink]="['/media-collection', 'entity']"
-              [queryParams]="{ id: data.galleryOccurrences[0].id, type: type }"
-              i18n="@@MainSideMenu.MediaCollections"
-        >Bildbank</ion-button>
-      </div>
-
-      <ng-container *ngIf="showOccurrences && data?.details?.id">
+      }
+      @if (showOccurrences && data?.details?.id) {
         <h3 i18n="@@NamedEntity.Occurrences">Förekomster</h3>
         <occurrences-accordion [id]="data?.details?.id" [type]="type"></occurrences-accordion>
-      </ng-container>
-
-    </ng-container>
-
-    <ng-template #loadingOrError>
-      <div *ngIf="(loadingErrorData$ | async); else loading" class="modal-inner-box">
-        <p i18n="@@NamedEntity.NoInfoFound">Ingen information hittades.</p>
-      </div>
-
-      <ng-template #loading>
+      }
+    } @else {
+      @if (loadingErrorData$ | async) {
+        <div class="modal-inner-box">
+          <p i18n="@@NamedEntity.NoInfoFound">Ingen information hittades.</p>
+        </div>
+      } @else {
         <ion-spinner class="loading" name="crescent"></ion-spinner>
-      </ng-template>
-    </ng-template>
-
+      }
+    }
   </div>
 </ion-content>

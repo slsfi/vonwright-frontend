@@ -7,10 +7,10 @@ import { PlatformService } from '@services/platform.service';
 
 
 @Component({
-    selector: 'page-cover',
-    templateUrl: './collection-cover.page.html',
-    styleUrls: ['./collection-cover.page.scss'],
-    standalone: false
+  selector: 'page-cover',
+  templateUrl: './collection-cover.page.html',
+  styleUrls: ['./collection-cover.page.scss'],
+  standalone: false
 })
 export class CollectionCoverPage implements OnInit {
   _activeComponent: boolean = true;

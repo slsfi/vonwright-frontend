@@ -1,46 +1,66 @@
 <ion-header class="ion-no-border">
   <ion-toolbar class="secondary">
 
-    <text-changer slot="start" *ngIf="!mobileMode"
-          [parentPageType]="'introduction'"
-          [ionViewActive]="_activeComponent"
-          class="text-changer-desktop-mode"
-    ></text-changer>
+    @if (!mobileMode) {
+      <text-changer slot="start"
+            [parentPageType]="'introduction'"
+            [ionViewActive]="_activeComponent"
+            class="text-changer-desktop-mode"
+      ></text-changer>
+    }
 
     <ion-buttons slot="end" class="secondary-toolbar-buttons-wrapper">
-      <ion-button *ngIf="showTextDownloadButton" (click)="showDownloadModal()">
-        <ion-icon slot="start" class="download-icon" name="download"></ion-icon>
-        <span class="side-title" i18n="@@DownloadTexts.Download">Ladda ner</span>
-      </ion-button>
-      <ion-button *ngIf="showURNButton" (click)="showReference()">
-        <ion-icon slot="start" class="urn-icon" name="arrow-redo-sharp"></ion-icon>
-        <span class="side-title" i18n="@@Reference.Refer">Hänvisa</span>
-      </ion-button>
-      <ion-button *ngIf="showViewOptionsButton" (click)="showViewOptionsPopover($event)">
-        <ion-icon slot="start" class="settings-icon" name="settings-sharp"></ion-icon>
-        <span class="side-title" i18n="@@ViewOptions.Settings">Inställningar</span>
-      </ion-button>
-      <ion-button *ngIf="hasSeparateIntroToc" [ngClass]="tocMenuOpen ? 'menuOpenTOC' : 'menuClosedTOC'" (click)="toggleTocMenu()">
-        <ion-icon slot="start" name="list" *ngIf="!tocMenuOpen"></ion-icon>
-        <ion-icon slot="start" name="close" *ngIf="tocMenuOpen"></ion-icon>
-        <span class="side-title" i18n="@@CollectionIntroduction.Contents">Innehåll</span>
-      </ion-button>
+      @if (showTextDownloadButton) {
+        <ion-button (click)="showDownloadModal()">
+          <ion-icon slot="start" class="download-icon" name="download"></ion-icon>
+          <span class="side-title" i18n="@@DownloadTexts.Download">Ladda ner</span>
+        </ion-button>
+      }
+      @if (showURNButton) {
+        <ion-button (click)="showReference()">
+          <ion-icon slot="start" class="urn-icon" name="arrow-redo-sharp"></ion-icon>
+          <span class="side-title" i18n="@@Reference.Refer">Hänvisa</span>
+        </ion-button>
+      }
+      @if (showViewOptionsButton) {
+        <ion-button (click)="showViewOptionsPopover($event)">
+          <ion-icon slot="start" class="settings-icon" name="settings-sharp"></ion-icon>
+          <span class="side-title" i18n="@@ViewOptions.Settings">Inställningar</span>
+        </ion-button>
+      }
+      @if (hasSeparateIntroToc) {
+        <ion-button [ngClass]="tocMenuOpen ? 'menuOpenTOC' : 'menuClosedTOC'" (click)="toggleTocMenu()">
+          @if (!tocMenuOpen) {
+            <ion-icon slot="start" name="list"></ion-icon>
+          }
+          @if (tocMenuOpen) {
+            <ion-icon slot="start" name="close"></ion-icon>
+          }
+          <span class="side-title" i18n="@@CollectionIntroduction.Contents">Innehåll</span>
+        </ion-button>
+      }
     </ion-buttons>
 
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="collection-ion-content" [class.mobile-mode-content]="mobileMode" [scrollX]="false" [scrollY]="false">
+<ion-content class="collection-ion-content"
+      [class.mobile-mode-content]="mobileMode"
+      [scrollX]="false"
+      [scrollY]="false"
+>
   <article class="scroll-content-container"
         [class.xsmallFontSize]="textsize == TextsizeEnum.XSmall"
         [class.smallFontSize]="textsize == TextsizeEnum.Small"
         [class.mediumFontSize]="textsize == TextsizeEnum.Medium"
         [class.largeFontSize]="textsize == TextsizeEnum.Large"
         [class.xlargeFontSize]="textsize == TextsizeEnum.XLarge"
-  > 
+  >
     <!-- Loading spinner -->
-    <ion-spinner *ngIf="textLoading" class="loading" name="crescent"></ion-spinner>
-    
+    @if (textLoading) {
+      <ion-spinner class="loading" name="crescent"></ion-spinner>
+    }
+
     <!-- Introduction text wrapper -->
     <div class="tei teiContainer"
           [class.show_personInfo]="viewOptionsService.show.personInfo && viewOptionsTogglesIntro.personInfo"
@@ -53,57 +73,75 @@
     ></div>
 
     <!-- Tooltip wrapper -->
-    <div
-          class="toolTip tei teiContainer"
+    <div class="toolTip tei teiContainer"
           [class.show_personInfo]="viewOptionsService.show.personInfo"
           [class.show_workInfo]="viewOptionsService.show.workInfo"
-          [ngStyle]="{'position': toolTipPosType, 'top': toolTipPosition.top, 'left': toolTipPosition.left, 'max-width': toolTipMaxWidth, 'transform': 'scale(' + toolTipScaleValue + ')'}"
+          [ngStyle]="{
+            'position': toolTipPosType,
+            'top': toolTipPosition.top,
+            'left': toolTipPosition.left,
+            'max-width': toolTipMaxWidth,
+            'transform': 'scale(' + toolTipScaleValue + ')'
+          }"
           [innerHTML]="toolTipText | trustHtml"
     ></div>
-    
+
     <!-- Info overlay wrapper -->
     <div tabindex="-1"
           class="infoOverlay tei teiContainer"
           [class.show_personInfo]="viewOptionsService.show.personInfo"
           [class.show_workInfo]="viewOptionsService.show.workInfo"
-          [ngStyle]="{'position': infoOverlayPosType, 'bottom': infoOverlayPosition.bottom, 'left': infoOverlayPosition.left, 'width': infoOverlayWidth}"
+          [ngStyle]="{
+            'position': infoOverlayPosType,
+            'bottom': infoOverlayPosition.bottom,
+            'left': infoOverlayPosition.left,
+            'width': infoOverlayWidth
+          }"
     >
       <div class="infoOverlayHeader">
         <p class="infoOverlayTitle" [innerHTML]="infoOverlayTitle"></p>
-        <ion-button *ngIf="infoOverlayTriggerElem"
-              class="close close-info-overlay"
-              fill="clear"
-        >
-          <ion-icon name="close"
-                slot="icon-only"
-                aria-label="Stäng"
-                i18n-aria-label="@@BasicActions.Close"
-          ></ion-icon>
-        </ion-button>
+        @if (infoOverlayTriggerElem) {
+          <ion-button
+                class="close close-info-overlay"
+                fill="clear"
+          >
+            <ion-icon name="close"
+                  slot="icon-only"
+                  aria-label="Stäng"
+                  i18n-aria-label="@@BasicActions.Close"
+            ></ion-icon>
+          </ion-button>
+        }
       </div>
       <div class="infoOverlayContent" [innerHTML]="infoOverlayText | trustHtml"></div>
     </div>
   </article>
 
   <!-- Introduction table of contents -->
-  <nav id="TOC" *ngIf="hasSeparateIntroToc && tocMenuOpen">
-    <div *ngIf="!mobileMode" id="toc-close-button" (click)="toggleTocMenu()">
-      <ion-button class="close" fill="clear">
-        <ion-icon name="close"
-              class="intro-toc-button"
-              slot="icon-only"
-              aria-label="Stäng"
-              i18n-aria-label="@@BasicActions.Close"
-        ></ion-icon>
-      </ion-button>
-    </div>
-    <div id="toc-text" [innerHTML]="textMenu | trustHtml"></div>
-  </nav>
+  @if (hasSeparateIntroToc && tocMenuOpen) {
+    <nav id="TOC">
+      @if (!mobileMode) {
+        <div id="toc-close-button" (click)="toggleTocMenu()">
+          <ion-button class="close" fill="clear">
+            <ion-icon name="close"
+                  class="intro-toc-button"
+                  slot="icon-only"
+                  aria-label="Stäng"
+                  i18n-aria-label="@@BasicActions.Close"
+            ></ion-icon>
+          </ion-button>
+        </div>
+      }
+      <div id="toc-text" [innerHTML]="textMenu | trustHtml"></div>
+    </nav>
+  }
 
 </ion-content>
 
-<text-changer *ngIf="mobileMode"
-      [parentPageType]="'introduction'"
-      [ionViewActive]="_activeComponent"
-      class="text-changer-mobile-mode"
-></text-changer>
+@if (mobileMode) {
+  <text-changer
+        [parentPageType]="'introduction'"
+        [ionViewActive]="_activeComponent"
+        class="text-changer-mobile-mode"
+  ></text-changer>
+}

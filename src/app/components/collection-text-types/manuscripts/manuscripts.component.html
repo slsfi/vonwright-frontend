@@ -1,20 +1,47 @@
-<ion-spinner *ngIf="!text" class="loading" name="crescent"></ion-spinner>
+@if (!text) {
+  <ion-spinner class="loading" name="crescent"></ion-spinner>
+}
 
-<div *ngIf="text && manuscripts.length > 0 && (showTitle || manuscripts.length>1 || showOpenLegendButton || showNormalizedToggle)" class="text-select-wrapper">
-  <h3 *ngIf="showTitle" [innerHTML]="selectedManuscript.name"></h3>
-  <div *ngIf="manuscripts.length>1 || showOpenLegendButton" class="flex-buttons">
-    <ion-button *ngIf="manuscripts.length>1" class="custom-button" (click)="selectManuscript()" i18n="@@Manuscripts.ChangeManuscript">Byt manuskript</ion-button>
-    <!--
-    <ion-button fill="outline" class="custom-outline-button" (click)="openFacsimileMan($event, selectedManuscript)" i18n="@@Manuscripts.OpenFacsimile">Öppna faksimil</ion-button>
-    -->
-    <ion-button *ngIf="showOpenLegendButton" fill="outline" slot="icon-only" class="circular-icon-button align-right" (click)="openNewLegend($event)" title="Teckenförklaringar" i18n-title="@@Legend.Legend">
-      <ion-icon name="help-outline"></ion-icon>
-    </ion-button>
+@if (text && manuscripts.length > 0 && (showTitle || manuscripts.length>1 || showOpenLegendButton || showNormalizedToggle)) {
+  <div class="text-select-wrapper">
+    @if (showTitle) {
+      <h3 [innerHTML]="selectedManuscript.name"></h3>
+    }
+    @if (manuscripts.length > 1 || showOpenLegendButton) {
+      <div class="flex-buttons">
+        @if (manuscripts.length > 1) {
+          <ion-button class="custom-button"
+                (click)="selectManuscript()"
+                i18n="@@Manuscripts.ChangeManuscript"
+          >Byt manuskript</ion-button>
+        }
+        <!--
+        <ion-button fill="outline" class="custom-outline-button" (click)="openFacsimileMan($event, selectedManuscript)" i18n="@@Manuscripts.OpenFacsimile">Öppna faksimil</ion-button>
+        -->
+        @if (showOpenLegendButton) {
+          <ion-button class="circular-icon-button align-right"
+                fill="outline"
+                slot="icon-only"
+                (click)="openNewLegend($event)"
+                title="Teckenförklaringar"
+                i18n-title="@@Legend.Legend"
+          >
+            <ion-icon name="help-outline"></ion-icon>
+          </ion-button>
+        }
+      </div>
+    }
+    @if (showNormalizedToggle) {
+      <div class="show-normalized-toggle">
+        <ion-toggle justify="space-between"
+              (ionChange)="toggleNormalizedManuscript()"
+              [enableOnOffLabels]="true"
+              i18n="@@Manuscripts.ShowNormalized"
+        >Visa ändringar inarbetade</ion-toggle>
+      </div>
+    }
   </div>
-  <div *ngIf="showNormalizedToggle" class="show-normalized-toggle">
-    <ion-toggle (ionChange)="toggleNormalizedManuscript()" justify="space-between" [enableOnOffLabels]="true" i18n="@@Manuscripts.ShowNormalized">Visa ändringar inarbetade</ion-toggle>
-  </div>
-</div>
+}
 
 <div class="tei teiContainer teiManuscript"
       [class.show_personInfo]="viewOptionsService.show.personInfo"
