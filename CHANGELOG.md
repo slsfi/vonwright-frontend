@@ -8,13 +8,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ## Unreleased
 
-
-
-## [1.5.7-production.1] – 2025-03-17
-
 ### Changed
 
-- Merge release [`v1.5.7`](https://github.com/slsfi/digital-edition-frontend-ng/releases/tag/1.5.7) from upstream, original repository into `production` branch. ([7e53a85](https://github.com/slsfi/vonwright-frontend/commit/7e53a8595886a94633c9da08e6c726b91aeb8876))
+- Update disallow rules in `robots.txt`.
 
 
 
@@ -87,6 +83,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 ### Fixed
 
 - Prebuild-scripts: handle 404 responses from API. ([e37f6ad](https://github.com/slsfi/digital-edition-frontend-ng/commit/e37f6ad6f1d28993dda3f4eaced45efecb31ae33))
+
+
+
+## [1.5.7-production.1] – 2025-03-17
+
+### Changed
+
+- Merge release [`v1.5.7`](https://github.com/slsfi/digital-edition-frontend-ng/releases/tag/1.5.7) from upstream, original repository into `production` branch. ([7e53a85](https://github.com/slsfi/vonwright-frontend/commit/7e53a8595886a94633c9da08e6c726b91aeb8876))
 
 
 

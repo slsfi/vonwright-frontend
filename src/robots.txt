@@ -1,5 +1,8 @@
 User-agent: *
 Disallow: /search
+Disallow: /sv/search
+Disallow: /index/
+Disallow: /sv/index/
 Crawl-delay: 10
 
 Sitemap: https://vonwright.sls.fi/sitemap.txt
