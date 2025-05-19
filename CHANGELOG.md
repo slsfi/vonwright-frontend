@@ -8,6 +8,38 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ## Unreleased
 
+### Changed
+
+- Update to base version [`1.6.5`](https://github.com/slsfi/digital-edition-frontend-ng/releases/tag/1.6.5) from upstream, original repository.
+
+
+
+## [1.6.5] – 2025-05-19
+
+> [!IMPORTANT]
+> This release includes a critical fix to a bug introduced in version [1.6.0](https://github.com/slsfi/digital-edition-frontend-ng/releases/tag/1.6.0). Projects on versions 1.6.0–1.6.4 are adviced to update as soon as possible.
+
+### Fixed
+
+- Add `marked-footnote` extension to local instance of `marked` in `markdown.service.ts`. Adding it to the global instance causes the app to hang over time. ([707e5d7](https://github.com/slsfi/digital-edition-frontend-ng/commit/707e5d7027da77540fe707ea44d5fec0a6724821))
+
+### Changed
+
+- Deps: update `@angular/cli` to 19.2.12 and `@angular/core` to 19.2.11. ([a3f0220](https://github.com/slsfi/digital-edition-frontend-ng/commit/a3f02201cbeb168542b972e5338339621dc54c4d))
+- Deps (dev): update `@types/node` to 20.17.48. ([d6b2772](https://github.com/slsfi/digital-edition-frontend-ng/commit/d6b27729eb4d7fab28177c6648509cd0904c5220))
+
+
+
+## [1.6.4] – 2025-05-14
+
+### Fixed
+
+- SSR of ebooks in pdf-format blocked. ([0cff40a](https://github.com/slsfi/digital-edition-frontend-ng/commit/0cff40af045b7d85d35147ad860232f6648c1930))
+
+### Changed
+
+- Deps (dev): update `@types/node` to 20.17.47. ([ed89e0c](https://github.com/slsfi/digital-edition-frontend-ng/commit/ed89e0c1667bd90e25accac677cd0700c8f77475))
+
 
 
 ## [1.6.3-production.1] – 2025-05-14
@@ -38,6 +70,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 
 ## [1.6.2] – 2025-05-05
+
+> [!NOTE]
+> This release, in spite of being a patch release, might introduce breaking changes for projects that have customized the Angular HTML templates, as it contains a migration to the new Angular control flow syntax.
 
 ### Changed
 
@@ -684,7 +719,9 @@ siteLogoDimensions: {
 
 
 
-[unreleased]: https://github.com/slsfi/digital-edition-frontend-ng/compare/1.6.3...HEAD
+[unreleased]: https://github.com/slsfi/digital-edition-frontend-ng/compare/1.6.5...HEAD
+[1.6.5]: https://github.com/slsfi/digital-edition-frontend-ng/compare/1.6.4...1.6.5
+[1.6.4]: https://github.com/slsfi/digital-edition-frontend-ng/compare/1.6.3...1.6.4
 [1.6.3]: https://github.com/slsfi/digital-edition-frontend-ng/compare/1.6.2...1.6.3
 [1.6.2]: https://github.com/slsfi/digital-edition-frontend-ng/compare/1.6.1...1.6.2
 [1.6.1]: https://github.com/slsfi/digital-edition-frontend-ng/compare/1.6.0...1.6.1

@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { catchError, map, Observable, of } from 'rxjs';
-import { marked } from 'marked';
+import { Marked } from 'marked';
 import markedFootnote from 'marked-footnote'
 
 import { config } from '@config';
@@ -12,6 +12,7 @@ import { config } from '@config';
 })
 export class MarkdownService {
   private apiURL: string = '';
+  private marked: Marked;
 
   constructor(
     private http: HttpClient
@@ -20,10 +21,17 @@ export class MarkdownService {
     const projectName = config.app?.projectNameDB ?? '';
     this.apiURL = apiBaseURL + '/' + projectName;
 
-    // Configure marked to use the marked-footnote extension for handling
-    // GitHub flavoured Markdown footnotes:
+    // * Create new instance of Marked to keep options and extensions
+    // * locally scoped. Adding the marked-footnote extension to the
+    // * global scope of Marked will cause it to be added on every
+    // * SSR, ultimately resulting in an unresponsive app.
+    //   https://marked.js.org/using_advanced#instance
+    this.marked = new Marked();
+
+    // Configure this instance of Marked to use the marked-footnote
+    // extension for handling GitHub flavoured Markdown footnotes:
     // https://docs.github.com/en/get-started/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax#footnotes
-    marked.use(markedFootnote({
+    this.marked.use(markedFootnote({
       description: $localize`:@@About.FootnotesHeading:Noter`,
       prefixId: "md-footnote-"
     }));
@@ -81,7 +89,7 @@ export class MarkdownService {
    * Parses the given markdown to HTML and returns it as a string.
    */
   parseMd(md: string): string {
-    return marked.parse(md) as string;
+    return this.marked.parse(md) as string;
   }
 
   /**

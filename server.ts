@@ -66,7 +66,7 @@ export function app(lang: string): express.Express {
   server.get('*', (req, res, next) => {
     const url = req.url.split(/[?#]/, 1)[0].toLowerCase();
     const ext = url.slice(url.lastIndexOf('.'));
-    if (staticExtensions.has(ext)) {
+    if (staticExtensions.has(ext) && !url.startsWith('/ebook/')) {
       res.status(404).send('File with ' + ext + ' extension not found');
       return;
     }
