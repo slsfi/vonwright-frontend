@@ -22,11 +22,13 @@ import { sortArrayOfObjectsNumerically } from '@utility-functions';
 export class FacsimilesComponent implements OnInit {
   @Input() facsID: number | undefined = undefined;
   @Input() imageNr: number | undefined = undefined;
+  @Input() sortOrder: number | undefined = undefined;
   @Input() textItemID: string = '';
   @Output() selectedFacsID = new EventEmitter<number>();
   @Output() selectedFacsName = new EventEmitter<string>();
   @Output() selectedImageNr = new EventEmitter<number | null>();
-  
+  @Output() selectedFacsSortOrder = new EventEmitter<number | null>();
+
   angle: number = 0;
   externalFacsimiles: any[] = [];
   facsURLAlternate: string = '';
@@ -113,11 +115,12 @@ export class FacsimilesComponent implements OnInit {
         const inputFacsimile = this.facsimiles.filter((item: any) => {
           return (item.facsimile_id === this.facsID);
         })[0];
-        if (inputFacsimile) {
-          this.selectedFacsimile = inputFacsimile;
-        } else {
-          this.selectedFacsimile = this.facsimiles[0];
-        }
+        this.selectedFacsimile = inputFacsimile ? inputFacsimile : this.facsimiles[0];
+      } else if (this.sortOrder) {
+        const inputFacsimile = this.facsimiles.filter((item: any) => {
+          return (item.priority === this.sortOrder);
+        })[0];
+        this.selectedFacsimile = inputFacsimile ? inputFacsimile : this.facsimiles[0];
       } else if (
         this.externalFacsimiles.length > 0 && 
         (
@@ -145,6 +148,7 @@ export class FacsimilesComponent implements OnInit {
       this.selectedFacsimileIsExternal = true;
       this.emitSelectedFacsimileId(0);
       this.emitSelectedFacsimileName($localize`:@@Facsimiles.ExternalFacsimiles:Externa faksimil`);
+      this.emitSelectedFacsimileSortOrder(null);
       this.emitImageNumber(null);
     } else if (facs) {
       this.initializeDisplayedFacsimile(facs);
@@ -162,11 +166,8 @@ export class FacsimilesComponent implements OnInit {
       ? facs.content?.replace(/src="images\//g, 'src="assets/images/')
       : facs.content;
 
-    if (extImageNr !== undefined) {
-      this.facsNumber = extImageNr;
-    } else {
-      this.facsNumber = facs.page;
-    }
+    this.facsNumber = (extImageNr !== undefined) ? extImageNr : facs.page;
+
     this.facsNumber < 1 ? this.facsNumber = 1 : (
       this.facsNumber > this.numberOfImages ? this.facsNumber = this.numberOfImages : this.facsNumber
     );
@@ -174,6 +175,12 @@ export class FacsimilesComponent implements OnInit {
     if (this.facsimiles.length > 1 || this.externalFacsimiles.length > 0) {
       this.emitSelectedFacsimileId(facs.facsimile_id);
       this.emitSelectedFacsimileName(facs.title);
+    }
+
+    if (this.externalFacsimiles.length < 1 && this.facsimiles.length > 1) {
+      this.emitSelectedFacsimileSortOrder(facs.priority);
+    } else {
+      this.emitSelectedFacsimileSortOrder(null);
     }
 
     if (this.numberOfImages > 1) {
@@ -255,6 +262,10 @@ export class FacsimilesComponent implements OnInit {
       (this.facsimiles.length == 1 && this.externalFacsimiles.length > 0)) {
       this.selectedFacsName.emit(name);
     }
+  }
+
+  emitSelectedFacsimileSortOrder(sortOrder: number | null) {
+    this.selectedFacsSortOrder.emit(sortOrder);
   }
 
   emitImageNumber(nr: number | null) {

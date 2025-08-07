@@ -1,7 +1,7 @@
 import { ChangeDetectorRef, Component, ElementRef, Inject, LOCALE_ID, NgZone, OnDestroy, OnInit, QueryList, Renderer2, ViewChild, ViewChildren } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { IonFabButton, IonFabList, IonPopover, ModalController, PopoverController } from '@ionic/angular';
-import { Observable, Subscription } from 'rxjs';
+import { combineLatest, Observable, Subscription } from 'rxjs';
 
 import { config } from '@config';
 import { DownloadTextsModal } from '@modals/download-texts/download-texts.modal';
@@ -18,7 +18,7 @@ import { ScrollService } from '@services/scroll.service';
 import { TooltipService } from '@services/tooltip.service';
 import { UrlService } from '@services/url.service';
 import { ViewOptionsService } from '@services/view-options.service';
-import { isBrowser, moveArrayItem } from '@utility-functions';
+import { enableFrontMatterPageOrTextViewType, isBrowser, moveArrayItem } from '@utility-functions';
 
 
 @Component({
@@ -50,12 +50,11 @@ export class CollectionTextPage implements OnDestroy, OnInit {
   infoOverlayWidth: string | null = null;
   legacyId: string = '';
   mobileMode: boolean = false;
-  multilingualReadingTextLanguages: any[] = [];
-  paramChapterID: any;
-  paramCollectionID: any;
-  paramPublicationID: any;
+  multilingualReadingTextLanguages: string[] = [];
+  paramCollectionID: string;
+  paramPublicationID: string;
+  paramChapterID: string;
   routeParamsSubscription: Subscription | null = null;
-  routeQueryParamsSubscription: Subscription | null = null;
   searchMatches: string[] = [];
   showTextDownloadButton: boolean = false;
   showURNButton: boolean = true;
@@ -108,26 +107,6 @@ export class CollectionTextPage implements OnDestroy, OnInit {
     this.showTextDownloadButton = config.page?.text?.showTextDownloadButton ?? false;
     this.showURNButton = config.page?.text?.showURNButton ?? true;
     this.showViewOptionsButton = config.page?.text?.showViewOptionsButton ?? true;
-
-    // Hide some or all of the view types that can be added (variants, facsimiles, readingtext etc.)
-    const viewTypes = config.page?.text?.viewTypes ?? {};
-    for (const type in viewTypes) {
-      if (
-        viewTypes.hasOwnProperty(type) &&
-        viewTypes[type]
-      ) {
-        if (
-          type === 'readingtext' &&
-          this.multilingualReadingTextLanguages.length > 1
-        ) {
-          for (const estLanguage of this.multilingualReadingTextLanguages) {
-            this.enabledViewTypes.push(type + '_' + estLanguage);
-          }
-        } else {
-          this.enabledViewTypes.push(type);
-        }
-      }
-    }
   }
 
   ngOnInit() {
@@ -141,85 +120,94 @@ export class CollectionTextPage implements OnDestroy, OnInit {
       }
     );
 
-    this.routeParamsSubscription = this.route.params.subscribe(
-      (params: any) => {
-        let textItemID;
+    let latestTextItemID: string = '';
 
-        if (params['chapterID'] !== undefined && params['chapterID'] !== '') {
-          textItemID = params['collectionID'] + '_' + params['publicationID'] + '_' + params['chapterID'];
-          this.paramChapterID = params['chapterID'];
-        } else {
-          textItemID = params['collectionID'] + '_' + params['publicationID'];
-        }
+    this.routeParamsSubscription = combineLatest([
+      this.route.params,
+      this.route.queryParams
+    ]).subscribe(([params, queryParams]) => {
+      // Compute new textItemID to see if route params have changed
+      const { collectionID = '', publicationID = '', chapterID = '' } = params;
 
-        if (this.textItemID !== textItemID) {
-          this.textItemID = textItemID;
-          // Save the id of the previous and current read view text in textService.
-          this.collectionContentService.previousReadViewTextId = this.collectionContentService.readViewTextId;
-          this.collectionContentService.readViewTextId = this.textItemID;
-        }
+      latestTextItemID = chapterID
+        ? `${collectionID}_${publicationID}_${chapterID}`
+        : `${collectionID}_${publicationID}`;
 
-        this.paramCollectionID = params['collectionID'];
-        this.paramPublicationID = params['publicationID'];
+      if (this.textItemID !== latestTextItemID) {
+        // Route params have changed
+        this.textItemID = latestTextItemID;
+        this.paramCollectionID = collectionID;
+        this.paramPublicationID = publicationID;
+        this.paramChapterID = chapterID;
+        // Save the id of the previous and current read view text in textService.
+        this.collectionContentService.previousReadViewTextId = this.collectionContentService.readViewTextId;
+        this.collectionContentService.readViewTextId = this.textItemID;
 
         if (config.collections?.enableLegacyIDs) {
           this.setCollectionAndPublicationLegacyId(this.paramPublicationID);
         }
+
+        this.enabledViewTypes = this.computeEnabledViewTypes(
+          this.paramCollectionID, this.multilingualReadingTextLanguages
+        );
       }
-    );
 
-    this.routeQueryParamsSubscription = this.route.queryParams.subscribe(
-      (queryParams: any) => {
+      // queryParams actions
+      if (queryParams['q']) {
+        this.searchMatches = this.parserService.getSearchMatchesFromQueryParams(queryParams['q']);
+      }
 
-        if (queryParams['q']) {
-          this.searchMatches = this.parserService.getSearchMatchesFromQueryParams(queryParams['q']);
-        }
+      if (queryParams['views']) {
+        let parsedViews: any[] = this.urlService.parse(queryParams['views'], true);
 
-        if (queryParams['views']) {
-          const parsedViews = this.urlService.parse(queryParams['views'], true);
-
-          let viewsChanged = false;
-          if (this.views.length !== parsedViews.length) {
-            viewsChanged = true;
-          } else {
-            for (let i = 0; i < this.views.length; i++) {
-              // Comparison on the entire view objects doesn't work for texts that have
-              // just positions that can change, hence checking only if types unequal
-              if (this.views[i].type !== parsedViews[i].type) {
-                viewsChanged = true;
-                break;
-              }
-            }
-          }
-
-          if (this.views.length < 1 || viewsChanged) {
-            this.views = parsedViews;
-            this.illustrationsViewShown = this.viewTypeIsShown('illustrations');
-          }
-
-          // Clear the array keeping track of recently open views in
-          // text service and populate it with the current ones.
-          this.collectionContentService.recentCollectionTextViews = [];
-          parsedViews.forEach((viewObj: any) => {
-            const cachedViewObj: any = { type: viewObj.type };
-            if (
-              viewObj.type === 'variants' &&
-              viewObj.sortOrder
-            ) {
-              cachedViewObj.sortOrder = viewObj.sortOrder;
-            }
-            this.collectionContentService.recentCollectionTextViews.push(cachedViewObj);
-          });
+        let viewsChanged = false;
+        if (this.views.length !== parsedViews.length) {
+          viewsChanged = true;
         } else {
-          this.setViews();
+          for (let i = 0; i < this.views.length; i++) {
+            // Comparison on the entire view objects doesn't work for texts that have
+            // just positions that can change, hence checking only if types unequal
+            if (this.views[i].type !== parsedViews[i].type) {
+              viewsChanged = true;
+              break;
+            }
+          }
         }
 
-        if (queryParams['position'] || (this.textPosition && queryParams['position'] === undefined)) {
-          this.textPosition = queryParams['position'];
+        if (this.views.length < 1 || viewsChanged) {
+          // Ensure the parsedViews are among enabled view types
+          if (!parsedViews.every((view: any) => this.enabledViewTypes.includes(view.type))) {
+            // Filter out disabled view types
+            parsedViews = parsedViews.filter((view: any) => this.enabledViewTypes.includes(view.type));
+          }
+          this.views = parsedViews;
+          this.illustrationsViewShown = this.viewTypeIsShown('illustrations');
         }
 
+        // Clear the array keeping track of recently open views in
+        // text service and populate it with the current ones.
+        this.collectionContentService.recentCollectionTextViews = [];
+        parsedViews.forEach((viewObj: any) => {
+          const cachedViewObj: any = { type: viewObj.type };
+          if (
+            viewObj.sortOrder &&
+            (
+              viewObj.type === 'variants' ||
+              viewObj.type === 'facsimiles'
+            )
+          ) {
+            cachedViewObj.sortOrder = viewObj.sortOrder;
+          }
+          this.collectionContentService.recentCollectionTextViews.push(cachedViewObj);
+        });
+      } else {
+        this.setViews();
       }
-    );
+
+      if (queryParams['position'] || (this.textPosition && queryParams['position'] === undefined)) {
+        this.textPosition = queryParams['position'];
+      }
+    });
 
     if (isBrowser()) {
       this.setUpTextListeners();
@@ -228,7 +216,6 @@ export class CollectionTextPage implements OnDestroy, OnInit {
 
   ngOnDestroy() {
     this.routeParamsSubscription?.unsubscribe();
-    this.routeQueryParamsSubscription?.unsubscribe();
     this.textsizeSubscription?.unsubscribe();
     this.unlistenClickEvents?.();
     this.unlistenKeyUpEnterEvents?.();
@@ -245,46 +232,120 @@ export class CollectionTextPage implements OnDestroy, OnInit {
     this._activeComponent = false;
   }
 
+  /**
+   * Compute which view types (readingtext, comments, facsimiles ...) should be
+   * enabled for this collection.
+   * @param collectionID 
+   * @param readingtextLanguages 
+   * @returns string[]
+   */
+  private computeEnabledViewTypes(
+    collectionID: string,
+    readingtextLanguages: string[]
+  ): string[] {
+    const enabledTypes: string[] = [];
+    const viewTypes = config.page?.text?.viewTypes ?? {};
+
+    for (const type in viewTypes) {
+      if (
+        viewTypes.hasOwnProperty(type) &&
+        enableFrontMatterPageOrTextViewType('text', collectionID, config, type)
+      ) {
+        if (type === 'readingtext' && readingtextLanguages.length > 1) {
+          for (const lang of readingtextLanguages) {
+            enabledTypes.push(`${type}_${lang}`);
+          }
+        } else {
+          enabledTypes.push(type);
+        }
+      }
+    }
+
+    return enabledTypes;
+  }
+
+  /**
+   * Compute default view types, taking into consideration the enabled view
+   * types for the current collection.
+   * @param enabledViewTypes 
+   * @param readingtextLanguages 
+   * @param activeLocale 
+   * @returns
+   */
+  private computeDefaultViewTypes(
+    enabledViewTypes: string[],
+    readingtextLanguages: string[],
+    activeLocale: string
+  ): any[] {
+    const newViews: any[] = [];
+    let defaultViews: string[] = config.page?.text?.defaultViews ?? ['readingtext'];
+
+    if (
+      readingtextLanguages.length > 1 &&
+      defaultViews[0].startsWith('readingtext_') &&
+      defaultViews[0] !== 'readingtext_' + activeLocale
+    ) {
+      // Set the active locale's reading text to first column if
+      // multilingual reading texts
+      defaultViews = moveArrayItem(
+        defaultViews, defaultViews.indexOf('readingtext_' + activeLocale), 0
+      );
+    }
+
+    // Ensure default views are among the enabled view types
+    defaultViews.forEach((type: string) => {
+      if (enabledViewTypes.includes(type)) {
+        newViews.push({ type });
+      }
+    });
+
+    if (newViews.length < 1 && enabledViewTypes.length > 0) {
+      // All default views are disabled -> just show the first
+      // enabled view type
+      newViews.push({ type: enabledViewTypes[0] });
+    }
+
+    return newViews;
+  }
+
   private setViews() {
     // There are no views defined in the url params =>
     // show a) current views if defined,
     //      b) recent view types if defined, or
     //      c) default view types.
     if (this.views.length > 0) {
-      // show current views
+      // a) show current views
       this.updateViewsInRouterQueryParams(this.views);
       this.setActiveViewInMobileMode(this.views);
     } else if (this.collectionContentService.recentCollectionTextViews.length > 0) {
-      // show recent view types
+      // b) show recent view types
       // if different collection than previously pass type of views only
       const typesOnly = this.textItemID.split('_')[0] !== this.collectionContentService.previousReadViewTextId.split('_')[0] ? true : false;
-      this.updateViewsInRouterQueryParams(
-        this.collectionContentService.recentCollectionTextViews, typesOnly
-      );
-      this.setActiveViewInMobileMode(this.collectionContentService.recentCollectionTextViews);
-    } else {
-      // show default view types
-      let newViews: any[] = [];
-      let defaultViews: string[] = config.page?.text?.defaultViews ?? ['readingtext'];
 
-      if (
-        this.multilingualReadingTextLanguages.length > 1 &&
-        defaultViews[0].startsWith('readingtext_') &&
-        defaultViews[0] !== 'readingtext_' + this.activeLocale
-      ) {
-        // Set the active locale's reading text to first column if
-        // multilingual reading texts
-        defaultViews = moveArrayItem(
-          defaultViews, defaultViews.indexOf('readingtext_' + this.activeLocale), 0
-        );
+      let newViews = this.collectionContentService.recentCollectionTextViews;
+
+      if (typesOnly) {
+        // Make sure the only enabled view types for this collection are added
+        // from the recent views. First deep copy the array of view objects and
+        // then remove disabled view types from it.
+        const recentViewsCopy = newViews.map(obj => ({ ...obj }));
+        // Filter out view objects of disabled types
+        newViews = recentViewsCopy.filter((view: any) => this.enabledViewTypes.includes(view.type));
+        // If the new views list is empty, add enabled default views
+        if (newViews.length < 1) {
+          newViews = this.computeDefaultViewTypes(
+            this.enabledViewTypes, this.multilingualReadingTextLanguages, this.activeLocale
+          );
+        }
       }
 
-      defaultViews.forEach((type: string) => {
-        if (this.enabledViewTypes.indexOf(type) > -1) {
-          newViews.push({ type });
-        }
-      });
-
+      this.updateViewsInRouterQueryParams(newViews, typesOnly);
+      this.setActiveViewInMobileMode(newViews);
+    } else {
+      // c) show default view types
+      const newViews = this.computeDefaultViewTypes(
+        this.enabledViewTypes, this.multilingualReadingTextLanguages, this.activeLocale
+      );
       this.updateViewsInRouterQueryParams(newViews);
       this.setActiveViewInMobileMode(newViews);
     }
@@ -603,8 +664,20 @@ export class CollectionTextPage implements OnDestroy, OnInit {
 
         eventTarget = this.getEventTarget(event);
         if (
-          eventTarget.classList.contains('variantScrollTarget') ||
-          eventTarget.classList.contains('anchorScrollTarget')
+          (
+            eventTarget.classList.contains('variantScrollTarget') ||
+            eventTarget.classList.contains('anchorScrollTarget')
+          ) &&
+          (
+            this.viewOptionsService.selectedVariationType === 'all' ||
+            (
+              this.viewOptionsService.selectedVariationType === 'sub' &&
+              (
+                eventTarget.classList.contains('substantial') ||
+                eventTarget.classList.contains('lemma')
+              )
+            )
+          )
         ) {
           // Click on variant lemma --> highlight and scroll all variant columns
           // in desktop mode; display variant info in infoOverlay in mobile mode.
@@ -987,7 +1060,10 @@ export class CollectionTextPage implements OnDestroy, OnInit {
               this.ngZone.run(() => {
                 this.showTooltipFromInlineHtml(eventTarget);
               });
-            } else if (eventTarget['classList'].contains('ttVariant')) {
+            } else if (
+              eventTarget['classList'].contains('ttVariant') &&
+              this.viewOptionsService.selectedVariationType !== 'none'
+            ) {
               this.ngZone.run(() => {
                 this.showVariantTooltip(eventTarget);
               });
@@ -1127,6 +1203,12 @@ export class CollectionTextPage implements OnDestroy, OnInit {
 
   private showVariantTooltip(targetElem: HTMLElement) {
     if (
+      this.viewOptionsService.selectedVariationType === 'sub' &&
+      !targetElem.classList.contains('substantial')
+    ) {
+      return;
+    }
+    if (
       targetElem.nextElementSibling?.classList.contains('tooltip') &&
       targetElem.nextElementSibling?.textContent
     ) {
@@ -1150,12 +1232,12 @@ export class CollectionTextPage implements OnDestroy, OnInit {
   private showCommentInfoOverlay(id: string, targetElem: HTMLElement) {
     this.tooltipService.getCommentTooltip(this.textItemID, id).subscribe({
       next: (tooltip: any) => {
-        this.setInfoOverlayTitle($localize`:@@Commentary.Commentary:Kommentar`);
+        this.setInfoOverlayTitle($localize`:@@ViewOptions.ExplanatoryNote:Punktkommentar`);
         this.setInfoOverlayPositionAndWidth(targetElem);
         this.setInfoOverlayText(tooltip.description);
       },
       error: (errorC: any) => {
-        this.setInfoOverlayTitle($localize`:@@Commentary.Commentary:Kommentar`);
+        this.setInfoOverlayTitle($localize`:@@ViewOptions.ExplanatoryNote:Punktkommentar`);
         this.setInfoOverlayPositionAndWidth(targetElem);
         this.setInfoOverlayText($localize`:@@NamedEntity.NoInfoFound:Ingen information hittades.`);
       }

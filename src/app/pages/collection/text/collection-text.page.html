@@ -344,9 +344,11 @@
             [textItemID]="textItemID"
             [facsID]="view.id"
             [imageNr]="view.nr"
+            [sortOrder]="view.sortOrder"
             (selectedFacsID)="updateViewProperty('id', $event, i)"
             (selectedImageNr)="updateViewProperty('nr', $event, i)"
             (selectedFacsName)="updateViewProperty('title', $event, i, false)"
+            (selectedFacsSortOrder)="updateViewProperty('sortOrder', $event, i)"
       ></facsimiles>
     } @loading (minimum 1s) {
       <ion-spinner class="loading" name="crescent"></ion-spinner>

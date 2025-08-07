@@ -55,7 +55,7 @@ async function generateStaticCollectionMenus() {
     const locale = lang.code;
 
     // Load translations
-    const transl = {};
+    const fmPagesTranslations = {};
     for (const [page, enabled] of Object.entries(fmPages)) {
       if (enabled) {
         const translationId = page === 'cover' ? 'CollectionCover.Cover'
@@ -64,7 +64,7 @@ async function generateStaticCollectionMenus() {
           : page === 'introduction' ? 'CollectionIntroduction.Introduction'
           : '';
         const text = common.getTranslation(translationsPath, locale, translationId);
-        transl[page] = text;
+        fmPagesTranslations[page] = text;
       }
     }
 
@@ -74,14 +74,22 @@ async function generateStaticCollectionMenus() {
       collectionsEndpoint += '/' + locale;
     }
 
-    const collections = await common.fetchFromAPI(collectionsEndpoint);
+    const collections = await common.fetchWithRetry(collectionsEndpoint);
     if (!collections) {
       console.warn(`Skipping locale "${locale}": could not fetch collections from ${collectionsEndpoint}`);
       continue;
     }
 
+    let collectionCount = 0;
+
     // Loop through each collection
     for (const collection of collections) {
+      collectionCount++;
+      if (collectionCount % 10 === 0) {
+        // Pause every 10th collection to avoid backend overload
+        await common.sleep(2000);
+      }
+
       const collectionId = collection?.id;
       const collectionTitle = collection?.title ?? '';
 
@@ -95,7 +103,7 @@ async function generateStaticCollectionMenus() {
         tocEndpoint += '/' + locale;
       }
 
-      const tocJSON = await common.fetchFromAPI(tocEndpoint);
+      const tocJSON = await common.fetchWithRetry(tocEndpoint);
       if (!tocJSON) {
         console.warn(`Skipping collection ${collectionId} (${locale}): could not fetch TOC from ${tocEndpoint}`);
         continue;
@@ -126,10 +134,12 @@ async function generateStaticCollectionMenus() {
       appendToFile(filename, '<ul>\n');
 
       // Front matter links
-      for (const [page, text] of Object.entries(transl)) {
-        html = `<li><a href="/${locale}/collection/${collectionId}/${page}">${text}</a></li>\n`;
-        appendToFile(filename, html);
-        linksCount++;
+      for (const [page, text] of Object.entries(fmPagesTranslations)) {
+        if (common.enableFrontMatterPage(page, collectionId, config)) {
+          html = `<li><a href="/${locale}/collection/${collectionId}/${page}">${text}</a></li>\n`;
+          appendToFile(filename, html);
+          linksCount++;
+        }
       }
 
       // TOC item links

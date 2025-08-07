@@ -10,7 +10,7 @@ import { HtmlParserService } from '@services/html-parser.service';
 import { PlatformService } from '@services/platform.service';
 import { ScrollService } from '@services/scroll.service';
 import { ViewOptionsService } from '@services/view-options.service';
-import { isBrowser } from '@utility-functions';
+import { enableFrontMatterPageOrTextViewType, isBrowser } from '@utility-functions';
 
 
 @Component({
@@ -46,9 +46,7 @@ export class ReadingTextComponent implements OnChanges, OnDestroy, OnInit {
     private renderer2: Renderer2,
     private scrollService: ScrollService,
     public viewOptionsService: ViewOptionsService
-  ) {
-    this.illustrationsViewAvailable = config.page?.text?.viewTypes?.illustrations ?? false;
-  }
+  ) {}
 
   ngOnChanges(changes: SimpleChanges) {
     for (const propName in changes) {
@@ -75,6 +73,10 @@ export class ReadingTextComponent implements OnChanges, OnDestroy, OnInit {
     this.mobileMode = this.platformService.isMobile();
 
     if (this.textItemID) {
+      const collectionID = this.textItemID.split('_')[0];
+      this.illustrationsViewAvailable = enableFrontMatterPageOrTextViewType(
+        'text', collectionID, config, 'illustrations'
+      );
       this.loadReadingText();
     }
     if (isBrowser()) {

@@ -100,7 +100,7 @@ export class CollectionTitlePage implements OnDestroy, OnInit {
     if (!this.loadContentFromMarkdown) {
       return this.collectionContentService.getTitle(id, lang).pipe(
         map((res: any) => {
-          if (res?.content) {
+          if (res?.content && res?.content !== 'File not found') {
             let text = this.replaceImageAssetsPaths
               ? res.content.replace(/src="images\//g, 'src="assets/images/')
               : res.content;

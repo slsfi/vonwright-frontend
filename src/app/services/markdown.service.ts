@@ -31,9 +31,12 @@ export class MarkdownService {
     // Configure this instance of Marked to use the marked-footnote
     // extension for handling GitHub flavoured Markdown footnotes:
     // https://docs.github.com/en/get-started/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax#footnotes
+    // https://github.com/bent10/marked-extensions/tree/main/packages/footnote
     this.marked.use(markedFootnote({
+      backRefLabel: $localize`:@@About.FootnotesBackToReference:Tillbaka till nothänvisning` + ' {0}',
       description: $localize`:@@About.FootnotesHeading:Noter`,
-      prefixId: "md-footnote-"
+      headingClass: '',
+      prefixId: 'md-footnote-'
     }));
   }
 

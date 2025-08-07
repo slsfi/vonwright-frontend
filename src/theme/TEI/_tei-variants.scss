@@ -141,6 +141,44 @@ div.tei {
   }
 }
 
+div.tei.teiVariant {
+  &.show-variations-none {
+    .lemma,
+    .variant,
+    .orthographic,
+    .substantial,
+    .interpunction,
+    .identical,
+    .typographic,
+    .error {
+      background-color: unset !important;
+    }
+
+    .structVar {
+      display: none;
+    }
+
+    .variantScrollTarget {
+      cursor: default;
+    }
+  }
+
+  &.show-variations-sub {
+    .variant,
+    .orthographic,
+    .interpunction,
+    .identical,
+    .typographic,
+    .error {
+      background-color: unset !important;
+
+      &.variantScrollTarget {
+        cursor: default;
+      }
+    }
+  }
+}
+
 .teiVariant.ref_variant + .teiVariant.ref_variant {
   margin-left: -0.125em;
 }

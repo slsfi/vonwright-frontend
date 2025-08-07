@@ -198,7 +198,7 @@ export class CollectionIntroductionPage implements OnInit, OnDestroy {
     this.textLoading = true;
     this.collectionContentService.getIntroduction(id, lang).subscribe({
       next: (res: any) => {
-        if (res?.content) {
+        if (res?.content && res?.content !== 'File not found') {
           this.textLoading = false;
           // Fix paths for images
           let textContent = this.replaceImageAssetsPaths
@@ -208,7 +208,7 @@ export class CollectionIntroductionPage implements OnInit, OnDestroy {
           // TODO: this manipulation of the introductions TOC should maybe be done using htmlparser2,
           // TODO: on the other hand using regex doesn't rely on an external dependency ...
           // Find the introduction's table of contents in the text
-          const pattern = /<div data-id="content">(.*?)<\/div>/;
+          const pattern = /<div data-id="content">(.*?)<\/div>/s;
           const matches = textContent.match(pattern);
           if (matches && matches.length > 0) {
             // The introduction's table of contents was found,

@@ -25,19 +25,19 @@
               value="default"
               i18n="@@CollectionSideMenu.SortOptions.Default"
         >Standard</ion-select-option>
-        @if (sortOptions.includes('alphabetical')) {
+        @if (sortOptions | arrayIncludes:'alphabetical') {
           <ion-select-option
                 value="alphabetical"
                 i18n="@@CollectionSideMenu.SortOptions.Alphabetical"
           >Alfabetisk</ion-select-option>
         }
-        @if (sortOptions.includes('chronological')) {
+        @if (sortOptions | arrayIncludes:'chronological') {
           <ion-select-option
                 value="chronological"
                 i18n="@@CollectionSideMenu.SortOptions.Chronological"
           >Kronologisk</ion-select-option>
         }
-        @if (sortOptions.includes('categorical')) {
+        @if (sortOptions | arrayIncludes:'categorical') {
           <ion-select-option
                 value="categorical"
                 i18n="@@CollectionSideMenu.SortOptions.Categorical"
@@ -49,29 +49,29 @@
   <ul role="menu" [ngClass]="activeMenuOrder + '-menu-sorting'">
     @if (enableCover) {
       <li [attr.aria-current]="routeUrlSegments[2].path === 'cover' ? 'page' : null" role="menuitem" data-id="toc_cover">
-        <a routerLink="{{collectionID | collectionPagePath: 'cover'}}" [class.menu-highlight]="routeUrlSegments[2].path === 'cover'">
-          <span class="label" i18n="@@CollectionCover.Cover">Omslag</span>
+        <a routerLink="{{collectionID | collectionPagePath:'cover'}}" [class.menu-highlight]="routeUrlSegments[2].path === 'cover'">
+          <span class="label">{{ coverPageName }}</span>
         </a>
       </li>
     }
     @if (enableTitle) {
       <li [attr.aria-current]="routeUrlSegments[2].path === 'title' ? 'page' : null" role="menuitem" data-id="toc_title">
-        <a routerLink="{{collectionID | collectionPagePath: 'title'}}" [class.menu-highlight]="routeUrlSegments[2].path === 'title'">
-          <span class="label" i18n="@@CollectionTitle.TitlePage">Titelblad</span>
+        <a routerLink="{{collectionID | collectionPagePath:'title'}}" [class.menu-highlight]="routeUrlSegments[2].path === 'title'">
+          <span class="label">{{ titlePageName }}</span>
         </a>
       </li>
     }
     @if (enableForeword) {
       <li [attr.aria-current]="routeUrlSegments[2].path === 'foreword' ? 'page' : null" role="menuitem" data-id="toc_foreword">
-        <a routerLink="{{collectionID | collectionPagePath: 'foreword'}}" [class.menu-highlight]="routeUrlSegments[2].path === 'foreword'">
-          <span class="label" i18n="@@CollectionForeword.Foreword">Förord</span>
+        <a routerLink="{{collectionID | collectionPagePath:'foreword'}}" [class.menu-highlight]="routeUrlSegments[2].path === 'foreword'">
+          <span class="label">{{ forewordPageName }}</span>
         </a>
       </li>
     }
     @if (enableIntroduction) {
       <li [attr.aria-current]="routeUrlSegments[2].path === 'introduction' ? 'page' : null" role="menuitem" data-id="toc_introduction">
-        <a routerLink="{{collectionID | collectionPagePath: 'introduction'}}" [class.menu-highlight]="routeUrlSegments[2].path === 'introduction'">
-          <span class="label" i18n="@@CollectionIntroduction.Introduction">Inledning</span>
+        <a routerLink="{{collectionID | collectionPagePath:'introduction'}}" [class.menu-highlight]="routeUrlSegments[2].path === 'introduction'">
+          <span class="label">{{ introductionPageName }}</span>
         </a>
       </li>
     }
@@ -85,7 +85,7 @@
           [attr.data-id]="item.itemId ? 'toc_' + item.itemId : ''"
           [attr.aria-current]="currentMenuItemId === item.itemId ? 'page' : null"
           [attr.aria-haspopup]="item.children ? 'menu' : null"
-          [attr.aria-expanded]="item.children ? selectedMenu.includes(item.itemId) || selectedMenu.includes(item.nodeId) : null"
+          [attr.aria-expanded]="item.children ? (selectedMenu | arrayIncludesAny:[item.itemId, item.nodeId]) : null"
           role="menuitem"
     >
       @if (item.itemId) {
@@ -107,7 +107,7 @@
       }
       @if (item.children) {
         <ul role="menu"
-              [class.open]="selectedMenu.includes(item.itemId) || selectedMenu.includes(item.nodeId)"
+              [class.open]="selectedMenu | arrayIncludesAny:[item.itemId, item.nodeId]"
         >
           <ng-container *ngTemplateOutlet="recursiveMenu; context: {$implicit: item.children}"/>
         </ul>
@@ -133,7 +133,7 @@
     <ion-icon name="chevron-forward-outline"
           class="item-icon-r toggle-icon"
           aria-hidden="true"
-          [class.open]="selectedMenu.includes(item.itemId) || selectedMenu.includes(item.nodeId)"
+          [class.open]="selectedMenu | arrayIncludesAny:[item.itemId, item.nodeId]"
     ></ion-icon>
   }
 </ng-template>

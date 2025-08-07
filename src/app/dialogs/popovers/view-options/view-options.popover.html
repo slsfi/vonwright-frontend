@@ -106,3 +106,22 @@
     }
   </ion-list>
 }
+
+@if (showVariationTypeOption) {
+  <ion-list lines="full">
+    <ion-list-header>
+      <ion-label i18n="@@ViewOptions.VariantOptions">Visningsalternativ, varianter</ion-label>
+    </ion-list-header>
+    <ion-item>
+      <ion-radio-group
+            class="selected-variation-type"
+            [value]="viewOptionsService.selectedVariationType"
+            (ionChange)="setSelectedVariationType($event)"
+      >
+        <ion-radio value="all" labelPlacement="end" justify="start" i18n="@@ViewOptions.ShowAllVariation">Visa alla skillnader</ion-radio>
+        <ion-radio value="sub" labelPlacement="end" justify="start" i18n="@@ViewOptions.ShowSubstantialVariation">Visa substantiella skillnader</ion-radio>
+        <ion-radio value="none" labelPlacement="end" justify="start" i18n="@@ViewOptions.ShowNoVariation">Visa inga skillnader</ion-radio>
+      </ion-radio-group>
+    </ion-item>
+  </ion-list>
+}

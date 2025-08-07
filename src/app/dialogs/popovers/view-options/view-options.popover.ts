@@ -31,6 +31,7 @@ export class ViewOptionsPopover implements OnDestroy, OnInit {
     pageBreakOriginal: false,
     pageBreakEdition: false
   };
+  showVariationTypeOption: boolean = false;
   textsize: Textsize = Textsize.Small;
   textsizeSubscription: Subscription | null = null;
   togglesCounter: number;
@@ -39,9 +40,10 @@ export class ViewOptionsPopover implements OnDestroy, OnInit {
 
   constructor(
     private popoverCtrl: PopoverController,
-    private viewOptionsService: ViewOptionsService
+    protected viewOptionsService: ViewOptionsService
   ) {
     this.availableToggles = config.page?.text?.viewOptions ?? undefined;
+    this.showVariationTypeOption = config.page?.text?.variantViewOptions?.showVariationTypeOption ?? false;
   }
 
   ngOnInit() {
@@ -64,6 +66,13 @@ export class ViewOptionsPopover implements OnDestroy, OnInit {
       if (value && this.availableToggles[key]) {
         this.checkedToggles++;
       }
+    }
+
+    // The collection text page is the only page where variant view options
+    // should be possibly shown, here we are assuming it's the only page that
+    // does not define the input toggles.
+    if (this.toggles !== undefined && this.showVariationTypeOption) {
+      this.showVariationTypeOption = false;
     }
 
     this.textsizeSubscription = this.viewOptionsService.getTextsize().subscribe(
@@ -149,6 +158,12 @@ export class ViewOptionsPopover implements OnDestroy, OnInit {
 
   setTextSize(size: Textsize) {
     this.viewOptionsService.setTextsize(size);
+  }
+
+  setSelectedVariationType(event: any) {
+    if (event?.detail?.value) {
+      this.viewOptionsService.selectedVariationType = event.detail.value;
+    }
   }
 
 }

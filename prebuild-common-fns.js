@@ -62,6 +62,19 @@ async function fetchFromAPI(endpoint) {
   }
 }
 
+async function fetchWithRetry(url, attempts = 3, delay = 2000) {
+  for (let attempt = 1; attempt <= attempts; attempt++) {
+    const result = await fetchFromAPI(url);
+    if (result) return result;
+    if (attempt < attempts) {
+      console.warn(`Fetch failed (${attempt}/${attempts}) for ${url}. Retrying in ${delay}ms...`);
+      await sleep(delay);
+    }
+  }
+  console.error(`Fetch failed (${attempts}/${attempts}) for ${url}.`);
+  return null;
+}
+
 /**
  * Given an object with nested objects in the property 'branchingKey',
  * returns a flattened array of the object. If 'requiredKey' is not
@@ -124,12 +137,36 @@ function getTranslation(folderPath, locale, id) {
   }
 }
 
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+/**
+ * Check if a front matter page should be enabled for a collection.
+ * @param {string} type - One of 'cover', 'title', 'foreword', 'introduction'
+ * @param {string} collectionId
+ * @param {object} config
+ * @returns {boolean}
+ */
+function enableFrontMatterPage(type, collectionId, config) {
+  const defaultEnable = config.collections?.frontMatterPages?.[type] ?? false;
+  if (!defaultEnable) {
+    return false;
+  }
+  const collection = Number(collectionId);
+  const disabledCollections = config.collections?.frontMatterPageDisabled?.[type] ?? [];
+  return !disabledCollections.includes(collection);
+}
+
 /**
  * Export all functions in this file as a CommonJS module.
  */
 module.exports = {
   getConfig,
   fetchFromAPI,
+  fetchWithRetry,
   flattenObjectTree,
-  getTranslation
+  getTranslation,
+  sleep,
+  enableFrontMatterPage
 };

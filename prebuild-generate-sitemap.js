@@ -43,10 +43,6 @@ async function generateSitemap() {
 
   const locale = config.app?.i18n?.defaultLanguage ?? 'sv';
   const multilingualCollectionTOC = config.app?.i18n?.multilingualCollectionTableOfContents ?? false;
-  const collectionCovers = config.collections?.frontMatterPages?.cover ?? false;
-  const collectionTitles = config.collections?.frontMatterPages?.title ?? false;
-  const collectionForewords = config.collections?.frontMatterPages?.foreword ?? false;
-  const collectionIntros = config.collections?.frontMatterPages?.introduction ?? false;
 
   const APIBase = API + '/' + projectName;
   if (urlOrigin.length && urlOrigin[urlOrigin.length - 1] === '/') {
@@ -67,7 +63,7 @@ async function generateSitemap() {
 
   // Get about-pages URLs
   if (config.component?.mainSideMenu?.items?.about) {
-    let aboutPages = await common.fetchFromAPI(APIBase + '/static-pages-toc/' + locale);
+    let aboutPages = await common.fetchWithRetry(APIBase + '/static-pages-toc/' + locale);
     if (aboutPages && aboutPages.children) {
       urlCounter += generateAboutPagesURLs(aboutPages.children, '03', urlOrigin, locale);
     }
@@ -86,7 +82,7 @@ async function generateSitemap() {
     }
 
     // Fetch all collections from the backend
-    const allCollections = await common.fetchFromAPI(collectionsEndpoint);
+    const allCollections = await common.fetchWithRetry(collectionsEndpoint);
 
     if (!allCollections) {
       console.warn(`Skipping collections: No data fetched from ${collectionsEndpoint}`);
@@ -96,27 +92,20 @@ async function generateSitemap() {
       const collections = allCollections.filter(coll => includedCollectionIds.includes(coll.id));
 
       if (collections) {
-        if (collectionCovers) {
-          urlCounter += await generateCollectionURLs(collections, 'cover', urlOrigin, locale);
-        }
-        if (collectionTitles) {
-          urlCounter += await generateCollectionURLs(collections, 'title', urlOrigin, locale);
-        }
-        if (collectionForewords) {
-          urlCounter += await generateCollectionURLs(collections, 'foreword', urlOrigin, locale);
-        }
-        if (collectionIntros) {
-          urlCounter += await generateCollectionURLs(collections, 'introduction', urlOrigin, locale);
+        const fmPages = ['cover', 'title', 'foreword', 'introduction']
+
+        for (const fmPage of fmPages) {
+          urlCounter += await generateCollectionURLs(collections, fmPage, urlOrigin, locale, config);
         }
 
-        urlCounter += await generateCollectionURLs(collections, 'text', urlOrigin, locale, APIBase, multilingualCollectionTOC);
+        urlCounter += await generateCollectionURLs(collections, 'text', urlOrigin, locale, config, APIBase, multilingualCollectionTOC);
       }
     }
   }
 
   // Get media collection URLs
   if (config.component?.mainSideMenu?.items?.mediaCollections) {
-    const mediaCollections = await common.fetchFromAPI(APIBase + '/gallery/data/' + locale);
+    const mediaCollections = await common.fetchWithRetry(APIBase + '/gallery/data/' + locale);
     if (mediaCollections && mediaCollections.length) {
       urlCounter += await generateMediaCollectionURLs(mediaCollections, urlOrigin, locale);
     }
@@ -174,12 +163,16 @@ function generateEbookURLs(epubs, urlOrigin, locale) {
   return counter;
 }
 
-async function generateCollectionURLs(collections, part, urlOrigin, locale, API = undefined, multilingualTOC = false) {
+async function generateCollectionURLs(collections, part, urlOrigin, locale, config, API = undefined, multilingualTOC = false) {
   let counter = 0;
   for (let i = 0; i < collections.length; i++) {
     if (part === 'text') {
+      if (i > 0 && (i % 10 === 0)) {
+        // Pause every 10th collection to avoid backend overload
+        await common.sleep(2000);
+      }
       counter += await generateCollectionTextURLs(collections[i]['id'] || 0, urlOrigin, locale, API, multilingualTOC);
-    } else {
+    } else if (common.enableFrontMatterPage(part, collections[i]['id'], config)) {
       const url = `${urlOrigin}/${locale}/collection/${collections[i]['id']}/${part}`;
       appendToSitemapFile(url + '\n');
       counter += 1;
@@ -194,7 +187,7 @@ async function generateCollectionTextURLs(collection_id, urlOrigin, locale, API,
     endpoint += '/' + locale;
   }
 
-  const tocJSON = await common.fetchFromAPI(endpoint);
+  const tocJSON = await common.fetchWithRetry(endpoint);
 
   // Handle failed fetch
   if (!tocJSON) {

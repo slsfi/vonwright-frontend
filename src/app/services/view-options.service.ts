@@ -21,6 +21,7 @@ export class ViewOptionsService {
     pageBreakOriginal: false,
     pageBreakEdition: false
   };
+  selectedVariationType: string = 'all';
 
   private epubAlertDismissed: boolean = false;
   private textsizeSubject$: BehaviorSubject<Textsize> = new BehaviorSubject<Textsize>(Textsize.Small);
@@ -32,6 +33,7 @@ export class ViewOptionsService {
         this.show[key] = true;
       }
     });
+    this.selectedVariationType = config.page?.text?.variantViewOptions?.defaultVariationType ?? 'all';
   }
 
   getTextsize(): Observable<Textsize> {

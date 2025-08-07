@@ -54,11 +54,7 @@ export class HomePage implements OnInit {
     }
 
     // Only show subtitle if translation for it not missing
-    if ($localize`:@@Site.Subtitle:Webbplatsens undertitel`) {
-      this.siteHasSubtitle = true;
-    } else {
-      this.siteHasSubtitle = false;
-    }
+    this.siteHasSubtitle = $localize`:@@Site.Subtitle:Webbplatsens undertitel` ? true : false;
   }
 
   ngOnInit() {
@@ -78,6 +74,7 @@ export class HomePage implements OnInit {
         ['/search'],
         { queryParams: { query: this.searchQuery } }
       );
+      this.searchQuery = '';
     }
   }
 

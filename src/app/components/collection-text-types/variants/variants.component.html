@@ -32,5 +32,8 @@
 
 <div class="tei teiContainer teiVariant"
       [class.show_pageBreakOriginal]="viewOptionsService.show.pageBreakOriginal"
+      [class.show-variations-all]="viewOptionsService.selectedVariationType === 'all'"
+      [class.show-variations-sub]="viewOptionsService.selectedVariationType === 'sub'"
+      [class.show-variations-none]="viewOptionsService.selectedVariationType === 'none'"
       [innerHTML]="text | trustHtml"
 ></div>

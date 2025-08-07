@@ -10,7 +10,7 @@
     <li
           [attr.aria-current]="highlightedMenu === item.nodeId ? 'page' : null"
           [attr.aria-haspopup]="item.children ? 'menu' : null"
-          [attr.aria-expanded]="item.children ? selectedMenu.includes(item.nodeId) : null"
+          [attr.aria-expanded]="item.children ? (selectedMenu | arrayIncludes:item.nodeId) : null"
           role="menuitem"
     >
       @if (!item.children) {
@@ -32,7 +32,7 @@
       }
       @if (item.children) {
         <ul role="menu"
-              [class.open]="selectedMenu.includes(item.nodeId)"
+              [class.open]="selectedMenu | arrayIncludes:item.nodeId"
         >
           <ng-container *ngTemplateOutlet="recursiveMenu; context: {$implicit: item.children}"/>
         </ul>
@@ -47,7 +47,7 @@
     <ion-icon name="chevron-forward-outline"
           class="item-icon-r toggle-icon"
           aria-hidden="true"
-          [class.open]="selectedMenu.includes(item.nodeId)"
+          [class.open]="selectedMenu | arrayIncludes:item.nodeId"
     ></ion-icon>
   }
 </ng-template>

@@ -74,11 +74,7 @@ export class VariantsComponent implements OnInit {
       const inputVariant = this.variants.filter((item: any) => {
         return (item.id === this.varID);
       })[0];
-      if (inputVariant) {
-        this.selectedVariant = inputVariant;
-      } else {
-        this.selectedVariant = this.variants[0];
-      }
+      this.selectedVariant = inputVariant ? inputVariant : this.variants[0];
     } else if (this.sortOrder) {
       const inputVariant = this.variants.filter((item: any) => {
         return (item.sort_order === this.sortOrder);

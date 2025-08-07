@@ -8,6 +8,170 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ## Unreleased
 
+### Changed
+
+- Update to base version [`1.8.2`](https://github.com/slsfi/digital-edition-frontend-ng/releases/tag/1.8.2) from upstream, original repository.
+
+
+
+## [1.8.2] – 2025-06-24
+
+### Fixed
+
+- Extraction of introduction table of contents when HTML contains newlines. ([c6c22c2](https://github.com/slsfi/digital-edition-frontend-ng/commit/c6c22c25bc5a10a7c857cea3d0dbe3f4e6e35742))
+- Document title on positioned introduction page. ([f8469b1](https://github.com/slsfi/digital-edition-frontend-ng/commit/f8469b16a32032d2f6ef8c5478a13c45847b8636))
+- Handle missing collection table of contents gracefully. ([cab4d0c](https://github.com/slsfi/digital-edition-frontend-ng/commit/cab4d0c58d13d8195a328ca3ec4b349ff2415ae6))
+
+### Changed
+
+- Improve readability and performance of the collection side menu component. ([7066ef1](https://github.com/slsfi/digital-edition-frontend-ng/commit/7066ef10adbdfd9dc5b082b3086e28e9abe9de76))
+- Improve readability and performance of the main side menu component. ([d9f46ee](https://github.com/slsfi/digital-edition-frontend-ng/commit/d9f46eea181bd4c138edd1a97c0702398c5ea554))
+
+
+
+## [1.8.1] – 2025-06-23
+
+### Fixed
+
+- Error messages on failed loading of foreword and introduction pages. ([7abca16](https://github.com/slsfi/digital-edition-frontend-ng/commit/7abca16296c4505848776374e756379d06ae73c1))
+- Title of explanatory notes in the info-overlay component on the collection text page. ([2b3d5ba](https://github.com/slsfi/digital-edition-frontend-ng/commit/2b3d5ba9e9ebdc572534c549ad6b3b54379b8564))
+
+
+
+## [1.8.0] – 2025-06-23
+
+### Added
+
+- Config option `config.component.mainSideMenu.defaultExpanded` to expand the main menu items with children by default when set to `true`. Defaults to `false`. ([45930e6](https://github.com/slsfi/digital-edition-frontend-ng/commit/45930e6dcb2b1e69ed5c76c9ce534e0a40f387af))
+- Support for custom names for the collection frontmatter pages (cover, title, foreword and introduction). By default, all collections have the same names for the frontmatter pages, set in the translation files in `src/locale/`. The names of these pages can now be set differently for each collection in the JSON table of contents (ToC) files of the collections. The root object in the JSON ToC-files can optionally take the keys `coverPageName`, `titlePageName`, `forewordPageName` and `introductionPageName`. If any of these are set (i.e. have truthy values), those page names are used instead of the default ones. ([f98b6f4](https://github.com/slsfi/digital-edition-frontend-ng/commit/f98b6f41b861605ef692e3a23fa750c34a1fc1b5)) Example of a JSON ToC-file where the introduction page of a particular collection has a non-default name:
+
+```json
+{
+  "text": "About Wittgenstein",
+  "collectionId": "225",
+  "type": "title",
+  "introductionPageName": "G.H. von Wright as a Gateway to Wittgenstein",
+  "children": []
+}
+```
+
+- Config option `config.page.text.variantViewOptions` to allow the user to control the type of variation that is displayed in variant texts. It has two properties: `showVariationTypeOption`, which is a boolean used to control if the view option should be shown or not (defaults to `false`), and `defaultVariationType`, which is a string used to set the variation type that is shown by default. Possible values include `all` (default) for displaying all variation types, `sub` for displaying only substantial/significant variation, and `none` for hiding all variation highlighting. ([e6ae4d3](https://github.com/slsfi/digital-edition-frontend-ng/commit/e6ae4d340c6e61ea59a451bfcb27e7d8f1b5ec72#diff-b0bf11efc4756fd809b5ba1d2cc58847e1e61af9ca9215b394c86cee16de8498)) Example:
+
+```typescript
+export const config: Config = {
+  /*...*/
+  page: {
+    /*...*/
+    text: {
+      /*...*/
+      variantViewOptions: {
+        showVariationTypeOption: true,
+        defaultVariationType: "sub"
+      },
+      /*...*/
+    },
+    /*...*/
+  },
+  /*...*/
+}
+```
+
+### Fixed
+
+- Clear search field on home page after query, so that when navigating back to the home page, the search field is empty. ([040fd83](https://github.com/slsfi/digital-edition-frontend-ng/commit/040fd83ca9b9e721acdee5dc4e803b7ecb9fff16))
+- Preserve selected facsimile collection on text change. ([9f645ca](https://github.com/slsfi/digital-edition-frontend-ng/commit/9f645cacbcfda48a008d9621e0a34fef27a775a0))
+- Parsing of `itemId` to router links when position but no chapter segment is present. ([992988c](https://github.com/slsfi/digital-edition-frontend-ng/commit/992988c7c6c776e5163e3068cce3672ca1fcabb1))
+- Localization of back to reference labels of footnotes in Markdown texts. ([4dabdcb](https://github.com/slsfi/digital-edition-frontend-ng/commit/4dabdcb9aab057ff3e52c5b095aa66f0bec494dd))
+
+### Changed
+
+- Update README. ([cb30c5c](https://github.com/slsfi/digital-edition-frontend-ng/commit/cb30c5c79839d882ff689b8d5cd831116fdf8060), [671f6c6](https://github.com/slsfi/digital-edition-frontend-ng/commit/671f6c63e693f6b52814e345d6ab19fd9d0d368b))
+- Deps: update `@angular/cli` to 19.2.15 and `@angular/core` to 19.2.14. ([4694863](https://github.com/slsfi/digital-edition-frontend-ng/commit/46948634efbd98d3da939e634356f856558cf0b2))
+- Deps: update `marked-footnote` to 1.3.0. ([f34a364](https://github.com/slsfi/digital-edition-frontend-ng/commit/f34a364cbbdc12d914acbf7625a2337a40913b96))
+- Deps: update transitive dependencies. ([a410da3](https://github.com/slsfi/digital-edition-frontend-ng/commit/a410da348fc1272a0e3183dfb9b31b90e28d93b7))
+- Deps (dev): update `@types/express` to 4.17.23. ([542b9a3](https://github.com/slsfi/digital-edition-frontend-ng/commit/542b9a3de1bb16229b4ea3e7001a086a218cfa2e))
+- Deps (dev): update `@types/node` to 20.19.1. ([ef3e2a9](https://github.com/slsfi/digital-edition-frontend-ng/commit/ef3e2a9cc25dd8d7cdc9e52041bb5f9c767271c9))
+- Deps (dev): update `jasmine-core` to 5.8.0. ([a45cd26](https://github.com/slsfi/digital-edition-frontend-ng/commit/a45cd26bdbffc2b733a3c15cdaf0fe62ae099184))
+- Deps (dev): update `ng-extract-i18n-merge` to 2.15.1. ([9eaf5b7](https://github.com/slsfi/digital-edition-frontend-ng/commit/9eaf5b780c36654b4f2194d73302bfd4be8b1070))
+
+
+
+## [1.7.0] – 2025-06-07
+
+### Added
+
+- Config option `config.collections.frontMatterPageDisabled` with `cover`, `title`, `foreword` and `introduction` as keys, each taking an array of collection IDs as numbers, to disable the respective frontmatter page of the specified collections. This can be used to disable frontmatter pages of some collections, even though the default is to have them enabled (through `config.collections.frontMatterPages`). For example, to disable the cover and introduction pages of just collections with IDs 1 and 2, and having them enabled for all other collections, you would define: ([c4cc376](https://github.com/slsfi/digital-edition-frontend-ng/commit/c4cc3760fd520b53b7023650cfa3f2c0d6023103), [b887ae8](https://github.com/slsfi/digital-edition-frontend-ng/commit/b887ae86c1eff24b7b37b07bc8bc37e2a48d4605))
+
+```typescript
+export const config: Config = {
+  /*...*/
+  collections: {
+    /*...*/
+    frontMatterPages: {
+      cover: true,
+      title: true,
+      foreword: true,
+      introduction: true
+    },
+    frontMatterPageDisabled: {
+      cover: [1, 2],
+      title: [],
+      foreword: [],
+      introduction: [1, 2]
+    },
+    /*...*/
+  },
+  /*...*/
+}
+```
+
+- Config option `config.page.text.viewTypeDisabledCollections` with the collection text page view types `readingtext`, `comments`, `facsimiles`, `manuscripts`, `variants`, `illustrations`, `legend` and `metadata` as keys, each taking an array of collection IDs as numbers, to disable the respective view type of the specified collections. This can be used to disable particular view types for some collections, even though the default is to have them enabled (through `config.page.text.viewTypes`). For example, to disable `facsimiles` and `variants` view types of just collections with IDs 1 and 2, and having them enabled for all other collections, you would define: ([aac0877](https://github.com/slsfi/digital-edition-frontend-ng/commit/aac08771a79b739eab70774f95faf7fd754ba0b1), [c703dfc](https://github.com/slsfi/digital-edition-frontend-ng/commit/c703dfc65785d674fc7ad7be87d33b255168d4c3))
+
+```typescript
+export const config: Config = {
+  /*...*/
+  page: {
+    /*...*/
+    text: {
+      /*...*/
+      viewTypes: {
+        showAll: true,
+        readingtext: true,
+        comments: true,
+        facsimiles: true,
+        manuscripts: true,
+        variants: true,
+        illustrations: true,
+        legend: true,
+        metadata: true
+      },
+      viewTypeDisabledCollections: {
+        readingtext: [],
+        comments: [],
+        facsimiles: [1, 2],
+        manuscripts: [],
+        variants: [1, 2],
+        illustrations: [],
+        legend: [],
+        metadata: []
+      }
+    },
+    /*...*/
+  },
+  /*...*/
+}
+```
+
+### Fixed
+
+- Add throttling and retries to prebuild scripts to prevent backend overload. ([4b57519](https://github.com/slsfi/digital-edition-frontend-ng/commit/4b575195560282eb27398b0c165f086ee22b785f), [3774ad6](https://github.com/slsfi/digital-edition-frontend-ng/commit/3774ad61a93508cbf0356d45392d7ccb168ffc63), [b694671](https://github.com/slsfi/digital-edition-frontend-ng/commit/b6946714f4f9ebaea8de9994848f0daae199c900))
+
+### Changed
+
+- Deps: update `marked` to 15.0.12. ([48ffd64](https://github.com/slsfi/digital-edition-frontend-ng/commit/48ffd64abf25cc66492782fea99a3eefed5a29d7))
+- Deps: update `zone.js` to 0.15.1. ([da67c52](https://github.com/slsfi/digital-edition-frontend-ng/commit/da67c52fce7684ba6da1691e5527a3b62e3cefac))
+- Deps (dev): update `@types/node` to 20.19.0. ([16f43e6](https://github.com/slsfi/digital-edition-frontend-ng/commit/16f43e68cf729bee0968c5e48749a76b82173e59))
+
 
 
 ## [1.6.5-production.1] – 2025-05-19
@@ -723,7 +887,11 @@ siteLogoDimensions: {
 
 
 
-[unreleased]: https://github.com/slsfi/digital-edition-frontend-ng/compare/1.6.5...HEAD
+[unreleased]: https://github.com/slsfi/digital-edition-frontend-ng/compare/1.8.2...HEAD
+[1.8.2]: https://github.com/slsfi/digital-edition-frontend-ng/compare/1.8.1...1.8.2
+[1.8.1]: https://github.com/slsfi/digital-edition-frontend-ng/compare/1.8.0...1.8.1
+[1.8.0]: https://github.com/slsfi/digital-edition-frontend-ng/compare/1.7.0...1.8.0
+[1.7.0]: https://github.com/slsfi/digital-edition-frontend-ng/compare/1.6.5...1.7.0
 [1.6.5]: https://github.com/slsfi/digital-edition-frontend-ng/compare/1.6.4...1.6.5
 [1.6.4]: https://github.com/slsfi/digital-edition-frontend-ng/compare/1.6.3...1.6.4
 [1.6.3]: https://github.com/slsfi/digital-edition-frontend-ng/compare/1.6.2...1.6.3

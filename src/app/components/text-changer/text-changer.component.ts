@@ -1,7 +1,7 @@
 import { Component, Input, OnChanges, OnDestroy, OnInit, SimpleChanges } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { IonicModule } from '@ionic/angular';
-import { combineLatest, distinctUntilChanged, map, Subscription, switchMap } from 'rxjs';
+import { combineLatestWith, distinctUntilChanged, filter, map, Subscription } from 'rxjs';
 
 import { config } from '@config';
 import { CollectionTableOfContentsService } from '@services/collection-toc.service';
@@ -9,6 +9,7 @@ import { DocumentHeadService } from '@services/document-head.service';
 import { CollectionPagePathPipe } from '@pipes/collection-page-path.pipe';
 import { CollectionPagePositionQueryparamPipe } from '@pipes/collection-page-position-queryparam.pipe';
 import { PlatformService } from '@services/platform.service';
+import { enableFrontMatterPageOrTextViewType } from '@utility-functions';
 
 
 /**
@@ -63,56 +64,46 @@ export class TextChangerComponent implements OnChanges, OnDestroy, OnInit {
     this.mobileMode = this.platformService.isMobile();
 
     // Subscribe to BehaviorSubject emitting the current (flattened) TOC
-    // as outer observable (the received TOC is already properly ordered).
-    // Then observe changes to route parameters, and act on changes to either.
+    // (the received TOC is already properly ordered) and to route
+    // parameters, then act on changes to either.
     this.tocSubscr = this.tocService.getCurrentFlattenedCollectionToc().pipe(
-      switchMap((toc: any) => {
-        // Early return if the view is not active or no TOC
-        if (!this.ionViewActive || !toc || !toc?.children?.length) {
-          return [];
-        }
-        // Now that we have the TOC, we switch to observing route parameters
-        return combineLatest([
-          this.route.paramMap,
-          this.route.queryParamMap
-        ]).pipe(
-          map(([paramMap, queryParamMap]) => {
-            const collectionID = paramMap.get('collectionID');
-            const publicationID = paramMap.get('publicationID');
-            const chapterID = paramMap.get('chapterID');
-            const position = queryParamMap.get('position');
-            return { toc, collectionID, publicationID, chapterID, position };
-          }),
-          distinctUntilChanged((prev, curr) => 
-            prev.toc?.collectionId === curr.toc?.collectionId &&
-            prev.toc?.order === curr.toc?.order &&
-            prev.collectionID === curr.collectionID &&
-            prev.publicationID === curr.publicationID &&
-            prev.chapterID === curr.chapterID &&
-            prev.position === curr.position
-          )
-        );
-      })
+      filter(toc => this.ionViewActive && !!toc),
+      combineLatestWith(this.route.paramMap, this.route.queryParamMap),
+      map(([toc, paramMap, queryParamMap]) => ({
+        toc,
+        collectionID: paramMap.get('collectionID'),
+        publicationID: paramMap.get('publicationID'),
+        chapterID: paramMap.get('chapterID'),
+        position: queryParamMap.get('position')
+      })),
+      distinctUntilChanged((prev, curr) => 
+        prev.toc.collectionId === curr.toc.collectionId &&
+        prev.toc.order === curr.toc.order &&
+        prev.collectionID === curr.collectionID &&
+        prev.publicationID === curr.publicationID &&
+        prev.chapterID === curr.chapterID &&
+        prev.position === curr.position
+      )
     ).subscribe(({ toc, collectionID, publicationID, chapterID, position }) => {
       // Check that collectionID not nullish and matches id in TOC to proceed
-      if (!collectionID || collectionID !== String(toc?.collectionId)) {
+      if (!collectionID || collectionID !== String(toc.collectionId)) {
         return;
       }
 
       this.textItemID =
-            (publicationID && chapterID) ? collectionID + '_' + publicationID + '_' + chapterID
-            : publicationID ? collectionID + '_' + publicationID
+            (publicationID && chapterID) ? `${collectionID}_${publicationID}_${chapterID}`
+            : publicationID ? `${collectionID}_${publicationID}`
             : collectionID;
-      this.tocItemId = position ? this.textItemID + ';' + position : this.textItemID;
+      this.tocItemId = position ? `${this.textItemID};${position}` : this.textItemID;
       this.textPosition = position || '';
 
-      if (this.collectionId !== collectionID || this.activeMenuOrder !== toc?.order) {
+      if (this.collectionId !== collectionID || this.activeMenuOrder !== toc.order) {
         // A new TOC or changed ordering of current TOC:
         // concatenate front matter pages and TOC to form flattened TOC
         this.collectionId = collectionID;
         this.collectionTitle = toc.text || '';
-        this.activeMenuOrder = toc?.order || 'default';
-        this.flattenedToc = this.getFrontmatterPages(collectionID).concat(toc.children);
+        this.activeMenuOrder = toc.order || 'default';
+        this.flattenedToc = this.getFrontmatterPages(collectionID, toc).concat(toc.children ?? []);
       }
 
       this.updateCurrentText();
@@ -123,18 +114,18 @@ export class TextChangerComponent implements OnChanges, OnDestroy, OnInit {
     this.tocSubscr?.unsubscribe();
   }
 
-  private getFrontmatterPages(collectionId: string) {
+  private getFrontmatterPages(collectionId: string, toc: any) {
     type FrontMatterKey = 'cover' | 'title' | 'foreword' | 'introduction';
     const frontMatterKeys: FrontMatterKey[] = ['cover', 'title', 'foreword', 'introduction'];
     const localizedTexts: Record<FrontMatterKey, string> = {
-      cover: $localize`:@@CollectionCover.Cover:Omslag`,
-      title: $localize`:@@CollectionTitle.TitlePage:Titelblad`,
-      foreword: $localize`:@@CollectionForeword.Foreword:Förord`,
-      introduction: $localize`:@@CollectionIntroduction.Introduction:Inledning`
+      cover: toc.coverPageName || $localize`:@@CollectionCover.Cover:Omslag`,
+      title: toc.titlePageName || $localize`:@@CollectionTitle.TitlePage:Titelblad`,
+      foreword: toc.forewordPageName || $localize`:@@CollectionForeword.Foreword:Förord`,
+      introduction: toc.introductionPageName || $localize`:@@CollectionIntroduction.Introduction:Inledning`
     };
 
     return frontMatterKeys.reduce<{ text: string; page: string; itemId: string }[]>((pages, key) => {
-      if (config.collections?.frontMatterPages?.[key]) {
+      if (enableFrontMatterPageOrTextViewType(key, collectionId, config)) {
         pages.push({
           text: localizedTexts[key],
           page: key,
@@ -161,9 +152,10 @@ export class TextChangerComponent implements OnChanges, OnDestroy, OnInit {
     }
 
     // Set the document title to the current text title.
-    // Positioned item's title should not be set, instead we have to
-    // search for the non-positioned item's title.
-    const titleItemIndex = this.textPosition
+    // Positioned item's title should not be set. Instead, if a frontmatter
+    // page ("page" key present), we have to search for the non-positioned
+    // item's title.
+    const titleItemIndex = this.textPosition && !this.flattenedToc[this.currentTocTextIndex].page
           ? this.flattenedToc.findIndex(({ itemId }) => itemId === this.textItemID)
           : this.currentTocTextIndex;
 

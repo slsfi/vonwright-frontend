@@ -22,12 +22,11 @@ export class CollectionPagePathPipe implements PipeTransform {
             case 'introduction':
                 return `/collection/${itemId}/introduction`;
             default:
-                const idList = itemId.split('_');
+                const idList = itemId.split(';')[0].split('_');
                 if (idList.length > 1) {
                     let url = `/collection/${idList[0]}/text/${idList[1]}`;
                     if (idList.length > 2) {
-                        const chapter = idList[2].split(';')[0];
-                        url += `/${chapter}`;
+                        url += `/${idList[2]}`;
                     }
                     return url;
                 } else {

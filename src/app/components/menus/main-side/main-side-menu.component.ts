@@ -1,28 +1,41 @@
-import { Component, Inject, Input, LOCALE_ID, OnChanges, OnInit } from '@angular/core';
+import {
+  ChangeDetectionStrategy, ChangeDetectorRef, Component, Inject, Input,
+  LOCALE_ID, OnChanges, OnInit
+} from '@angular/core';
 import { NgTemplateOutlet } from '@angular/common';
 import { RouterLink, UrlSegment } from '@angular/router';
 import { IonicModule } from '@ionic/angular';
 import { catchError, forkJoin, map, Observable, of } from 'rxjs';
 
 import { config } from '@config';
+import { ArrayIncludesPipe } from '@pipes/array-includes.pipe';
 import { ParentChildPagePathPipe } from '@pipes/parent-child-page-path.pipe';
 import { CollectionsService } from '@services/collections.service';
 import { DocumentHeadService } from '@services/document-head.service';
 import { MarkdownService } from '@services/markdown.service';
 import { MediaCollectionService } from '@services/media-collection.service';
-import { addOrRemoveValueInArray, sortArrayOfObjectsAlphabetically } from '@utility-functions';
+import { addOrRemoveValueInNewArray, sortArrayOfObjectsAlphabetically } from '@utility-functions';
 
-
+/**
+ * * This component uses ChangeDetectionStrategy.OnPush so change detection has to
+ * * be manually triggered in the component whenever the `selectedMenu` array changes.
+ * * Because a pure pipe is used in the template to check included items in
+ * * `selectedMenu`, the array has to be recreated every time it changes, otherwise
+ * * the changes won't be reflected in the view.
+ */
 @Component({
   selector: 'main-side-menu',
   templateUrl: './main-side-menu.component.html',
   styleUrls: ['./main-side-menu.component.scss'],
-  imports: [NgTemplateOutlet, IonicModule, RouterLink, ParentChildPagePathPipe]
+  imports: [
+    NgTemplateOutlet, IonicModule, RouterLink, ArrayIncludesPipe,
+    ParentChildPagePathPipe
+  ],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class MainSideMenuComponent implements OnInit, OnChanges {
   @Input() urlSegments: UrlSegment[] = [];
 
-  _config = config;
   ebooksList: any[] = [];
   highlightedMenu: string = '';
   mainMenu: any[] = [];
@@ -34,13 +47,14 @@ export class MainSideMenuComponent implements OnInit, OnChanges {
   ]; // app.component handles setting html-title for these
 
   constructor(
+    private cdr: ChangeDetectorRef,
     private collectionsService: CollectionsService,
     private headService: DocumentHeadService,
     private mdcontentService: MarkdownService,
     private mediaCollectionService: MediaCollectionService,
     @Inject(LOCALE_ID) private activeLocale: string
   ) {
-    this.ebooksList = this._config.ebooks ?? [];
+    this.ebooksList = config.ebooks ?? [];
 
     if (this.ebooksList) {
       this.ebooksList.forEach((epub: any) => {
@@ -52,6 +66,15 @@ export class MainSideMenuComponent implements OnInit, OnChanges {
   ngOnInit() {
     this.getMenuData().subscribe(
       (menu: any[]) => {
+        if (config.component?.mainSideMenu?.defaultExpanded ?? false) {
+          // Add root menu items to selectedMenu array if the main menu
+          // should be expanded by default when initialised.
+          menu.forEach((item: any) => {
+            if (item.children) {
+              this.selectedMenu.push(item.nodeId);
+            }
+          });
+        }
         this.mainMenu = menu;
         this.updateHighlightedMenuItem();
       }
@@ -95,37 +118,23 @@ export class MainSideMenuComponent implements OnInit, OnChanges {
    * config.
    */
   private getMenuItemsArray(): Observable<any>[] {
-    const menuItemArray: Observable<any>[] = [];
     const enabledPages = config.component?.mainSideMenu?.items ?? {};
 
-    for (const page in enabledPages) {
-      if (
-        enabledPages.hasOwnProperty(page) &&
-        enabledPages[page]
-      ) {
-        if (page === 'home') {
-          menuItemArray.push(this.getHomePageMenuItem());
-        } else if (page === 'about') {
-          menuItemArray.push(this.getAboutPagesMenu());
-        } else if (page === 'ebooks') {
-          menuItemArray.push(this.getEbookPagesMenu());
-        } else if (page === 'collections') {
-          menuItemArray.push(this.getCollectionPagesMenu());
-        } else if (page === 'mediaCollections') {
-          menuItemArray.push(this.getMediaCollectionPagesMenu());
-        } else if (page === 'indexKeywords') {
-          menuItemArray.push(this.getIndexPageMenuItem('keywords'));
-        } else if (page === 'indexPersons') {
-          menuItemArray.push(this.getIndexPageMenuItem('persons'));
-        } else if (page === 'indexPlaces') {
-          menuItemArray.push(this.getIndexPageMenuItem('places'));
-        } else if (page === 'indexWorks') {
-          menuItemArray.push(this.getIndexPageMenuItem('works'));
-        }
-      }
-    }
+    const menuItemGetters: Record<string, () => Observable<any>> = {
+      home: () => this.getHomePageMenuItem(),
+      about: () => this.getAboutPagesMenu(),
+      ebooks: () => this.getEbookPagesMenu(),
+      collections: () => this.getCollectionPagesMenu(),
+      mediaCollections: () => this.getMediaCollectionPagesMenu(),
+      indexKeywords: () => this.getIndexPageMenuItem('keywords'),
+      indexPersons: () => this.getIndexPageMenuItem('persons'),
+      indexPlaces: () => this.getIndexPageMenuItem('places'),
+      indexWorks: () => this.getIndexPageMenuItem('works')
+    };
 
-    return menuItemArray;
+    return Object.entries(enabledPages)
+          .filter(([key, isEnabled]) => isEnabled && menuItemGetters.hasOwnProperty(key))
+          .map(([key]) => menuItemGetters[key]());
   }
 
   private getHomePageMenuItem(): Observable<any> {
@@ -170,26 +179,26 @@ export class MainSideMenuComponent implements OnInit, OnChanges {
   }
 
   private getCollectionPagesMenu(): Observable<any> {
-    if (this._config.collections?.order?.length) {
+    if (config.collections?.order?.length) {
       return this.collectionsService.getCollections().pipe(
         map((res: any) => {
           this.recursivelyAddParentPagePath(res, '/collection');
           res = this.groupCollections(res);
           let menu = [];
+          const groupTitles = [
+            $localize`:@@MainSideMenu.CollectionsGroup1:Innehåll`,
+            $localize`:@@MainSideMenu.CollectionsGroup2:Innehåll 2`,
+            $localize`:@@MainSideMenu.CollectionsGroup3:Innehåll 3`,
+            $localize`:@@MainSideMenu.CollectionsGroup4:Innehåll 4`,
+            $localize`:@@MainSideMenu.CollectionsGroup5:Innehåll 5`
+          ];
           for (let i = 0; i < res.length; i++) {
-            let title = $localize`:@@MainSideMenu.CollectionsGroup1:Innehåll`;
-            if (i > 0) {
-              i === 1 ? title = $localize`:@@MainSideMenu.CollectionsGroup2:Innehåll 2`
-              : i === 2 ? title = $localize`:@@MainSideMenu.CollectionsGroup3:Innehåll 3`
-              : i === 3 ? title = $localize`:@@MainSideMenu.CollectionsGroup4:Innehåll 4`
-              : i === 4 ? title = $localize`:@@MainSideMenu.CollectionsGroup5:Innehåll 5`
-              : title = 'Error: out of category translations';
-            }
+            const title = groupTitles[i] ?? 'Error: out of category translations';
             if (res[i].length > 1) {
               // The group contains several collections.
               menu.push({ title, children: res[i] });
             } else {
-              // The group contains just one collections, so unwrap it,
+              // The group contains just one collection, so unwrap it,
               // meaning that the group menu item will not be collapsible,
               // instead linking directly into the one collection in the
               // group.
@@ -231,24 +240,25 @@ export class MainSideMenuComponent implements OnInit, OnChanges {
   }
 
   private getIndexPageMenuItem(indexType: string): Observable<any> {
-    let menuData: any[] = [];
-    if (indexType === 'persons') {
-      menuData = [{ id: '', title: $localize`:@@MainSideMenu.IndexPersons:Personregister`, parentPath: '/index/persons' }];
-    } else if (indexType === 'places') {
-      menuData = [{ id: '', title: $localize`:@@MainSideMenu.IndexPlaces:Ortregister`, parentPath: '/index/places' }];
-    } else if (indexType === 'keywords') {
-      menuData = [{ id: '', title: $localize`:@@MainSideMenu.IndexKeywords:Ämnesord`, parentPath: '/index/keywords' }];
-    } else if (indexType === 'works') {
-      menuData = [{ id: '', title: $localize`:@@MainSideMenu.IndexWorks:Verkregister`, parentPath: '/index/works' }];
-    }
-    return of({ menuType: indexType, menuData });
+    const indexTitles: Record<string, string> = {
+      persons: $localize`:@@MainSideMenu.IndexPersons:Personregister`,
+      places: $localize`:@@MainSideMenu.IndexPlaces:Ortregister`,
+      keywords: $localize`:@@MainSideMenu.IndexKeywords:Ämnesord`,
+      works: $localize`:@@MainSideMenu.IndexWorks:Verkregister`
+    };
+    const title = indexTitles[indexType];
+
+    return of({
+      menuType: indexType,
+      menuData: [{ id: '', title, parentPath: `/index/${indexType}` }]
+    });
   }
 
   private groupCollections(collections: any) {
-    if (this._config.collections?.order) {
-      let collectionsList = this._config.collections.order.map(() => []);
+    if (config.collections?.order) {
+      let collectionsList = config.collections.order.map(() => []);
 
-      this._config.collections.order.forEach((array: number[], index: number) => {
+      config.collections.order.forEach((array: number[], index: number) => {
         array.forEach((item: number) => {
           const collectionIndex = collections.findIndex((collection: any) => collection.id === item);
           if (collectionIndex > -1) {
@@ -308,6 +318,7 @@ export class MainSideMenuComponent implements OnInit, OnChanges {
     if (!currentItemRoot) {
       this.highlightedMenu = '';
     }
+    this.cdr.markForCheck();
   }
 
   /**
@@ -325,7 +336,10 @@ export class MainSideMenuComponent implements OnInit, OnChanges {
         this.highlightedMenu = item.nodeId;
         if (item.parentPath === '/media-collection') {
           this.headService.setTitle([String(item.title), $localize`:@@MainSideMenu.MediaCollections:Bildbank`]);
-        } else if (!this.topMenuItems.includes(item.parentPath) && this.urlSegments[0]?.path !== 'collection') {
+        } else if (
+          !this.topMenuItems.includes(item.parentPath) &&
+          this.urlSegments[0]?.path !== 'collection'
+        ) {
           // For top menu items the title is set by app.component, and
           // for collections the title is set by the text-changer component
           this.headService.setTitle([String(item.title)]);
@@ -334,7 +348,7 @@ export class MainSideMenuComponent implements OnInit, OnChanges {
       } else if (item.children) {
         const result = this.recursiveFindCurrentMenuItem(item.children, stringForComparison);
         if (result && !this.selectedMenu.includes(item.nodeId)) {
-          this.selectedMenu.push(item.nodeId);
+          this.selectedMenu = addOrRemoveValueInNewArray(this.selectedMenu, item.nodeId);
         }
         return result;
       } else {
@@ -344,7 +358,8 @@ export class MainSideMenuComponent implements OnInit, OnChanges {
   }
 
   toggle(menuItem: any) {
-    addOrRemoveValueInArray(this.selectedMenu, menuItem.nodeId);
+    this.selectedMenu = addOrRemoveValueInNewArray(this.selectedMenu, menuItem.nodeId);
+    this.cdr.markForCheck();
   }
 
 }

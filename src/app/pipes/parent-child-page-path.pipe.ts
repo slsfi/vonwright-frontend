@@ -1,6 +1,7 @@
 import { Pipe, PipeTransform } from '@angular/core';
 
 import { config } from '@config';
+import { enableFrontMatterPageOrTextViewType } from '@utility-functions';
 
 
 /**
@@ -14,13 +15,13 @@ import { config } from '@config';
 export class ParentChildPagePathPipe implements PipeTransform {
     transform(parentPath: string, childId: string): string {
         if (parentPath === '/collection') {
-            if (config.collections?.frontMatterPages?.cover) {
+            if (enableFrontMatterPageOrTextViewType('cover', childId, config)) {
                 return `${parentPath}/${childId}/cover`;
-            } else if (config.collections?.frontMatterPages?.title) {
+            } else if (enableFrontMatterPageOrTextViewType('title', childId, config)) {
                 return `${parentPath}/${childId}/title`;
-            } else if (config.collections?.frontMatterPages?.foreword) {
+            } else if (enableFrontMatterPageOrTextViewType('foreword', childId, config)) {
                 return `${parentPath}/${childId}/foreword`;
-            } else if (config.collections?.frontMatterPages?.introduction) {
+            } else if (enableFrontMatterPageOrTextViewType('introduction', childId, config)) {
                 return `${parentPath}/${childId}/introduction`;
             } else if (config.collections?.firstTextItem) {
                 const idPath = config.collections.firstTextItem[childId]?.split('_') || [];
