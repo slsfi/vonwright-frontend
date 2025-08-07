@@ -156,7 +156,13 @@ function generateAboutPagesURLs(aboutPages, mdFolderNumber, urlOrigin, locale) {
 function generateEbookURLs(epubs, urlOrigin, locale) {
   let counter = 0;
   for (let i = 0; i < epubs.length; i++) {
-    const url = `${urlOrigin}/${locale}/ebook/${epubs[i]['filename']}`;
+    const filename = epubs[i]['filename'];
+    const type = filename.substring(filename.lastIndexOf('.') + 1, filename.length) || '';
+    const name = filename.substring(0, filename.length - type.length - 1) || '';
+    if (!type || !name) {
+      continue;
+    }
+    const url = `${urlOrigin}/${locale}/ebook/${type}/${name}`;
     appendToSitemapFile(url + '\n');
     counter += 1;
   }

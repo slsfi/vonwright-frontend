@@ -1,5 +1,5 @@
-import { Component, Inject, Input, OnInit } from '@angular/core';
-import { DOCUMENT } from '@angular/common';
+import { Component, Inject, Input, OnInit, DOCUMENT } from '@angular/core';
+
 import { PRIMARY_OUTLET, Router, RouterModule, UrlSegment, UrlTree } from '@angular/router';
 import { IonicModule, ModalController } from '@ionic/angular';
 

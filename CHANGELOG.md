@@ -8,6 +8,76 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ## Unreleased
 
+### Changed
+
+- Update to base version [`2.0.0`](https://github.com/slsfi/digital-edition-frontend-ng/releases/tag/2.0.0) from upstream, original repository.
+
+
+
+## [2.0.0] – 2025-08-05
+
+> [!IMPORTANT]
+> This release includes breaking changes that are detailed further below.
+
+### Added
+
+- Site title to the top menu bar with link to the home page. ([7065613](https://github.com/slsfi/digital-edition-frontend-ng/commit/7065613e60e0f4f7dbd361128be7577e67cb801f))
+- Home button to main side menu as an always present menu item. ([1f16c59](https://github.com/slsfi/digital-edition-frontend-ng/commit/1f16c59beaa2b3eee35f5762b947f1a3e7b98bb0))
+- Search button to main side menu. Can be toggled with the boolean config option `component.mainSideMenu.items.search`. ([4f792b4](https://github.com/slsfi/digital-edition-frontend-ng/commit/4f792b4eb3de10470cc3d9ad592b7dd7023c8a2b))
+
+### Fixed
+
+- Finnish translation for `BasicActions.DontShowAgain`. ([b58868c](https://github.com/slsfi/digital-edition-frontend-ng/commit/b58868cb440349317494a34b0759220d4363bfeb))
+
+### Changed
+
+- Align supported browsers with Angular 20. ([818acae](https://github.com/slsfi/digital-edition-frontend-ng/commit/818acae7faa4bf628429fbc93ba48de769a7f40d), [88566ae](https://github.com/slsfi/digital-edition-frontend-ng/commit/88566ae1e051a9391a4ba49ee438e8b356c511d9))
+- Use Node.js 22 and align supported Node.js versions with Angular 20. ([184e67b](https://github.com/slsfi/digital-edition-frontend-ng/commit/184e67b9c74c2c6e4b20c80c6072eb15aacae969))
+- Make the Angular server compatible with Express 5. ([bd83c11](https://github.com/slsfi/digital-edition-frontend-ng/commit/bd83c113a33cecb0cef33e77865e752a52e29936))
+- Migrate Sass `@import` to Dart Sass 3.0 compatible `@use` structure. ([c7492d8](https://github.com/slsfi/digital-edition-frontend-ng/commit/c7492d8dbcb0c9e073a185b9b0150f62033ef95e))
+- Optimize margins between top menu bar items on small screens. ([9e66b57](https://github.com/slsfi/digital-edition-frontend-ng/commit/9e66b57a4687902e0faedae66642c64376012cbb))
+- Update `/ebook/` routes to use `/ebook/{extension}/{filename}` format. Requests to the old routes with `/ebook/{filename}.{extension}` format are redirected. ([a6c1cf8](https://github.com/slsfi/digital-edition-frontend-ng/commit/a6c1cf8f11dfc6945a30eb4ad51763f0da2a3a2a))
+- Deps: update `@angular/cli` and `@angular/core` to 20.1.4. ([12154a0](https://github.com/slsfi/digital-edition-frontend-ng/commit/12154a0527a70bf1b9870df2b1de55587c7e5499), [28972c1](https://github.com/slsfi/digital-edition-frontend-ng/commit/28972c15c2a4482c910561d60843f00eebe1dbf1))
+- Deps: update `express` to 5.1.0. ([bd83c11](https://github.com/slsfi/digital-edition-frontend-ng/commit/bd83c113a33cecb0cef33e77865e752a52e29936))
+- Deps: update `marked` to 16.1.2. ([ef0b6fe](https://github.com/slsfi/digital-edition-frontend-ng/commit/ef0b6fe7580cc9f9ec7374e185954a1c76001d4e), [fe1dbdc](https://github.com/slsfi/digital-edition-frontend-ng/commit/fe1dbdca9eff487c05db57c48f1b70a27b06385c))
+- Deps: update `marked-footnote` to 1.4.0. ([07de434](https://github.com/slsfi/digital-edition-frontend-ng/commit/07de434c9f2313fad5f80e4bb77236d98b1bb112))
+- Deps: update transitive dependencies. ([afeb221](https://github.com/slsfi/digital-edition-frontend-ng/commit/afeb221cd6d068a177c909e159a353a7b80e62a4))
+- Deps (dev): update `@types/express` to 5.0.3. ([bd83c11](https://github.com/slsfi/digital-edition-frontend-ng/commit/bd83c113a33cecb0cef33e77865e752a52e29936))
+- Deps (dev): update `@types/node` to 22.17.0. ([fbe944e](https://github.com/slsfi/digital-edition-frontend-ng/commit/fbe944ec98d909c7b9c92872a51a0e28c03ef586), [79b32e8](https://github.com/slsfi/digital-edition-frontend-ng/commit/79b32e81a3d7ef819044d7c4c3b5a36250d79eb9))
+- Deps (dev): update `jasmine-core` to 5.9.0. ([7945ce5](https://github.com/slsfi/digital-edition-frontend-ng/commit/7945ce5e701391d6c4d311c77641ef1be9c7db93))
+- Deps (dev): update `gzipper` to 8.2.1. ([2effc10](https://github.com/slsfi/digital-edition-frontend-ng/commit/2effc10880c4a6b85fd79b31cdff673ff2e3cec0))
+- Replace deprecated `@angular/platform-browser-dynamic` package with functions from `@angular/platform-browser`. ([bfb367a](https://github.com/slsfi/digital-edition-frontend-ng/commit/bfb367a6141078a73e7c5cad6fb99e56fd433167))
+
+### Removed
+
+- Style rule `.teiComment.noteReference` from `_tei-comments.scss`. ([2ec187e](https://github.com/slsfi/digital-edition-frontend-ng/commit/2ec187e9d0f53673f5d9c0f54761a24f916bfc05))
+- Site logo from top menu bar. ([0743be0](https://github.com/slsfi/digital-edition-frontend-ng/commit/0743be03c0e6c0e3a7e33bfe23b685a1fcc04ecb))
+- Home button from top menu bar. ([b04a7de](https://github.com/slsfi/digital-edition-frontend-ng/commit/b04a7de483f869ed67684c3ddc662b3dddcf37a4))
+- Reference button from top menu bar. ([be9fa58](https://github.com/slsfi/digital-edition-frontend-ng/commit/be9fa587ebe0ca7890b6e4704dd0b60385f5b145))
+- The integrated EPUB-viewer. ([196daad](https://github.com/slsfi/digital-edition-frontend-ng/commit/196daade80f6358db257467e4140e3660a400c4a), [6454a1b](https://github.com/slsfi/digital-edition-frontend-ng/commit/6454a1bc972ddac86b6c6a6f2222c1161d3b8857), [f0bf83b](https://github.com/slsfi/digital-edition-frontend-ng/commit/f0bf83b2a45e0fdd7c9a174a93470c6db6ed0657))
+
+### !!! Breaking changes !!!
+
+This is a detailed account of the breaking changes in this release:
+
+- Drop support for Node.js 18. Supported Node.js versions are ^20.19.0 || ^22.12.0 || ^24.0.0. The GitHub Actions build system will install Node.js 22 for future builds.
+- The style rule `.teiComment.noteReference` for references after comment notes has been removed from `_tei-comments.scss`. Projects that need the rule should add it to `custom.scss` instead:
+```css
+div.tei .teiComment.noteReference {
+  display: block;
+  font-size: 0.85em;
+  line-height: 1.55;
+  margin-top: 0.5em;
+}
+```
+- Many `@import` rules in `global.scss` have been replaced with `@include meta.load-css()` in order to prepare the code base for future Dart Sass updates. As a consequence, customizations to `global.scss` will conflict with this release:
+    - Modifying imported font files should still be done in `global.scss`: use `@include meta.load-css()` instead of `@import` to include SCSS files with `@font-face` rules; to disable any of the four built-in fonts, comment out the respective `@include` lines.
+    - Modifying TEI styles and styles for info-overlays and tooltips is no longer done in `global.scss`: instead, comment out the `@use` lines for the unused features from `theme/_inc-global-tei.scss` and `theme/_inc-global-optional.scss`.
+- Remove the option to show a logo to the right in the top menu bar. The config options controlling the appearance of the logo have been removed from `config.ts`: `showSiteLogo`, `siteLogoDefaultImageURL`, `siteLogoMobileImageURL`, `siteLogoLinkURL`, `siteLogoDimensions`.
+- Remove `component.mainSideMenu.items.home` from the config. The home button is always shown in the main side menu.
+- Remove the option to show the ”refer to edition” button in the top menu bar. The config option `component.topMenu.showURNButton` has been removed.
+- Remove support for viewing EPUB-files integrated in the web app. Integrated PDF-files are still supported.
+
 
 
 ## [1.8.2-production.1] – 2025-08-07
@@ -891,7 +961,8 @@ siteLogoDimensions: {
 
 
 
-[unreleased]: https://github.com/slsfi/digital-edition-frontend-ng/compare/1.8.2...HEAD
+[unreleased]: https://github.com/slsfi/digital-edition-frontend-ng/compare/2.0.0...HEAD
+[2.0.0]: https://github.com/slsfi/digital-edition-frontend-ng/compare/1.8.2...2.0.0
 [1.8.2]: https://github.com/slsfi/digital-edition-frontend-ng/compare/1.8.1...1.8.2
 [1.8.1]: https://github.com/slsfi/digital-edition-frontend-ng/compare/1.8.0...1.8.1
 [1.8.0]: https://github.com/slsfi/digital-edition-frontend-ng/compare/1.7.0...1.8.0

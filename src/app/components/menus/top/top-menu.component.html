@@ -12,12 +12,6 @@
       <span class="side-title" i18n="@@TopMenu.Menu">Meny</span>
     </button>
   </li>
-  <li role="menuitem">
-    <a [routerLink]="['/']" class="home-button">
-      <ion-icon name="home-sharp"></ion-icon>
-      <span class="side-title" i18n="@@TopMenu.Home">Hem</span>
-    </a>
-  </li>
   <li [class.visuallyhidden]="!showTopContentButton" class="content-button" role="menuitem">
     <a [routerLink]="['/content']">
       <ion-icon name="library-sharp"></ion-icon>
@@ -38,14 +32,6 @@
         <ion-icon name="search-sharp"></ion-icon>
         <span class="side-title" i18n="@@TopMenu.Search">Sök</span>
       </a>
-    </li>
-  }
-  @if (showTopURNButton) {
-    <li class="reference-button" role="menuitem">
-      <button (click)="showReference($event)" type="button" aria-haspopup="dialog">
-        <ion-icon name="arrow-redo-sharp"></ion-icon>
-        <span class="side-title" i18n="@@Reference.Refer">Hänvisa</span>
-      </button>
     </li>
   }
   @if (showLanguageButton && currentLanguageLabel && languages.length > 1) {
@@ -75,28 +61,5 @@
       </ul>
     </li>
   }
-  @if (showSiteLogo) {
-    <li class="site-logo" role="menuitem">
-      <a href="{{siteLogoLinkUrl}}">
-        @if (siteLogoDefaultImageUrl) {
-          <img class="default-logo"
-                alt="Logo"
-                i18n-alt="@@TopMenu.LogoAltText"
-                [attr.height]="siteLogoDimensions?.default?.height ? siteLogoDimensions.default.height : null"
-                [attr.width]="siteLogoDimensions?.default?.width ? siteLogoDimensions.default.width : null"
-                [src]="siteLogoDefaultImageUrl"
-          >
-        }
-        @if (siteLogoMobileImageUrl) {
-          <img class="mobile-logo"
-                alt="Logo"
-                i18n-alt="@@TopMenu.LogoAltText"
-                [attr.height]="siteLogoDimensions?.mobile?.height ? siteLogoDimensions.mobile.height : null"
-                [attr.width]="siteLogoDimensions?.mobile?.width ? siteLogoDimensions.mobile.width : null"
-                [src]="siteLogoMobileImageUrl"
-          >
-        }
-      </a>
-    </li>
-  }
 </ul>
+<div class="site-title"><a [routerLink]="['/']" i18n="@@Site.Title">Webbplatsens titel</a></div>

@@ -1,0 +1,32 @@
+/**
+ * TEI global styles, applied to the content of collection pages.
+ * If your project doesn't have collections you can safely comment
+ * all of these out. You can also selectively comment out styles
+ * for components/features that you don't have, or comment out some
+ * of them and define your own styles from scratch in custom.scss.
+ */
+
+// TEI core styles. If you only have facsimiles you can comment it out.
+@use "TEI/tei-core";
+// TEI styles for semantic elements and icons.
+@use "TEI/tei-semantic-extras";
+// TEI styles for showing page breaks.
+@use "TEI/tei-page-breaks";
+// TEI styles for showing paragraph/line numberings.
+@use "TEI/tei-paragraph-numbering";
+// TEI common styles, used by multiple collection components.
+@use "TEI/tei-common";
+// TEI styles for the collection title page.
+@use "TEI/tei-title";
+// TEI styles for the collection foreword page.
+// @use "TEI/tei-foreword";
+// TEI styles for the collection introduction page.
+@use "TEI/tei-introduction";
+// TEI styles for the collection reading text component.
+@use "TEI/tei-readingtext";
+// TEI styles for the collection comments component.
+@use "TEI/tei-comments";
+// TEI styles for the collection manuscripts component.
+// @use "TEI/tei-manuscripts";
+// TEI styles for the collection variants component.
+// @use "TEI/tei-variants";

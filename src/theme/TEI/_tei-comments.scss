@@ -87,14 +87,6 @@ div.tei {
       font-style: normal;
     }
   }
-
-  /* Style for references after comment notes. Used in vonwright.sls.fi */
-  .teiComment.noteReference {
-    display: block;
-    font-size: 0.85em;
-    line-height: 1.55;
-    margin-top: 0.5em;
-  }
 }
 
 comments div.tei {

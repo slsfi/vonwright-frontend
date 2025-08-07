@@ -7,6 +7,10 @@
  */
 @use "sass:meta";
 
+/* Sass variables. */
+@use "theme/sass_variables";
+
+
 /* Core CSS required for Ionic components to work properly. */
 @import "~@ionic/angular/css/core.css";
 
@@ -21,22 +25,22 @@
  * Import font files using @font-face rules. Comment out the import lines of
  * the font-families you don’t use in your project.
  */
-@import "./theme/font-face/roboto";
-@import "./theme/font-face/source-serif";
-// @import "./theme/font-face/mulish";
-// @import "./theme/font-face/inter";
+@include meta.load-css("theme/font-face/roboto");
+@include meta.load-css("theme/font-face/source-serif");
+// @include meta.load-css("theme/font-face/mulish");
+// @include meta.load-css("theme/font-face/inter");
 
 
-/* CSS and Sass variables. */
-@import "./theme/variables";
+/* CSS variables (CSS custom properties). */
+@include meta.load-css("theme/variables");
 
 
 /* General global styles. */
-@include meta.load-css("theme/general");
+@include meta.load-css("theme/inc-global-general");
 
 
-/* Styles for markdown content. */
-@include meta.load-css("theme/markdown");
+/* Global styles for markdown content. */
+@include meta.load-css("theme/inc-global-markdown");
 
 
 /* Style overrides to Ionic components. */
@@ -56,46 +60,14 @@
 
 
 /* Misc. global styles. */
-@include meta.load-css("theme/misc");
+@include meta.load-css("theme/inc-global-misc");
 
 
-/**
- * TEI global styles, applied to the content of collection pages.
- * If your project doesn't have collections you can safely comment
- * all of these out. You can also selectively comment out styles
- * for components/features that you don't have, or comment out some
- * of them and define your own styles from scratch in custom.scss.
- */
-// TEI core styles. If you only have facsimiles you can comment it out.
-@import "./theme/TEI/tei-core";
-// TEI styles for semantic elements and icons.
-@import "./theme/TEI/tei-semantic-extras";
-// TEI styles for showing page breaks.
-@import "./theme/TEI/tei-page-breaks";
-// TEI styles for showing paragraph/line numberings.
-@import "./theme/TEI/tei-paragraph-numbering";
-// TEI common styles, used by multiple collection components.
-@import "./theme/TEI/tei-common";
-// TEI styles for the collection title page.
-@import "./theme/TEI/tei-title";
-// TEI styles for the collection foreword page.
-// @import "./theme/TEI/tei-foreword";
-// TEI styles for the collection introduction page.
-@import "./theme/TEI/tei-introduction";
-// TEI styles for the collection reading text component.
-@import "./theme/TEI/tei-readingtext";
-// TEI styles for the collection comments component.
-@import "./theme/TEI/tei-comments";
-// TEI styles for the collection manuscripts component.
-// @import "./theme/TEI/tei-manuscripts";
-// TEI styles for the collection variants component.
-// @import "./theme/TEI/tei-variants";
+/* TEI global styles, that can be commented out if not needed in your project
+   to reduce the size of the global CSS file. */
+@include meta.load-css("theme/inc-global-tei");
 
 
-/**
- * Styles for info-overlay and tooltip div:s in collection introduction
- * and collection text pages. Projects that don't have collections or
- * tooltips in introduction or text pages can comment these out.
- */
-@import "./theme/common/info-overlay";
-@import "./theme/common/tooltip";
+/* Optional global styles, that can be commented out if not needed in your
+   project to reduce the size of the global CSS file. */
+@include meta.load-css("theme/inc-global-optional");

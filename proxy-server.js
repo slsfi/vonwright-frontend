@@ -34,7 +34,10 @@ function run() {
   // Use default language server if no language code defined in route.
   server.use("", translatedServers[languages[0]]);
 
-  server.listen(port, () => {
+  server.listen(port, (error) => {
+    if (error) {
+      throw error;
+    }
     console.log(`Node Express server listening on http://localhost:${port}`);
   });
 }

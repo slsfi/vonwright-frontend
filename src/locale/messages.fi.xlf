@@ -30,12 +30,6 @@
         <target>Sulje</target>
       </segment>
     </unit>
-    <unit id="BasicActions.DontShowAgain">
-      <segment state="initial">
-        <source>Visa inte igen</source>
-        <target>Visa inte igen</target>
-      </segment>
-    </unit>
     <unit id="BasicActions.Download">
       <segment state="initial">
         <source>Ladda ner</source>
@@ -666,30 +660,6 @@
         <target>Tekstityyppi</target>
       </segment>
     </unit>
-    <unit id="Epub.Contents">
-      <segment state="initial">
-        <source>Innehåll</source>
-        <target>Sisältö</target>
-      </segment>
-    </unit>
-    <unit id="Epub.FileNotFound">
-      <segment state="initial">
-        <source>Texten kunde inte laddas. Epub-filen saknas.</source>
-        <target>Tekstiä ei pystytty lataamaan. Epub-tiedostoa ei ole.</target>
-      </segment>
-    </unit>
-    <unit id="Epub.NoticeHeader">
-      <segment state="initial">
-        <source>Anmärkning</source>
-        <target>Huomautus</target>
-      </segment>
-    </unit>
-    <unit id="Epub.NoticeMessage">
-      <segment state="initial">
-        <source>Det här är en e-bok i epubformat som visas på webbsidan med hjälp av ett inbyggt läsprogram. Läsprogrammet fungerar bäst om din webbläsare är Firefox. I Chrome, Edge och Safari fungerar inte e-böckers länkar i läsprogrammet. Vi rekommenderar därför att du använder Firefox, eller laddar ner e-boken och läser den med ett läsprogram på din apparat.</source>
-        <target>Tämä on epub-muodossa oleva sähkökirja, jota näytetään verkkosivustolla sisäänrakennetun lukuohjelman avulla. Lukuohjelma toimii parhaiten Firefox-selaimessa. Chrome, Edge ja Safari-selaimissa sähkökirjojen linkit eivät toimi lukuohjelmassa. Suosittelemme siksi, että käytät Firefoxia, tai lataat sähkökirjan ja luet sitä omalla laitteellasi, valitsemallasi lukuohjelmalla.</target>
-      </segment>
-    </unit>
     <unit id="Facsimiles.AltText">
       <segment state="initial">
         <source>Skannat faksimil</source>
@@ -1012,6 +982,12 @@
       <segment state="initial">
         <source>Bildbank</source>
         <target>Kuvakokoelmat</target>
+      </segment>
+    </unit>
+    <unit id="MainSideMenu.Search">
+      <segment state="initial">
+        <source>Sök i utgåvan</source>
+        <target>Hae editiosta</target>
       </segment>
     </unit>
     <unit id="Manuscripts.ChangeManuscript">
@@ -1512,12 +1488,6 @@
         <target>Lähdeviittaus tähän tekstiin</target>
       </segment>
     </unit>
-    <unit id="Reference.ReferToEdition">
-      <segment state="initial">
-        <source>Hänvisa till denna webbutgåva</source>
-        <target>Lähdeviittaus tähän digitaaliseen editioon</target>
-      </segment>
-    </unit>
     <unit id="Reference.ReferToForeword">
       <segment state="initial">
         <source>Hänvisa till detta förord</source>
@@ -1588,18 +1558,6 @@
       <segment state="initial">
         <source>Innehåll</source>
         <target>Sisältö</target>
-      </segment>
-    </unit>
-    <unit id="TopMenu.Home">
-      <segment state="initial">
-        <source>Hem</source>
-        <target>Etusivu</target>
-      </segment>
-    </unit>
-    <unit id="TopMenu.LogoAltText">
-      <segment state="initial">
-        <source>Logo</source>
-        <target>Logo</target>
       </segment>
     </unit>
     <unit id="TopMenu.Menu">

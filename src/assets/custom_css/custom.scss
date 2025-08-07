@@ -88,6 +88,7 @@
                                      Roboto, Oxygen-Sans, Ubuntu, Cantarell,
                                      "Helvetica Neue", sans-serif;
     --font-stack-app-base:           "Roboto", var(--font-stack-system);
+    --font-stack-top-site-title:     var(--font-stack-app-base);
     --font-stack-home-banner:        var(--font-stack-app-base);
     --font-stack-tei:                "SourceSerif", Constantia, "Lucida Bright",
                                      Lucidabright, "Lucida Serif", Lucida,
@@ -374,6 +375,16 @@ page-elastic-search {
       font-size: 0.889em;
       padding: 0.125em 0.25em;
     }
+  }
+}
+
+/* Hänvisningar efter punktkommentarers texter i kommentarspalten. */
+comments {
+  div.tei .teiComment.noteReference {
+    display: block;
+    font-size: 0.85em;
+    line-height: 1.55;
+    margin-top: 0.5em;
   }
 }
 

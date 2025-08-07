@@ -1,6 +1,7 @@
 import { Pipe, PipeTransform } from '@angular/core';
 
 import { config } from '@config';
+import { splitFilename } from '@utility-functions';
 
 
 /**
@@ -41,7 +42,12 @@ export class ElasticHitPagePathPipe implements PipeTransform {
       );
 
       if (ebook?.filename) {
-        path = `/ebook/${ebook.filename}`;
+        const filenameparts = splitFilename(ebook.filename);
+        if (filenameparts.extension) {
+          path = `/ebook/${filenameparts.extension}/${filenameparts.name}`;
+        } else {
+          path = `/ebook`;
+        }
       }
     }
 

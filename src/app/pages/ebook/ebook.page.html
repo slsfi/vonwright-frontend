@@ -1,14 +1,4 @@
-@if (filename && ebookType === 'epub') {
-  @defer (on immediate) {
-    <epub-viewer
-          id="epub-page-container"
-          class="ion-page"
-          [epubFileName]="filename"
-    ></epub-viewer>
-  } @placeholder {
-    <h1 class="screen-reader-only" [innerHTML]="title"></h1>
-  }
-} @else if (filename && ebookType === 'pdf') {
+@if (filename && ebookType === 'pdf') {
   <pdf-viewer
         id="pdf-page-container"
         class="ion-page"

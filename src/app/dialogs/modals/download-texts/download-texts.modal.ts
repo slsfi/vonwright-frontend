@@ -1,5 +1,5 @@
-import { Component, Inject, Input, LOCALE_ID, OnDestroy, OnInit } from '@angular/core';
-import { AsyncPipe, DOCUMENT, NgClass, NgStyle, NgTemplateOutlet } from '@angular/common';
+import { Component, Inject, Input, LOCALE_ID, OnDestroy, OnInit, DOCUMENT } from '@angular/core';
+import { AsyncPipe, NgClass, NgStyle, NgTemplateOutlet } from '@angular/common';
 import { PRIMARY_OUTLET, Router, UrlSegment, UrlTree } from '@angular/router';
 import { IonicModule, ModalController } from '@ionic/angular';
 import { catchError, forkJoin, map, Observable, of, Subscription, tap } from 'rxjs';

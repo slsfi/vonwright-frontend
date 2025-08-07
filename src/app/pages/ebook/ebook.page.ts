@@ -1,8 +1,9 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 
 import { config } from '@config';
+import { splitFilename } from '@utility-functions';
 
 
 @Component({
@@ -18,22 +19,36 @@ export class EbookPage implements OnDestroy, OnInit {
   title: string = '';
 
   constructor(
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private router: Router
   ) {}
 
   ngOnInit() {
+    const availableEbooks: any[] = config.ebooks ?? [];
+
     this.routeParamsSubscr = this.route.params.subscribe(params => {
-      this.filename = '';
-      this.ebookType = '';
-      const availableEbooks: any[] = config.ebooks ?? [];
-      for (const ebook of availableEbooks) {
-        if (ebook.filename === params.filename) {
-          this.filename = ebook.filename;
-          this.title = ebook.title;
-          this.ebookType = this.filename.substring(
-            this.filename.lastIndexOf('.') + 1, this.filename.length
-          ) || '';
-          break;
+      if (params.filename && !params.type && !params.name) {
+        // Legacy route -> redirect to correct route
+        const filenameparts = splitFilename(params.filename);
+        if (filenameparts.extension) {
+          this.router.navigate(
+            ['/ebook', filenameparts.extension, filenameparts.name],
+            { replaceUrl: true }
+          );
+        }
+      } else {
+        this.filename = '';
+        this.title = '';
+        this.ebookType = '';
+        for (const ebook of availableEbooks) {
+          const requestedFilename = `${params.name}.${params.type}`;
+
+          if (ebook.filename === requestedFilename) {
+            this.filename = ebook.filename;
+            this.title = ebook.title;
+            this.ebookType = params.type;
+            break;
+          }
         }
       }
     });

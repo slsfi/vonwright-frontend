@@ -3,6 +3,7 @@
  * Styles for reading-texts.
  */
 @use "sass:math";
+@use "../sass_variables" as vars;
 
 /*
 Size of comment asterisks at different font sizes.
@@ -14,48 +15,48 @@ in. For instance, the asterisks must not be larger
 inside headings.
 */
 .miniFontSize div.tei img.comment {
-  width: math.ceil(0.75 * $text-fontsize-mini) !important;
-  height: math.ceil(0.75 * $text-fontsize-mini) !important;
+  width: math.ceil(0.75 * vars.$text-fontsize-mini) !important;
+  height: math.ceil(0.75 * vars.$text-fontsize-mini) !important;
 }
 
 .tinyFontSize div.tei img.comment {
-  width: math.ceil(0.75 * $text-fontsize-tiny) !important;
-  height: math.ceil(0.75 * $text-fontsize-tiny) !important;
+  width: math.ceil(0.75 * vars.$text-fontsize-tiny) !important;
+  height: math.ceil(0.75 * vars.$text-fontsize-tiny) !important;
 }
 
 .xxxsmallFontSize div.tei img.comment {
-  width: math.ceil(0.75 * $text-fontsize-xxxsmall) !important;
-  height: math.ceil(0.75 * $text-fontsize-xxxsmall) !important;
+  width: math.ceil(0.75 * vars.$text-fontsize-xxxsmall) !important;
+  height: math.ceil(0.75 * vars.$text-fontsize-xxxsmall) !important;
 }
 
 .xxsmallFontSize div.tei img.comment {
-  width: math.ceil(0.75 * $text-fontsize-xxsmall) !important;
-  height: math.ceil(0.75 * $text-fontsize-xxsmall) !important;
+  width: math.ceil(0.75 * vars.$text-fontsize-xxsmall) !important;
+  height: math.ceil(0.75 * vars.$text-fontsize-xxsmall) !important;
 }
 
 .xsmallFontSize div.tei img.comment {
-  width: math.ceil(0.75 * $text-fontsize-xsmall) !important;
-  height: math.ceil(0.75 * $text-fontsize-xsmall) !important;
+  width: math.ceil(0.75 * vars.$text-fontsize-xsmall) !important;
+  height: math.ceil(0.75 * vars.$text-fontsize-xsmall) !important;
 }
 
 .smallFontSize div.tei img.comment {
-  width: math.ceil(0.75 * $text-fontsize-small) !important;
-  height: math.ceil(0.75 * $text-fontsize-small) !important;
+  width: math.ceil(0.75 * vars.$text-fontsize-small) !important;
+  height: math.ceil(0.75 * vars.$text-fontsize-small) !important;
 }
 
 .mediumFontSize div.tei img.comment {
-  width: math.ceil(0.75 * $text-fontsize-medium) !important;
-  height: math.ceil(0.75 * $text-fontsize-medium) !important;
+  width: math.ceil(0.75 * vars.$text-fontsize-medium) !important;
+  height: math.ceil(0.75 * vars.$text-fontsize-medium) !important;
 }
 
 .largeFontSize div.tei img.comment {
-  width: math.ceil(0.75 * $text-fontsize-large) !important;
-  height: math.ceil(0.75 * $text-fontsize-large) !important;
+  width: math.ceil(0.75 * vars.$text-fontsize-large) !important;
+  height: math.ceil(0.75 * vars.$text-fontsize-large) !important;
 }
 
 .xlargeFontSize div.tei img.comment {
-  width: math.ceil(0.75 * $text-fontsize-xlarge) !important;
-  height: math.ceil(0.75 * $text-fontsize-xlarge) !important;
+  width: math.ceil(0.75 * vars.$text-fontsize-xlarge) !important;
+  height: math.ceil(0.75 * vars.$text-fontsize-xlarge) !important;
 }
 
 /*

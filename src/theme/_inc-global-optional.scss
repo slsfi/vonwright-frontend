@@ -1,0 +1,7 @@
+/**
+ * Styles for info-overlay and tooltip div:s in collection introduction
+ * and collection text pages. Projects that don't have collections or
+ * tooltips in introduction or text pages can comment these out.
+ */
+@use "common/info-overlay";
+@use "common/tooltip";

@@ -14,7 +14,7 @@ import { CollectionsService } from '@services/collections.service';
 import { DocumentHeadService } from '@services/document-head.service';
 import { MarkdownService } from '@services/markdown.service';
 import { MediaCollectionService } from '@services/media-collection.service';
-import { addOrRemoveValueInNewArray, sortArrayOfObjectsAlphabetically } from '@utility-functions';
+import { addOrRemoveValueInNewArray, sortArrayOfObjectsAlphabetically, splitFilename } from '@utility-functions';
 
 /**
  * * This component uses ChangeDetectionStrategy.OnPush so change detection has to
@@ -57,8 +57,9 @@ export class MainSideMenuComponent implements OnInit, OnChanges {
     this.ebooksList = config.ebooks ?? [];
 
     if (this.ebooksList) {
-      this.ebooksList.forEach((epub: any) => {
-        epub.id = epub.filename;
+      this.ebooksList.forEach((ebook: any) => {
+        const filenameparts = splitFilename(ebook.filename);
+        ebook.id = filenameparts.name;
       });
     }
   }
@@ -100,6 +101,8 @@ export class MainSideMenuComponent implements OnInit, OnChanges {
         for (let i = 0; i < res.length; i++) {
           if (res[i].menuData && res[i].menuData.length) {
             for (let x = 0; x < res[i].menuData.length; x++) {
+              // Add the menu type to the menu data
+              res[i].menuData[x].menuType = res[i].menuType;
               menu.push(res[i].menuData[x]);
             }
           }
@@ -118,7 +121,13 @@ export class MainSideMenuComponent implements OnInit, OnChanges {
    * config.
    */
   private getMenuItemsArray(): Observable<any>[] {
-    const enabledPages = config.component?.mainSideMenu?.items ?? {};
+    // Get enabled menu items from config, and prepend with the home
+    // menu item, which is forced to always be shown.
+    let enabledPages = {
+      home: true,
+      ...(config.component?.mainSideMenu?.items ?? {})
+    };
+    enabledPages.home = true;
 
     const menuItemGetters: Record<string, () => Observable<any>> = {
       home: () => this.getHomePageMenuItem(),
@@ -129,7 +138,8 @@ export class MainSideMenuComponent implements OnInit, OnChanges {
       indexKeywords: () => this.getIndexPageMenuItem('keywords'),
       indexPersons: () => this.getIndexPageMenuItem('persons'),
       indexPlaces: () => this.getIndexPageMenuItem('places'),
-      indexWorks: () => this.getIndexPageMenuItem('works')
+      indexWorks: () => this.getIndexPageMenuItem('works'),
+      search: () => this.getSearchPageMenuItem()
     };
 
     return Object.entries(enabledPages)
@@ -161,11 +171,12 @@ export class MainSideMenuComponent implements OnInit, OnChanges {
   private getEbookPagesMenu(): Observable<any> {
     let menuData: any[] = [];
     if (this.ebooksList.length) {
-      this.ebooksList.forEach(epub => {
+      this.ebooksList.forEach(ebook => {
+        const filenameparts = splitFilename(ebook.filename);
         menuData.push({
-          id: epub.id,
-          title: epub.title,
-          parentPath: '/ebook'
+          id: filenameparts.name,
+          title: ebook.title,
+          parentPath: `/ebook/${filenameparts.extension}`
         });
       });
       if (this.ebooksList.length > 1) {
@@ -254,6 +265,11 @@ export class MainSideMenuComponent implements OnInit, OnChanges {
     });
   }
 
+  private getSearchPageMenuItem(): Observable<any> {
+    const menuData: any[] = [{ id: '', title: $localize`:@@MainSideMenu.Search:Sök i utgåvan`, parentPath: '/search' }];
+    return of({ menuType: 'search', menuData });
+  }
+
   private groupCollections(collections: any) {
     if (config.collections?.order) {
       let collectionsList = config.collections.order.map(() => []);
@@ -309,11 +325,10 @@ export class MainSideMenuComponent implements OnInit, OnChanges {
    * and expands any collapsed parents in the menu tree.
    */
   private updateHighlightedMenuItem() {
-    let currentPath = this.urlSegments && this.urlSegments[0]?.path || '';
-    if (currentPath && this.urlSegments && this.urlSegments[1]?.path) {
-      currentPath += '/' + this.urlSegments[1]?.path;
-    }
-    currentPath = '/' + currentPath;
+    // Create a path string from all route segments, prefixed with a slash
+    // (e.g., '/ebook/pdf/title-of-the-ebook')
+    const currentPath = '/' + (this.urlSegments?.map(segment => segment.path).join('/') || '');
+
     const currentItemRoot = this.recursiveFindCurrentMenuItem(this.mainMenu, currentPath);
     if (!currentItemRoot) {
       this.highlightedMenu = '';

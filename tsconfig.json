@@ -14,7 +14,7 @@
     "declaration": false,
     "downlevelIteration": true,
     "experimentalDecorators": true,
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "importHelpers": true,
     "target": "ES2022",
     "module": "ES2022",
@@ -26,15 +26,33 @@
     "allowSyntheticDefaultImports": true,
     "strictPropertyInitialization": false,
     "paths": {
-      "@components/*": ["src/app/components/*"],
-      "@config": ["src/assets/config/config"],
-      "@directives/*": ["src/app/directives/*"],
-      "@modals/*": ["src/app/dialogs/modals/*"],
-      "@models/*": ["src/app/models/*"],
-      "@popovers/*": ["src/app/dialogs/popovers/*"],
-      "@pipes/*": ["src/app/pipes/*"],
-      "@services/*": ["src/app/services/*"],
-      "@utility-functions": ["src/app/utils/utility-functions"]
+      "@components/*": [
+        "src/app/components/*"
+      ],
+      "@config": [
+        "src/assets/config/config"
+      ],
+      "@directives/*": [
+        "src/app/directives/*"
+      ],
+      "@modals/*": [
+        "src/app/dialogs/modals/*"
+      ],
+      "@models/*": [
+        "src/app/models/*"
+      ],
+      "@popovers/*": [
+        "src/app/dialogs/popovers/*"
+      ],
+      "@pipes/*": [
+        "src/app/pipes/*"
+      ],
+      "@services/*": [
+        "src/app/services/*"
+      ],
+      "@utility-functions": [
+        "src/app/utils/utility-functions"
+      ]
     }
   },
   "angularCompilerOptions": {

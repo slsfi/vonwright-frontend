@@ -6,9 +6,9 @@ import 'zone.js/node';
 import { LOCALE_ID } from '@angular/core';
 import { APP_BASE_HREF } from '@angular/common';
 import { CommonEngine } from '@angular/ssr/node';
-import * as express from 'express';
-import { existsSync } from 'fs';
-import { join } from 'path';
+import express from 'express';
+import { existsSync } from 'node:fs';
+import { join } from 'node:path';
 
 import AppServerModule from './src/main.server';
 import { environment } from './src/environments/environment';
@@ -17,21 +17,23 @@ import { REQUEST } from './src/express.tokens';
 // The Express app is exported so that it can be used by serverless Functions.
 export function app(lang: string): express.Express {
   const server = express();
-  const distFolder = join(process.cwd(), `dist/app/browser/${lang}`);
+  const browserDistFolder = join(process.cwd(), `dist/app/browser/${lang}`);
   const staticHtmlFolder = join(process.cwd(), `dist/app/browser/${lang}/static-html`);
-  const indexHtml = existsSync(join(distFolder, 'index.original.html'))
-    ? join(distFolder, 'index.original.html')
-    : join(distFolder, 'index.html');
+  const indexHtml = existsSync(join(browserDistFolder, 'index.original.html'))
+    ? join(browserDistFolder, 'index.original.html')
+    : join(browserDistFolder, 'index.html');
 
   const commonEngine = new CommonEngine();
 
   server.set('view engine', 'html');
-  server.set('views', distFolder);
+  server.set('views', browserDistFolder);
 
   // Serve pre-rendered static HTML files from /static-html
   // If the file is missing, the next middleware sends a 404
   server.use('/static-html', express.static(staticHtmlFolder, {
-    maxAge: '1d'
+    maxAge: '1d',
+    index: false,
+    redirect: false
   }));
 
   // Handle 404 for /static-html, this is to prevent the built-in Angular wildcard route for
@@ -41,18 +43,22 @@ export function app(lang: string): express.Express {
   });
 
   // Serve unversioned files (robots.txt, etc.) with no caching
-  server.get(['/robots.txt', '/sitemap.txt', '/favicon.ico'], express.static(distFolder, {
+  server.get(['/robots.txt', '/sitemap.txt', '/favicon.ico'], express.static(browserDistFolder, {
     maxAge: 0
   }));
 
   // Serve assets (like images in /assets/) with short caching
-  server.use('/assets', express.static(join(distFolder, 'assets'), {
-    maxAge: '1d'
+  server.use('/assets', express.static(join(browserDistFolder, 'assets'), {
+    maxAge: '1d',
+    index: false,
+    redirect: false
   }));
 
   // Serve other static files from /browser, these should be hashed so serve with long-term caching
-  server.get('*.*', express.static(distFolder, {
-    maxAge: '1y'
+  server.use(express.static(browserDistFolder, {
+    maxAge: '1y',
+    index: false,
+    redirect: false
   }));
 
   // Prevent Angular SSR from handling requests for known static file types (e.g. missing images or fonts)
@@ -63,7 +69,7 @@ export function app(lang: string): express.Express {
     '.mp4', '.webm', '.mp3', '.wav', '.ogg',
     '.pdf', '.txt'
   ]);
-  server.get('*', (req, res, next) => {
+  server.use((req, res, next) => {
     const url = req.url.split(/[?#]/, 1)[0].toLowerCase();
     const ext = url.slice(url.lastIndexOf('.'));
     if (staticExtensions.has(ext) && !url.startsWith('/ebook/')) {
@@ -74,7 +80,7 @@ export function app(lang: string): express.Express {
   });
 
   // Catch-all route: render Angular app for non-static paths (SSR or client-side routes, including 404 pages)
-  server.get('*', (req, res, next) => {
+  server.use((req, res, next) => {
     // console.log(`[SSR] Rendering URL: ${req.url}`);
     const { protocol, originalUrl, baseUrl, headers } = req;
 
@@ -89,11 +95,11 @@ export function app(lang: string): express.Express {
         documentFilePath: indexHtml,
         url: `${protocol}://${headers.host}${originalUrl}`,
         inlineCriticalCss: false,
-        publicPath: distFolder,
+        publicPath: browserDistFolder,
         providers: [
           { provide: APP_BASE_HREF, useValue: baseUrl },
           { provide: LOCALE_ID, useValue: lang },
-          { provide: REQUEST, useValue: req }
+          { provide: REQUEST, useValue: req },
         ],
       })
       .then((html) => res.send(html))
@@ -113,7 +119,10 @@ function runDev(): void {
   const server = express();
   server.use('/sv', appSv);
   server.use('', appSv);
-  server.listen(port, () => {
+  server.listen(port, (error) => {
+    if (error) {
+      throw error;
+    }
     console.log(`Node Express dev server listening on http://localhost:${port}`);
   });
 }

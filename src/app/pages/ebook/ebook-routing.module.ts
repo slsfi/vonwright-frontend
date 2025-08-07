@@ -11,6 +11,10 @@ const routes: Routes = [
   {
     path: ':filename',
     component: EbookPage,
+  },
+  {
+    path: ':type/:name',
+    component: EbookPage,
   }
 ];
 

@@ -124,11 +124,6 @@ npm install @ionic/angular @ionic/angular-server
 ```
 
 
-### [`epubjs`][npm_epubjs]
-
-Library for rendering ePub documents in the browser, used by the `epub-viewer` component in the app. It is poorly documented and not actively maintained anymore. It works without problems only in Firefox.
-
-
 ### [`express`][npm_express]
 
 Framework for running a web server in Node.js. This library is required by Angular to enable server-side rendering.

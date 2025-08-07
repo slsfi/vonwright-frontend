@@ -12,6 +12,7 @@
           [attr.aria-haspopup]="item.children ? 'menu' : null"
           [attr.aria-expanded]="item.children ? (selectedMenu | arrayIncludes:item.nodeId) : null"
           role="menuitem"
+          [class.home-menu-item]="item.menuType === 'home'"
     >
       @if (!item.children) {
         <a
@@ -20,6 +21,9 @@
               [class.submenu-label]="item.children"
         >
           <ng-container *ngTemplateOutlet="menuItemContent; context: {$implicit: item}"/>
+          @if (item.menuType === 'home') {
+            <ion-icon aria-hidden="true" name="home-sharp" class="home-icon"></ion-icon>
+          }
         </a>
       }
       @if (item.children) {

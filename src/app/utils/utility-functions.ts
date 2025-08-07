@@ -287,3 +287,35 @@ export function enableFrontMatterPageOrTextViewType(
 
   return !disabledCollections.includes(collection);
 }
+
+
+/**
+ * Splits a filename into its base name and extension.
+ *
+ * This function finds the last dot (`.`) in the filename and splits it
+ * into two parts:
+ * - The part before the last dot is considered the base name.
+ * - The part after the last dot is considered the extension.
+ *
+ * Special cases:
+ * - If the filename has no dot or starts with a dot (e.g., ".bashrc"),
+ *   it is treated as having no extension.
+ * - For compound extensions (e.g., "archive.tar.gz"), only the last part
+ *   ("gz") is returned as the extension.
+ *
+ * @param filename - The full filename as a string (e.g., "document.pdf",
+ *                   "archive.tar.gz", ".bashrc").
+ * @returns An object with `name` (the base name) and `extension` (the file
+ *          type/extension). 
+ */
+export function splitFilename(filename: string): { name: string; extension: string } {
+  const lastDotIndex = filename.lastIndexOf(".");
+
+  if (lastDotIndex === -1 || lastDotIndex === 0) {
+    return { name: filename, extension: "" };
+  }
+
+  const name = filename.slice(0, lastDotIndex);
+  const extension = filename.slice(lastDotIndex + 1);
+  return { name, extension };
+}

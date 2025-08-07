@@ -37,8 +37,6 @@
           <h3><ng-container i18n="@@Reference.ReferToEbook">Hänvisa till denna text</ng-container>:</h3>
         } @else if (origin === 'media-collection') {
           <h3><ng-container i18n="@@Reference.ReferToMediaCollection">Hänvisa till denna bildsamling</ng-container>:</h3>
-        } @else if (origin === 'top-menu') {
-          <h3><ng-container i18n="@@Reference.ReferToEdition">Hänvisa till denna webbutgåva</ng-container>:</h3>
         }
         <p [innerHTML]="referenceData.reference_text + (referenceData.urn ? ', ' + urnResolverUrl + referenceData.urn : currentUrl ? ', ' + currentUrl : '')"></p>
       }

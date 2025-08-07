@@ -1,5 +1,5 @@
-import { Component, Inject, Input, LOCALE_ID, OnInit, ViewChild } from '@angular/core';
-import { AsyncPipe, DOCUMENT, NgStyle } from '@angular/common';
+import { Component, Inject, Input, LOCALE_ID, OnInit, ViewChild, DOCUMENT } from '@angular/core';
+import { AsyncPipe, NgStyle } from '@angular/common';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { ActivatedRoute } from '@angular/router';
 import { IonicModule, ModalController } from '@ionic/angular';

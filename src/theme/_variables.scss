@@ -1,5 +1,6 @@
 :root {
   // GLOBAL CSS VARIABLES
+  // Note that Sass variables are defined in _sass_variables.scss
 
   // Base colors
   --primary-color:                    #497083;
@@ -29,6 +30,7 @@
                                    Roboto, Oxygen-Sans, Ubuntu, Cantarell,
                                    "Helvetica Neue", sans-serif;
   --font-stack-app-base:           "Roboto", var(--font-stack-system);
+  --font-stack-top-site-title:     var(--font-stack-app-base);
   --font-stack-home-banner:        var(--font-stack-app-base);
   --font-stack-tei:                "SourceSerif", Constantia, "Lucida Bright",
                                    Lucidabright, "Lucida Serif", Lucida,
@@ -49,17 +51,3 @@
   --ion-background-color-step-100:  #f4f4f4;
   --ion-font-family:                var(--font-stack-app-base);
 }
-
-
-// GLOBAL SCSS VARIABLES
-
-// Text size variables
-$text-fontsize-mini:     12px; // 0.75rem;   => Only for print
-$text-fontsize-tiny:     13px; // 0.8125rem; => Only for print
-$text-fontsize-xxxsmall: 14px; // 0.875rem;  => Only for print
-$text-fontsize-xxsmall:  15px; // 0.9375rem; => Only for print
-$text-fontsize-xsmall:   16px; // 1rem;
-$text-fontsize-small:    17px; // 1.0625rem;
-$text-fontsize-medium:   18px; // 1.125rem;
-$text-fontsize-large:    19px; // 1.1875rem; => Not for print
-$text-fontsize-xlarge:   21px; // 1.3125rem; => Not for print
