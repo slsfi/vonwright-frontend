@@ -1,4 +1,4 @@
-import { Inject, Injectable, LOCALE_ID } from '@angular/core';
+import { Injectable, LOCALE_ID, inject } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { BehaviorSubject, catchError, map, Observable, of } from 'rxjs';
 
@@ -10,29 +10,21 @@ import { flattenObjectTree, sortArrayOfObjectsAlphabetically, sortArrayOfObjects
   providedIn: 'root',
 })
 export class CollectionTableOfContentsService {
+  private http = inject(HttpClient);
+  private activeLocale = inject(LOCALE_ID);
+
+  private readonly apiURL: string = `${config.app?.backendBaseURL ?? ''}/${config.app?.projectNameDB ?? ''}`;
+  private readonly multilingualToc: boolean = config.app?.i18n?.multilingualCollectionTableOfContents ?? false;
+  private readonly categoricalTocPrimarySortKey: string = config.component?.collectionSideMenu?.categoricalSortingPrimaryKey ?? 'date';
+  private readonly categoricalTocSecondarySortKey: string = config.component?.collectionSideMenu?.categoricalSortingSecondaryKey ?? '';
+
   private activeTocOrder: string = '';
-  private apiURL: string = '';
-  private categoricalTocPrimarySortKey: string = 'date';
-  private categoricalTocSecondarySortKey: string = '';
   private currentUnorderedToc: any = {};          // default order current TOC
   private currentUnorderedFlattenedToc: any = {}; // default order flattened current TOC
   private currentToc: any = {};                   // possibly ordered current TOC
   private currentFlattenedToc: any = {};          // possibly ordered, flattened current TOC
   private currentToc$ = new BehaviorSubject<any>(null);
   private currentFlattenedToc$ = new BehaviorSubject<any>(null);
-  private multilingualToc: boolean = false;
-
-  constructor(
-    private http: HttpClient,
-    @Inject(LOCALE_ID) private activeLocale: string
-  ) {
-    const apiBaseURL = config.app?.backendBaseURL ?? '';
-    const projectName = config.app?.projectNameDB ?? '';
-    this.apiURL = apiBaseURL + '/' + projectName;
-    this.multilingualToc = config.app?.i18n?.multilingualCollectionTableOfContents ?? false;
-    this.categoricalTocPrimarySortKey = config.component?.collectionSideMenu?.categoricalSortingPrimaryKey ?? 'date';
-    this.categoricalTocSecondarySortKey = config.component?.collectionSideMenu?.categoricalSortingSecondaryKey ?? '';
-  }
 
   getTableOfContents(id: string): Observable<any> {
     if (this.currentUnorderedToc?.collectionId === id) {
@@ -202,6 +194,14 @@ export class CollectionTableOfContentsService {
         return of('');
       })
     );
+  }
+
+  /**
+   * Synchronously get the title of the introduction in the current
+   * collection table of contents.
+   */
+  getCurrentTocIntroductionTitle(): string {
+    return this.currentToc?.introductionPageName || $localize`:@@CollectionIntroduction.Introduction:Inledning`;
   }
 
   /**

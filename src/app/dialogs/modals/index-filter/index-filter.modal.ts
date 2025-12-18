@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { IonicModule, ModalController } from '@ionic/angular';
 
@@ -12,6 +12,9 @@ import { NamedEntityService } from '@services/named-entity.service';
   imports: [FormsModule, IonicModule]
 })
 export class IndexFilterModal implements OnInit {
+  private modalCtrl = inject(ModalController);
+  private namedEntityService = inject(NamedEntityService);
+
   @Input() activeFilters: any = undefined;
   @Input() searchType: string = '';
 
@@ -24,11 +27,6 @@ export class IndexFilterModal implements OnInit {
   isEmpty: boolean = false;
   shouldFilterYear = false;
   showLoading: boolean = false;
-
-  constructor(
-    private modalCtrl: ModalController,
-    private namedEntityService: NamedEntityService
-  ) {}
 
   ngOnInit() {
     if (this.activeFilters?.filterYearMin) {

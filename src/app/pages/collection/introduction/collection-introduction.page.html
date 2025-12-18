@@ -1,3 +1,6 @@
+@let viewOptions = viewOptionsService.show();
+@let textsize = viewOptionsService.textsize();
+
 <ion-header class="ion-no-border">
   <ion-toolbar class="secondary">
 
@@ -50,11 +53,11 @@
       [scrollY]="false"
 >
   <article class="scroll-content-container"
-        [class.xsmallFontSize]="textsize == TextsizeEnum.XSmall"
-        [class.smallFontSize]="textsize == TextsizeEnum.Small"
-        [class.mediumFontSize]="textsize == TextsizeEnum.Medium"
-        [class.largeFontSize]="textsize == TextsizeEnum.Large"
-        [class.xlargeFontSize]="textsize == TextsizeEnum.XLarge"
+        [class.xsmallFontSize]="textsize === 'xsmall'"
+        [class.smallFontSize]="textsize === 'small'"
+        [class.mediumFontSize]="textsize === 'medium'"
+        [class.largeFontSize]="textsize === 'large'"
+        [class.xlargeFontSize]="textsize === 'xlarge'"
   >
     <!-- Loading spinner -->
     @if (textLoading) {
@@ -63,19 +66,19 @@
 
     <!-- Introduction text wrapper -->
     <div class="tei teiContainer"
-          [class.show_personInfo]="viewOptionsService.show.personInfo && viewOptionsTogglesIntro.personInfo"
-          [class.show_placeInfo]="viewOptionsService.show.placeInfo && viewOptionsTogglesIntro.placeInfo"
-          [class.show_workInfo]="viewOptionsService.show.workInfo && viewOptionsTogglesIntro.workInfo"
-          [class.show_paragraphNumbering]="viewOptionsService.show.paragraphNumbering && viewOptionsTogglesIntro.paragraphNumbering"
-          [class.show_pageBreakEdition]="viewOptionsService.show.pageBreakEdition && viewOptionsTogglesIntro.pageBreakEdition"
+          [class.show_personInfo]="viewOptions.personInfo && viewOptionsTogglesIntro.personInfo"
+          [class.show_placeInfo]="viewOptions.placeInfo && viewOptionsTogglesIntro.placeInfo"
+          [class.show_workInfo]="viewOptions.workInfo && viewOptionsTogglesIntro.workInfo"
+          [class.show_paragraphNumbering]="viewOptions.paragraphNumbering && viewOptionsTogglesIntro.paragraphNumbering"
+          [class.show_pageBreakEdition]="viewOptions.pageBreakEdition && viewOptionsTogglesIntro.pageBreakEdition"
           [class.hideIntro]="hasSeparateIntroToc"
           [innerHTML]="text | trustHtml"
     ></div>
 
     <!-- Tooltip wrapper -->
     <div class="toolTip tei teiContainer"
-          [class.show_personInfo]="viewOptionsService.show.personInfo"
-          [class.show_workInfo]="viewOptionsService.show.workInfo"
+          [class.show_personInfo]="viewOptions.personInfo"
+          [class.show_workInfo]="viewOptions.workInfo"
           [ngStyle]="{
             'position': toolTipPosType,
             'top': toolTipPosition.top,
@@ -89,8 +92,8 @@
     <!-- Info overlay wrapper -->
     <div tabindex="-1"
           class="infoOverlay tei teiContainer"
-          [class.show_personInfo]="viewOptionsService.show.personInfo"
-          [class.show_workInfo]="viewOptionsService.show.workInfo"
+          [class.show_personInfo]="viewOptions.personInfo"
+          [class.show_workInfo]="viewOptions.workInfo"
           [ngStyle]="{
             'position': infoOverlayPosType,
             'bottom': infoOverlayPosition.bottom,

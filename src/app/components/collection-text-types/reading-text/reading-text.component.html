@@ -1,19 +1,24 @@
-@if (!text) {
+@let text = html();
+
+@if (text === undefined) {
   <ion-spinner class="loading" name="crescent"></ion-spinner>
+} @else {
+  @let viewOptions = viewOptionsService.show();
+
+  <div class="tei teiContainer"
+       [innerHTML]="text | trustHtml"
+       [MathJax]="text"
+       [attr.lang]="textLanguage() || null"
+       [class.show_comments]="viewOptions.comments"
+       [class.show_personInfo]="viewOptions.personInfo"
+       [class.show_placeInfo]="viewOptions.placeInfo"
+       [class.show_workInfo]="viewOptions.workInfo"
+       [class.show_emendations]="viewOptions.emendations"
+       [class.show_normalisations]="viewOptions.normalisations"
+       [class.show_abbreviations]="viewOptions.abbreviations"
+       [class.show_paragraphNumbering]="viewOptions.paragraphNumbering"
+       [class.show_pageBreakOriginal]="viewOptions.pageBreakOriginal"
+       [class.show_pageBreakEdition]="viewOptions.pageBreakEdition"
+       [class.clickable-illustrations]="inlineVisibleIllustrations() && illustrationsViewAvailable()">
+  </div>
 }
-<div class="tei teiContainer"
-      [innerHTML]="text | trustHtml"
-      [MathJax]="text"
-      [attr.lang]="textLanguage ? textLanguage : null"
-      [class.show_comments]="viewOptionsService.show.comments"
-      [class.show_personInfo]="viewOptionsService.show.personInfo"
-      [class.show_placeInfo]="viewOptionsService.show.placeInfo"
-      [class.show_workInfo]="viewOptionsService.show.workInfo"
-      [class.show_emendations]="viewOptionsService.show.emendations"
-      [class.show_normalisations]="viewOptionsService.show.normalisations"
-      [class.show_abbreviations]="viewOptionsService.show.abbreviations"
-      [class.show_paragraphNumbering]="viewOptionsService.show.paragraphNumbering"
-      [class.show_pageBreakOriginal]="viewOptionsService.show.pageBreakOriginal"
-      [class.show_pageBreakEdition]="viewOptionsService.show.pageBreakEdition"
-      [class.clickable-illustrations]="inlineVisibleIllustrations && illustrationsViewAvailable"
-></div>

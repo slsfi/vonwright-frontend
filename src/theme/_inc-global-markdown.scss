@@ -1,19 +1,49 @@
 /* -- General styles for elements in markdown. -- */
+@use "./sass_variables" as vars;
+
 .markdown {
   font-size: 1.125rem;
+
+  &.miniFontSize {
+    font-size: vars.$text-fontsize-mini;
+  }
+  &.tinyFontSize {
+    font-size: vars.$text-fontsize-tiny;
+  }
+  &.xxxsmallFontSize {
+    font-size: vars.$text-fontsize-xxxsmall;
+  }
+  &.xxsmallFontSize {
+    font-size: vars.$text-fontsize-xxsmall;
+  }
+  &.xsmallFontSize {
+    font-size: vars.$text-fontsize-xsmall;
+  }
+  &.smallFontSize {
+    font-size: vars.$text-fontsize-small;
+  }
+  &.mediumFontSize {
+    font-size: vars.$text-fontsize-medium;
+  }
+  &.largeFontSize {
+    font-size: vars.$text-fontsize-large;
+  }
+  &.xlargeFontSize {
+    font-size: vars.$text-fontsize-xlarge;
+  }
 
   h1, h2, h3, h4, h5, h6 {
     font-weight: 700;
   }
 
   h1, h2, h3, h4 {
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.4444em;
   }
 
   h1 {
-    font-size: 1.625rem;
-    margin-top: 2rem;
-    margin-bottom: 1.5rem;
+    font-size: 1.4444em;
+    margin-top: 1.7778em;
+    margin-bottom: 1.3333em;
     text-transform: uppercase;
   }
 
@@ -22,24 +52,24 @@
   }
 
   h2 {
-    font-size: 1.4375rem;
-    margin-top: 1.8rem;
+    font-size: 1.2778em;
+    margin-top: 1.6em;
   }
 
   h3 {
-    font-size: 1.25rem;
-    margin-top: 1.5rem;
+    font-size: 1.1111em;
+    margin-top: 1.3333em;
   }
 
   h2 + h3 {
-    margin-top: 1rem;
+    margin-top: 0.8889em;
   }
 
   h4 {
-    font-size: 1.125rem;
+    font-size: 1.0556em;
     font-weight: normal;
     font-style: italic;
-    margin-top: 1.25rem;
+    margin-top: 1.1111em;
   }
 
   p {
@@ -67,17 +97,17 @@
 
   img[src$="#align-left"] {
     float: left;
-    margin: 0 1rem 1rem 0;
+    margin: 0 0.8889em 0.8889em 0;
   }
 
   img[src$="#align-right"] {
     float: right;
-    margin: 0 0 1rem 1rem;
+    margin: 0 0 0.8889em 0.8889em;
   }
 
   img[src$="#align-center"] {
     display: block;
-    margin: 1rem auto;
+    margin: 0.8889em auto;
   }
 }
 
@@ -167,3 +197,58 @@ modal-download-texts .markdown {
 	}
 }
 /* --- */
+
+page-article .markdown {
+  h2 {
+    margin-top: 4em;
+  }
+
+  h3 {
+    margin-top: 2em;
+  }
+
+  h2 + h3 {
+    margin-top: 1.25em;
+  }
+
+  p {
+    line-height: 1.6em;
+    margin: 0;
+
+    + p {
+      text-indent: 1.25em;
+    }
+  }
+
+  blockquote {
+    font-size: .9412em;
+  }
+
+  hgroup {
+    margin: 3em 0 4em 0;
+
+    h1 {
+      letter-spacing: .02em;
+      line-height: 1.35;
+      margin: 0;
+      text-align: center;
+    }
+
+    p {
+      line-height: 1.35;
+      margin: 1em 0;
+      text-align: center;
+      text-indent: 0;
+
+      &[role="doc-subtitle"] {
+        font-size: 1.375em;
+        font-weight: normal;
+        margin: 0.75em 0 1.25em 0;
+      }
+
+      &.noIndent {
+        text-indent: 0;
+      }
+    }
+  }
+}

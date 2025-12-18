@@ -1,10 +1,11 @@
-import { Component, Inject, Input, LOCALE_ID, OnDestroy, OnInit, DOCUMENT } from '@angular/core';
+import { Component, Input, LOCALE_ID, OnDestroy, OnInit, DOCUMENT, inject } from '@angular/core';
 import { AsyncPipe, NgClass, NgStyle, NgTemplateOutlet } from '@angular/common';
 import { PRIMARY_OUTLET, Router, UrlSegment, UrlTree } from '@angular/router';
 import { IonicModule, ModalController } from '@ionic/angular';
 import { catchError, forkJoin, map, Observable, of, Subscription, tap } from 'rxjs';
 
 import { config } from '@config';
+import { TextKey } from '@models/collection.models';
 import { TrustHtmlPipe } from '@pipes/trust-html.pipe';
 import { CollectionContentService } from '@services/collection-content.service';
 import { CollectionsService } from '@services/collections.service';
@@ -15,7 +16,8 @@ import { HtmlParserService } from '@services/html-parser.service';
 import { MarkdownService } from '@services/markdown.service';
 import { ReferenceDataService } from '@services/reference-data.service';
 import { ViewOptionsService } from '@services/view-options.service';
-import { concatenateNames } from '@utility-functions';
+import { concatenateNames, isFileNotFoundHtml } from '@utility-functions';
+import { CorrespondentData, LetterData } from '@models/metadata.models';
 
 
 @Component({
@@ -25,10 +27,24 @@ import { concatenateNames } from '@utility-functions';
   imports: [AsyncPipe, NgClass, NgStyle, NgTemplateOutlet, IonicModule, TrustHtmlPipe]
 })
 export class DownloadTextsModal implements OnDestroy, OnInit {
-  @Input() origin: string = '';
-  @Input() textItemID: string = '';
+  private collectionContentService = inject(CollectionContentService);
+  private collectionsService = inject(CollectionsService);
+  private commentService = inject(CommentService);
+  private headService = inject(DocumentHeadService);
+  private mdService = inject(MarkdownService);
+  private modalCtrl = inject(ModalController);
+  private parserService = inject(HtmlParserService);
+  private referenceDataService = inject(ReferenceDataService);
+  private tocService = inject(CollectionTableOfContentsService);
+  private router = inject(Router);
+  private viewOptionsService = inject(ViewOptionsService);
+  private activeLocale = inject(LOCALE_ID);
+  private document = inject<Document>(DOCUMENT);
 
-  collectionId: string = '';
+  @Input() origin: string = '';
+  @Input() textKey: TextKey | undefined = undefined;
+  @Input() collectionId: string | undefined = undefined;
+
   collectionTitle: string = '';
   commentTitle: string = '';
   copyrightText: string = '';
@@ -65,21 +81,7 @@ export class DownloadTextsModal implements OnDestroy, OnInit {
   textSizeTranslation: string = '';
   urnResolverUrl: string = '';
 
-  constructor(
-    private collectionContentService: CollectionContentService,
-    private collectionsService: CollectionsService,
-    private commentService: CommentService,
-    private headService: DocumentHeadService,
-    private mdService: MarkdownService,
-    private modalCtrl: ModalController,
-    private parserService: HtmlParserService,
-    private referenceDataService: ReferenceDataService,
-    private router: Router,
-    private tocService: CollectionTableOfContentsService,
-    private viewOptionsService: ViewOptionsService,
-    @Inject(LOCALE_ID) private activeLocale: string,
-    @Inject(DOCUMENT) private document: Document
-  ) {
+  constructor() {
     // Get configs
     this.readTextLanguages = config.app?.i18n?.multilingualReadingTextLanguages ?? [];
     if (this.readTextLanguages.length < 2) {
@@ -158,14 +160,10 @@ export class DownloadTextsModal implements OnDestroy, OnInit {
     this.setTranslations();
     this.setReferenceData();
 
-    if (this.textItemID) {
-      // Parse text item id
-      const idParts = this.textItemID.split(';')[0].split('_');
-      this.collectionId = idParts[0];
-
+    if (this.textKey || this.collectionId) {
       this.setCollectionTitle();
 
-      if (this.readTextsMode) {
+      if (this.readTextsMode && this.textKey) {
         // Get publication title
         this.pageTitleSubscr = this.headService.getCurrentPageTitle().subscribe(
           (pubTitle: string) => {
@@ -180,7 +178,7 @@ export class DownloadTextsModal implements OnDestroy, OnInit {
           // comments are available. original_filename is used to determine if
           // reading-texts exist, and publication_comment_id if comments exist.
           this.publicationData$ = this.collectionsService.getPublication(
-            idParts[1]
+            this.textKey.publicationID ?? ''
           ).pipe(
             tap((res: any) => {
               if (res?.original_filename) {
@@ -197,7 +195,7 @@ export class DownloadTextsModal implements OnDestroy, OnInit {
         if (this.downloadFormatsMs.length) {
           // Get a list of all manuscripts in the publication
           this.manuscriptsList$ = this.collectionContentService.getManuscriptsList(
-            this.textItemID
+            this.textKey
           ).pipe(
             tap((res: any) => {
               if (res?.manuscripts?.length) {
@@ -250,22 +248,22 @@ export class DownloadTextsModal implements OnDestroy, OnInit {
     if (textType === 'intro') {
       this.loadingIntro = true;
       dlText$ = this.collectionContentService.getDownloadableIntroduction(
-        this.textItemID, format, this.activeLocale
+        this.collectionId!, format, this.activeLocale
       );
     } else if (textType === 'rt') {
       this.loadingEst = true;
       dlText$ = this.collectionContentService.getDownloadableReadingText(
-        this.textItemID, format, language
+        this.textKey!, format, language
       );
     } else if (textType === 'com') {
       this.loadingCom = true;
       dlText$ = this.commentService.getDownloadableComments(
-        this.textItemID, format
+        this.textKey!, format
       );
     } else if (textType === 'ms') {
       this.loadingMs = true;
       dlText$ = this.collectionContentService.getDownloadableManuscript(
-        this.textItemID, typeID || 0, format
+        this.textKey!, typeID || 0, format
       );
     }
 
@@ -283,15 +281,15 @@ export class DownloadTextsModal implements OnDestroy, OnInit {
           } else if (textType === 'rt') {
             const langForFilename = language ? '_' + language : '';
             fileName = this.convertToFilename(this.publicationTitle)
-                  + langForFilename + '-id-' + this.textItemID.split('_')[1]
+                  + langForFilename + '-id-' + this.textKey!.publicationID
                   + '.' + fileExtension;
           } else if (textType === 'com') {
             fileName = this.convertToFilename(
               this.commentTitle + ' ' + this.publicationTitle
-            ) + '-id-' + this.textItemID.split('_')[1] + '.' + fileExtension;
+            ) + '-id-' + this.textKey!.publicationID + '.' + fileExtension;
           } else if (textType === 'ms') {
             fileName = this.convertToFilename(this.publicationTitle)
-                  + '-id-' + this.textItemID.split('_')[1]
+                  + '-id-' + this.textKey!.publicationID
                   + '-ms-' + typeID + '.' + fileExtension;
           }
 
@@ -337,17 +335,17 @@ export class DownloadTextsModal implements OnDestroy, OnInit {
 
     if (textType === 'intro') {
       this.loadingIntro = true;
-      text$ = this.collectionContentService.getIntroduction(this.textItemID, this.activeLocale);
+      text$ = this.collectionContentService.getIntroduction(this.collectionId!, this.activeLocale);
     } else if (textType === 'rt') {
       this.loadingEst = true;
-      text$ = this.collectionContentService.getReadingText(this.textItemID, language);
+      text$ = this.collectionContentService.getReadingText(this.textKey!, language);
     } else if (textType === 'com') {
       this.loadingCom = true;
       text$ = forkJoin([
-        this.commentService.getComments(this.textItemID).pipe(
+        this.commentService.getComments(this.textKey!).pipe(
           catchError(error => of({ error }))
         ),
-        this.commentService.getCorrespondanceMetadata(this.textItemID.split('_')[1]).pipe(
+        this.commentService.getCorrespondanceMetadata(this.textKey!.publicationID).pipe(
           catchError(error => of({ error }))
         )
       ]).pipe(
@@ -357,7 +355,7 @@ export class DownloadTextsModal implements OnDestroy, OnInit {
       );
     } else if (textType === 'ms') {
       this.loadingMs = true;
-      text$ = this.collectionContentService.getManuscripts(this.textItemID, typeID);
+      text$ = this.collectionContentService.getManuscripts(this.textKey!, typeID);
     }
 
     if (text$) {
@@ -367,15 +365,13 @@ export class DownloadTextsModal implements OnDestroy, OnInit {
           if (
             (textType === 'intro' && res?.content) ||
             (
-              textType === 'rt' &&
-              res?.content &&
-              res?.content !== '<html xmlns="http://www.w3.org/1999/xhtml"><head></head><body>File not found</body></html>'
+              textType === 'rt' && res?.html && !isFileNotFoundHtml(res.html)
             ) ||
             (textType === 'com' && res?.comments && !res.comments.error) ||
             (
               textType === 'ms' &&
-              res?.manuscripts?.length > 0 &&
-              res?.manuscripts[0]?.manuscript_changes
+              res?.length > 0 &&
+              res[0]?.changesHtml
             )
           ) {
             let text: string = '';
@@ -383,11 +379,11 @@ export class DownloadTextsModal implements OnDestroy, OnInit {
             if (textType === 'intro') {
               text = this.getProcessedPrintIntro(res.content);
             } else if (textType === 'rt') {
-              text = this.getProcessedPrintReadText(res.content, language);
+              text = this.getProcessedPrintReadText(res.html, language);
             } else if (textType === 'com') {
               text = this.getProcessedPrintComments(res);
             } else if (textType === 'ms') {
-              text = this.getProcessedPrintManuscripts(res.manuscripts[0].manuscript_changes, res.manuscripts[0].language, typeTitle);
+              text = this.getProcessedPrintManuscripts(res[0].changesHtml, res[0].language, typeTitle);
             }
 
             try {
@@ -440,7 +436,7 @@ export class DownloadTextsModal implements OnDestroy, OnInit {
   }
 
   private getProcessedPrintReadText(text: string, language?: string): string {
-    text = this.parserService.postprocessReadingText(text, this.textItemID.split('_')[0]);
+    text = this.parserService.postprocessReadingText(text, this.textKey!.collectionID);
     text = text.replace('<p> </p><p> </p><section role="doc-endnotes"><ol class="tei footnotesList"></ol></section>', '');
     text = this.fixImagePaths(text);
     return this.constructHtmlForPrint(text, 'rt', language);
@@ -450,32 +446,30 @@ export class DownloadTextsModal implements OnDestroy, OnInit {
     let text = this.constructHtmlForPrint(commentsData.comments, 'com');
     let metaContent = '';
 
-    if (commentsData.metadata?.letter) {
+    if (commentsData.metadata !== null && commentsData.metadata?.letter) {
       let concatSenders = '';
       let concatReceivers = '';
 
       if (commentsData.metadata?.subjects?.length > 0) {
         const senders: string[] = [];
         const receivers: string[] = [];
-        commentsData.metadata.subjects.forEach((subject: any) => {
-          if (subject['avs\u00e4ndare']) {
-            senders.push(subject['avs\u00e4ndare']);
+        commentsData.metadata.subjects.forEach((subject: CorrespondentData) => {
+          if (subject.sender) {
+            senders.push(subject.sender);
           }
-          if (subject['mottagare']) {
-            receivers.push(subject['mottagare']);
+          if (subject.receiver) {
+            receivers.push(subject.receiver);
           }
         });
         concatSenders = concatenateNames(senders);
         concatReceivers = concatenateNames(receivers);
       }
 
-      if (commentsData.metadata.letter) {
-        metaContent = this.getCorrespondenceDataAsHtml(
-          commentsData.metadata.letter, concatSenders, concatReceivers
-        );
-        const contentParts = text.split('</div>\n</comments>');
-        text = contentParts[0] + metaContent + '</div>\n</comments>' + contentParts[1];
-      }
+      metaContent = this.getCorrespondenceDataAsHtml(
+        commentsData.metadata.letter, concatSenders, concatReceivers
+      );
+      const contentParts = text.split('</div>\n</comments>');
+      text = contentParts[0] + metaContent + '</div>\n</comments>' + contentParts[1];
     }
     return text;
   }
@@ -668,14 +662,16 @@ export class DownloadTextsModal implements OnDestroy, OnInit {
 
   private getViewOptionsClassNames(textType: string): string {
     let classes = '';
+    const viewOptions = this.viewOptionsService.show();
+
     if (textType === 'rt' || textType === 'intro') {
-      if (this.viewOptionsService.show.paragraphNumbering) {
+      if (viewOptions.paragraphNumbering) {
         classes += 'show_paragraphNumbering ';
       }
-      if (this.viewOptionsService.show.pageBreakEdition) {
+      if (viewOptions.pageBreakEdition) {
         classes += 'show_pageBreakEdition ';
       }
-      if (textType === 'rt' && this.viewOptionsService.show.pageBreakOriginal) {
+      if (textType === 'rt' && viewOptions.pageBreakOriginal) {
         classes += 'show_pageBreakOriginal ';
       }
     }
@@ -734,7 +730,7 @@ export class DownloadTextsModal implements OnDestroy, OnInit {
         this.copyrightURL = $localize`:@@DownloadTexts.CopyrightURL:https://creativecommons.org/licenses/by-nc-nd/4.0/deed.sv`;
       }
     } else if (this.introductionMode) {
-      this.introductionTitle = $localize`:@@CollectionIntroduction.Introduction:Inledning`;
+      this.introductionTitle = this.tocService.getCurrentTocIntroductionTitle();
 
       if ($localize`:@@DownloadTexts.CopyrightNoticeIntroduction:CC BY-NC-ND 4.0`) {
         this.copyrightText = $localize`:@@DownloadTexts.CopyrightNoticeIntroduction:CC BY-NC-ND 4.0`;
@@ -760,8 +756,9 @@ export class DownloadTextsModal implements OnDestroy, OnInit {
 
   private setCollectionTitle() {
     // Get collection title from database
-    if (this.collectionId) {
-      this.collectionsService.getCollection(this.collectionId).subscribe(
+    const coll_id = this.textKey?.collectionID ?? this.collectionId;
+    if (coll_id) {
+      this.collectionsService.getCollection(coll_id).subscribe(
         (collectionData: any) => {
           if (collectionData?.[0]?.['name']) {
             this.collectionTitle = collectionData[0]['name'];
@@ -796,7 +793,7 @@ export class DownloadTextsModal implements OnDestroy, OnInit {
     return filename;
   }
 
-  private getCorrespondenceDataAsHtml(data: any, concatSenders: string, concatReceivers: string): string {
+  private getCorrespondenceDataAsHtml(data: LetterData, concatSenders: string, concatReceivers: string): string {
     let mContent = '';
     mContent += '<div class="ms">\n';
     mContent += '<h3>' + $localize`:@@Commentary.Manuscript.Title:Manuskriptbeskrivning` + '</h3>\n';

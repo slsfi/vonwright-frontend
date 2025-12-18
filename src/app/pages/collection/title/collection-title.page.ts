@@ -1,11 +1,10 @@
-import { Component, ElementRef, Inject, LOCALE_ID, OnDestroy, OnInit } from '@angular/core';
+import { Component, ElementRef, LOCALE_ID, OnInit, inject } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { ModalController, PopoverController } from '@ionic/angular';
-import { catchError, combineLatest, map, Observable, of, Subscription, switchMap, tap } from 'rxjs';
+import { catchError, combineLatest, map, Observable, of, switchMap, tap } from 'rxjs';
 
 import { config } from '@config';
 import { ReferenceDataModal } from '@modals/reference-data/reference-data.modal';
-import { Textsize } from '@models/textsize.model';
 import { ViewOptionsPopover } from '@popovers/view-options/view-options.popover';
 import { CollectionContentService } from '@services/collection-content.service';
 import { HtmlParserService } from '@services/html-parser.service';
@@ -21,49 +20,33 @@ import { ViewOptionsService } from '@services/view-options.service';
   styleUrls: ['./collection-title.page.scss'],
   standalone: false
 })
-export class CollectionTitlePage implements OnDestroy, OnInit {
+export class CollectionTitlePage implements OnInit {
+  private collectionContentService = inject(CollectionContentService);
+  private elementRef = inject(ElementRef);
+  private mdService = inject(MarkdownService);
+  private modalController = inject(ModalController);
+  private parserService = inject(HtmlParserService);
+  private popoverCtrl = inject(PopoverController);
+  private route = inject(ActivatedRoute);
+  private scrollService = inject(ScrollService);
+  private platformService = inject(PlatformService);
+  viewOptionsService = inject(ViewOptionsService);
+  private activeLocale = inject(LOCALE_ID);
+
+  readonly loadContentFromMarkdown: boolean = config.page?.title?.loadContentFromMarkdown ?? false;
+  readonly replaceImageAssetsPaths: boolean = config.collections?.replaceImageAssetsPaths ?? true;
+  readonly showURNButton: boolean = config.page?.title?.showURNButton ?? false;
+  readonly showViewOptionsButton: boolean = config.page?.title?.showViewOptionsButton ?? true;
+
   _activeComponent: boolean = true;
   collectionID: string = '';
   intervalTimerId: number = 0;
-  loadContentFromMarkdown: boolean = false;
   mobileMode: boolean = false;
-  replaceImageAssetsPaths: boolean = true;
   searchMatches: string[] = [];
-  showURNButton: boolean = false;
-  showViewOptionsButton: boolean = true;
   text$: Observable<string | null>;
-  textsize: Textsize = Textsize.Small;
-  textsizeSubscription: Subscription | null = null;
-
-  TextsizeEnum = Textsize;
-
-  constructor(
-    private collectionContentService: CollectionContentService,
-    private elementRef: ElementRef,
-    private mdService: MarkdownService,
-    private modalController: ModalController,
-    private parserService: HtmlParserService,
-    private popoverCtrl: PopoverController,
-    private route: ActivatedRoute,
-    private scrollService: ScrollService,
-    private platformService: PlatformService,
-    private viewOptionsService: ViewOptionsService,
-    @Inject(LOCALE_ID) private activeLocale: string
-  ) {
-    this.loadContentFromMarkdown = config.page?.title?.loadContentFromMarkdown ?? false;
-    this.replaceImageAssetsPaths = config.collections?.replaceImageAssetsPaths ?? true;
-    this.showURNButton = config.page?.title?.showURNButton ?? false;
-    this.showViewOptionsButton = config.page?.title?.showViewOptionsButton ?? true;
-  }
 
   ngOnInit() {
     this.mobileMode = this.platformService.isMobile();
-
-    this.textsizeSubscription = this.viewOptionsService.getTextsize().subscribe(
-      (textsize: Textsize) => {
-        this.textsize = textsize;
-      }
-    );
 
     this.text$ = combineLatest(
       [this.route.params, this.route.queryParams]
@@ -82,10 +65,6 @@ export class CollectionTitlePage implements OnDestroy, OnInit {
         return this.loadTitle(collectionID, this.activeLocale);
       })
     );
-  }
-
-  ngOnDestroy() {
-    this.textsizeSubscription?.unsubscribe();
   }
 
   ionViewWillEnter() {

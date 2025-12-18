@@ -1,4 +1,4 @@
-import { Inject, Injectable, Optional, PLATFORM_ID } from '@angular/core';
+import { Injectable, PLATFORM_ID, inject } from '@angular/core';
 import { isPlatformServer } from '@angular/common';
 import { Request } from 'express';
 
@@ -33,12 +33,12 @@ import { isBrowser } from '@utility-functions';
   providedIn: 'root',
 })
 export class PlatformService {
+  private platformId = inject(PLATFORM_ID);
+  private request = inject<Request>(REQUEST, { optional: true });
+
   private mode: string = 'desktop'; // mode is either 'desktop' or 'mobile'
 
-  constructor(
-    @Inject(PLATFORM_ID) private platformId: any,
-    @Optional() @Inject(REQUEST) private request: Request
-  ) {
+  constructor() {
     this.setMode();
   }
 

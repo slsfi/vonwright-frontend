@@ -1,11 +1,10 @@
-import { Component, ElementRef, Inject, LOCALE_ID, OnDestroy, OnInit } from '@angular/core';
+import { Component, ElementRef, LOCALE_ID, OnInit, inject } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { ModalController, PopoverController } from '@ionic/angular';
-import { catchError, combineLatest, map, Observable, of, Subscription, switchMap, tap } from 'rxjs';
+import { catchError, combineLatest, map, Observable, of, switchMap, tap } from 'rxjs';
 
 import { config } from '@config';
 import { ReferenceDataModal } from '@modals/reference-data/reference-data.modal';
-import { Textsize } from '@models/textsize.model';
 import { ViewOptionsPopover } from '@popovers/view-options/view-options.popover';
 import { CollectionContentService } from '@services/collection-content.service';
 import { HtmlParserService } from '@services/html-parser.service';
@@ -20,46 +19,31 @@ import { ViewOptionsService } from '@services/view-options.service';
   styleUrls: ['./collection-foreword.page.scss'],
   standalone: false
 })
-export class CollectionForewordPage implements OnDestroy, OnInit {
+export class CollectionForewordPage implements OnInit {
+  private collectionContentService = inject(CollectionContentService);
+  private elementRef = inject(ElementRef);
+  private modalController = inject(ModalController);
+  private parserService = inject(HtmlParserService);
+  private platformService = inject(PlatformService);
+  private popoverCtrl = inject(PopoverController);
+  private route = inject(ActivatedRoute);
+  private scrollService = inject(ScrollService);
+  viewOptionsService = inject(ViewOptionsService);
+  private activeLocale = inject(LOCALE_ID);
+
+  readonly replaceImageAssetsPaths: boolean = config.collections?.replaceImageAssetsPaths ?? true;
+  readonly showURNButton: boolean = config.page?.foreword?.showURNButton ?? false;
+  readonly showViewOptionsButton: boolean = config.page?.foreword?.showViewOptionsButton ?? true;
+
   _activeComponent: boolean = true;
   collectionID: string = '';
   intervalTimerId: number = 0;
   mobileMode: boolean = false;
-  replaceImageAssetsPaths: boolean = true;
   searchMatches: string[] = [];
-  showURNButton: boolean = false;
-  showViewOptionsButton: boolean = true;
   text$: Observable<string>;
-  textsize: Textsize = Textsize.Small;
-  textsizeSubscription: Subscription | null = null;
-
-  TextsizeEnum = Textsize;
-
-  constructor(
-    private collectionContentService: CollectionContentService,
-    private elementRef: ElementRef,
-    private modalController: ModalController,
-    private parserService: HtmlParserService,
-    private platformService: PlatformService,
-    private popoverCtrl: PopoverController,
-    private route: ActivatedRoute,
-    private scrollService: ScrollService,
-    private viewOptionsService: ViewOptionsService,
-    @Inject(LOCALE_ID) private activeLocale: string
-  ) {
-    this.replaceImageAssetsPaths = config.collections?.replaceImageAssetsPaths ?? true;
-    this.showURNButton = config.page?.foreword?.showURNButton ?? false;
-    this.showViewOptionsButton = config.page?.foreword?.showViewOptionsButton ?? true;
-  }
 
   ngOnInit() {
     this.mobileMode = this.platformService.isMobile();
-
-    this.textsizeSubscription = this.viewOptionsService.getTextsize().subscribe(
-      (textsize: Textsize) => {
-        this.textsize = textsize;
-      }
-    );
 
     this.text$ = combineLatest(
       [this.route.params, this.route.queryParams]
@@ -78,10 +62,6 @@ export class CollectionForewordPage implements OnDestroy, OnInit {
         return this.loadForeword(collectionID, this.activeLocale);
       })
     );
-  }
-
-  ngOnDestroy() {
-    this.textsizeSubscription?.unsubscribe();
   }
 
   ionViewWillEnter() {

@@ -1,4 +1,4 @@
-import { Component, Inject, Input, LOCALE_ID, OnInit, ViewChild, DOCUMENT } from '@angular/core';
+import { Component, LOCALE_ID, OnInit, ViewChild, DOCUMENT, inject, input } from '@angular/core';
 import { AsyncPipe, NgStyle } from '@angular/common';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { ActivatedRoute } from '@angular/router';
@@ -18,31 +18,32 @@ import { ReferenceDataModal } from '@modals/reference-data/reference-data.modal'
   host: { ngSkipHydration: 'true' }
 })
 export class PdfViewerComponent implements OnInit {
-  @Input() pdfFileName: string = '';
+  private modalController = inject(ModalController);
+  private route = inject(ActivatedRoute);
+  private sanitizer = inject(DomSanitizer);
+  private activeLocale = inject(LOCALE_ID);
+  private document = inject<Document>(DOCUMENT);
+
+  readonly pdfFileName = input<string>('');
   @ViewChild('downloadOptionsPopover') downloadOptionsPopover: any;
-  
+
+  readonly showURNButton: boolean = config.component?.epub?.showURNButton ?? false;
+
   downloadPopoverIsOpen: boolean = false;
   pageNumber: number | null = null;
   pdfData: Record<string, any> = {};
   pdfURL$: Observable<SafeResourceUrl | undefined>;
-  showURNButton: boolean = false;
   _window: Window | null = null;
 
-  constructor(
-    private modalController: ModalController,
-    private route: ActivatedRoute,
-    private sanitizer: DomSanitizer,
-    @Inject(LOCALE_ID) private activeLocale: string,
-    @Inject(DOCUMENT) private document: Document
-  ) {
-    this.showURNButton = config.component?.epub?.showURNButton ?? false;
+  constructor() {
     this._window = <any>this.document.defaultView;
   }
 
   ngOnInit() {
     const availableEbooks: any[] = config.ebooks ?? [];
+    const pdfFileName = this.pdfFileName();
     for (const ebook of availableEbooks) {
-      if (ebook.filename === this.pdfFileName) {
+      if (ebook.filename === pdfFileName) {
         this.pdfData = ebook;
         break;
       }
@@ -56,7 +57,7 @@ export class PdfViewerComponent implements OnInit {
                   this._window?.location.pathname.split('/')[1] === this.activeLocale
                   ? '/' + this.activeLocale : ''
                 )
-              + '/assets/ebooks/' + this.pdfFileName
+              + '/assets/ebooks/' + pdfFileName
             );
 
     this.pdfURL$ = this.route.queryParamMap.pipe(

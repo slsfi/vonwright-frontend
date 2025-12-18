@@ -1,33 +1,29 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { catchError, map, Observable, of } from 'rxjs';
 import { Parser } from 'htmlparser2';
 import { DomHandler } from 'domhandler';
-import { existsOne, findAll, getAttributeValue } from 'domutils';
+import { existsOne, findAll, findOne, getChildren, getAttributeValue, isTag } from 'domutils';
 import { render } from 'dom-serializer';
 
 import { config } from '@config';
+import { HeadingNode } from '@models/article.models';
+import { TextKey } from '@models/collection.models';
+import { Illustration } from '@models/illustration.models';
+import { ReadingText } from '@models/readingtext.models';
 import { CollectionContentService } from '@services/collection-content.service';
+import { isFileNotFoundHtml } from '@utility-functions';
 
 
 @Injectable({
   providedIn: 'root',
 })
 export class HtmlParserService {
-  private addTEIClassNames: boolean = true;
-  private apiURL: string = '';
-  private mediaCollectionMappings: any = {};
-  private replaceImageAssetsPaths: boolean = true;
+  private collectionContentService = inject(CollectionContentService);
 
-  constructor(
-    private collectionContentService: CollectionContentService
-  ) {
-    const apiBaseURL = config.app?.backendBaseURL ?? '';
-    const projectName = config.app?.projectNameDB ?? '';
-    this.apiURL = apiBaseURL + '/' + projectName;
-    this.mediaCollectionMappings = config.collections?.mediaCollectionMappings ?? {};
-    this.addTEIClassNames = config.collections?.addTEIClassNames ?? true;
-    this.replaceImageAssetsPaths = config.collections?.replaceImageAssetsPaths ?? true;
-  }
+  private readonly addTEIClassNames: boolean = config.collections?.addTEIClassNames ?? true;
+  private readonly apiURL: string = `${config.app?.backendBaseURL ?? ''}/${config.app?.projectNameDB ?? ''}`;
+  private readonly mediaCollectionMappings: any = config.collections?.mediaCollectionMappings ?? {};
+  private readonly replaceImageAssetsPaths: boolean = config.collections?.replaceImageAssetsPaths ?? true;
 
   postprocessReadingText(text: string, collectionId: string): string {
     // Fix image paths if config option for this enabled
@@ -70,21 +66,15 @@ export class HtmlParserService {
     return text;
   }
 
-  getReadingTextIllustrations(id: string): Observable<any> {
-    return this.collectionContentService.getReadingText(id).pipe(
-      map((res) => {
-        const images: any[] = [];
-        if (
-          res &&
-          res.content &&
-          res.content !== '<html xmlns="http://www.w3.org/1999/xhtml"><head></head><body>File not found</body></html>'
-        ) {
+  getReadingTextIllustrations(textKey: TextKey): Observable<Illustration[]> {
+    return this.collectionContentService.getReadingText(textKey).pipe(
+      map((rt: ReadingText) => {
+        const images: Illustration[] = [];
+        if (rt?.html && !isFileNotFoundHtml(rt.html)) {
           const _apiURL = this.apiURL;
-          const collectionID = String(id).split('_')[0];
-          let text = res.content as string;
-          text = this.postprocessReadingText(text, collectionID);
-
+          const collectionID = textKey.collectionID;
           const galleryId = this.mediaCollectionMappings?.[collectionID];
+          let text = this.postprocessReadingText(rt.html, collectionID);
 
           // Parse the read text html to get all illustrations in it using
           // SSR compatible htmlparser2
@@ -96,14 +86,17 @@ export class HtmlParserService {
                   if (!attributes.class?.includes('hide-illustration')) {
                     illustrationClass = 'visible-illustration';
                   }
-                  const image = { src: attributes.src, class: illustrationClass };
+                  const image: Illustration = {
+                    src: attributes.src,
+                    class: illustrationClass
+                  };
                   images.push(image);
                 } else if (
                   attributes.class?.includes('doodle') &&
                   attributes['data-id'] &&
                   galleryId
                 ) {
-                  const image = {
+                  const image: Illustration = {
                     src: `${_apiURL}/gallery/get/${galleryId}/`
                           + attributes['data-id'].replace('tag_', '') + '.jpg',
                     class: 'doodle'
@@ -312,6 +305,7 @@ export class HtmlParserService {
     return parsed_text;
   }
 
+
   private fixImageAssetsPaths(text: string): string {
     // Fix image paths if config option for this enabled
     if (this.replaceImageAssetsPaths) {
@@ -319,6 +313,183 @@ export class HtmlParserService {
     } else {
       return text;
     }
+  }
+
+
+  /**
+   * Parses an HTML string and extracts all heading elements (`<h1>` to `<h6>`),
+   * returning them as a nested tree structure based on heading levels.
+   *
+   * For each heading, this method:
+   * - Uses the heading's own `id` attribute if present and non-empty.
+   * - If no `id` is present, checks its immediate children for a `<span>` element
+   *   with a non-empty `id` attribute and uses that instead.
+   * - Normalizes the chosen ID by trimming whitespace and discarding empty strings.
+   * - Extracts the heading's visible text (including content outside the `<span>`).
+   *
+   * The returned heading list is converted into a hierarchical tree where headings
+   * of deeper levels are nested under the nearest preceding heading of a shallower level.
+   *
+   * This method is SSR-compatible and uses htmlparser2 for parsing.
+   *
+   * @param html - The HTML string to extract headings from.
+   * @returns A nested array of `HeadingNode` objects representing the Table of
+   *          Contents structure, where each node may contain child headings.
+   *
+   * Example:
+   *   <h1 id="a">A</h1>
+   *   <h2><span id="a-1">A.1</span> continues here</h2>
+   *   <h2 id="a-2">A.2</h2>
+   *
+   *   Produces:
+   *   [
+   *     { id: "a", text: "A", level: 1, children: [
+   *         { id: "a-1", text: "A.1 continues here", level: 2, children: [] },
+   *         { id: "a-2", text: "A.2", level: 2, children: [] }
+   *       ]
+   *     }
+   *   ]
+   */
+  getHeadingsFromHtml(html: string): HeadingNode[] {
+    const handler = new DomHandler();
+    new Parser(handler).end(html);
+
+    const flat = findAll(
+      n => isTag(n) && /^h[1-6]$/.test(n.name),
+      handler.dom
+    ).map(h => {
+      const ownId = h.attribs?.id ?? null;
+
+      // Only immediate children:
+      const span = ownId
+        ? null
+        : findOne(
+            (n): n is import('domhandler').Element =>
+              isTag(n) && n.name === 'span' && !!getAttributeValue(n, 'id'),
+            getChildren(h) ?? [],
+            /* recurse */ false
+          );
+
+      const id = this.normalizeId(ownId ?? (span ? getAttributeValue(span, 'id') : null));
+
+      return {
+        id,
+        text: this.getTextContent(h),
+        level: parseInt(h.name.substring(1), 10),
+        children: [] as HeadingNode[],
+      };
+    });
+
+    return this.buildHeadingTree(flat);
+  }
+
+
+  /**
+   * Recursively extracts and concatenates the plain text content from a
+   * given HTML element and all of its child nodes.
+   *
+   * This method is used to retrieve the visible text content from heading
+   * tags or other HTML elements parsed with htmlparser2. It skips
+   * non-text nodes and decodes nested structures into a clean, trimmed
+   * string.
+   *
+   * @param node A DOM node from htmlparser2 (usually of type 'tag').
+   * @returns A string containing all the concatenated text content within
+   *          the node.
+   *
+   * Example:
+   *   Given a heading element like:
+   *     <h2 id="example">Intro <span>Section</span></h2>
+   *   The output will be:
+   *     "Intro Section"
+   */
+  private getTextContent(node: any): string {
+    if (!node.children) return '';
+    return node.children.map((child: any) => {
+      if (child.type === 'text') {
+        return child.data;
+      }
+      if (child.type === 'tag' && !child.attribs?.id?.startsWith('md-footnote-ref')) {
+        // Elements with @id with a value starting with 'md-footnote-ref' are suppressed
+        // since they are footnote references.
+        return this.getTextContent(child);
+      }
+      return '';
+    }).join('').trim();
+  }
+
+
+  /**
+   * Converts a flat array of headings into a nested tree structure based
+   * on heading levels.
+   *
+   * Headings with a higher level are nested as children under the last
+   * heading of a lower level. This method assumes the flat input array is
+   * already sorted in document order.
+   *
+   * @param flat A flat array of HeadingNode objects (with `level`, `id`,
+   *             `text`).
+   * @returns A nested tree of HeadingNode objects, where children
+   *          represent subheadings.
+   *
+   * Example:
+   *   Input:
+   *   [
+   *     { level: 1, text: 'Intro', id: 'intro', children: [] },
+   *     { level: 2, text: 'Details', id: 'details', children: [] },
+   *     { level: 1, text: 'Conclusion', id: 'conclusion', children: [] }
+   *   ]
+   *
+   *   Output:
+   *   [
+   *     { level: 1, text: 'Intro', id: 'intro', children: [
+   *         { level: 2, text: 'Details', id: 'details', children: [] }
+   *       ]
+   *     },
+   *     { level: 1, text: 'Conclusion', id: 'conclusion', children: [] }
+   *   ]
+   */
+  private buildHeadingTree(flat: HeadingNode[]): HeadingNode[] {
+    const root: HeadingNode[] = [];
+    const stack: HeadingNode[] = [];
+
+    for (const heading of flat) {
+      const node: HeadingNode = { ...heading, children: [] };
+
+      while (stack.length > 0 && heading.level <= stack[stack.length - 1].level) {
+        stack.pop();
+      }
+
+      if (stack.length === 0) {
+        root.push(node);
+      } else {
+        stack[stack.length - 1].children.push(node);
+      }
+
+      stack.push(node);
+    }
+
+    return root;
+  }
+
+
+  /**
+   * Normalizes an ID string by trimming whitespace and ensuring it is non-empty.
+   *
+   * This method returns the given ID string with leading and trailing whitespace
+   * removed. If the resulting string is empty, `null`, or `undefined`, it returns `null`
+   * to indicate that the element effectively has no usable ID.
+   *
+   * @param s - The ID string to normalize, or `null`/`undefined` if absent.
+   * @returns The trimmed ID string, or `null` if the input was empty or missing.
+   *
+   * Example:
+   *   normalizeId("  heading-1  ") -> "heading-1"
+   *   normalizeId("")              -> null
+   *   normalizeId(undefined)       -> null
+   */
+  private normalizeId(s: string | null | undefined): string | null {
+    return s && s.trim() ? s : null;
   }
 
 }

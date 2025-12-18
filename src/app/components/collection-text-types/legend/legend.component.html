@@ -1,5 +1,8 @@
-@if ((text$ | async); as text) {
-  <div [innerHTML]="text | trustHtml" class="tei teiContainer legend-markdown-content markdown"></div>
-} @else {
+@let legendHtml = html();
+
+@if (legendHtml === undefined) {
   <ion-spinner class="loading" name="crescent"></ion-spinner>
+} @else {
+  <div [innerHTML]="legendHtml | trustHtml"
+       class="tei teiContainer legend-markdown-content markdown"></div>
 }

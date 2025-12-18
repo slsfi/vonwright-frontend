@@ -1,0 +1,48 @@
+:host {
+  --article-toc-background-color: var(--intro-toc-background-color, --main-background-color);
+
+  background-color: var(--article-toc-background-color);
+  font-size: 1rem;
+  padding: 10px 20px 70px;
+
+  nav > ul {
+    margin-left: 0;
+    margin-top: 0;
+  }
+
+  nav > ul > li > ul {
+    margin-left: 0;
+  }
+}
+
+ul {
+  list-style-type: none;
+  margin: 0.5em 0 0 1.5em;
+  padding: 0;
+}
+
+li {
+  padding-bottom: 0.5em;
+}
+
+a {
+  color: rgb(27, 27, 27);
+  text-decoration: none;
+  transition: 0.3s;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.article-toc-level-1 {
+  display: inline-block;
+  font-size: 1.1875rem;
+  font-weight: bold;
+  padding: 0.75em 0 0.25em 0;
+  text-transform: uppercase;
+}
+
+.article-toc-level-2 {
+  font-weight: bold;
+}

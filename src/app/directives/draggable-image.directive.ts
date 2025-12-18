@@ -1,4 +1,4 @@
-import { Directive, ElementRef, EventEmitter, Input, NgZone, OnDestroy, OnInit, Output, Renderer2 } from '@angular/core';
+import { Directive, ElementRef, NgZone, OnDestroy, OnInit, Renderer2, inject, output, input } from '@angular/core';
 
 
 @Directive({
@@ -6,11 +6,15 @@ import { Directive, ElementRef, EventEmitter, Input, NgZone, OnDestroy, OnInit, 
   selector: '[draggableImage]'
 })
 export class DraggableImageDirective implements OnInit, OnDestroy {
-  @Input('draggableImage') initialCoordinates: number[] = [0, 0];
-  @Input() angle: number = 0;
-  @Input() zoom: number = 1;
-  @Input() mouseOnly: boolean = false;
-  @Output() finalCoordinates = new EventEmitter<number[]>();
+  private elRef = inject(ElementRef);
+  private ngZone = inject(NgZone);
+  private renderer = inject(Renderer2);
+
+  readonly initialCoordinates = input<number[]>([0, 0], { alias: "draggableImage" });
+  readonly angle = input<number>(0);
+  readonly zoom = input<number>(1);
+  readonly mouseOnly = input<boolean>(false);
+  readonly finalCoordinates = output<number[]>();
 
   private activeDrag: boolean = false;
   private currentCoordinates: number[] = [0, 0];
@@ -25,12 +29,6 @@ export class DraggableImageDirective implements OnInit, OnDestroy {
   private unlistenTouchStartEvents: () => void;
   private unlistenTouchMoveEvents: () => void;
   private unlistenTouchEndEvents: () => void;
-
-  constructor(
-    private elRef: ElementRef,
-    private ngZone: NgZone,
-    private renderer: Renderer2
-  ) {}
 
   ngOnInit() {
     this.unlistenMouseDownEvents = this.renderer.listen(
@@ -55,7 +53,7 @@ export class DraggableImageDirective implements OnInit, OnDestroy {
       }
     );
 
-    if (!this.mouseOnly) {
+    if (!this.mouseOnly()) {
       this.unlistenTouchStartEvents = this.renderer.listen(
         this.elRef.nativeElement, 'touchstart', (event: any) => {
           this.ngZone.runOutsideAngular(() => {
@@ -123,7 +121,7 @@ export class DraggableImageDirective implements OnInit, OnDestroy {
       if (this.elRef.nativeElement) {
         this.renderer.setStyle(
           this.elRef.nativeElement,
-          'transform', 'scale(' + this.zoom + ') translate3d(' + this.currentCoordinates[0] + 'px, ' + this.currentCoordinates[1] + 'px, 0px) rotate(' + this.angle + 'deg)'
+          'transform', 'scale(' + this.zoom() + ') translate3d(' + this.currentCoordinates[0] + 'px, ' + this.currentCoordinates[1] + 'px, 0px) rotate(' + this.angle() + 'deg)'
         );
       }
     }
@@ -151,8 +149,8 @@ export class DraggableImageDirective implements OnInit, OnDestroy {
       deltaY = event.clientY - this.offsetY;
     }
 
-    x = this.initialCoordinates[0] + deltaX / this.zoom;
-    y = this.initialCoordinates[1] + deltaY / this.zoom;
+    x = this.initialCoordinates()[0] + deltaX / this.zoom();
+    y = this.initialCoordinates()[1] + deltaY / this.zoom();
 
     return [x, y];
   }

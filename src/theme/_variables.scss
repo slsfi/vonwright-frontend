@@ -42,6 +42,7 @@
                                    Times, "Times New Roman", serif;
   --font-stack-tei-editorial-note: "Helvetica Neue", "Arial Nova", Helvetica,
                                    Arial, sans-serif;
+  --font-stack-article-markdown:   "SourceSerif", var(--font-stack-app-base);
 
   // Override global Ionic CSS variables
   --ion-backdrop-opacity:           0.3;

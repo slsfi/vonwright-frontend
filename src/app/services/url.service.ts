@@ -31,8 +31,6 @@ import { Injectable } from '@angular/core';
   providedIn: 'root',
 })
 export class UrlService {
-  constructor() { }
-
   parse(text: string, impliedArray: boolean = false): any {
     /*
     // Legacy JsonURL method of parsing

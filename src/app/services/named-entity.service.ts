@@ -1,4 +1,4 @@
-import { Inject, Injectable, LOCALE_ID } from '@angular/core';
+import { Injectable, LOCALE_ID, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
@@ -10,22 +10,15 @@ import { convertNamedEntityTypeForBackend, isEmptyObject } from '@utility-functi
   providedIn: 'root',
 })
 export class NamedEntityService {
-  private apiURL: string = '';
-  private elasticLocationIndex: string = 'location';
-  private elasticSubjectIndex: string = 'subject';
-  private elasticTagIndex: string = 'tag';
-  private elasticWorkIndex: string = 'work';
-  private multilingual: boolean = false;
+  private http = inject(HttpClient);
+  private activeLocale = inject(LOCALE_ID);
 
-  constructor(
-    private http: HttpClient,
-    @Inject(LOCALE_ID) private activeLocale: string
-  ) {
-    const apiBaseURL = config.app?.backendBaseURL ?? '';
-    const projectName = config.app?.projectNameDB ?? '';
-    this.apiURL = apiBaseURL + '/' + projectName;
-    this.multilingual = config.app?.i18n?.multilingualNamedEntityData ?? false;
-  }
+  private readonly apiURL: string = `${config.app?.backendBaseURL ?? ''}/${config.app?.projectNameDB ?? ''}`;
+  private readonly elasticLocationIndex: string = 'location';
+  private readonly elasticSubjectIndex: string = 'subject';
+  private readonly elasticTagIndex: string = 'tag';
+  private readonly elasticWorkIndex: string = 'work';
+  private readonly multilingual: boolean = config.app?.i18n?.multilingualNamedEntityData ?? false;
 
   /**
    * Get details of a single named entity.

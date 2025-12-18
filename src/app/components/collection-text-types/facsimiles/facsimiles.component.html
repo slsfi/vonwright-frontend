@@ -1,120 +1,136 @@
-@if (externalFacsimiles.length > 0 || facsimiles.length > 0 && (showTitle || facsimiles.length > 1 || externalFacsimiles.length > 0)) {
-  <div class="text-select-wrapper facsimile-header"
-        [class.external-urls-header]="selectedFacsimileIsExternal"
-        [class.facs-change-possible]="facsimiles.length > 1 || (facsimiles.length == 1 && externalFacsimiles.length > 0)"
-        [class.facs-title-shown]="!selectedFacsimileIsExternal && showTitle"
-        [class.mobile-mode]="mobileMode"
-  >
-    @if (!selectedFacsimileIsExternal && showTitle) {
-      <h3 [innerHTML]="selectedFacsimile.title | trustHtml"></h3>
-    }
-    @if (selectedFacsimileIsExternal) {
-      <h3 i18n="@@Facsimiles.ExternalFacsimiles">Externa faksimil</h3>
-    }
-    @if (facsimiles.length > 1 || (facsimiles.length == 1 && externalFacsimiles.length > 0)) {
-      <div class="flex-buttons">
-        <ion-button class="custom-button"
-              (click)="presentSelectFacsimileAlert()"
-              i18n="@@Facsimiles.ChangeFacsimile"
-        >Byt faksimil</ion-button>
+@let isLoading = loading();
+
+@if (isLoading) {
+  <ion-spinner class="loading" name="crescent"></ion-spinner>
+} @else {
+  @let msg = statusMessage();
+  @let internals = facsimiles();
+  @let externals = externalFacsimiles();
+  @let selectedIsExt = selectedIsExternal();
+  @let selectedFacs = selectedFacsimile();
+
+  @if (msg) {
+    <div class="tei teiContainer" [innerHTML]="msg | trustHtml"></div>
+  } @else {
+    @if (
+      (externals.length > 0 || internals.length > 0) &&
+      (showTitle || internals.length > 1 || externals.length > 0)
+    ) {
+      <div class="text-select-wrapper facsimile-header"
+            [class.external-urls-header]="selectedIsExt"
+            [class.facs-change-possible]="internals.length > 1 || (internals.length === 1 && externals.length > 0)"
+            [class.facs-title-shown]="!selectedIsExt && selectedFacs && showTitle"
+            [class.mobile-mode]="mobileMode"
+      >
+        @if (!selectedIsExt && selectedFacs && showTitle) {
+          <div class="tsw-text-title" [innerHTML]="selectedFacs.title | trustHtml"></div>
+        }
+        @if (selectedIsExt) {
+          <div class="tsw-text-title" i18n="@@Facsimiles.ExternalFacsimiles">Externa faksimil</div>
+        }
+        @if (internals.length > 1 || (internals.length === 1 && externals.length > 0)) {
+          <div class="flex-buttons">
+            <ion-button class="custom-button"
+                  (click)="presentSelectFacsimileAlert()"
+                  i18n="@@Facsimiles.ChangeFacsimile"
+            >Byt faksimil</ion-button>
+          </div>
+        }
       </div>
     }
-  </div>
-}
 
-@if (selectedFacsimileIsExternal) {
-  <div class="external-urls-wrapper tei teiContainer"
-        [class.mobile-mode]="mobileMode"
-  >
-    <ul>
-      @for (ext of externalFacsimiles; track ext.url) {
-        <li>
-          <a target="_blank" [href]="ext.url" [innerHTML]="ext.title"></a>
-        </li>
-      }
-    </ul>
-  </div>
-}
+    @if (selectedIsExt) {
+      <div class="external-urls-wrapper tei teiContainer" [class.mobile-mode]="mobileMode">
+        <ul>
+          @for (ext of externals; track ext.id) {
+            <li>
+              <a target="_blank" [href]="ext.url" [innerHTML]="ext.title"></a>
+            </li>
+          }
+        </ul>
+      </div>
+    }
 
-@if (!selectedFacsimileIsExternal && numberOfImages && numberOfImages > 1) {
-  <ion-input class="image-nr-input"
-        [class.mobile-mode]="mobileMode"
-        fill="solid"
-        label="Bild:"
-        i18n-label="@@Facsimiles.Image"
-        [helperText]="numberOfImages ? '/ ' + numberOfImages : ''"
-        type="number"
-        inputmode="numeric"
-        min="1"
-        [max]="numberOfImages ? numberOfImages : null"
-        (ionChange)="setImageNr($event)"
-        [(ngModel)]="facsNumber"
-  ></ion-input>
-}
+    @if (!selectedIsExt && numberOfImages > 1) {
+      <ion-input class="image-nr-input"
+            [class.mobile-mode]="mobileMode"
+            fill="solid"
+            label="Bild:"
+            i18n-label="@@Facsimiles.Image"
+            [helperText]="'/ ' + numberOfImages"
+            type="number"
+            inputmode="numeric"
+            min="1"
+            [max]="numberOfImages"
+            (ionChange)="setImageNr()"
+            [(ngModel)]="facsNumber"
+      ></ion-input>
+    }
 
-@if (facsNumber && !selectedFacsimileIsExternal && selectedFacsimile) {
-  <div class="facsimile-image-wrapper">
-    <img
-          [src]="facsURLAlternate
-                ? facsURLAlternate+'/'+selectedFacsimile.publication_facsimile_collection_id+'/'+facsSize+'/'+facsNumber+'.jpg'
-                : facsURLDefault+facsNumber+(facsSize ? '/'+facsSize : '')"
-          alt="Skannat faksimil"
-          i18n-alt="@@Facsimiles.AltText"
-          loading="lazy"
-          [ngStyle]="{'transform':'scale('+zoom+') translate3d('+prevX+'px, '+prevY+'px, 0px) rotate('+angle+'deg)'}"
-          (wheel)="zoomWithMouseWheel($event)"
-          [draggableImage]="[prevX, prevY]"
-          [angle]="angle"
-          [zoom]="zoom"
-          (finalCoordinates)="setImageCoordinates($event)"
-      >
-  </div>
-}
-
-@if (facsimiles.length>0) {
-  @if (numberOfImages && numberOfImages > 1 && !selectedFacsimileIsExternal) {
-    <ion-fab class="left-facs-controls">
-      <ion-fab-button class="primary-fab-button"
-            size="small"
-            (click)="previous()"
-            title="Föregående bild"
-            i18n-title="@@Facsimiles.Previous"
-      >
-        <ion-icon name="arrow-back" aria-label="Föregående bild" i18n-aria-label="@@Facsimiles.Previous"></ion-icon>
-      </ion-fab-button>
-    </ion-fab>
-  }
-  @if (!selectedFacsimileIsExternal) {
-    <ion-fab class="right-facs-controls">
-      @if (numberOfImages && numberOfImages > 1) {
-        <ion-fab-button class="primary-fab-button"
-              size="small"
-              (click)="next()"
-              title="Följande bild"
-              i18n-title="@@Facsimiles.Next"
+    @if (facsNumber && !selectedIsExt && selectedFacs) {
+      <div class="facsimile-image-wrapper">
+        <img #facsimg
+              [src]="facsURLAlternate
+                    ? facsURLAlternate + '/' + selectedFacs!.publication_facsimile_collection_id +
+                    '/' + facsSize + '/' + facsNumber + '.jpg'
+                    : facsURLDefault() + facsNumber + (facsSize ? '/' + facsSize : '')"
+              alt="Skannat faksimil"
+              i18n-alt="@@Facsimiles.AltText"
+              loading="lazy"
+              [ngStyle]="{
+                transform: 'scale(' + zoom + ') translate3d(' + prevX + 'px, ' + prevY + 'px, 0px) rotate(' + angle + 'deg)'
+              }"
+              (wheel)="zoomWithMouseWheel(facsimg, $event)"
+              [draggableImage]="[prevX, prevY]"
+              [angle]="angle"
+              [zoom]="zoom"
+              (finalCoordinates)="setImageCoordinates($event)"
         >
-          <ion-icon name="arrow-forward" aria-label="Följande bild" i18n-aria-label="@@Facsimiles.Next"></ion-icon>
-        </ion-fab-button>
-      }
-      <ion-fab-button size="small" (click)="openFullScreen()" title="Visa i helskärmsläge" i18n-title="@@Facsimiles.Fullscreen" aria-haspopup="dialog">
-        <ion-icon name="expand-outline" aria-label="Visa i helskärmsläge" i18n-aria-label="@@Facsimiles.Fullscreen"></ion-icon>
-      </ion-fab-button>
-      <ion-fab-button size="small" (click)="zoomIn()" title="Zooma in" i18n-title="@@Facsimiles.ZoomIn">
-        <ion-icon name="add-outline" aria-label="Zooma in" i18n-aria-label="@@Facsimiles.ZoomIn"></ion-icon>
-      </ion-fab-button>
-      <ion-fab-button size="small" (click)="zoomOut()" title="Zooma ut" i18n-title="@@Facsimiles.ZoomOut">
-        <ion-icon name="remove-outline" aria-label="Zooma ut" i18n-aria-label="@@Facsimiles.ZoomOut"></ion-icon>
-      </ion-fab-button>
-      <ion-fab-button size="small" (click)="rotate()" title="Rotera" i18n-title="@@Facsimiles.Rotate">
-        <ion-icon name="refresh-outline" aria-label="Rotera" i18n-aria-label="@@Facsimiles.Rotate"></ion-icon>
-      </ion-fab-button>
-      <ion-fab-button size="small" (click)="reset()" title="Återställ" i18n-title="@@Facsimiles.Reset">
-        <ion-icon name="scan-outline" aria-label="Återställ" i18n-aria-label="@@Facsimiles.Reset"></ion-icon>
-      </ion-fab-button>
-    </ion-fab>
-  }
-}
+      </div>
+    }
 
-@if (text) {
-  <div class="tei teiContainer" [innerHTML]="text | trustHtml"></div>
+    @if (internals.length > 0) {
+      @if (numberOfImages > 1 && !selectedIsExt) {
+        <ion-fab class="left-facs-controls">
+          <ion-fab-button class="primary-fab-button"
+                size="small"
+                (click)="previous()"
+                title="Föregående bild"
+                i18n-title="@@Facsimiles.Previous"
+          >
+            <ion-icon name="arrow-back" aria-label="Föregående bild" i18n-aria-label="@@Facsimiles.Previous"></ion-icon>
+          </ion-fab-button>
+        </ion-fab>
+      }
+      @if (!selectedIsExt) {
+        <ion-fab class="right-facs-controls">
+          @if (numberOfImages > 1) {
+            <ion-fab-button class="primary-fab-button"
+                  size="small"
+                  (click)="next()"
+                  title="Följande bild"
+                  i18n-title="@@Facsimiles.Next"
+            >
+              <ion-icon name="arrow-forward" aria-label="Följande bild" i18n-aria-label="@@Facsimiles.Next"></ion-icon>
+            </ion-fab-button>
+          }
+          <ion-fab-button size="small" (click)="openFullScreen()" title="Visa i helskärmsläge" i18n-title="@@Facsimiles.Fullscreen" aria-haspopup="dialog">
+            <ion-icon name="expand-outline" aria-label="Visa i helskärmsläge" i18n-aria-label="@@Facsimiles.Fullscreen"></ion-icon>
+          </ion-fab-button>
+          <ion-fab-button size="small" (click)="zoomIn()" title="Zooma in" i18n-title="@@Facsimiles.ZoomIn">
+            <ion-icon name="add-outline" aria-label="Zooma in" i18n-aria-label="@@Facsimiles.ZoomIn"></ion-icon>
+          </ion-fab-button>
+          <ion-fab-button size="small" (click)="zoomOut()" title="Zooma ut" i18n-title="@@Facsimiles.ZoomOut">
+            <ion-icon name="remove-outline" aria-label="Zooma ut" i18n-aria-label="@@Facsimiles.ZoomOut"></ion-icon>
+          </ion-fab-button>
+          <ion-fab-button size="small" (click)="rotate()" title="Rotera" i18n-title="@@Facsimiles.Rotate">
+            <ion-icon name="refresh-outline" aria-label="Rotera" i18n-aria-label="@@Facsimiles.Rotate"></ion-icon>
+          </ion-fab-button>
+          <ion-fab-button size="small" (click)="reset()" title="Återställ" i18n-title="@@Facsimiles.Reset">
+            <ion-icon name="scan-outline" aria-label="Återställ" i18n-aria-label="@@Facsimiles.Reset"></ion-icon>
+          </ion-fab-button>
+        </ion-fab>
+      }
+    }
+  }
 }

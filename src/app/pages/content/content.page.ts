@@ -1,4 +1,4 @@
-import { Component, Inject, LOCALE_ID, OnInit } from '@angular/core';
+import { Component, LOCALE_ID, OnInit, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 
 import { MarkdownService } from '@services/markdown.service';
@@ -11,12 +11,10 @@ import { MarkdownService } from '@services/markdown.service';
   standalone: false
 })
 export class ContentPage implements OnInit {
-  mdContent$: Observable<string | null>;
+  private mdService = inject(MarkdownService);
+  private activeLocale = inject(LOCALE_ID);
 
-  constructor(
-    private mdService: MarkdownService,
-    @Inject(LOCALE_ID) private activeLocale: string
-  ) {}
+  mdContent$: Observable<string | null>;
 
   ngOnInit() {
     this.mdContent$ = this.mdService.getParsedMdContent(

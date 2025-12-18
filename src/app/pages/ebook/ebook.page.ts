@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 
@@ -13,15 +13,13 @@ import { splitFilename } from '@utility-functions';
   standalone: false
 })
 export class EbookPage implements OnDestroy, OnInit {
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+
   ebookType: string = '';
   filename: string = '';
   routeParamsSubscr: Subscription | null = null;
   title: string = '';
-
-  constructor(
-    private route: ActivatedRoute,
-    private router: Router
-  ) {}
 
   ngOnInit() {
     const availableEbooks: any[] = config.ebooks ?? [];

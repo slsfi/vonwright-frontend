@@ -1,11 +1,12 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Inject, LOCALE_ID, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, LOCALE_ID, OnDestroy, OnInit, inject } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ModalController } from '@ionic/angular';
 import { combineLatest, forkJoin, map, Observable, Subscription } from 'rxjs';
 
 import { config } from '@config';
 import { ReferenceDataModal } from '@modals/reference-data/reference-data.modal';
-import { GalleryItem } from '@models/gallery-item-model';
+import { GalleryItem } from '@models/gallery-item-models';
+import { MediaCollection } from '@models/media-collection.models';
 import { FullscreenImageViewerModal } from '@modals/fullscreen-image-viewer/fullscreen-image-viewer.modal';
 import { DocumentHeadService } from '@services/document-head.service';
 import { MarkdownService } from '@services/markdown.service';
@@ -22,18 +23,44 @@ import { isEmptyObject, sortArrayOfObjectsAlphabetically, sortArrayOfObjectsNume
   standalone: false
 })
 export class MediaCollectionPage implements OnDestroy, OnInit {
+  private cdRef = inject(ChangeDetectorRef);
+  private headService = inject(DocumentHeadService);
+  private mdService = inject(MarkdownService);
+  private mediaCollectionService = inject(MediaCollectionService);
+  private modalController = inject(ModalController);
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+  private urlService = inject(UrlService);
+  private activeLocale = inject(LOCALE_ID);
+
+  readonly apiEndPoint: string = config.app?.backendBaseURL ?? '';
+  readonly filterSelectOptions: Record<string, any> = {
+    person: {
+      header: $localize`:@@MediaCollection.FilterPerson:Avgränsa enligt person`,
+      cssClass: 'custom-select-alert'
+    },
+    place: {
+      header: $localize`:@@MediaCollection.FilterPlace:Avgränsa enligt plats`,
+      cssClass: 'custom-select-alert'
+    },
+    keyword: {
+      header: $localize`:@@MediaCollection.FilterKeyword:Avgränsa enligt ämnesord`,
+      cssClass: 'custom-select-alert'
+    }
+  };
+  readonly projectName: string = config.app?.projectNameDB ?? '';
+  readonly showURNButton: boolean = config.page?.mediaCollection?.showURNButton ?? false;
+
   activeKeywordFilters: number[] = [];
   activePersonFilters: number[] = [];
   activePlaceFilters: number[] = [];
   allMediaCollections: GalleryItem[] = [];
   allMediaConnections: any = {};
-  apiEndPoint: string = '';
   filterOptionsKeywords: any[] = [];
   filterOptionsPersons: any[] = [];
   filterOptionsPlaces: any[] = [];
   filterOptionsSubscription: Subscription | null = null;
   filterResultCount: number = -1;
-  filterSelectOptions: Record<string, any> = {};
   galleryBacksideImageURLs: (string | undefined)[] = [];
   galleryData: GalleryItem[] = [];
   galleryDescriptions: (string | undefined)[] = [];
@@ -47,40 +74,7 @@ export class MediaCollectionPage implements OnDestroy, OnInit {
   mediaCollectionTitle: string = '';
   namedEntityID: string = '';
   namedEntityType: string = '';
-  projectName: string = '';
-  showURNButton: boolean = false;
   urlParametersSubscription: Subscription | null = null;
-
-  constructor(
-    private cdRef: ChangeDetectorRef,
-    private headService: DocumentHeadService,
-    private mdService: MarkdownService,
-    private mediaCollectionService: MediaCollectionService,
-    private modalController: ModalController,
-    private route: ActivatedRoute,
-    private router: Router,
-    private urlService: UrlService,
-    @Inject(LOCALE_ID) private activeLocale: string
-  ) {
-    this.apiEndPoint = config.app?.backendBaseURL ?? '';
-    this.projectName = config.app?.projectNameDB ?? '';
-    this.showURNButton = config.page?.mediaCollection?.showURNButton ?? false;
-
-    this.filterSelectOptions = {
-      person: {
-        header: $localize`:@@MediaCollection.FilterPerson:Avgränsa enligt person`,
-        cssClass: 'custom-select-alert'
-      },
-      place: {
-        header: $localize`:@@MediaCollection.FilterPlace:Avgränsa enligt plats`,
-        cssClass: 'custom-select-alert'
-      },
-      keyword: {
-        header: $localize`:@@MediaCollection.FilterKeyword:Avgränsa enligt ämnesord`,
-        cssClass: 'custom-select-alert'
-      }
-    };
-  }
 
   ngOnInit() {
     this.urlParametersSubscription = combineLatest(
@@ -188,7 +182,7 @@ export class MediaCollectionPage implements OnDestroy, OnInit {
     this.galleryData = [];
 
     this.mediaCollectionService.getMediaCollections(this.activeLocale).subscribe(
-      (collections: any[]) => {
+      (collections: MediaCollection[]) => {
         this.allMediaCollections = this.getTransformedGalleryData(collections);
         this.galleryData = this.allMediaCollections;
         this.setFilterOptionsAndApplyActiveFilters();
@@ -202,7 +196,7 @@ export class MediaCollectionPage implements OnDestroy, OnInit {
     // Get all media collections if not yet loaded, set current collection title and description
     if (this.allMediaCollections.length < 1) {
       this.mediaCollectionService.getMediaCollections(this.activeLocale).subscribe(
-        (collections: any[]) => {
+        (collections: MediaCollection[]) => {
           for (let i = 0; i < collections.length; i++) {
             if (collections[i].id === Number(mediaCollectionID)) {
               this.mediaCollectionTitle = collections[i].title || '';
@@ -260,10 +254,10 @@ export class MediaCollectionPage implements OnDestroy, OnInit {
     );
   }
 
-  private getTransformedGalleryData(galleryItems: any[], singleGallery = false): GalleryItem[] {
+  private getTransformedGalleryData(galleryItems: MediaCollection[], singleGallery = false): GalleryItem[] {
     const galleryItemsList: GalleryItem[] = [];
     if (galleryItems?.length) {
-      galleryItems.forEach((gallery: any) => {
+      galleryItems.forEach((gallery: MediaCollection) => {
         const galleryItem = new GalleryItem(gallery);
         const urlStart = `${this.apiEndPoint}/${this.projectName}/gallery/get/${galleryItem.collectionID}/`;
 

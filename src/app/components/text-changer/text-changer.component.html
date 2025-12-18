@@ -6,10 +6,11 @@
     <div class="prev-wrapper">
       @if (currentTocTextIndex > 0) {
         <a class="prev-button"
+              [ariaLabel]="mobileMode ? prevLabel : null"
               [routerLink]="flattenedToc[currentTocTextIndex - 1].itemId | collectionPagePath: flattenedToc[currentTocTextIndex - 1].page"
               [queryParams]="flattenedToc[currentTocTextIndex - 1].itemId | collectionPagePositionQueryparam"
         >
-          <ion-icon name="arrow-back"></ion-icon>
+          <ion-icon name="arrow-back" [ariaHidden]="true"></ion-icon>
           @if (!mobileMode) {
             <span class="prev-text-name">
               {{flattenedToc[currentTocTextIndex - 1].text}}
@@ -24,6 +25,7 @@
     <div class="next-wrapper">
       @if (currentTocTextIndex < flattenedToc.length - 1) {
         <a class="next-button"
+              [ariaLabel]="mobileMode ? nextLabel : null"
               [routerLink]="flattenedToc[currentTocTextIndex + 1].itemId | collectionPagePath: flattenedToc[currentTocTextIndex + 1].page"
               [queryParams]="flattenedToc[currentTocTextIndex + 1].itemId | collectionPagePositionQueryparam"
         >
@@ -32,7 +34,7 @@
               {{flattenedToc[currentTocTextIndex + 1].text}}
             </span>
           }
-          <ion-icon name="arrow-forward"></ion-icon>
+          <ion-icon name="arrow-forward" [ariaHidden]="true"></ion-icon>
         </a>
       }
     </div>

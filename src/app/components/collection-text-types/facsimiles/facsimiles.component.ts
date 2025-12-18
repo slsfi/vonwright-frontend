@@ -1,306 +1,372 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, Injector, effect, inject, input, output, signal } from '@angular/core';
 import { NgStyle } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AlertButton, AlertController, AlertInput, IonicModule, ModalController } from '@ionic/angular';
+import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
+import { catchError, of, switchMap, tap } from 'rxjs';
 
 import { config } from '@config';
 import { DraggableImageDirective } from '@directives/draggable-image.directive';
 import { FullscreenImageViewerModal } from '@modals/fullscreen-image-viewer/fullscreen-image-viewer.modal';
-import { Facsimile } from '@models/facsimile.model';
+import { ExternalFacsimile, Facsimile, FacsimileApi, toExternalFacsimile, toFacsimile } from '@models/facsimile.models';
+import { TextKey } from '@models/collection.models';
 import { TrustHtmlPipe } from '@pipes/trust-html.pipe';
 import { CollectionContentService } from '@services/collection-content.service';
 import { PlatformService } from '@services/platform.service';
 import { sortArrayOfObjectsNumerically } from '@utility-functions';
 
 
+// ─────────────────────────────────────────────────────────────────────────────
+// * This component is zoneless-ready. *
+// ─────────────────────────────────────────────────────────────────────────────
 @Component({
   selector: 'facsimiles',
   templateUrl: './facsimiles.component.html',
   styleUrls: ['./facsimiles.component.scss'],
-  imports: [NgStyle, FormsModule, IonicModule, DraggableImageDirective, TrustHtmlPipe]
+  imports: [NgStyle, FormsModule, IonicModule, DraggableImageDirective, TrustHtmlPipe],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class FacsimilesComponent implements OnInit {
-  @Input() facsID: number | undefined = undefined;
-  @Input() imageNr: number | undefined = undefined;
-  @Input() sortOrder: number | undefined = undefined;
-  @Input() textItemID: string = '';
-  @Output() selectedFacsID = new EventEmitter<number>();
-  @Output() selectedFacsName = new EventEmitter<string>();
-  @Output() selectedImageNr = new EventEmitter<number | null>();
-  @Output() selectedFacsSortOrder = new EventEmitter<number | null>();
+export class FacsimilesComponent {
+  // ─────────────────────────────────────────────────────────────────────────────
+  // Dependency injection, Input/Output signals, Fields, Local state signals
+  // ─────────────────────────────────────────────────────────────────────────────
+  private alertCtrl = inject(AlertController);
+  private collectionContentService = inject(CollectionContentService);
+  private destroyRef = inject(DestroyRef);
+  private injector = inject(Injector);
+  private modalCtrl = inject(ModalController);
+  private platformService = inject(PlatformService);
+
+  readonly facsID = input<number | undefined>();
+  readonly imageNr = input<number | undefined>();
+  readonly sortOrder = input<number | undefined>();
+  readonly textKey = input.required<TextKey>();
+
+  readonly selectedFacsID = output<number>();
+  readonly selectedFacsName = output<string>();
+  readonly selectedImageNr = output<number | null>();
+  readonly selectedFacsSortOrder = output<number | null>();
+
+  readonly facsSize: number | null = config.component?.facsimiles?.imageQuality ?? 1;
+  readonly facsURLAlternate: string = config.app?.alternateFacsimileBaseURL ?? '';
+  readonly replaceImageAssetsPaths: boolean = config.collections?.replaceImageAssetsPaths ?? true;
+  readonly showTitle: boolean = config.component?.facsimiles?.showTitle ?? true;
 
   angle: number = 0;
-  externalFacsimiles: any[] = [];
-  facsURLAlternate: string = '';
   facsNumber: number = 1;
-  facsimiles: any[] = [];
-  facsSize: number | null = 1;
-  facsURLDefault: string = '';
-  mobileMode: boolean = false;
+  mobileMode: boolean = this.platformService.isMobile();
   numberOfImages: number = 0;
   prevX: number = 0;
   prevY: number = 0;
-  replaceImageAssetsPaths: boolean = true;
-  selectedFacsimile: any | null = null;
-  selectedFacsimileIsExternal: boolean = false;
-  showTitle: boolean = true;
-  text: string = '';
   zoom: number = 1.0;
 
-  constructor(
-    private alertCtrl: AlertController,
-    private collectionContentService: CollectionContentService,
-    private modalCtrl: ModalController,
-    private platformService: PlatformService
-  ) {
-    this.facsSize = config.component?.facsimiles?.imageQuality ?? 1;
-    this.facsURLAlternate = config.app?.alternateFacsimileBaseURL ?? '';
-    this.replaceImageAssetsPaths = config.collections?.replaceImageAssetsPaths ?? true;
-    this.showTitle = config.component?.facsimiles?.showTitle ?? true;
+  externalFacsimiles = signal<ExternalFacsimile[]>([]);
+  facsimiles = signal<Facsimile[]>([]);
+  facsURLDefault = signal<string>('');                 // base URL for images
+  loading = signal(true);
+  selectedFacsimile = signal<Facsimile | null>(null);  // current "internal" facsimile
+  selectedIsExternal = signal<boolean>(false);
+  statusMessage = signal<string | null>(null);         // "None" / "Error"
+
+
+  // ─────────────────────────────────────────────────────────────────────────────
+  // Constructor: wire side-effects (load, outputs)
+  // ─────────────────────────────────────────────────────────────────────────────
+
+  constructor() {
+    this.loadFacsimiles();
+    this.registerOutputEmissions();
   }
 
-  ngOnInit() {
-    this.mobileMode = this.platformService.isMobile();
+  private loadFacsimiles() {
+    toObservable(this.textKey).pipe(
+      tap(() => {
+        // reset before load
+        this.loading.set(true);
+        this.statusMessage.set(null);
+        this.facsimiles.set([]);
+        this.externalFacsimiles.set([]);
+        this.selectedIsExternal.set(false);
+        this.selectedFacsimile.set(null);
+        this.facsURLDefault.set('');
+        this.numberOfImages = 0;
+      }),
+      switchMap((tk: TextKey) =>
+        this.collectionContentService.getFacsimiles(tk).pipe(
+          catchError(err => {
+            console.error(err);
+            this.statusMessage.set($localize`:@@Facsimiles.Error:Ett fel har uppstått. Faksimil kunde inte hämtas.`);
+            // keep internal list empty, external empty
+            return of<FacsimileApi[]>([]);
+          })
+        )
+      ),
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe((items: FacsimileApi[]) => {
+      // split into internal/external facsimiles
+      const tk = this.textKey();
+      const sectionId = tk.chapterID?.replace('ch', '') || '';
 
-    if (this.textItemID) {
-      this.loadFacsimiles();
-    }
-  }
+      const internals: Facsimile[] = [];
+      const externals: ExternalFacsimile[] = [];
 
-  loadFacsimiles() {
-    this.collectionContentService.getFacsimiles(this.textItemID).subscribe({
-      next: (facs) => {
-        if (facs && facs.length > 0) {
-          const sectionId = this.textItemID.split('_')[2]?.split(';')[0]?.replace('ch', '') || '';
-          for (const f of facs) {
-            const facsimile = new Facsimile(f);
-            facsimile.itemId = this.textItemID;
-            facsimile.manuscript_id = f.publication_manuscript_id;
-            if (!f['external_url']) {
-              facsimile.title = f['title'];
+      for (const f of items) {
+        if (f.external_url && !f.folder_path) {
+          const extFac = toExternalFacsimile(f);
+
+          if (sectionId !== '') {
+            if (String(f.section_id) === sectionId) {
+              externals.push(extFac);
             }
-            if (f['external_url'] && !f['folder_path']) {
-              this.externalFacsimiles.push({'title': f['title'], 'url': f['external_url'], 'priority': f['priority']});
-            } else {
-              if (sectionId !== '') {
-                if (String(f['section_id']) === sectionId) {
-                  this.facsimiles.push(facsimile);
-                }
-              } else {
-                this.facsimiles.push(facsimile);
-              }
-            }
+          } else {
+            externals.push(extFac);
           }
-          if (this.facsimiles.length > 1) {
-            sortArrayOfObjectsNumerically(this.facsimiles, 'priority', 'asc');
-          }
-          if (this.externalFacsimiles.length > 1) {
-            sortArrayOfObjectsNumerically(this.externalFacsimiles, 'priority', 'asc');
-          }
-          this.setInitialFacsimile();
         } else {
-          this.text = $localize`:@@Facsimiles.None:Inga faksimil tillgängliga.`;
+          const fac = toFacsimile(f);
+
+          if (sectionId !== '') {
+            if (String(f.section_id) === sectionId) {
+              internals.push(fac);
+            }
+          } else {
+            internals.push(fac);
+          }
         }
-      },
-      error: (e) => {
-        console.error(e);
-        this.text = $localize`:@@Facsimiles.Error:Ett fel har uppstått. Faksimil kunde inte hämtas.`;
       }
+
+      if (internals.length > 1) {
+        sortArrayOfObjectsNumerically(internals, 'priority', 'asc');
+      }
+      if (externals.length > 1) {
+        sortArrayOfObjectsNumerically(externals, 'priority', 'asc');
+      }
+
+      this.externalFacsimiles.set(externals);
+      this.facsimiles.set(internals);
+      this.loading.set(false);
+
+      if (internals.length === 0 && externals.length === 0) {
+        this.statusMessage.set($localize`:@@Facsimiles.None:Inga faksimil tillgängliga.`);
+        return;
+      }
+
+      // Apply selection of initial facsimile
+      this.applyInitialSelection();
     });
   }
 
-  setInitialFacsimile() {
-    if (this.facsimiles.length > 0) {
-      if (this.facsID !== undefined && this.facsID > 0) {
-        const inputFacsimile = this.facsimiles.filter((item: any) => {
-          return (item.facsimile_id === this.facsID);
-        })[0];
-        this.selectedFacsimile = inputFacsimile ? inputFacsimile : this.facsimiles[0];
-      } else if (this.sortOrder) {
-        const inputFacsimile = this.facsimiles.filter((item: any) => {
-          return (item.priority === this.sortOrder);
-        })[0];
-        this.selectedFacsimile = inputFacsimile ? inputFacsimile : this.facsimiles[0];
-      } else if (
-        this.externalFacsimiles.length > 0 && 
+  private registerOutputEmissions() {
+    // Emit outputs when a new facsimile becomes selected
+    effect(() => {
+      const facs = this.facsimiles();
+      const extF = this.externalFacsimiles();
+      const isExternal = this.selectedIsExternal();
+      const fac = this.selectedFacsimile();
+
+      // selected facsimile id/name (+ sort order when meaningful)
+      if (isExternal) {
+        this.selectedFacsID.emit(0);
+        this.selectedFacsSortOrder.emit(null);
+        this.selectedImageNr.emit(null);
+        if (facs.length > 0) {
+          this.selectedFacsName.emit($localize`:@@Facsimiles.ExternalFacsimiles:Externa faksimil`);
+        }
+        return;
+      }
+
+      if (fac) {
+        // emit name only if multiple internals or (one internal +
+        // at least one external)
+        const shouldEmitName = (facs.length > 1) || (facs.length === 1 && extF.length > 0);
+        this.selectedFacsID.emit(fac.facsimile_id);
+        if (shouldEmitName) {
+          this.selectedFacsName.emit(fac.title);
+        }
+
+        if (extF.length < 1 && facs.length > 1) {
+          this.selectedFacsSortOrder.emit(fac.priority);
+        } else {
+          this.selectedFacsSortOrder.emit(null);
+        }
+
+        // image number emit: only if multiple pages
+        if (this.numberOfImages > 1) {
+          this.selectedImageNr.emit(this.facsNumber);
+        } else {
+          this.selectedImageNr.emit(null);
+        }
+      }
+    }, { injector: this.injector });
+  }
+
+
+  // ─────────────────────────────────────────────────────────────────────────────
+  // Selection helpers
+  // ─────────────────────────────────────────────────────────────────────────────
+
+  private applyInitialSelection() {
+    const internals = this.facsimiles() ?? [];
+    const externals = this.externalFacsimiles();
+
+    if (internals.length > 0) {
+      const byInputId = this.facsID();
+      const bySort = this.sortOrder();
+
+      if (byInputId !== undefined && byInputId > 0) {
+        const found = internals.find(i => i.facsimile_id === byInputId) ?? internals[0];
+        this.initializeDisplayedFacsimile(found, this.imageNr());
+        return;
+      }
+
+      if (bySort !== undefined) {
+        const found = internals.find(i => i.priority === bySort) ?? internals[0];
+        this.initializeDisplayedFacsimile(found, this.imageNr());
+        return;
+      }
+
+      // Otherwise: choose external if present & either (facsID < 1)
+      // or external has higher priority than first internal
+      if (
+        externals.length > 0 &&
         (
-          (this.facsID !== undefined && this.facsID < 1) ||
-          this.externalFacsimiles[0]['priority'] < this.facsimiles[0]['priority']
+          (byInputId !== undefined && byInputId < 1) ||
+          (externals[0].priority < internals[0].priority)
         )
       ) {
-        this.selectedFacsimileIsExternal = true;
-        this.emitSelectedFacsimileId(0);
-        this.emitSelectedFacsimileName($localize`:@@Facsimiles.ExternalFacsimiles:Externa faksimil`);
-      } else {
-        this.selectedFacsimile = this.facsimiles[0];
+        this.chooseExternal();
+        return;
       }
-  
-      if (this.selectedFacsimile) {
-        this.initializeDisplayedFacsimile(this.selectedFacsimile, this.imageNr);
-      }
-    } else {
-      this.selectedFacsimileIsExternal = true;
+
+      // Default: first internal
+      this.initializeDisplayedFacsimile(internals[0], this.imageNr());
+      return;
+    }
+
+    // Only externals available
+    if (externals.length > 0) {
+      this.chooseExternal();
     }
   }
 
-  changeFacsimile(facs?: any) {
-    if (facs === 'external') {
-      this.selectedFacsimileIsExternal = true;
-      this.emitSelectedFacsimileId(0);
-      this.emitSelectedFacsimileName($localize`:@@Facsimiles.ExternalFacsimiles:Externa faksimil`);
-      this.emitSelectedFacsimileSortOrder(null);
-      this.emitImageNumber(null);
+  private chooseExternal() {
+    this.selectedIsExternal.set(true);
+    this.selectedFacsimile.set(null);
+    this.numberOfImages = 0;
+  }
+
+  private initializeDisplayedFacsimile(facs: Facsimile, initialImageNr?: number) {
+    this.selectedIsExternal.set(false);
+    this.selectedFacsimile.set(facs);
+
+    // default image base URL for internal images
+    const base = `${config.app.backendBaseURL}/${config.app.projectNameDB}/facsimiles/${facs.publication_facsimile_collection_id}/`;
+    this.facsURLDefault.set(base);
+
+    // pages & current page number (clamped)
+    this.numberOfImages = facs.number_of_pages;
+
+    const start = (initialImageNr !== undefined) ? initialImageNr : facs.page;
+    this.facsNumber = Math.max(1, Math.min(this.numberOfImages || 1, start || 1));
+  }
+
+  private changeFacsimile(isExternal: boolean, facs?: Facsimile) {
+    if (isExternal) {
+      this.chooseExternal();
     } else if (facs) {
       this.initializeDisplayedFacsimile(facs);
       this.reset();
     }
   }
 
-  private initializeDisplayedFacsimile(facs: any, extImageNr?: number) {
-    this.selectedFacsimileIsExternal = false;
-    this.selectedFacsimile = facs;
-    this.numberOfImages = facs.number_of_pages;
-    this.facsURLDefault = config.app.backendBaseURL + '/' + config.app.projectNameDB +
-          `/facsimiles/${facs.publication_facsimile_collection_id}/`;
-    this.text = this.replaceImageAssetsPaths
-      ? facs.content?.replace(/src="images\//g, 'src="assets/images/')
-      : facs.content;
 
-    this.facsNumber = (extImageNr !== undefined) ? extImageNr : facs.page;
-
-    this.facsNumber < 1 ? this.facsNumber = 1 : (
-      this.facsNumber > this.numberOfImages ? this.facsNumber = this.numberOfImages : this.facsNumber
-    );
-
-    if (this.facsimiles.length > 1 || this.externalFacsimiles.length > 0) {
-      this.emitSelectedFacsimileId(facs.facsimile_id);
-      this.emitSelectedFacsimileName(facs.title);
-    }
-
-    if (this.externalFacsimiles.length < 1 && this.facsimiles.length > 1) {
-      this.emitSelectedFacsimileSortOrder(facs.priority);
-    } else {
-      this.emitSelectedFacsimileSortOrder(null);
-    }
-
-    if (this.numberOfImages > 1) {
-      this.emitImageNumber(this.facsNumber);
-    } else {
-      this.emitImageNumber(null);
-    }
-  }
+  // ─────────────────────────────────────────────────────────────────────────────
+  // UI actions
+  // ─────────────────────────────────────────────────────────────────────────────
 
   async presentSelectFacsimileAlert() {
-    const inputs = [] as AlertInput[];
-    const buttons = [] as AlertButton[];
+    const internals = this.facsimiles() ?? [];
+    const externals = this.externalFacsimiles();
 
-    if (this.externalFacsimiles.length > 0) {
+    const inputs: AlertInput[] = [];
+
+    if (externals.length > 0) {
       inputs.push({
         type: 'radio',
         label: $localize`:@@Facsimiles.ExternalFacsimiles:Externa faksimil`,
         value: '-1',
-        checked: this.selectedFacsimileIsExternal
+        checked: this.selectedIsExternal(),
       });
     }
 
-    this.facsimiles.forEach((facsimile: any, index: any) => {
-      let checkedValue = false;
+    const sel = this.selectedFacsimile();
+    internals.forEach((fac, index) => {
+      const checked =
+        !this.selectedIsExternal() &&
+        sel &&
+        sel.facsimile_id === fac.facsimile_id &&
+        ((sel.page === undefined) || sel.page === fac.page);
 
-      if (
-        !this.selectedFacsimileIsExternal &&
-        (
-          this.selectedFacsimile.facsimile_id === facsimile.facsimile_id &&
-          (
-            this.selectedFacsimile.page === undefined &&
-            this.selectedFacsimile.first_page === facsimile.page ||
-            this.selectedFacsimile.page === facsimile.page
-          )
-        )
-      ) {
-        checkedValue = true;
-      }
-
-      // Tags are stripped from the title which is shown as the label
       inputs.push({
         type: 'radio',
-        label: facsimile.title.replace(/(<([^>]+)>)/gi, ''),
+        label: fac.title.replace(/(<([^>]+)>)/gi, ''),
         value: String(index),
-        checked: checkedValue
+        checked: checked ?? undefined,
       });
     });
 
-    buttons.push({ text: $localize`:@@BasicActions.Cancel:Avbryt` });
-    buttons.push({
-      text: $localize`:@@BasicActions.Ok:Ok`,
-      handler: (index: string) => {
-        if (parseInt(index) < 0) {
-          this.changeFacsimile('external');
-        } else {
-          this.changeFacsimile(this.facsimiles[parseInt(index)]);
-        }
-      }
-    });
+    const buttons: AlertButton[] = [
+      { text: $localize`:@@BasicActions.Cancel:Avbryt` },
+      {
+        text: $localize`:@@BasicActions.Ok:Ok`,
+        handler: (value: string) => {
+          const idx = Number(value);
+          if (Number.isNaN(idx)) {
+            return;
+          }
+
+          if (idx < 0) {
+            this.changeFacsimile(true);
+          } else {
+            const fac = internals[idx];
+            if (fac) this.changeFacsimile(false, fac);
+          }
+        },
+      },
+    ];
 
     const alert = await this.alertCtrl.create({
       header: $localize`:@@Facsimiles.SelectFacsDialogTitle:Välj faksimil`,
       subHeader: $localize`:@@Facsimiles.SelectFacsDialogSubtitle:Faksimilet ersätter det faksimil som visas i kolumnen där du klickade.`,
       cssClass: 'custom-select-alert',
-      buttons: buttons,
-      inputs: inputs
+      inputs,
+      buttons,
     });
 
-    await alert.present();
-  }
-
-  emitSelectedFacsimileId(id: number) {
-    this.selectedFacsID.emit(id);
-  }
-
-  emitSelectedFacsimileName(name: string) {
-    if (
-      this.facsimiles.length > 1 ||
-      (this.facsimiles.length == 1 && this.externalFacsimiles.length > 0)) {
-      this.selectedFacsName.emit(name);
-    }
-  }
-
-  emitSelectedFacsimileSortOrder(sortOrder: number | null) {
-    this.selectedFacsSortOrder.emit(sortOrder);
-  }
-
-  emitImageNumber(nr: number | null) {
-    this.selectedImageNr.emit(nr);
-  }
-
-  setImageNr(e?: any) {
-    if (this.facsNumber < 1) {
-      this.facsNumber = 1;
-    } else if (this.facsNumber > this.numberOfImages) {
-      this.facsNumber = this.numberOfImages;
-    }
-    this.emitImageNumber(this.facsNumber);
+    alert.present();
   }
 
   async openFullScreen() {
+    if (this.selectedIsExternal() || !this.selectedFacsimile()) {
+      return;
+    }
+
+    const fac = this.selectedFacsimile()!;
     const fullscreenImageSize = config.modal?.fullscreenImageViewer?.imageQuality || this.facsSize;
-    const imageURLs = [];
-    for (let i = 1; i < (this.numberOfImages || 0) + 1; i++) {
-      const url = (
-          this.facsURLAlternate ?
-              this.facsURLAlternate+'/'+this.selectedFacsimile.publication_facsimile_collection_id+'/'+fullscreenImageSize+'/'+i+'.jpg' :
-              this.facsURLDefault+i+(fullscreenImageSize ? '/'+fullscreenImageSize : '')
-      )
+
+    const imageURLs: string[] = [];
+    for (let i = 1; i <= this.numberOfImages; i++) {
+      const url = this.facsURLAlternate
+        ? `${this.facsURLAlternate}/${fac.publication_facsimile_collection_id}/${fullscreenImageSize}/${i}.jpg`
+        : `${this.facsURLDefault()}${i}${fullscreenImageSize ? '/' + fullscreenImageSize : ''}`;
       imageURLs.push(url);
     }
 
-    const params = {
-      activeImageIndex: this.facsNumber - 1,
-      imageURLs: imageURLs
-    };
-
     const modal = await this.modalCtrl.create({
       component: FullscreenImageViewerModal,
-      componentProps: params,
+      componentProps: {
+        activeImageIndex: this.facsNumber - 1,
+        imageURLs,
+      },
       cssClass: 'fullscreen-image-viewer-modal',
     });
 
@@ -312,23 +378,31 @@ export class FacsimilesComponent implements OnInit {
       this.setImageNr();
     }
   }
-  
-  previous() {
-    if (this.facsNumber > 1) {
-      this.facsNumber--;
-    } else {
+
+  setImageNr() {
+    if (this.facsNumber < 1) {
+      this.facsNumber = 1;
+    } else if (this.numberOfImages && this.facsNumber > this.numberOfImages) {
       this.facsNumber = this.numberOfImages;
     }
-    this.emitImageNumber(this.facsNumber);
+
+    this.selectedImageNr.emit(this.facsNumber);
+  }
+
+  previous() {
+    if (!this.numberOfImages) {
+      return;
+    }
+    this.facsNumber = this.facsNumber > 1 ? this.facsNumber - 1 : this.numberOfImages;
+    this.selectedImageNr.emit(this.facsNumber);
   }
 
   next() {
-    if (this.facsNumber < this.numberOfImages) {
-      this.facsNumber++;
-    } else {
-      this.facsNumber = 1;
+    if (!this.numberOfImages) {
+      return;
     }
-    this.emitImageNumber(this.facsNumber);
+    this.facsNumber = this.facsNumber < this.numberOfImages ? this.facsNumber + 1 : 1;
+    this.selectedImageNr.emit(this.facsNumber);
   }
 
   zoomIn() {
@@ -356,20 +430,20 @@ export class FacsimilesComponent implements OnInit {
     this.prevY = 0;
   }
 
-  zoomWithMouseWheel(event: any) {
-    if (event.target) {
-      if (event.deltaY < 0) {
-        this.zoomIn();
-      } else {
-        this.zoomOut();
-      }
-      event.target.style.transform = 'scale('+this.zoom+') translate3d('+this.prevX+'px, '+this.prevY+'px, 0px) rotate('+this.angle+'deg)';
+  zoomWithMouseWheel(img: HTMLImageElement, event: WheelEvent) {
+    if (event.deltaY < 0) {
+      this.zoomIn();
+    } else {
+      this.zoomOut();
     }
+
+    img.style.transform =
+      `scale(${this.zoom}) translate3d(${this.prevX}px, ${this.prevY}px, 0px) rotate(${this.angle}deg)`;
   }
 
-  setImageCoordinates(coordinates: number[]) {
-    this.prevX = coordinates[0];
-    this.prevY = coordinates[1];
+  setImageCoordinates(coords: number[]) {
+    this.prevX = coords[0] ?? 0;
+    this.prevY = coords[1] ?? 0;
   }
 
 }

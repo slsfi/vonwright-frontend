@@ -16,6 +16,16 @@
         <source>Sidans innehåll kunde inte laddas.</source>
       </segment>
     </unit>
+    <unit id="Article.Contents">
+      <segment>
+        <source>Innehåll</source>
+      </segment>
+    </unit>
+    <unit id="Article.LoadingError">
+      <segment>
+        <source>Artikeln kunde inte laddas.</source>
+      </segment>
+    </unit>
     <unit id="BasicActions.Cancel">
       <segment>
         <source>Avbryt</source>
@@ -426,6 +436,11 @@
         <source>Dölj avgränsningar</source>
       </segment>
     </unit>
+    <unit id="ElasticSearch.Language">
+      <segment>
+        <source>Språk</source>
+      </segment>
+    </unit>
     <unit id="ElasticSearch.LetterReceiverLocation">
       <segment>
         <source>Mottagarort (brev)</source>
@@ -744,6 +759,11 @@
     <unit id="IndexFilter.PersonTypes">
       <segment>
         <source>Personkategorier</source>
+      </segment>
+    </unit>
+    <unit id="Language.Undefined">
+      <segment>
+        <source>odefinierat</source>
       </segment>
     </unit>
     <unit id="Legend.Legend">
@@ -1231,6 +1251,11 @@
         <source>Källhänvisning</source>
       </segment>
     </unit>
+    <unit id="Reference.ReferToArticle">
+      <segment>
+        <source>Hänvisa till denna artikel</source>
+      </segment>
+    </unit>
     <unit id="Reference.ReferToCollection">
       <segment>
         <source>Hänvisa till denna delutgåva</source>
@@ -1279,6 +1304,16 @@
     <unit id="Site.Title">
       <segment>
         <source>Webbplatsens titel</source>
+      </segment>
+    </unit>
+    <unit id="TextChanger.NextLabel">
+      <segment>
+        <source>Följande text</source>
+      </segment>
+    </unit>
+    <unit id="TextChanger.PrevLabel">
+      <segment>
+        <source>Föregående text</source>
       </segment>
     </unit>
     <unit id="TopMenu.About">

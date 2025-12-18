@@ -1,8 +1,9 @@
-import { Component, Inject, Input, LOCALE_ID, OnInit } from '@angular/core';
-import { AsyncPipe } from '@angular/common';
+import { ChangeDetectionStrategy, Component, DestroyRef, LOCALE_ID, inject, input, signal } from '@angular/core';
+import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 import { IonicModule } from '@ionic/angular';
-import { catchError, Observable, of, Subject } from 'rxjs';
+import { catchError, of, switchMap, tap } from 'rxjs';
 
+import { PublicationMetadata } from '@models/metadata.models';
 import { CollectionContentService } from '@services/collection-content.service';
 
 
@@ -10,29 +11,49 @@ import { CollectionContentService } from '@services/collection-content.service';
   selector: 'text-metadata',
   templateUrl: './metadata.component.html',
   styleUrls: ['./metadata.component.scss'],
-  imports: [AsyncPipe, IonicModule]
+  imports: [IonicModule],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class MetadataComponent implements OnInit {
-  @Input() textItemID: string = '';
+export class MetadataComponent {
+  // ─────────────────────────────────────────────────────────────────────────────
+  // Dependency injection, Input/Output signals, Fields, Local state signals
+  // ─────────────────────────────────────────────────────────────────────────────
+  private collectionContentService = inject(CollectionContentService);
+  private destroyRef = inject(DestroyRef);
+  private activeLocale = inject(LOCALE_ID);
 
-  loadingError$: Subject<boolean> = new Subject<boolean>();
-  metadata$: Observable<any>;
+  readonly publicationID = input.required<string>();
 
-  constructor(
-    private collectionContentService: CollectionContentService,
-    @Inject(LOCALE_ID) private activeLocale: string
-  ) {}
+  error = signal(false);
+  publicationMetadata = signal<PublicationMetadata | null>(null);
 
-  ngOnInit() {
-    this.metadata$ = this.collectionContentService.getMetadata(
-      this.textItemID.split('_')[1] || '0', this.activeLocale
-    ).pipe(
-      catchError((error) => {
-        console.error('Error loading metadata', error);
-        this.loadingError$.next(true);
-        return of();
-      })
-    );
+
+  // ─────────────────────────────────────────────────────────────────────────────
+  // Constructor: Load data
+  // ─────────────────────────────────────────────────────────────────────────────
+  constructor() {
+    toObservable(this.publicationID).pipe(
+      tap(() => {
+        // new load → show spinner and clear error
+        this.publicationMetadata.set(null);
+        this.error.set(false);
+      }),
+      switchMap((id) =>
+        this.collectionContentService.getMetadata(id, this.activeLocale).pipe(
+          catchError((err) => {
+            console.error('Error loading metadata', err);
+            this.error.set(true);
+            // keep metadata = null so the template shows the error block
+            return of<PublicationMetadata | null>(null);
+          })
+        )
+      ),
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe((meta) => {
+      if (meta) {
+        this.publicationMetadata.set(meta);
+      }
+    });
   }
 
 }

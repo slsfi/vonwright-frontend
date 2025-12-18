@@ -3,6 +3,7 @@
 
 li.home-menu-item {
   background-color: var(--side-menu-back-button-background-color);
+  border-bottom: 1px solid var(--side-menu-divider-color);
   color: var(--side-menu-back-button-text-color);
 
   ion-icon {

@@ -1,4 +1,4 @@
-import { Component, ElementRef, Inject, LOCALE_ID, NgZone, OnDestroy, OnInit, Renderer2 } from '@angular/core';
+import { Component, ElementRef, LOCALE_ID, NgZone, OnDestroy, OnInit, Renderer2, inject } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Observable, Subscription, switchMap } from 'rxjs';
 
@@ -14,21 +14,19 @@ import { isBrowser } from '@utility-functions';
   standalone: false
 })
 export class AboutPage implements OnInit, OnDestroy {
+  private elementRef = inject(ElementRef);
+  private mdService = inject(MarkdownService);
+  private ngZone = inject(NgZone);
+  private renderer2 = inject(Renderer2);
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+  private scrollService = inject(ScrollService);
+  private activeLocale = inject(LOCALE_ID);
+
   markdownText$: Observable<string | null>;
 
   private fragmentSubscription?: Subscription;
   private unlistenClickEvents?: () => void;
-
-  constructor(
-    private elementRef: ElementRef,
-    private mdService: MarkdownService,
-    private ngZone: NgZone,
-    private renderer2: Renderer2,
-    private route: ActivatedRoute,
-    private router: Router,
-    private scrollService: ScrollService,
-    @Inject(LOCALE_ID) private activeLocale: string
-  ) {}
 
   ngOnInit() {
     if (isBrowser()) {

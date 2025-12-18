@@ -1,7 +1,8 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { catchError, map, Observable, of } from 'rxjs';
 
 import { config } from '@config';
+import { TextKey } from '@models/collection.models';
 import { CommentService } from '@services/comment.service';
 import { NamedEntityService } from '@services/named-entity.service';
 import { PlatformService } from '@services/platform.service';
@@ -11,6 +12,13 @@ import { PlatformService } from '@services/platform.service';
   providedIn: 'root',
 })
 export class TooltipService {
+  private commentService = inject(CommentService);
+  private namedEntityService = inject(NamedEntityService);
+  private platformService = inject(PlatformService);
+
+  private readonly maxTooltipCacheSize: number = 50;
+  private readonly simpleWorkMetadata: boolean = config.modal?.namedEntity?.useSimpleWorkMetadata ?? false;
+
   private cachedTooltips: Record<string, any> = {
     'comments': new Map(),
     'footnotes': new Map(),
@@ -18,16 +26,6 @@ export class TooltipService {
     'places': new Map(),
     'works': new Map()
   };
-  private maxTooltipCacheSize: number = 50;
-  private simpleWorkMetadata: boolean = false;
-
-  constructor(
-    private commentService: CommentService,
-    private namedEntityService: NamedEntityService,
-    private platformService: PlatformService
-  ) {
-    this.simpleWorkMetadata = config.modal?.namedEntity?.useSimpleWorkMetadata ?? false;
-  }
 
   getSemanticDataObjectTooltip(id: string, type: string, targetElem: HTMLElement): Observable<string> {
     const cachedTooltip =
@@ -90,7 +88,7 @@ export class TooltipService {
    * <img src=".." data-id="en5929">
    * <span class="tooltip"></span>
    */
-  getCommentTooltip(textItemID: string, elementID: string): Observable<any> {
+  getCommentTooltip(textKey: TextKey, elementID: string): Observable<any> {
     elementID = elementID.replace('end', 'en');
     const cachedTooltip = this.cachedTooltips.comments.has(elementID)
       ? this.cachedTooltips.comments.get(elementID) : '';
@@ -99,7 +97,7 @@ export class TooltipService {
       return of({ name: 'Comment', description: cachedTooltip });
     }
 
-    return this.commentService.getSingleComment(textItemID, elementID).pipe(
+    return this.commentService.getSingleComment(textKey, elementID).pipe(
       map((comment: any) => {
         this.cachedTooltips.comments.size > this.maxTooltipCacheSize && this.cachedTooltips.comments.clear();
         !this.platformService.isMobile() && this.cachedTooltips.comments.set(elementID, comment);

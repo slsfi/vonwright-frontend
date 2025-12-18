@@ -1,9 +1,8 @@
-import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
-import { AsyncPipe } from '@angular/common';
-import { Observable, of } from 'rxjs';
+import { ChangeDetectionStrategy, Component, effect, inject, input, signal } from '@angular/core';
 
 import { config } from '@config';
 import { CollectionTableOfContentsService } from '@services/collection-toc.service';
+import { TrustHtmlPipe } from '@pipes/trust-html.pipe';
 import { isBrowser } from '@utility-functions';
 
 
@@ -11,56 +10,39 @@ import { isBrowser } from '@utility-functions';
   selector: 'static-html',
   templateUrl: './static-html.component.html',
   styleUrl: './static-html.component.scss',
-  imports: [AsyncPipe]
+  imports: [TrustHtmlPipe],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class StaticHtmlComponent implements OnChanges {
-  @Input() type: string = '';
-  @Input() id: string = '';
+export class StaticHtmlComponent {
+  private tocService = inject(CollectionTableOfContentsService);
 
-  prebuiltCollectionMenus: boolean = true;
-  staticContent$: Observable<string>;
+  readonly type = input<string>('');
+  readonly id = input<string>('');
 
-  constructor(
-    private tocService: CollectionTableOfContentsService
-  ) {
-    this.prebuiltCollectionMenus = config.app?.prebuild?.staticCollectionMenus ?? true;
-  }
+  readonly prebuiltCollectionMenus: boolean = config.app?.prebuild?.staticCollectionMenus ?? true;
 
-  ngOnChanges(changes: SimpleChanges): void {
-    let inputChanged = false;
+  readonly staticContent = signal<string>('');
 
-    for (const propName in changes) {
-      if (changes.hasOwnProperty(propName)) {
-        if (
-          (
-            propName === 'type' &&
-            changes.type.previousValue !== changes.type.currentValue
-          ) || (
-            propName === 'id' &&
-            changes.id.previousValue !== changes.id.currentValue
-          )
-        ) {
-          inputChanged = true;
-          break;
-        }
-      }
+  private _effect = effect((onCleanup) => {
+    const type = this.type();
+    const id = this.id();
+
+    // reset if invalid
+    if (!type || !id) {
+      this.staticContent.set('');
+      return;
     }
 
-    if (inputChanged && this.type && this.id) {
-      this.staticContent$ = this.getStaticContent();
-    }
-  }
+    if (type === 'collection-toc' && this.prebuiltCollectionMenus && !isBrowser()) {
+      const sub = this.tocService.getStaticTableOfContents(id).subscribe(
+        html => this.staticContent.set(html ?? '')
+      );
 
-  private getStaticContent(): Observable<string> {
-    // Get the static TOC for the collection if prebuilding of static
-    // TOC files is enabled in config and running on the server. In the
-    // browser the dynamic TOC is loaded, so no need to first render the
-    // static one.
-    if (this.type === 'collection-toc' && this.prebuiltCollectionMenus && !isBrowser()) {
-      return this.tocService.getStaticTableOfContents(this.id);
+      // Cancels in-flight request on next change AND on component destroy
+      onCleanup(() => sub.unsubscribe());
+    } else {
+      this.staticContent.set('');
     }
-
-    return of('');
-  }
+  });
 
 }

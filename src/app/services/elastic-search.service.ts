@@ -1,32 +1,30 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 import { config } from '@config';
-import { AggregationQuery, Facets, SearchQuery, TimeRange } from '@models/elastic-search.model';
+import { AggregationQuery, Facets, SearchQuery, TimeRange } from '@models/elastic-search.models';
 
 
 @Injectable({
   providedIn: 'root',
 })
 export class ElasticSearchService {
-  private aggregations: any = {};
-  private fixedFilters?: object[];
-  private indices: string[] = [];
+  private http = inject(HttpClient);
+
+  private readonly aggregations: any = config.page?.elasticSearch?.aggregations ?? undefined;
+  private readonly fixedFilters: object[] = config.page?.elasticSearch?.fixedFilters ?? [];
+  private readonly textTypes: string[] = config.page?.elasticSearch?.typeFilterGroupOptions ?? [];
+
   private searchURL: string = '';
   private source: string[] = [];
-  private textTypes: string[] = [];
 
-  constructor(
-    private http: HttpClient
-  ) {
-    this.aggregations = config.page?.elasticSearch?.aggregations ?? undefined;
-    this.indices = config.page?.elasticSearch?.indices ?? [];
-    this.fixedFilters = config.page?.elasticSearch?.fixedFilters ?? [];
-    this.textTypes = config.page?.elasticSearch?.typeFilterGroupOptions ?? [];
-    const apiBaseURL = config.app?.backendBaseURL ?? '';
-    const projectName = config.app?.projectNameDB ?? '';
-    this.searchURL = apiBaseURL + '/' + projectName + '/search/elastic/' + this.indices.join(',');
+  constructor() {
+    const apiBaseURL: string = config.app?.backendBaseURL ?? '';
+    const projectName: string = config.app?.projectNameDB ?? '';
+    const indices: string[] = config.page?.elasticSearch?.indices ?? [];
+
+    this.searchURL = `${apiBaseURL}/${projectName}/search/elastic/${indices.join(',')}`;
 
     // Add fields that should always be returned in hits
     this.source = [
@@ -138,7 +136,7 @@ export class ElasticSearchService {
         range: {
           orig_date_sort: {
             gte: range.from,
-            lte: range.to,
+            lt: range.to,
           },
         },
       });
@@ -351,7 +349,7 @@ export class ElasticSearchService {
         range: {
           orig_date_sort: {
             gte: range.from,
-            lte: range.to,
+            lt: range.to,
           },
         },
       });

@@ -1,178 +1,270 @@
-import { Component, EventEmitter, Input, OnChanges, Output } from '@angular/core'
+import { ChangeDetectionStrategy, Component, computed, effect, input, output, signal } from '@angular/core';
 import { NgClass } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
 
+import { YearBucket, YearRange } from '@models/elastic-search.models';
+
+
+// ─────────────────────────────────────────────────────────────────────────────
+// * This component is zoneless-ready. *
+// ─────────────────────────────────────────────────────────────────────────────
 /**
- * ! The ion-datetime-buttons have been commented out in the template 
- * ! because the component is not compatible with Angular SSR - it
- * ! throws a runtime error on the server side.
+ * Year-based histogram:
+ * - Input: all years (yearsAll) & current-filter years (years)
+ * - Output: { from: 'YYYY', to: 'YYYY' } | null
  */
 @Component({
   selector: 'date-histogram',
   templateUrl: './date-histogram.component.html',
   styleUrls: ['./date-histogram.component.scss'],
-  imports: [NgClass, FormsModule, IonicModule]
+  imports: [NgClass, FormsModule, IonicModule],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class DateHistogramComponent implements OnChanges {
-  @Input() selectedRange?: any = undefined;
-  @Input() years?: [any] = undefined;
-  @Input() yearsAll?: [any] = undefined;
-  @Output() rangeChange = new EventEmitter<any>();
+export class DateHistogramComponent {
+  // --- Inputs & outputs (signal-based) ------------------------------
 
-  firstUpdate: boolean = true;
-  firstYear?: string = undefined;
-  from?: string = undefined;
-  lastYear?: string = undefined;
-  max: number = 0;
-  to?: string = undefined;
+  /** Selected year range coming from parent (e.g. { from: '1847', to: '1868' }). */
+  readonly selectedRange = input<YearRange | null>(null);
 
-  constructor() {}
+  /**
+   * Buckets for the currently filtered results.
+   * Example: [{ key_as_string: '1847', doc_count: 3 }, ...]
+   */
+  readonly years = input<YearBucket[] | undefined>();
 
-  ngOnChanges() {
-    this.updateMax();
-    this.updateData();
-  }
+  /**
+   * Buckets for all results (unfiltered histogram).
+   * Used as base for the padded histogram (decade boundaries).
+   */
+  readonly yearsAll = input<YearBucket[] | undefined>();
 
-  private updateMax() {
-    this.max = this.years?.reduce(function (current, year) {
-      return Math.max(current, year.doc_count)
-    }, 0) || 0;
-  }
+  /**
+   * Emits whenever the user picks a new year range or clears it.
+   * Emits either { from: 'YYYY', to: 'YYYY' } or null.
+   */
+  readonly rangeChange = output<YearRange | null>();
 
-  private updateData() {
-    if (this.yearsAll && this.years) {
-      if (this.firstUpdate) {
-        this.firstUpdate = false;
+  // --- Internal signals --------------------------------------------
 
-        if (this.yearsAll.length) {
-          this.firstYear = this.yearsAll[0]['key_as_string'];
-          this.lastYear = this.yearsAll[this.yearsAll.length - 1]['key_as_string'];
+  /** From year (as string "YYYY"). */
+  readonly from = signal<string | null>(null);
 
-          let first = Number(this.yearsAll[0]['key_as_string']);
-          while (first % 10 !== 0) {
-            first = first - 1;
-            this.yearsAll.unshift(
-              {
-                key: new Date(String(first)).getTime(),
-                key_as_string: String(first),
-                doc_count: 0
-              }
-            );
-          }
+  /** To year (as string "YYYY"). */
+  readonly to = signal<string | null>(null);
 
-          let last = Number(this.yearsAll[this.yearsAll.length - 1]['key_as_string']);
-          while (last % 10 !== 0) {
-            last = last + 1;
-            this.yearsAll.push(
-              {
-                key: new Date(String(last)).getTime(),
-                key_as_string: String(last),
-                doc_count: 0
-              }
-            );
-          }
-        }
-        // console.log('yearsAll', this.yearsAll);
-      } else if (this.selectedRange?.from && this.selectedRange?.to) {
-        // console.log(this.selectedRange);
-        this.from = this.selectedRange?.from;
-        this.to = this.selectedRange?.to;
-      } else if (!this.selectedRange) {
-        this.from = undefined;
-        this.to = undefined;
-      }
-
-      // console.log('years', this.years);
-
-      for (let a = 0; a < this.yearsAll.length; a++) {
-        this.yearsAll[a]['doc_count_current'] = 0;
-        for (let y = 0; y < this.years.length; y++) {
-          if (this.yearsAll[a]['key_as_string'] === this.years[y]['key_as_string']) {
-            this.yearsAll[a]['doc_count_current'] = this.years[y]['doc_count'];
-            break;
-          }
-        }
-      }
+  /**
+   * Max doc_count_current, used for relative bar widths,
+   * derived from paddedYearsAll.
+   * */
+  readonly max = computed<number>(() => {
+    const padded = this.paddedYearsAll();
+    let m = 0;
+    for (const y of padded) {
+      const c = y.doc_count_current ?? 0;
+      if (c > m) m = c;
     }
+    return m;
+  });
+
+  /**
+   * Padded and merged year buckets:
+   * - copies yearsAll()
+   * - pads to decade boundaries
+   */
+  readonly paddedYearsAll = computed<YearBucket[]>(() => {
+    const all = this.yearsAll() ?? [];
+    if (!all.length) return [];
+
+    const base: YearBucket[] = all.map((y) => ({
+      key: y.key,
+      key_as_string: y.key_as_string,
+      doc_count: y.doc_count,
+      doc_count_current: 0,
+    }));
+
+    let firstYear = Number(base[0].key_as_string);
+    let lastYear = Number(base[base.length - 1].key_as_string);
+
+    if (Number.isNaN(firstYear) || Number.isNaN(lastYear)) {
+      return base;
+    }
+
+    const padded: YearBucket[] = [...base];
+
+    // pad backwards to decade
+    while (firstYear % 10 !== 0) {
+      firstYear -= 1;
+      padded.unshift({
+        key: firstYear,
+        key_as_string: String(firstYear),
+        doc_count: 0,
+        doc_count_current: 0,
+      });
+    }
+
+    // pad forwards to decade
+    while (lastYear % 10 !== 0) {
+      lastYear += 1;
+      padded.push({
+        key: lastYear,
+        key_as_string: String(lastYear),
+        doc_count: 0,
+        doc_count_current: 0,
+      });
+    }
+
+    // merge current counts
+    const current = this.years() ?? [];
+    const currentMap = new Map<string, number>();
+    current.forEach((y) =>
+      currentMap.set(y.key_as_string, y.doc_count ?? 0)
+    );
+
+    padded.forEach((y) => {
+      y.doc_count_current = currentMap.get(y.key_as_string) ?? 0;
+    });
+
+    return padded;
+  });
+
+  /** First year (real data, not padded). Mainly for potential future UI. */
+  readonly firstYear = computed<string | undefined>(() => {
+    const all = this.yearsAll() ?? [];
+    return all.length ? all[0].key_as_string : undefined;
+  });
+
+  /** Last year (real data, not padded). */
+  readonly lastYear = computed<string | undefined>(() => {
+    const all = this.yearsAll() ?? [];
+    return all.length ? all[all.length - 1].key_as_string : undefined;
+  });
+
+  // --- Effects -----------------------------------------------------
+
+  constructor() {
+    // Sync incoming selectedRange → local from/to
+    effect(() => {
+      const sel = this.selectedRange();
+      if (sel && sel.from && sel.to) {
+        this.from.set(sel.from);
+        this.to.set(sel.to);
+      } else {
+        this.from.set(null);
+        this.to.set(null);
+      }
+    });
   }
+
+  // --- Public API used from template -------------------------------
 
   reset() {
-    this.from = undefined;
-    this.to = undefined;
+    this.from.set(null);
+    this.to.set(null);
     this.rangeChange.emit(null);
   }
 
-  // Send the change event to the parent component
-  onChange() {
-    const fromTime = new Date(this.from || '').getTime();
-    // Add one year to get the full year.
-    const toTime = new Date(`${parseInt(this.to || '') + 1}`).getTime();
-
-    if (fromTime <= toTime) {
-      this.rangeChange.emit({ from: this.from, to: this.to });
-    }
+  getYearRelativeToMax(year: YearBucket): string {
+    const max = this.max();
+    if (!max) return '0%';
+    const current = year.doc_count_current ?? 0;
+    return `${Math.floor((current / max) * 100)}%`;
   }
 
-  getYearRelativeToMax(year: any) {
-    return `${Math.floor(year.doc_count_current / this.max * 100)}%`;
+  isDecade(year: YearBucket): boolean {
+    const y = parseInt(year.key_as_string || '', 10);
+    return !Number.isNaN(y) && y % 10 === 0;
   }
 
-  isDecade(year: any) {
-    return parseInt(year.key_as_string || '') % 10 === 0;
-  }
+  selectYear(selected: YearBucket) {
+    const year = selected.key_as_string;
+    const from = this.from();
+    const to = this.to();
 
-  selectYear(selected: any) {
-    this.selectedRange = undefined;
-    if (!this.from) {
-      this.from = selected.key_as_string;
-    } else if (!this.to && parseInt(selected.key_as_string || '') >= parseInt(this.from)) {
-      this.to = selected.key_as_string;
+    if (!from) {
+      this.from.set(year);
+      this.to.set(null);
+    } else if (!to && parseInt(year, 10) >= parseInt(from, 10)) {
+      this.to.set(year);
     } else {
-      this.from = selected.key_as_string;
-      this.to = undefined;
+      // Restart range
+      this.from.set(year);
+      this.to.set(null);
     }
 
-    if (this.from && this.to) {
-      this.onChange();
-    }
+    this.emitIfValidRange();
   }
 
-  isYearInRange(year: any) {
-    const yearNumber = parseInt(year.key_as_string || '');
-    if (year.key_as_string === this.from || year.key_as_string === this.to) {
+  isYearInRange(year: YearBucket): boolean {
+    const from = this.from();
+    const to = this.to();
+    const yearStr = year.key_as_string || '';
+    const y = parseInt(yearStr, 10);
+
+    // Highlight endpoints even if only one side is selected
+    if (yearStr === from || yearStr === to) {
       return true;
-    } else if (this.from && this.to) {
-      return yearNumber >= parseInt(this.from) && yearNumber <= parseInt(this.to);
-    } else {
-      return false;
     }
+
+    // If both ends are set, highlight the entire range
+    if (from && to) {
+      const fromYear = parseInt(from, 10);
+      const toYear = parseInt(to, 10);
+
+      if (
+        Number.isNaN(fromYear) ||
+        Number.isNaN(toYear) ||
+        Number.isNaN(y)
+      ) {
+        return false;
+      }
+
+      return y >= fromYear && y <= toYear;
+    }
+
+    return false;
   }
 
   updateYearFrom(event: any) {
-    if (event?.detail?.value) {
-      this.selectedRange = undefined;
-      if (!this.to || this.to && parseInt(event?.detail?.value) > parseInt(this.to || '')) {
-        this.from = event?.detail?.value;
-        this.to = undefined;
-      } else {
-        this.from = event?.detail?.value;
-        this.onChange();
-      }
+    const value: string | undefined = event?.detail?.value;
+    if (!value) return;
+
+    const to = this.to();
+    if (!to || parseInt(value, 10) > parseInt(to, 10)) {
+      this.from.set(value);
+      this.to.set(null);
+    } else {
+      this.from.set(value);
     }
+    this.emitIfValidRange();
   }
 
   updateYearTo(event: any) {
-    if (event?.detail?.value) {
-      this.selectedRange = undefined;
-      if (!this.from || this.from && parseInt(event?.detail?.value) < parseInt(this.from || '')) {
-        this.to = event?.detail?.value;
-        this.from = undefined;
-      } else {
-        this.to = event?.detail?.value;
-        this.onChange();
-      }
+    const value: string | undefined = event?.detail?.value;
+    if (!value) return;
+
+    const from = this.from();
+    if (!from || parseInt(value, 10) < parseInt(from, 10)) {
+      this.to.set(value);
+      this.from.set(null);
+    } else {
+      this.to.set(value);
     }
+    this.emitIfValidRange();
   }
 
+  // --- Helpers -----------------------------------------------------
+
+  private emitIfValidRange() {
+    const from = this.from();
+    const to = this.to();
+    if (!from || !to) return;
+
+    const fromYear = parseInt(from, 10);
+    const toYear = parseInt(to, 10);
+
+    if (!Number.isNaN(fromYear) && !Number.isNaN(toYear) && fromYear <= toYear) {
+      this.rangeChange.emit({ from, to });
+    }
+  }
 }

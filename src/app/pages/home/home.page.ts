@@ -1,4 +1,4 @@
-import { Component, Inject, LOCALE_ID, OnInit } from '@angular/core';
+import { Component, LOCALE_ID, OnInit, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { Observable } from 'rxjs';
 
@@ -13,49 +13,28 @@ import { MarkdownService } from '@services/markdown.service';
   standalone: false
 })
 export class HomePage implements OnInit {
+  private mdService = inject(MarkdownService);
+  private router = inject(Router);
+  private activeLocale = inject(LOCALE_ID);
+
+  readonly imageAltText: string = config.page?.home?.bannerImage?.altTexts?.[this.activeLocale] ?? 'image';
+  readonly imageHeight: number | null = config.page?.home?.bannerImage?.intrinsicSize?.height ?? null;
+  readonly imageOnRight: boolean = config.page?.home?.portraitOrientationSettings?.imagePlacement?.onRight ?? false;
+  readonly imageOrientationPortrait: boolean = config.page?.home?.bannerImage?.orientationPortrait ?? false;
+  readonly imageSources: any[] = config.page?.home?.bannerImage?.alternateSources ?? [];
+  readonly imageURL: string = config.page?.home?.bannerImage?.URL ?? 'assets/images/home-page-banner.jpg';
+  readonly imageURLStyle: string = `url(${this.imageURL})`;
+  readonly imageWidth: number | null = config.page?.home?.bannerImage?.intrinsicSize?.width ?? null;
+  readonly portraitImageObjectPosition: string | null = config.page?.home?.portraitOrientationSettings?.imagePlacement?.squareCroppedVerticalOffset ? '50% ' + config.page?.home?.portraitOrientationSettings?.imagePlacement?.squareCroppedVerticalOffset : null;
+  readonly showContentGrid: boolean = config.page?.home?.showContentGrid ?? false;
+  readonly showFooter: boolean = config.page?.home?.showFooter ?? false;
+  readonly showSearchbar: boolean = config.page?.home?.showSearchbar ?? false;
+  readonly siteHasSubtitle: boolean = $localize`:@@Site.Subtitle:Webbplatsens undertitel` ? true : false;
+  readonly titleOnImage: boolean = config.page?.home?.portraitOrientationSettings?.siteTitleOnImageOnSmallScreens ?? false;
+
   descriptionText$: Observable<string | null>;
   footerText$: Observable<string | null>;
-  imageAltText: string = '';
-  imageOnRight: boolean = false;
-  imageOrientationPortrait: boolean = false;
-  imageSources: any[] = [];
-  imageURL: string = '';
-  imageURLStyle: string = '';
-  imageHeight: number | null = null;
-  imageWidth: number | null = null;
-  portraitImageObjectPosition: string | null = null;
   searchQuery: string = '';
-  showContentGrid: boolean = false;
-  showFooter: boolean = false;
-  showSearchbar: boolean = false;
-  siteHasSubtitle: boolean = false;
-  titleOnImage: boolean = false;
-
-  constructor(
-    private mdService: MarkdownService,
-    private router: Router,
-    @Inject(LOCALE_ID) private activeLocale: string
-  ) {
-    this.imageAltText = config.page?.home?.bannerImage?.altTexts?.[this.activeLocale] ?? 'image';
-    this.imageOnRight = config.page?.home?.portraitOrientationSettings?.imagePlacement?.onRight ?? false;
-    this.imageOrientationPortrait = config.page?.home?.bannerImage?.orientationPortrait ?? false;
-    this.imageURL = config.page?.home?.bannerImage?.URL ?? 'assets/images/home-page-banner.jpg';
-    this.imageURLStyle = `url(${this.imageURL})`;
-    this.showContentGrid = config.page?.home?.showContentGrid ?? false;
-    this.showFooter = config.page?.home?.showFooter ?? false;
-    this.showSearchbar = config.page?.home?.showSearchbar ?? false;
-    this.titleOnImage = config.page?.home?.portraitOrientationSettings?.siteTitleOnImageOnSmallScreens ?? false;
-    this.imageHeight = config.page?.home?.bannerImage?.intrinsicSize?.height ?? null;
-    this.imageWidth = config.page?.home?.bannerImage?.intrinsicSize?.width ?? null;
-    this.imageSources = config.page?.home?.bannerImage?.alternateSources ?? [];
-
-    if (config.page?.home?.portraitOrientationSettings?.imagePlacement?.squareCroppedVerticalOffset) {
-      this.portraitImageObjectPosition = '50% ' + config.page?.home?.portraitOrientationSettings?.imagePlacement?.squareCroppedVerticalOffset;
-    }
-
-    // Only show subtitle if translation for it not missing
-    this.siteHasSubtitle = $localize`:@@Site.Subtitle:Webbplatsens undertitel` ? true : false;
-  }
 
   ngOnInit() {
     this.descriptionText$ = this.mdService.getParsedMdContent(

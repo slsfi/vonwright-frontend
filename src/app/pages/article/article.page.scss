@@ -1,0 +1,67 @@
+/* ATTN. Styles for elements in the markdown content must be globally defined in _markdown.scss to be applied. */
+
+// Import scoped CSS variables
+@use "../../../theme/scoped-variables/page-introduction-variables.scss";
+
+// Import general styles for the secondary toolbar
+@use "../../../theme/common/secondary-toolbar.scss";
+
+// Import general styles for the collection-ion-content class
+@use "../../../theme/common/collection-ion-content.scss";
+
+// Import general styles for the scroll-content-container class
+@use "../../../theme/common/scroll-content-container.scss";
+
+.markdown {
+  font-family: var(--font-stack-article-markdown, --font-stack-app-base);
+}
+
+article-toc {
+  margin: 0 10px 0 20px;
+  height: calc(100% - 90px);
+  width: 85%;
+  max-width: 375px;
+  position: fixed;
+  z-index: 10;
+  overflow-x: hidden;
+  transition: 0.25s;
+  right: 10px;
+  order: 2;
+}
+
+/* On large screens: the toc floats to the right of the text if not in mobile mode. */
+@media (min-width: 1000px) {
+  ion-content:not(.mobile-mode-content) article-toc {
+    position: sticky;
+    height: 100%;
+    transition: none;
+    z-index: 1;
+    width: 50vw;
+    right: unset;
+  }
+}
+
+@media screen and (max-width: 1000px) {
+  .mobile-mode-content article-toc {
+    height: calc(100% - 115px);
+  }
+}
+
+@media screen and (max-width: 820px) {
+  article-toc {
+    height: calc(100% - 70px);
+    right: 0;
+  }
+}
+
+@media screen and (max-width: 450px) {
+  article-toc {
+    width: 75%;
+  }
+}
+
+.mobile-mode-content article-toc {
+  height: calc(100% - 50px);
+  margin-right: 0;
+  right: 0;
+}

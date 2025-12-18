@@ -6,21 +6,21 @@ div.text-select-wrapper {
     background-color: var(--text-area-background-color, #fafafa);
     width: 100%;
   
-    h3 {
+    div.tsw-text-title {
         font-size: 1rem;
         font-weight: 600;
         word-wrap: break-word;
         white-space: normal;
         margin: 0;
     }
-  
+
     .flex-buttons {
         display: flex;
         align-items: flex-start;
         flex-wrap: wrap;
     }
   
-    h3 + .flex-buttons {
+    div.tsw-text-title + .flex-buttons {
         margin-top: 0.5rem;
     }
   

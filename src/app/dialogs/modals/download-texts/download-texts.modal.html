@@ -31,7 +31,7 @@
     <div class="modal-inner-box">
       @if (introductionMode && downloadFormatsIntro.length) {
         <div class="dlt-group">
-          <h3 i18n="@@CollectionIntroduction.Introduction">Inledning</h3>
+          <h3>{{ introductionTitle }}</h3>
           <ion-buttons class="download-buttons">
             @for (format of downloadFormatsIntro; track format) {
               @if (format !== 'print') {

@@ -1,4 +1,4 @@
-import { Pipe, PipeTransform } from '@angular/core';
+import { Pipe, PipeTransform, inject } from '@angular/core';
 
 import { config } from '@config';
 import { UrlService } from '@services/url.service';
@@ -13,13 +13,10 @@ import { UrlService } from '@services/url.service';
   standalone: true
 })
 export class ElasticHitQueryparamsPipe implements PipeTransform {
-  highlightSearchMatches: boolean = true;
-  openReadingTextWithCommentsHit: boolean = false;
+  private urlService = inject(UrlService);
 
-  constructor(private urlService: UrlService) {
-    this.highlightSearchMatches = config.collections?.highlightSearchMatches ?? true;
-    this.openReadingTextWithCommentsHit = config.page?.elasticSearch?.openReadingTextWithComments ?? false;
-  }
+  readonly highlightSearchMatches: boolean = config.collections?.highlightSearchMatches ?? true;
+  readonly openReadingTextWithCommentsHit: boolean = config.page?.elasticSearch?.openReadingTextWithComments ?? false;
 
   transform(elasticHit: any): any {
     let text_type = elasticHit?.source?.text_type ?? '';

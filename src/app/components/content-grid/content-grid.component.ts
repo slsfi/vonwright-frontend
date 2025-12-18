@@ -1,11 +1,13 @@
-import { Component, Inject, LOCALE_ID, OnInit } from '@angular/core';
+import { Component, LOCALE_ID, OnInit, inject } from '@angular/core';
 import { AsyncPipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { IonicModule } from '@ionic/angular';
 import { catchError, filter, forkJoin, from, map, mergeMap, Observable, of, toArray } from 'rxjs';
 
 import { config } from '@config';
-import { ContentItem } from '@models/content-item.model';
+import { Article } from '@models/article.models';
+import { Collection } from '@models/collection.models';
+import { ContentItem } from '@models/content-item.models';
 import { ParentChildPagePathPipe } from '@pipes/parent-child-page-path.pipe';
 import { CollectionsService } from '@services/collections.service';
 import { MarkdownService } from '@services/markdown.service';
@@ -18,28 +20,24 @@ import { MarkdownService } from '@services/markdown.service';
   imports: [AsyncPipe, IonicModule, RouterLink, ParentChildPagePathPipe]
 })
 export class ContentGridComponent implements OnInit {
-  availableEbooks: any[] = [];
-  flattenedCollectionSortOrder: number[] = [];
-  contentItems$: Observable<ContentItem[]>;
-  includeEbooks: boolean = false;
-  includeMediaCollection: boolean = false;
-  showTitles: boolean = true;
+  private collectionsService = inject(CollectionsService);
+  private mdService = inject(MarkdownService);
+  private activeLocale = inject(LOCALE_ID);
 
-  constructor(
-    private collectionsService: CollectionsService,
-    private mdService: MarkdownService,
-    @Inject(LOCALE_ID) private activeLocale: string
-  ) {
-    this.availableEbooks = config.ebooks ?? [];
-    this.flattenedCollectionSortOrder = (config.collections?.order ?? []).flat();
-    this.includeEbooks = config.component?.contentGrid?.includeEbooks ?? false;
-    this.includeMediaCollection = config.component?.contentGrid?.includeMediaCollection ?? false;
-    this.showTitles = config.component?.contentGrid?.showTitles ?? true;
-  }
+  readonly availableArticles: Article[] = config.articles ?? [];
+  readonly availableEbooks: any[] = config.ebooks ?? [];
+  readonly flattenedCollectionSortOrder: number[] = ((config.collections?.order as number[][]) ?? []).flat();
+  readonly includeArticles: boolean = config.component?.contentGrid?.includeArticles ?? false;
+  readonly includeEbooks: boolean = config.component?.contentGrid?.includeEbooks ?? false;
+  readonly includeMediaCollection: boolean = config.component?.contentGrid?.includeMediaCollection ?? false;
+  readonly showTitles: boolean = config.component?.contentGrid?.showTitles ?? true;
+
+  contentItems$: Observable<ContentItem[]>;
 
   ngOnInit() {
     this.contentItems$ = forkJoin(
       [
+        this.getArticles(),
         this.getEbooks(),
         this.getCollections(),
         this.getMediaCollection()
@@ -57,6 +55,19 @@ export class ContentGridComponent implements OnInit {
         return items;
       })
     );
+  }
+
+  private getArticles(): Observable<ContentItem[]> {
+    let itemsList: ContentItem[] = [];
+    if (this.includeArticles && this.availableArticles.length) {
+      this.availableArticles.forEach((article: Article) => {
+        if (article.language === this.activeLocale) {
+          const item = new ContentItem(article);
+          itemsList.push(item);
+        }
+      });
+    }
+    return of(itemsList);
   }
 
   private getEbooks(): Observable<ContentItem[]> {
@@ -77,28 +88,35 @@ export class ContentGridComponent implements OnInit {
     // which checks that they are included in the collections in config)
     // and append this information to the collection data
     return this.collectionsService.getCollections().pipe(
-      mergeMap((collectionsList: any[]) =>
+      mergeMap((collectionsList: Collection[]) =>
         // 'from' emits each collection separately
         from(collectionsList).pipe(
           // Filter collections to include only those with IDs in
           // this.flattenedCollectionSortOrder, which comes from config
-          filter((collection: any) =>
+          filter((collection: Collection) =>
             this.flattenedCollectionSortOrder.includes(collection.id)
           ),
           // load cover info for each collection that passes the filter
           // (mergeMap fetches in parallell, to fetch sequentially you'd
           // use concatMap)
-          mergeMap((collection: any) => 
+          mergeMap((collection: Collection) => 
             this.mdService.getMdContent(
               `${this.activeLocale}-08-${collection.id}`
             ).pipe(
               // add image alt-text and cover URL from response to
               // collection data
-              map((coverRes: any) => ({
-                ...collection,
-                imageAltText: coverRes.content.match(/!\[(.*?)\]\(.*?\)/)[1] || undefined,
-                imageURL: coverRes.content.match(/!\[.*?\]\((.*?)\)/)[1] || undefined
-              })),
+              map((md: string) => {
+                // try to capture first image from the Markdown: ![alt](url)
+                const m = md.match(/!\[(.*?)\]\((.*?)\)/);
+                const imageAltText = m?.[1] || undefined;
+                const imageURL = m?.[2] || undefined;
+
+                return {
+                  ...collection,
+                  imageAltText,
+                  imageURL,
+                };
+              }),
               catchError((error: any) => {
                 // error getting collection cover URL, so add collection
                 // with placeholder cover image
@@ -110,7 +128,7 @@ export class ContentGridComponent implements OnInit {
               })
             ),
           ),
-          map((collection: any) => {
+          map((collection: Collection) => {
             return new ContentItem(collection);
           }),
           // collect all collections into an array

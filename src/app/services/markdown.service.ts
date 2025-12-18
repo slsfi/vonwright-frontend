@@ -1,25 +1,29 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { catchError, map, Observable, of } from 'rxjs';
+import { catchError, map, Observable, of, shareReplay } from 'rxjs';
 import { Marked } from 'marked';
-import markedFootnote from 'marked-footnote'
+import markedFootnote from 'marked-footnote';
+import customHeadingId from "marked-custom-heading-id";
 
 import { config } from '@config';
+import { MarkdownApiResponse } from '@models/markdown.models';
+import { MdMenuNodeApiResponse } from '@models/menu.models';
 
 
 @Injectable({
   providedIn: 'root',
 })
 export class MarkdownService {
-  private apiURL: string = '';
+  private http = inject(HttpClient);
+
+  private readonly apiURL: string = `${config.app?.backendBaseURL ?? ''}/${config.app?.projectNameDB ?? ''}`;
+  /** One HTTP call per language for Markdown menu tree requests;
+   * value is shared & cached. */
+  private mdMenuTreeCache = new Map<string, Observable<MdMenuNodeApiResponse | null>>();
+
   private marked: Marked;
 
-  constructor(
-    private http: HttpClient
-  ) {
-    const apiBaseURL = config.app?.backendBaseURL ?? '';
-    const projectName = config.app?.projectNameDB ?? '';
-    this.apiURL = apiBaseURL + '/' + projectName;
+  constructor() {
 
     // * Create new instance of Marked to keep options and extensions
     // * locally scoped. Adding the marked-footnote extension to the
@@ -38,23 +42,35 @@ export class MarkdownService {
       headingClass: '',
       prefixId: 'md-footnote-'
     }));
+
+    // Configure this instance of Marked to use the
+    // marked-custom-heading-id extension for enabling custom heading
+    // ids with the Markdown Extended Syntax `# heading {#custom-id}`.
+    // https://www.markdownguide.org/extended-syntax/#heading-ids
+    // https://github.com/markedjs/marked-custom-heading-id
+    this.marked.use(customHeadingId());
   }
 
-  getMenuTree(language: string, rootNodeID: string): Observable<any> {
-    const endpoint = `${this.apiURL}/static-pages-toc/${language}`;
-    return this.http.get(endpoint).pipe(
-      map((res: any) => {
-        if (language && rootNodeID) {
-          res = this.getNodeById(`${language}-${rootNodeID}`, res);
-        } else {
-          res = res.children[0].children;
+  getMenuTree(
+    language: string,
+    rootNodeID: string
+  ): Observable<MdMenuNodeApiResponse | null> {
+    return this.getStaticPagesToc(language).pipe(
+      map((res: MdMenuNodeApiResponse | null) => {
+        if (!res) {
+          return null;
         }
-        res.id = this.stripLocaleFromID(res.id);
-        this.stripLocaleFromAboutPagesIDs(res.children);
-        return res;
-      }),
-      catchError((e) => {
-        return of({});
+
+        let node = this.getNodeById(`${language}-${rootNodeID}`, res);
+        if (!node) {
+          return null;
+        }
+
+        node.id = this.stripLocaleFromID(node.id);
+        if (node.children?.length) {
+          this.stripLocaleFromAboutPagesIDs(node.children);
+        }
+        return node;
       })
     );
   }
@@ -67,8 +83,8 @@ export class MarkdownService {
    */
   getParsedMdContent(fileID: string, errorMessage: string = ''): Observable<string | null> {
     return this.getMdContent(fileID).pipe(
-      map((res: any) => {
-        return res.content.trim() ? this.parseMd(res.content) : null;
+      map((md: string) => {
+        return md.trim() ? this.parseMd(md) : null;
       }),
       catchError((e: any) => {
         console.error('Error loading markdown content', e);
@@ -81,11 +97,13 @@ export class MarkdownService {
    * Get the content of a markdown file from the backend. Prefer using the
    * method 'getParsedMdContent' instead if you need the markdown parsed into HTML.
    * @param fileID ID of the file to get content of.
-   * @returns object where the markdown content is in the 'content' property as a string.
+   * @returns string with the markdown content.
    */
-  getMdContent(fileID: string): Observable<any> {
+  getMdContent(fileID: string): Observable<string> {
     const endpoint = `${this.apiURL}/md/${fileID}`;
-    return this.http.get(endpoint);
+    return this.http.get<MarkdownApiResponse>(endpoint).pipe(
+      map((res: MarkdownApiResponse) => (res.content ?? ''))
+    );
   }
 
   /**
@@ -93,6 +111,21 @@ export class MarkdownService {
    */
   parseMd(md: string): string {
     return this.marked.parse(md) as string;
+  }
+
+  /** Cached raw menu tree endpoint per language. */
+  private getStaticPagesToc(language: string): Observable<MdMenuNodeApiResponse | null> {
+    let cached$ = this.mdMenuTreeCache.get(language);
+    if (!cached$) {
+      const endpoint = `${this.apiURL}/static-pages-toc/${language}`;
+      cached$ = this.http.get<MdMenuNodeApiResponse>(endpoint).pipe(
+        catchError(() => of(null)),
+        // one-shot HTTP: cache forever and replay to late subscribers
+        shareReplay({ bufferSize: 1, refCount: false })
+      );
+      this.mdMenuTreeCache.set(language, cached$);
+    }
+    return cached$;
   }
 
   /**
@@ -113,13 +146,13 @@ export class MarkdownService {
     return runner(null, tree);
   }
 
-  private stripLocaleFromAboutPagesIDs(array: any[]) {
-    for (let i = 0; i < array.length; i++) {
-      array[i]['id'] = this.stripLocaleFromID(array[i]['id']);
-      if (array[i]['children']?.length) {
-        this.stripLocaleFromAboutPagesIDs(array[i]['children']);
+  private stripLocaleFromAboutPagesIDs(array: MdMenuNodeApiResponse[]) {
+    array.forEach((n: MdMenuNodeApiResponse) => {
+      n.id = this.stripLocaleFromID(n.id);
+      if (n.children?.length) {
+        this.stripLocaleFromAboutPagesIDs(n.children);
       }
-    }
+    });
   }
 
   private stripLocaleFromID(id: string) {

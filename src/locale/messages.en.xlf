@@ -18,6 +18,18 @@
         <target>Failed to load page content.</target>
       </segment>
     </unit>
+    <unit id="Article.Contents">
+      <segment state="initial">
+        <source>Innehåll</source>
+        <target>Contents</target>
+      </segment>
+    </unit>
+    <unit id="Article.LoadingError">
+      <segment state="initial">
+        <source>Artikeln kunde inte laddas.</source>
+        <target>Failed to load article.</target>
+      </segment>
+    </unit>
     <unit id="BasicActions.Cancel">
       <segment state="initial">
         <source>Avbryt</source>
@@ -510,28 +522,34 @@
         <target>Hide filters</target>
       </segment>
     </unit>
+    <unit id="ElasticSearch.Language">
+      <segment state="initial">
+        <source>Språk</source>
+        <target>Language</target>
+      </segment>
+    </unit>
     <unit id="ElasticSearch.LetterReceiverLocation">
       <segment state="initial">
         <source>Mottagarort (brev)</source>
-        <target>Reciever place</target>
+        <target>Addressee location (letters)</target>
       </segment>
     </unit>
     <unit id="ElasticSearch.LetterReceiverName">
       <segment state="initial">
         <source>Mottagare (brev)</source>
-        <target>Reciever</target>
+        <target>Addressee (letters)</target>
       </segment>
     </unit>
     <unit id="ElasticSearch.LetterSenderLocation">
       <segment state="initial">
         <source>Avsändarort (brev)</source>
-        <target>Sender place</target>
+        <target>Sender location (letters)</target>
       </segment>
     </unit>
     <unit id="ElasticSearch.LetterSenderName">
       <segment state="initial">
         <source>Avsändare (brev)</source>
-        <target>Sender</target>
+        <target>Sender (letters)</target>
       </segment>
     </unit>
     <unit id="ElasticSearch.LoadingError">
@@ -892,6 +910,12 @@
       <segment state="initial">
         <source>Personkategorier</source>
         <target>Person categories</target>
+      </segment>
+    </unit>
+    <unit id="Language.Undefined">
+      <segment state="initial">
+        <source>odefinierat</source>
+        <target>Undefined</target>
       </segment>
     </unit>
     <unit id="Legend.Legend">
@@ -1467,55 +1491,61 @@
     <unit id="Reference.Refer">
       <segment state="initial">
         <source>Hänvisa</source>
-        <target>Refer</target>
+        <target>Cite</target>
       </segment>
     </unit>
     <unit id="Reference.Reference">
       <segment state="initial">
         <source>Källhänvisning</source>
-        <target>Reference</target>
+        <target>How to cite</target>
+      </segment>
+    </unit>
+    <unit id="Reference.ReferToArticle">
+      <segment state="initial">
+        <source>Hänvisa till denna artikel</source>
+        <target>Cite this article</target>
       </segment>
     </unit>
     <unit id="Reference.ReferToCollection">
       <segment state="initial">
         <source>Hänvisa till denna delutgåva</source>
-        <target>Refer to this edition</target>
+        <target>Cite this edition</target>
       </segment>
     </unit>
     <unit id="Reference.ReferToEbook">
       <segment state="initial">
         <source>Hänvisa till denna text</source>
-        <target>Refer to this text</target>
+        <target>Cite this text</target>
       </segment>
     </unit>
     <unit id="Reference.ReferToForeword">
       <segment state="initial">
         <source>Hänvisa till detta förord</source>
-        <target>Refer to this foreword</target>
+        <target>Cite this foreword</target>
       </segment>
     </unit>
     <unit id="Reference.ReferToIntroduction">
       <segment state="initial">
         <source>Hänvisa till denna inledning</source>
-        <target>Refer to this introduction</target>
+        <target>Cite this introduction</target>
       </segment>
     </unit>
     <unit id="Reference.ReferToMediaCollection">
       <segment state="initial">
         <source>Hänvisa till denna bildsamling</source>
-        <target>Refer to this media collection</target>
+        <target>Cite this media collection</target>
       </segment>
     </unit>
     <unit id="Reference.ReferToReadingText">
       <segment state="initial">
         <source>Hänvisa till denna lästext</source>
-        <target>Refer to this text</target>
+        <target>Cite this text</target>
       </segment>
     </unit>
     <unit id="Reference.ReferToThisPage">
       <segment state="initial">
         <source>Hänvisa till denna sida</source>
-        <target>Refer to this page</target>
+        <target>Cite this page</target>
       </segment>
     </unit>
     <unit id="Site.MetaDescription.Home">
@@ -1534,6 +1564,18 @@
       <segment state="initial">
         <source>Webbplatsens titel</source>
         <target>Website title</target>
+      </segment>
+    </unit>
+    <unit id="TextChanger.NextLabel">
+      <segment state="initial">
+        <source>Följande text</source>
+        <target>Next text</target>
+      </segment>
+    </unit>
+    <unit id="TextChanger.PrevLabel">
+      <segment state="initial">
+        <source>Föregående text</source>
+        <target>Previous text</target>
       </segment>
     </unit>
     <unit id="TopMenu.About">

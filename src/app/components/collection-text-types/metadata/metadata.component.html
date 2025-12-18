@@ -1,5 +1,11 @@
+@let metadata = publicationMetadata();
+
 <div class="tei teiContainer">
-  @if ((metadata$ | async); as metadata) {
+  @if (error()) {
+    <p class="noIndent" i18n="@@Metadata.None">Ingen metadata tillgänglig.</p>
+  } @else if (metadata === null) {
+    <ion-spinner class="loading" name="crescent"></ion-spinner>
+  } @else {
     <h2 i18n="@@Metadata.Metadata">Metadata</h2>
     <dl>
       @if (metadata.publication_title) {
@@ -38,7 +44,7 @@
           <dd>{{metadata.publication_date}}</dd>
         </div>
       }
-      @if (metadata.author?.length) {
+      @if (metadata.author.length) {
         <div>
           <dt>
             @if (metadata.author.length < 2) {
@@ -58,7 +64,7 @@
           </dd>
         </div>
       }
-      @if (metadata.sender?.length) {
+      @if (metadata.sender.length) {
         <div>
           <dt>
             @if (metadata.sender.length < 2) {
@@ -78,7 +84,7 @@
           </dd>
         </div>
       }
-      @if (metadata.recipient?.length) {
+      @if (metadata.recipient.length) {
         <div>
           <dt>
             @if (metadata.recipient.length < 2) {
@@ -98,7 +104,7 @@
           </dd>
         </div>
       }
-      @if (metadata.translations?.length) {
+      @if (metadata.translations.length) {
         <div>
           <dt>
             @if (metadata.translations.length < 2) {
@@ -125,7 +131,7 @@
         </div>
       }
     </dl>
-    @if (metadata.facsimiles?.length) {
+    @if (metadata.facsimiles.length) {
       <h3>
         @if (metadata.facsimiles.length < 2) {
           <ng-container i18n="@@Metadata.Facsimile">Faksimil</ng-container>
@@ -168,12 +174,6 @@
           }
         </dl>
       }
-    }
-  } @else {
-    @if ((loadingError$ | async)) {
-      <p class="noIndent" i18n="@@Metadata.None">Ingen metadata tillgänglig.</p>
-    } @else {
-      <ion-spinner class="loading" name="crescent"></ion-spinner>
     }
   }
 </div>

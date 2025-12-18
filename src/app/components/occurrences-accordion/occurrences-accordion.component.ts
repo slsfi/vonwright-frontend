@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, OnInit, inject, input } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { IonicModule } from '@ionic/angular';
 import { take } from 'rxjs';
@@ -6,8 +6,8 @@ import { take } from 'rxjs';
 import { config } from '@config';
 import { CollectionPagePathPipe } from '@pipes/collection-page-path.pipe';
 import { OccurrenceCollectionTextPageQueryparamsPipe } from '@pipes/occurrence-collection-text-page-queryparams.pipe';
-import { Occurrence } from '@models/occurrence.model';
-import { SingleOccurrence } from '@models/single-occurrence.model';
+import { Occurrence } from '@models/occurrence.models';
+import { SingleOccurrence } from '@models/single-occurrence.models';
 import { CollectionTableOfContentsService } from '@services/collection-toc.service';
 import { NamedEntityService } from '@services/named-entity.service';
 import { sortArrayOfObjectsAlphabetically } from '@utility-functions';
@@ -20,43 +20,42 @@ import { sortArrayOfObjectsAlphabetically } from '@utility-functions';
   imports: [IonicModule, RouterModule, CollectionPagePathPipe, OccurrenceCollectionTextPageQueryparamsPipe]
 })
 export class OccurrencesAccordionComponent implements OnInit {
-  @Input() id: number | undefined = undefined;
-  @Input() type: string = '';
+  private namedEntityService = inject(NamedEntityService);
+  private tocService = inject(CollectionTableOfContentsService);
+
+  readonly id = input<number>();
+  readonly type = input<string>('');
+
+  readonly simpleWorkMetadata: boolean = config.modal?.namedEntity?.useSimpleWorkMetadata ?? false;
 
   groupedTexts: any[] = [];
   isLoading: boolean = true;
   occurrenceData: any[] = [];
   showPublishedStatus: number = 2;
-  simpleWorkMetadata: boolean = false;
-
-  constructor(
-    private namedEntityService: NamedEntityService,
-    private tocService: CollectionTableOfContentsService
-  ) {
-    this.simpleWorkMetadata = config.modal?.namedEntity?.useSimpleWorkMetadata ?? false;
-  }
 
   ngOnInit() {
-    if (this.type === 'keyword') {
+    const type = this.type();
+    if (type === 'keyword') {
       this.showPublishedStatus = config.page?.index?.keywords?.publishedStatus ?? 2;
-    } else if (this.type === 'person') {
+    } else if (type === 'person') {
       this.showPublishedStatus = config.page?.index?.persons?.publishedStatus ?? 2;
-    } else if (this.type === 'place') {
+    } else if (type === 'place') {
       this.showPublishedStatus = config.page?.index?.places?.publishedStatus ?? 2;
-    } else if (this.type === 'work') {
+    } else if (type === 'work') {
       this.showPublishedStatus = config.page?.index?.works?.publishedStatus ?? 2;
     }
 
-    if (this.type === 'work' && this.simpleWorkMetadata) {
+    const id = this.id();
+    if (type === 'work' && this.simpleWorkMetadata) {
       this.isLoading = false;
-    } else if (this.id && this.type) {
-      this.getOccurrenceData(this.id);
+    } else if (id && type) {
+      this.getOccurrenceData(id);
     }
   }
 
   private getOccurrenceData(id: any) {
     this.isLoading = true;
-    let objectType = this.type;
+    let objectType = this.type();
     if (objectType === 'work') {
       objectType = 'work_manifestation';
     }

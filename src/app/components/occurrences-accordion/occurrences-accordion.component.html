@@ -54,7 +54,7 @@
   </ul>
 }
 
-@if (simpleWorkMetadata && (type === 'work' || type === 'work_manifestation')) {
+@if (simpleWorkMetadata && (type() === 'work' || type() === 'work_manifestation')) {
   <p i18n="@@NamedEntity.WorkOccurrencesUnavailable">Förekomster för verk är inte tillgängliga.</p>
 } @else {
   @if (!isLoading && occurrenceData.length < 1) {

@@ -1,4 +1,4 @@
-import { Inject, Injectable, LOCALE_ID } from '@angular/core';
+import { Injectable, LOCALE_ID, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { UrlSegment } from '@angular/router';
 import { Observable, catchError, of, switchMap } from 'rxjs';
@@ -10,14 +10,10 @@ import { config } from '@config';
   providedIn: 'root',
 })
 export class ReferenceDataService {
-  private urnResolverUrl: string = 'https://urn.fi/';
+  private http = inject(HttpClient);
+  private activeLocale = inject(LOCALE_ID);
 
-  constructor(
-    private http: HttpClient,
-    @Inject(LOCALE_ID) private activeLocale: string
-  ) {
-    this.urnResolverUrl = config.modal?.referenceData?.URNResolverURL ?? 'https://urn.fi/';
-  }
+  private readonly urnResolverUrl: string = config.modal?.referenceData?.URNResolverURL ?? 'https://urn.fi/';
 
   getReferenceData(urlSegments: UrlSegment[]): Observable<any> {
     let url = '/';

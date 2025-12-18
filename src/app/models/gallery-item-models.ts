@@ -22,7 +22,7 @@ export class GalleryItem {
         this.imageURLThumb = this.imageURL;
         this.imageURLBack = obj.imageURLBack || obj.back || undefined;
         this.sortOrder = obj.sortOrder || obj.sort_order || undefined;
-        this.subItemCount = obj.subItemCount || obj.media_count || undefined;
+        this.subItemCount = obj.subItemCount || obj.mediaCount || obj.media_count || undefined;
         this.title = obj.full_name || obj.name || (obj.front ? obj.media_title_translation : obj.title) || undefined;
         this.subTitle = obj.subTitle || obj.subject_name || undefined;
         this.imageAltText = obj.imageAltText || this.title;

@@ -1,5 +1,6 @@
-import { Injectable, NgZone } from '@angular/core';
+import { Injectable, NgZone, inject } from '@angular/core';
 
+import { ScrollPlan, ScrollYPos } from '@models/scroll.models';
 import { isBrowser } from '@utility-functions';
 
 
@@ -7,6 +8,8 @@ import { isBrowser } from '@utility-functions';
   providedIn: 'root',
 })
 export class ScrollService {
+  private ngZone = inject(NgZone);
+
   private activeComHighl: Record<string, any> = {
     commentTimeOutId: null,
     commentLemmaElement: null,
@@ -17,9 +20,81 @@ export class ScrollService {
   };
   private intervalTimerId: number = 0;
 
-  constructor(
-    private ngZone: NgZone
-  ) {}
+
+  /**
+   * Computes a scroll plan (read-only) to position a target element at a given
+   * vertical location inside a scrollable container.
+   *
+   * Intended for split read/write flows with `afterRenderEffect`:
+   * - Call in **earlyRead** (DOM read phase).
+   * - Apply later with `applyScroll` in the **write** (DOM write) phase.
+   *
+   * If `container` is omitted, the nearest ancestor with class
+   * `scroll-content-container` is used. Returns `null` if the element or
+   * container cannot be resolved.
+   *
+   * @param element  The target element to bring into view.
+   * @param yPosition  Desired vertical placement inside the container ('top' | 'center'). Defaults to `center`.
+   * @param offset  Extra pixels to subtract from the computed top (e.g., for sticky headers). Defaults to `0`.
+   * @param container  Optional scrollable container; if not provided, it is inferred.
+   * @return  A plan describing where/how to scroll, or `null` if measurement was not possible.
+   */
+  computeScrollPlan(
+    element: HTMLElement | null,
+    yPosition: ScrollYPos = 'center',
+    offset = 0,
+    container: HTMLElement | null = null
+  ): ScrollPlan | null {
+    if (!element || (yPosition !== 'center' && yPosition !== 'top')) {
+      return null;
+    }
+
+    // Find the scrollable container of the element which
+    // is to be scrolled into view
+    if (!container) {
+      container = element.parentElement;
+      while (
+        container?.parentElement &&
+        !container.classList.contains('scroll-content-container')
+      ) {
+        container = container.parentElement;
+      }
+      if (!container || !container.parentElement) {
+        return null;
+      }
+    }
+
+    // DOM reads
+    const y = Math.floor(
+      element.getBoundingClientRect().top +
+      container.scrollTop -
+      container.getBoundingClientRect().top
+    );
+
+    // Base offset: accounts for borders/scrollbar and optional header allowance
+    let baseOffset = 10 + container.offsetHeight - container.clientHeight;
+    if (yPosition === 'center') {
+      baseOffset = Math.floor(container.offsetHeight / 2);
+      if (baseOffset > 45) {
+        baseOffset = baseOffset - 45;
+      }
+    }
+
+    const top = y - baseOffset - offset;
+    return { behavior: 'smooth', container, top };
+  }
+
+
+  /**
+   * Applies a previously computed scroll plan (write-only), i.e. scrolls a
+   * container to a target element. Use together with `computeScrollPlan`.
+   *
+   * @param plan  The plan returned by `computeScrollPlan`.
+   */
+  applyScroll(plan: ScrollPlan) {
+    plan.container.scrollTo({ top: plan.top, behavior: plan.behavior });
+  }
+
 
   /**
    * This function can be used to scroll a container so that the element which it

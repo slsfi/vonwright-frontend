@@ -1,8 +1,9 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, map } from 'rxjs';
 
 import { config } from '@config';
+import { MediaCollection, MediaCollectionApiResponse, toMediaCollection } from '@models/media-collection.models';
 import { convertNamedEntityTypeForBackend } from '@utility-functions';
 
 
@@ -10,19 +11,17 @@ import { convertNamedEntityTypeForBackend } from '@utility-functions';
   providedIn: 'root',
 })
 export class MediaCollectionService {
-  private apiURL: string = '';
+  private http = inject(HttpClient);
 
-  constructor(
-    private http: HttpClient
-  ) {
-    const apiBaseURL = config.app?.backendBaseURL ?? '';
-    const projectName = config.app?.projectNameDB ?? '';
-    this.apiURL = apiBaseURL + '/' + projectName;
-  }
+  private readonly apiURL: string = `${config.app?.backendBaseURL ?? ''}/${config.app?.projectNameDB ?? ''}`;
 
-  getMediaCollections(language: string): Observable<any> {
+  getMediaCollections(language: string): Observable<MediaCollection[]> {
     const endpoint = `${this.apiURL}/gallery/data/${language}`;
-    return this.http.get(endpoint);
+    return this.http.get<MediaCollectionApiResponse[]>(endpoint).pipe(
+      map((res: MediaCollectionApiResponse[]) => {
+        return res.map(toMediaCollection)
+      })
+    );
   }
 
   getSingleMediaCollection(id: string, language: string): Observable<any> {

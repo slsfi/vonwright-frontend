@@ -186,6 +186,16 @@ h1.page-title {
             @media screen and (max-width: 820px) {
                 margin-left: 0;
             }
+
+            &.scroll-to-top {
+                --background: var(--fab-button-secondary-background-color);
+                --color: var(--fab-button-secondary-icon-color);
+                margin-bottom: 0;
+                margin-top: 3em;
+                margin-right: 0;
+                position: sticky;
+                top: calc(100vh - 10em);
+            }
         }
     }
 }

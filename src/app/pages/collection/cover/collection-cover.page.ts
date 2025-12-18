@@ -1,4 +1,4 @@
-import { Component, Inject, LOCALE_ID, OnInit } from '@angular/core';
+import { Component, LOCALE_ID, OnInit, inject } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { catchError, map, Observable, of, switchMap, tap } from 'rxjs';
 
@@ -13,17 +13,15 @@ import { PlatformService } from '@services/platform.service';
   standalone: false
 })
 export class CollectionCoverPage implements OnInit {
+  private mdService = inject(MarkdownService);
+  private platformService = inject(PlatformService);
+  private route = inject(ActivatedRoute);
+  private activeLocale = inject(LOCALE_ID);
+
   _activeComponent: boolean = true;
   collectionID: string = '';
   coverData$: Observable<any>;
   mobileMode: boolean = false;
-
-  constructor(
-    private mdService: MarkdownService,
-    private platformService: PlatformService,
-    private route: ActivatedRoute,
-    @Inject(LOCALE_ID) private activeLocale: string
-  ) {}
 
   ngOnInit() {
     this.mobileMode = this.platformService.isMobile();
@@ -50,21 +48,20 @@ export class CollectionCoverPage implements OnInit {
 
   private getCoverDataFromMdContent(fileID: string): Observable<any> {
     return this.mdService.getMdContent(fileID).pipe(
-      map((res: any) => {
+      map((md: string) => {
         // Extract image url and alt-text from markdown content.
-        let image_alt = res.content.match(/!\[(.*?)\]\(.*?\)/)[1];
-        if (!image_alt) {
-          image_alt = 'Cover image';
-        }
-        let image_src = res.content.match(/!\[.*?\]\((.*?)\)/)[1];
-        if (!image_src) {
-          image_src = '';
-        }
+        const m = md.match(/!\[(.*?)\]\((.*?)\)/);
+        const image_alt = m?.[1] || 'Collection cover image';
+        const image_src = m?.[2] || 'assets/images/collection-cover-placeholder.jpg';
+
         return { image_alt, image_src };
       }),
       catchError((e: any) => {
         console.error('Error loading markdown content for cover image', e);
-        return of({ image_alt: 'Cover image', image_src: '' });
+        return of({
+          image_alt: 'Cover image',
+          image_src: 'assets/images/collection-cover-placeholder.jpg'
+        });
       })
     );
   }

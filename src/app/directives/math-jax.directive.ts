@@ -1,4 +1,4 @@
-import { Directive, ElementRef, Input, OnChanges } from '@angular/core';
+import { Directive, ElementRef, OnChanges, inject, input } from '@angular/core';
 import { SafeHtml } from '@angular/platform-browser';
 
 import { config } from '@config';
@@ -16,18 +16,14 @@ declare var MathJax: {
   selector: '[MathJax]'
 })
 export class MathJaxDirective implements OnChanges {
-  @Input('MathJax') mathJaxInput: string | SafeHtml | null = null;
+  private elRef = inject(ElementRef);
 
-  private mathJaxEnabled: boolean = false;
+  readonly mathJaxInput = input<string | SafeHtml | null>(null, { alias: "MathJax" });
 
-  constructor(
-    private elRef: ElementRef
-  ) {
-    this.mathJaxEnabled = config.collections?.enableMathJax ?? false;
-  }
+  readonly mathJaxEnabled: boolean = config.collections?.enableMathJax ?? false;
 
   ngOnChanges() {
-    if (isBrowser() && this.mathJaxEnabled && this.mathJaxInput) {
+    if (isBrowser() && this.mathJaxEnabled && this.mathJaxInput()) {
       try {
         // Tell the MathJax-processor to convert any TeX notated math in this.elRef.nativeElement
         MathJax.Hub.Queue(['Typeset', MathJax.Hub, this.elRef.nativeElement]);

@@ -1,4 +1,4 @@
-import { Component, Inject, Input, LOCALE_ID, OnInit } from '@angular/core';
+import { Component, Input, LOCALE_ID, OnInit, inject } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { IonicModule, ModalController } from '@ionic/angular';
 
@@ -14,16 +14,14 @@ import { config } from '@config';
   imports: [RouterModule, IonicModule]
 })
 export class IllustrationModal implements OnInit {
+  private mediaCollectionService = inject(MediaCollectionService);
+  private modalCtrl = inject(ModalController);
+  private activeLocale = inject(LOCALE_ID);
+
   @Input() imageNumber: string = '';
 
   imgPath: string = '';
   imgMetadata: Record<string, any> | undefined | null = undefined;
-
-  constructor(
-    private mediaCollectionService: MediaCollectionService,
-    private modalCtrl: ModalController,
-    @Inject(LOCALE_ID) private activeLocale: string
-  ) {}
 
   ngOnInit() {
     this.getImageMetadata();

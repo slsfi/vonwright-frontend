@@ -1,3 +1,6 @@
+@let flags = viewOptionsService.show();
+@let textsize = viewOptionsService.textsize();
+
 <ion-list lines="full">
   <ion-list-header>
     <ion-label i18n="@@ViewOptions.Textsize">Textstorlek</ion-label>
@@ -7,37 +10,37 @@
   </ion-list-header>
   <div class="font-size-buttons-wrapper">
     <ion-button class="text-button text-xsmall"
-          [class.selected-font-size]="textsize == TextsizeEnum.XSmall"
-          [attr.aria-pressed]="textsize == TextsizeEnum.XSmall"
-          (click)="setTextSize(TextsizeEnum.XSmall)"
+          [class.selected-font-size]="textsize === 'xsmall'"
+          [attr.aria-pressed]="textsize === 'xsmall'"
+          (click)="setTextSize('xsmall')"
           aria-label="Textstorlek: liten"
           i18n-aria-label="@@ViewOptions.TextsizeXSmall"
     >A</ion-button>
     <ion-button class="text-button text-small"
-          [class.selected-font-size]="textsize == TextsizeEnum.Small"
-          [attr.aria-pressed]="textsize == TextsizeEnum.Small"
-          (click)="setTextSize(TextsizeEnum.Small)"
+          [class.selected-font-size]="textsize === 'small'"
+          [attr.aria-pressed]="textsize === 'small'"
+          (click)="setTextSize('small')"
           aria-label="Textstorlek: normal"
           i18n-aria-label="@@ViewOptions.TextsizeSmall"
     >A</ion-button>
     <ion-button class="text-button text-medium"
-          [class.selected-font-size]="textsize == TextsizeEnum.Medium"
-          [attr.aria-pressed]="textsize == TextsizeEnum.Medium"
-          (click)="setTextSize(TextsizeEnum.Medium)"
+          [class.selected-font-size]="textsize === 'medium'"
+          [attr.aria-pressed]="textsize === 'medium'"
+          (click)="setTextSize('medium')"
           aria-label="Textstorlek: stor"
           i18n-aria-label="@@ViewOptions.TextsizeMedium"
     >A</ion-button>
     <ion-button class="text-button text-large"
-          [class.selected-font-size]="textsize == TextsizeEnum.Large"
-          [attr.aria-pressed]="textsize == TextsizeEnum.Large"
-          (click)="setTextSize(TextsizeEnum.Large)"
+          [class.selected-font-size]="textsize === 'large'"
+          [attr.aria-pressed]="textsize === 'large'"
+          (click)="setTextSize('large')"
           aria-label="Textstorlek: mycket stor"
           i18n-aria-label="@@ViewOptions.TextsizeLarge"
     >A</ion-button>
     <ion-button class="text-button text-xlarge"
-          [class.selected-font-size]="textsize == TextsizeEnum.XLarge"
-          [attr.aria-pressed]="textsize == TextsizeEnum.XLarge"
-          (click)="setTextSize(TextsizeEnum.XLarge)"
+          [class.selected-font-size]="textsize === 'xlarge'"
+          [attr.aria-pressed]="textsize === 'xlarge'"
+          (click)="setTextSize('xlarge')"
           aria-label="Textstorlek: störst"
           i18n-aria-label="@@ViewOptions.TextsizeXLarge"
     >A</ion-button>
@@ -49,59 +52,137 @@
     <ion-list-header>
       <ion-label i18n="@@ViewOptions.Options">Visningsalternativ</ion-label>
     </ion-list-header>
+
     @if (togglesCounter > 1) {
       <ion-item>
-        <ion-toggle (ionChange)="toggleAll($event)" [checked]="checkedToggles > togglesCounter-1" justify="space-between" [enableOnOffLabels]="true" i18n="@@ViewOptions.ToggleAll">Välj alla</ion-toggle>
+        <ion-toggle justify="space-between"
+                    [enableOnOffLabels]="true"
+                    i18n="@@ViewOptions.ToggleAll"
+                    (ionChange)="toggleAll($event)"
+                    [checked]="checkedCount() > (togglesCounter - 1)"
+        >Välj alla</ion-toggle>
       </ion-item>
     }
+
     @if (availableToggles.comments) {
       <ion-item>
-        <ion-toggle class="show_comments" [(ngModel)]="show.comments" (ionChange)="toggleOption('comments')" justify="space-between" [enableOnOffLabels]="true"><img alt="Röd asterisk" i18n-alt="@@ViewOptions.ExplanatoryNotesAltText" src="assets/images/asterisk.svg" class="asterisk"><ng-container i18n="@@ViewOptions.ExplanatoryNotes">Punktkommentarer</ng-container></ion-toggle>
+        <ion-toggle class="show_comments"
+                    justify="space-between"
+                    [enableOnOffLabels]="true"
+                    [checked]="flags.comments"
+                    (ionChange)="onToggle('comments', $event.detail.checked)"
+        >
+          <img alt="Röd asterisk" i18n-alt="@@ViewOptions.ExplanatoryNotesAltText"
+               src="assets/images/asterisk.svg" class="asterisk">
+          <ng-container i18n="@@ViewOptions.ExplanatoryNotes">Punktkommentarer</ng-container>
+        </ion-toggle>
       </ion-item>
     }
+
     @if (availableToggles.personInfo) {
       <ion-item>
-        <ion-toggle class="show_personInfo" [(ngModel)]="show.personInfo" (ionChange)="toggleOption('personInfo')" justify="space-between" [enableOnOffLabels]="true" i18n="@@ViewOptions.PersonInfo">Personupplysningar</ion-toggle>
+        <ion-toggle class="show_personInfo"
+                    justify="space-between"
+                    [enableOnOffLabels]="true"
+                    [checked]="flags.personInfo"
+                    (ionChange)="onToggle('personInfo', $event.detail.checked)"
+                    i18n="@@ViewOptions.PersonInfo"
+        >Personupplysningar</ion-toggle>
       </ion-item>
     }
+
     @if (availableToggles.placeInfo) {
       <ion-item>
-        <ion-toggle class="show_placeInfo" [(ngModel)]="show.placeInfo" (ionChange)="toggleOption('placeInfo')" justify="space-between" [enableOnOffLabels]="true" i18n="@@ViewOptions.PlaceInfo">Platsupplysningar</ion-toggle>
+        <ion-toggle class="show_placeInfo"
+                    justify="space-between"
+                    [enableOnOffLabels]="true"
+                    [checked]="flags.placeInfo"
+                    (ionChange)="onToggle('placeInfo', $event.detail.checked)"
+                    i18n="@@ViewOptions.PlaceInfo"
+        >Platsupplysningar</ion-toggle>
       </ion-item>
     }
+
     @if (availableToggles.workInfo) {
       <ion-item>
-        <ion-toggle class="show_workInfo" [(ngModel)]="show.workInfo" (ionChange)="toggleOption('workInfo')" justify="space-between" [enableOnOffLabels]="true" i18n="@@ViewOptions.WorkInfo">Verkupplysningar</ion-toggle>
+        <ion-toggle class="show_workInfo"
+                    justify="space-between"
+                    [enableOnOffLabels]="true"
+                    [checked]="flags.workInfo"
+                    (ionChange)="onToggle('workInfo', $event.detail.checked)"
+                    i18n="@@ViewOptions.WorkInfo"
+        >Verkupplysningar</ion-toggle>
       </ion-item>
     }
+
     @if (availableToggles.abbreviations) {
       <ion-item>
-        <ion-toggle class="show_abbreviations" [(ngModel)]="show.abbreviations" (ionChange)="toggleOption('abbreviations')" justify="space-between" [enableOnOffLabels]="true" i18n="@@ViewOptions.Abbreviations">Förkortningar</ion-toggle>
+        <ion-toggle class="show_abbreviations"
+                    justify="space-between"
+                    [enableOnOffLabels]="true"
+                    [checked]="flags.abbreviations"
+                    (ionChange)="onToggle('abbreviations', $event.detail.checked)"
+                    i18n="@@ViewOptions.Abbreviations"
+        >Förkortningar</ion-toggle>
       </ion-item>
     }
+
     @if (availableToggles.emendations) {
       <ion-item>
-        <ion-toggle class="show_emendationsInfo" [(ngModel)]="show.emendations" (ionChange)="toggleOption('emendations')" justify="space-between" [enableOnOffLabels]="true" i18n="@@ViewOptions.Emendations">Utgivarens ändringar</ion-toggle>
+        <ion-toggle class="show_emendationsInfo"
+                    justify="space-between"
+                    [enableOnOffLabels]="true"
+                    [checked]="flags.emendations"
+                    (ionChange)="onToggle('emendations', $event.detail.checked)"
+                    i18n="@@ViewOptions.Emendations"
+        >Utgivarens ändringar</ion-toggle>
       </ion-item>
     }
+
     @if (availableToggles.normalisations) {
       <ion-item>
-        <ion-toggle class="show_normalisationsInfo" [(ngModel)]="show.normalisations" (ionChange)="toggleOption('normalisations')" justify="space-between" [enableOnOffLabels]="true" i18n="@@ViewOptions.Normalisations">Normaliseringar</ion-toggle>
+        <ion-toggle class="show_normalisationsInfo"
+                    justify="space-between"
+                    [enableOnOffLabels]="true"
+                    [checked]="flags.normalisations"
+                    (ionChange)="onToggle('normalisations', $event.detail.checked)"
+                    i18n="@@ViewOptions.Normalisations"
+        >Normaliseringar</ion-toggle>
       </ion-item>
     }
+
     @if (availableToggles.paragraphNumbering) {
       <ion-item>
-        <ion-toggle [(ngModel)]="show.paragraphNumbering" (ionChange)="toggleOption('paragraphNumbering')" justify="space-between" [enableOnOffLabels]="true" i18n="@@ViewOptions.ParagraphNumbering">Stycke-/radnumrering</ion-toggle>
+        <ion-toggle justify="space-between"
+                    [enableOnOffLabels]="true"
+                    [checked]="flags.paragraphNumbering"
+                    (ionChange)="onToggle('paragraphNumbering', $event.detail.checked)"
+                    i18n="@@ViewOptions.ParagraphNumbering"
+        >Stycke-/radnumrering</ion-toggle>
       </ion-item>
     }
+
     @if (availableToggles.pageBreakOriginal) {
       <ion-item>
-        <ion-toggle class="show_pageBreakOriginal" [(ngModel)]="show.pageBreakOriginal" (ionChange)="toggleOption('pageBreakOriginal')" justify="space-between" [enableOnOffLabels]="true" i18n="@@ViewOptions.PageBreakOriginal">Sidnummer, original</ion-toggle>
+        <ion-toggle class="show_pageBreakOriginal"
+                    justify="space-between"
+                    [enableOnOffLabels]="true"
+                    [checked]="flags.pageBreakOriginal"
+                    (ionChange)="onToggle('pageBreakOriginal', $event.detail.checked)"
+                    i18n="@@ViewOptions.PageBreakOriginal"
+        >Sidnummer, original</ion-toggle>
       </ion-item>
     }
+
     @if (availableToggles.pageBreakEdition) {
       <ion-item>
-        <ion-toggle class="show_pageBreakEdition" [(ngModel)]="show.pageBreakEdition" (ionChange)="toggleOption('pageBreakEdition')" justify="space-between" [enableOnOffLabels]="true" i18n="@@ViewOptions.PageBreakEdition">Sidnummer, tryckt utgåva</ion-toggle>
+        <ion-toggle class="show_pageBreakEdition"
+                    justify="space-between"
+                    [enableOnOffLabels]="true"
+                    [checked]="flags.pageBreakEdition"
+                    (ionChange)="onToggle('pageBreakEdition', $event.detail.checked)"
+                    i18n="@@ViewOptions.PageBreakEdition"
+        >Sidnummer, tryckt utgåva</ion-toggle>
       </ion-item>
     }
   </ion-list>
@@ -113,14 +194,25 @@
       <ion-label i18n="@@ViewOptions.VariantOptions">Visningsalternativ, varianter</ion-label>
     </ion-list-header>
     <ion-item>
-      <ion-radio-group
-            class="selected-variation-type"
-            [value]="viewOptionsService.selectedVariationType"
-            (ionChange)="setSelectedVariationType($event)"
+      <ion-radio-group class="selected-variation-type"
+                       [value]="viewOptionsService.selectedVariationType()"
+                       (ionChange)="setSelectedVariationType($event)"
       >
-        <ion-radio value="all" labelPlacement="end" justify="start" i18n="@@ViewOptions.ShowAllVariation">Visa alla skillnader</ion-radio>
-        <ion-radio value="sub" labelPlacement="end" justify="start" i18n="@@ViewOptions.ShowSubstantialVariation">Visa substantiella skillnader</ion-radio>
-        <ion-radio value="none" labelPlacement="end" justify="start" i18n="@@ViewOptions.ShowNoVariation">Visa inga skillnader</ion-radio>
+        <ion-radio value="all"
+                   labelPlacement="end"
+                   justify="start"
+                   i18n="@@ViewOptions.ShowAllVariation"
+        >Visa alla skillnader</ion-radio>
+        <ion-radio value="sub"
+                   labelPlacement="end"
+                   justify="start"
+                   i18n="@@ViewOptions.ShowSubstantialVariation"
+        >Visa substantiella skillnader</ion-radio>
+        <ion-radio value="none"
+                   labelPlacement="end"
+                   justify="start"
+                   i18n="@@ViewOptions.ShowNoVariation"
+        >Visa inga skillnader</ion-radio>
       </ion-radio-group>
     </ion-item>
   </ion-list>

@@ -1,14 +1,17 @@
+@let languageMenuOpenValue = languageMenuOpen();
+@let showSideNavValue = showSideNav();
+
 <h2 id="top-menu-label" class="screen-reader-only" i18n="@@TopMenu.AriaLabel">Primär meny</h2>
 <ul role="menubar">
   <li class="main-menu-button" role="menuitem">
     <button (click)="toggleSideMenu($event)"
           type="button"
           aria-haspopup="menu"
-          [attr.aria-expanded]="showSideNav"
+          [attr.aria-expanded]="showSideNavValue"
           aria-controls="side-navigation"
     >
-      <ion-icon [class.visuallyhidden]="showSideNav" name="menu-sharp"></ion-icon>
-      <ion-icon [class.visuallyhidden]="!showSideNav" name="close-sharp"></ion-icon>
+      <ion-icon [class.visuallyhidden]="showSideNavValue" name="menu-sharp"></ion-icon>
+      <ion-icon [class.visuallyhidden]="!showSideNavValue" name="close-sharp"></ion-icon>
       <span class="side-title" i18n="@@TopMenu.Menu">Meny</span>
     </button>
   </li>
@@ -36,10 +39,11 @@
   }
   @if (showLanguageButton && currentLanguageLabel && languages.length > 1) {
     <li class="language-menu-button" role="menuitem">
-      <button (click)="toggleLanguageMenu($event)"
+      <button #languageMenuToggleBtn
+            (click)="toggleLanguageMenu($event)"
             type="button"
             id="language-menu-toggle-button"
-            [attr.aria-expanded]="languageMenuOpen"
+            [attr.aria-expanded]="languageMenuOpenValue"
             aria-haspopup="menu"
             aria-controls="language-menu"
             aria-label="Välj språk. Nuvarande språk:"
@@ -47,14 +51,27 @@
       >
         <ion-icon name="language-sharp"></ion-icon>
         <span class="current-language"><span class="current-language-label">{{currentLanguageLabel}} </span>({{activeLocale}})</span>
-        <ion-icon class="toggle-language-menu-icon" [class.hide-icon]="languageMenuOpen" name="chevron-down-sharp" aria-hidden="true"></ion-icon>
-        <ion-icon class="toggle-language-menu-icon" [class.hide-icon]="!languageMenuOpen" name="chevron-up-sharp" aria-hidden="true"></ion-icon>
+        <ion-icon class="toggle-language-menu-icon"
+              [class.hide-icon]="languageMenuOpenValue"
+              name="chevron-down-sharp"
+              aria-hidden="true"
+        ></ion-icon>
+        <ion-icon class="toggle-language-menu-icon"
+              [class.hide-icon]="!languageMenuOpenValue"
+              name="chevron-up-sharp"
+              aria-hidden="true"
+        ></ion-icon>
       </button>
-      <ul id="language-menu" role="menu" [class.open]="languageMenuOpen" [ngStyle]="{'min-width': languageMenuWidth + 'px'}">
+      <ul #languageMenu
+            id="language-menu"
+            role="menu"
+            [class.open]="languageMenuOpenValue"
+            [style.min-width.px]="languageMenuWidth()"
+      >
         @for (lang of languages; track lang.code) {
           @if (lang.code !== activeLocale) {
-            <li lang="{{lang.code}}" role="menuitem">
-              <a href="{{_window.location.origin + '/' + lang.code + currentRouterUrl}}">{{lang.label}} ({{lang.code}})</a>
+            <li [attr.lang]="lang.code" role="menuitem">
+              <a [href]="`/${lang.code}${currentRouterUrl()}`">{{lang.label}} ({{lang.code}})</a>
             </li>
           }
         }

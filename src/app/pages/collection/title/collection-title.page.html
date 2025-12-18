@@ -1,3 +1,5 @@
+@let textsize = viewOptionsService.textsize();
+
 <ion-header class="ion-no-border">
   <ion-toolbar class="secondary">
 
@@ -33,11 +35,11 @@
       [scrollY]="false"
 >
   <article class="scroll-content-container"
-    [class.xsmallFontSize]="textsize == TextsizeEnum.XSmall"
-    [class.smallFontSize]="textsize == TextsizeEnum.Small"
-    [class.mediumFontSize]="textsize == TextsizeEnum.Medium"
-    [class.largeFontSize]="textsize == TextsizeEnum.Large"
-    [class.xlargeFontSize]="textsize == TextsizeEnum.XLarge"
+    [class.xsmallFontSize]="textsize === 'xsmall'"
+    [class.smallFontSize]="textsize === 'small'"
+    [class.mediumFontSize]="textsize === 'medium'"
+    [class.largeFontSize]="textsize === 'large'"
+    [class.xlargeFontSize]="textsize === 'xlarge'"
   >
     @if ((text$ | async); as text) {
       <div

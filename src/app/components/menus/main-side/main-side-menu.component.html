@@ -1,23 +1,27 @@
+@let menu = mainMenu();
+@let open = selectedMenu();
+@let hl   = highlightedNodeId();
+
 <h2 id="main-side-menu-label" class="screen-reader-only" i18n="@@MainSideMenu.AriaLabel">Sekundär meny</h2>
-@if (mainMenu.length) {
+@if (menu.length) {
   <ul role="menu">
-    <ng-container *ngTemplateOutlet="recursiveMenu; context: {$implicit: mainMenu}"/>
+    <ng-container *ngTemplateOutlet="recursiveMenu; context: {$implicit: menu}"/>
   </ul>
 }
 
 <ng-template #recursiveMenu let-list>
   @for (item of list; track $index) {
     <li
-          [attr.aria-current]="highlightedMenu === item.nodeId ? 'page' : null"
+          [attr.aria-current]="hl === item.nodeId ? 'page' : null"
           [attr.aria-haspopup]="item.children ? 'menu' : null"
-          [attr.aria-expanded]="item.children ? (selectedMenu | arrayIncludes:item.nodeId) : null"
+          [attr.aria-expanded]="item.children ? (open | arrayIncludes:item.nodeId) : null"
           role="menuitem"
           [class.home-menu-item]="item.menuType === 'home'"
     >
       @if (!item.children) {
         <a
               [routerLink]="item.parentPath | parentChildPagePath: item.id"
-              [class.menu-highlight]="highlightedMenu === item.nodeId"
+              [class.menu-highlight]="hl === item.nodeId"
               [class.submenu-label]="item.children"
         >
           <ng-container *ngTemplateOutlet="menuItemContent; context: {$implicit: item}"/>
@@ -36,7 +40,7 @@
       }
       @if (item.children) {
         <ul role="menu"
-              [class.open]="selectedMenu | arrayIncludes:item.nodeId"
+              [class.open]="open | arrayIncludes:item.nodeId"
         >
           <ng-container *ngTemplateOutlet="recursiveMenu; context: {$implicit: item.children}"/>
         </ul>
@@ -51,7 +55,7 @@
     <ion-icon name="chevron-forward-outline"
           class="item-icon-r toggle-icon"
           aria-hidden="true"
-          [class.open]="selectedMenu | arrayIncludes:item.nodeId"
+          [class.open]="open | arrayIncludes:item.nodeId"
     ></ion-icon>
   }
 </ng-template>

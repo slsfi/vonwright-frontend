@@ -1,33 +1,29 @@
-import { Inject, Injectable, LOCALE_ID, OnDestroy, Renderer2, RendererFactory2, DOCUMENT } from '@angular/core';
-
+import { Injectable, LOCALE_ID, OnDestroy, Renderer2, RendererFactory2, DOCUMENT, inject } from '@angular/core';
 import { Meta, Title } from '@angular/platform-browser';
 import { BehaviorSubject, Observable } from 'rxjs';
 
 import { config } from '@config';
+import { Article } from '@models/article.models';
 
 
 @Injectable({
   providedIn: 'root',
 })
 export class DocumentHeadService implements OnDestroy {
+  private meta = inject(Meta);
+  private rendererFactory = inject(RendererFactory2);
+  private title = inject(Title);
+  private document = inject<Document>(DOCUMENT);
+  private activeLocale = inject(LOCALE_ID);
+
+  private readonly languages: any[] = config.app?.i18n?.languages ?? [];
+  private readonly openGraphTags: any = config.app?.openGraphMetaTags ?? undefined;
+  private readonly articles: Article[] = config.articles ?? [];
+
   private addedHeadElements: HTMLElement[] = [];
   private currentPageTitle$: BehaviorSubject<string> = new BehaviorSubject('');
   private currentRouterUrl: string | undefined = undefined;
-  private openGraphTags: any = undefined;
-  private languages: any[] = [];
-  private renderer: Renderer2;
-
-  constructor(
-    private meta: Meta,
-    private rendererFactory: RendererFactory2,
-    private title: Title,
-    @Inject(DOCUMENT) private document: Document,
-    @Inject(LOCALE_ID) private activeLocale: string
-  ) {
-    this.openGraphTags = config.app?.openGraphMetaTags ?? undefined;
-    this.languages = config.app?.i18n?.languages ?? [];
-    this.renderer = this.rendererFactory.createRenderer(null, null);
-  }
+  private renderer: Renderer2 = this.rendererFactory.createRenderer(null, null);
 
   ngOnDestroy(): void {
     this.cleanupAddedHeadElements();
@@ -73,9 +69,7 @@ export class DocumentHeadService implements OnDestroy {
     if (routerURL !== this.currentRouterUrl) {
       this.currentRouterUrl = routerURL;
 
-      const x_default = config.app?.i18n?.defaultLanguage
-        ? config.app.i18n.defaultLanguage
-        : this.languages[0].code;
+      const x_default = config.app?.i18n?.defaultLanguage ?? this.languages[0].code;
 
       // Remove old tags
       this.removeLinkTags('canonical');
@@ -187,11 +181,34 @@ export class DocumentHeadService implements OnDestroy {
   ) {
     const tag: HTMLLinkElement = this.renderer.createElement('link');
     this.renderer.setAttribute(tag, 'rel', relType);
+
+    let targetURL = routerURL;
+
     if (hreflang) {
-      !x_default && this.renderer.setAttribute(tag, 'hreflang', locale);
-      x_default && this.renderer.setAttribute(tag, 'hreflang', 'x-default');
+      const attrValue = x_default ? 'x-default' : locale;
+      this.renderer.setAttribute(tag, 'hreflang', attrValue);
     }
-    this.renderer.setAttribute(tag, 'href', this.getAbsoluteURL(locale + routerURL));
+
+    if (routerURL.startsWith('/article/')) {
+      // Article URLs need to be constructed from config for the routeName
+      // to be correctly mapped.
+      const currentRouteName = routerURL.split('/').at(-1);
+      // Find the article matching the current routeName and locale
+      const currentArticle = this.articles.find(
+        a => a.language === this.activeLocale && a.routeName === currentRouteName
+      );
+
+      if (currentArticle) {
+        // Find the article in the target locale
+        const targetArticle = this.articles.find(
+          a => a.language === locale && a.id === currentArticle.id
+        );
+        targetURL = targetArticle ? `/article/${targetArticle.routeName}` : targetURL;
+      }
+    }
+
+    const absoluteURL = this.getAbsoluteURL(locale + targetURL);
+    this.renderer.setAttribute(tag, 'href', absoluteURL);
     this.renderer.appendChild(this.document.head, tag);
     // Add the element to the array keeping track of elements that have
     // been added to the DOM so they can be cleaned up when the service is

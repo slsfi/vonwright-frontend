@@ -1,7 +1,7 @@
 import { Pipe, PipeTransform } from '@angular/core';
 
 import { config } from '@config';
-import { enableFrontMatterPageOrTextViewType } from '@utility-functions';
+import { enableFrontMatterPageOrTextViewType, splitFilename } from '@utility-functions';
 
 
 /**
@@ -31,6 +31,9 @@ export class ParentChildPagePathPipe implements PipeTransform {
                 return `/collection/${childId}/${idPath.join('/')}`;
             }
             return '';
+        } else if (parentPath === '/ebook') {
+            const idParts = splitFilename(childId);
+            return `${parentPath}/${idParts.extension}/${idParts.name}`
         } else {
             return childId ? `${parentPath}/${childId}` : `${parentPath}`
         }

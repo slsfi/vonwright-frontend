@@ -13,11 +13,7 @@ import { splitFilename } from '@utility-functions';
   standalone: true
 })
 export class ElasticHitPagePathPipe implements PipeTransform {
-  ebooks: any[] = [];
-
-  constructor() {
-    this.ebooks = config.ebooks ?? [];
-  }
+  readonly ebooks: any[] = config.ebooks ?? [];
 
   transform(elasticHit: any): string {
     let path = '/';

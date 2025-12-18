@@ -1,4 +1,4 @@
-import { Component, HostListener, Input, OnInit } from '@angular/core';
+import { Component, HostListener, Input, OnInit, inject } from '@angular/core';
 import { NgStyle } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonicModule, ModalController } from '@ionic/angular';
@@ -15,6 +15,9 @@ import { isBrowser } from '@utility-functions';
   imports: [NgStyle, FormsModule, IonicModule, DraggableImageDirective]
 })
 export class FullscreenImageViewerModal implements OnInit {
+  private modalCtrl = inject(ModalController);
+  private platformService = inject(PlatformService);
+
   @Input() activeImageIndex: number = 0;
   @Input() backsides: any[] = [];
   @Input() imageDescriptions: string[] = [];
@@ -30,11 +33,6 @@ export class FullscreenImageViewerModal implements OnInit {
   showBackside: boolean = false;
   toolbarHeight: number = 0;
   zoom: number = 1.0;
-
-  constructor(
-    private modalCtrl: ModalController,
-    private platformService: PlatformService
-  ) {}
 
   @HostListener('document:keyup.arrowleft') onKeyArrowLeft() {
     this.previous();

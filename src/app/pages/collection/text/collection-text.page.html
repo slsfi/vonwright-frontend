@@ -1,3 +1,7 @@
+@let textsize = viewOptionsService.textsize();
+@let viewTypes = enabledViewTypes();
+@let currentViews = views();
+
 <ion-header class="ion-no-border">
   <ion-toolbar class="secondary">
 
@@ -5,7 +9,7 @@
     @if (!mobileMode) {
       <text-changer slot="start"
             [parentPageType]="'text'"
-            [ionViewActive]="_activeComponent"
+            [ionViewActive]="activeComponent()"
             class="text-changer-desktop-mode"
       ></text-changer>
     }
@@ -44,15 +48,15 @@
     <h1 class="screen-reader-only" [innerHTML]="(currentPageTitle$ | async)"></h1>
     <!-- Wrapper for all columns -->
     <div class="text-columns-container"
-          [class.xsmallFontSize]="textsize == TextsizeEnum.XSmall"
-          [class.smallFontSize]="textsize == TextsizeEnum.Small"
-          [class.mediumFontSize]="textsize == TextsizeEnum.Medium"
-          [class.largeFontSize]="textsize == TextsizeEnum.Large"
-          [class.xlargeFontSize]="textsize == TextsizeEnum.XLarge"
-          [class.illustrations-view-shown]="illustrationsViewShown"
+          [class.xsmallFontSize]="textsize === 'xsmall'"
+          [class.smallFontSize]="textsize === 'small'"
+          [class.mediumFontSize]="textsize === 'medium'"
+          [class.largeFontSize]="textsize === 'large'"
+          [class.xlargeFontSize]="textsize === 'xlarge'"
+          [class.illustrations-view-shown]="illustrationsViewShown()"
     >
       <!-- Columns -->
-      @for (view of views; track view; let i = $index) {
+      @for (view of currentViews; track view.uid; let i = $index) {
         <article
               id="tcID{{i}}"
               class="text-column column-type-{{view.type}}"
@@ -74,7 +78,7 @@
               }
             </h2>
             <!-- Column options -->
-            @if (views.length > 1) {
+            @if (currentViews.length > 1) {
               <ion-fab class="column-options">
                 <ion-fab-button #fabColumnOptionsButton
                       class="toggle-fab-list-button"
@@ -87,9 +91,9 @@
                         i18n-aria-label="@@CollectionText.ColumnOptions.ToggleMenu"
                   ></ion-icon>
                 </ion-fab-button>
-                @if (views.length > 1) {
+                @if (currentViews.length > 1) {
                   <ion-fab-list side="bottom" #fabColumnOptions>
-                    @if (enabledViewTypes.length > 1) {
+                    @if (viewTypes.length > 1) {
                       <ion-fab-button
                             (click)="removeView(i)"
                             title="Ta bort kolumnen"
@@ -101,7 +105,7 @@
                         ></ion-icon>
                       </ion-fab-button>
                     }
-                    @if (i > -1 && views.length-1 > i) {
+                    @if (i > -1 && currentViews.length-1 > i) {
                       <ion-fab-button
                             (click)="moveViewRight(i)"
                             title="Byt plats med kolumnen till höger"
@@ -113,7 +117,7 @@
                         ></ion-icon>
                       </ion-fab-button>
                     }
-                    @if (views.length > i && i > 0) {
+                    @if (currentViews.length > i && i > 0) {
                       <ion-fab-button
                             (click)="moveViewLeft(i)"
                             title="Byt plats med kolumnen till vänster"
@@ -137,7 +141,7 @@
         </article>
       }
       <!-- Add view -->
-      @if (enabledViewTypes.length > 1) {
+      @if (viewTypes.length > 1) {
         <aside class="add-view-column">
           <h2 id="add-column-label" i18n="@@CollectionText.AddColumn.AddColumn">Ny kolumn</h2>
           <ion-fab id="add-view-fab" #fabmenuadd>
@@ -149,7 +153,7 @@
               <ion-icon name="add-outline" aria-labelledby="add-column-label"></ion-icon>
             </ion-fab-button>
           </ion-fab>
-          <ng-container *ngTemplateOutlet="addViewPopoverTemplate; context: {$implicit: enabledViewTypes}"/>
+          <ng-container *ngTemplateOutlet="addViewPopoverTemplate; context: {$implicit: viewTypes}"/>
         </aside>
       }
       <!-- Tooltip and info overlay -->
@@ -160,20 +164,21 @@
 
 <!-- Main content in mobile mode -->
 @if (mobileMode) {
+  @let activeViewindex = activeMobileModeViewIndex();
   <ion-content
         class="collection-ion-content mobile-mode-content"
-        [class.xsmallFontSize]="textsize == TextsizeEnum.XSmall"
-        [class.smallFontSize]="textsize == TextsizeEnum.Small"
-        [class.mediumFontSize]="textsize == TextsizeEnum.Medium"
-        [class.largeFontSize]="textsize == TextsizeEnum.Large"
-        [class.xlargeFontSize]="textsize == TextsizeEnum.XLarge"
-        [class.illustrations-view-shown]="illustrationsViewShown"
+        [class.xsmallFontSize]="textsize === 'xsmall'"
+        [class.smallFontSize]="textsize === 'small'"
+        [class.mediumFontSize]="textsize === 'medium'"
+        [class.largeFontSize]="textsize === 'large'"
+        [class.xlargeFontSize]="textsize === 'xlarge'"
+        [class.illustrations-view-shown]="illustrationsViewShown()"
         [scrollX]="false"
         [scrollY]="false"
   >
     <h1 class="screen-reader-only" [innerHTML]="(currentPageTitle$ | async)"></h1>
     <!-- Components for selecting active text type in mobile mode -->
-    @if (enabledViewTypes.length > 1) {
+    @if (viewTypes.length > 1) {
       <aside class="select-view-wrapper">
         <ion-select
               fill="outline"
@@ -182,9 +187,9 @@
               i18n-label="@@CollectionText.ActiveView"
               label-placement="floating"
               (ionChange)="setActiveMobileModeViewType($event)"
-              [value]="activeMobileModeViewIndex"
+              [value]="activeViewindex"
         >
-          @for (view of views; track view; let i = $index) {
+          @for (view of currentViews; track view.uid; let i = $index) {
             <ion-select-option [value]="i">
               <ng-container *ngTemplateOutlet="columnHeadingTemplate; context: {$implicit: view}"/>
               @if ((
@@ -200,8 +205,8 @@
         <ion-fab>
           <ion-fab-button
                 size="small"
-                [disabled]="views.length < 2"
-                (click)="removeView(activeMobileModeViewIndex)"
+                [disabled]="currentViews.length < 2"
+                (click)="removeView(activeViewindex)"
                 aria-label="Ta bort aktiv vy"
                 i18n-aria-label="@@CollectionText.RemoveActiveView"
           >
@@ -220,14 +225,14 @@
             <ion-icon name="add-outline"></ion-icon>
           </ion-fab-button>
         </ion-fab>
-        <ng-container *ngTemplateOutlet="addViewPopoverTemplate; context: {$implicit: enabledViewTypes}"/>
+        <ng-container *ngTemplateOutlet="addViewPopoverTemplate; context: {$implicit: viewTypes}"/>
       </aside>
     }
     <!-- Columns in mobile mode -->
-    @for (view of views; track view; let i = $index) {
+    @for (view of currentViews; track view.uid; let i = $index) {
       <article
             class="scroll-content-container mobile-scc column-type-{{view.type}}"
-            [class.visuallyhidden]="activeMobileModeViewIndex !== i"
+            [class.visuallyhidden]="activeViewindex !== i"
             [class.mobile-mode-readingtext]="
                     view.type === 'readingtext' ||
                     view.type === 'readingtext_sv' ||
@@ -267,7 +272,7 @@
 @if (mobileMode) {
   <text-changer
         [parentPageType]="'text'"
-        [ionViewActive]="_activeComponent"
+        [ionViewActive]="activeComponent()"
         class="text-changer-mobile-mode"
   ></text-changer>
 }
@@ -304,14 +309,17 @@
 
 <!-- Column types template -->
 <ng-template #columnTypesTemplate let-view="view" let-i="i">
+  @let searchMatchValues = searchMatches();
+  @let textKeyValue = textKey();
+
   @if (multilingualReadingTextLanguages.length > 1) {
     @for (lang of multilingualReadingTextLanguages; track lang) {
       @if (view.type === 'readingtext_' + lang) {
         <reading-text
               [language]="lang"
-              [textItemID]="textItemID"
-              [textPosition]="textPosition"
-              [searchMatches]="searchMatches"
+              [textKey]="textKeyValue"
+              [textPosition]="textPosition()"
+              [searchMatches]="searchMatchValues"
               (openNewIllustrView)="openNewView($event)"
               (selectedIllustration)="updateIllustrationViewImage($event)"
         ></reading-text>
@@ -321,9 +329,9 @@
 
   @if (view.type === 'readingtext' && multilingualReadingTextLanguages.length < 2) {
     <reading-text
-          [textItemID]="textItemID"
-          [textPosition]="textPosition"
-          [searchMatches]="searchMatches"
+          [textKey]="textKeyValue"
+          [textPosition]="textPosition()"
+          [searchMatches]="searchMatchValues"
           (openNewIllustrView)="openNewView($event)"
           (selectedIllustration)="updateIllustrationViewImage($event)"
     ></reading-text>
@@ -331,8 +339,8 @@
 
   @else if (view.type === 'comments') {
     <comments
-          [textItemID]="textItemID"
-          [searchMatches]="searchMatches"
+          [textKey]="textKeyValue"
+          [searchMatches]="searchMatchValues"
           (openNewReadingTextView)="openNewReadingTextShowCommentLemma($event)"
           (setMobileModeActiveText)="setActiveMobileModeViewType(undefined, $event)"
     ></comments>
@@ -341,7 +349,7 @@
   @else if (view.type === 'facsimiles') {
     @defer (on immediate) {
       <facsimiles
-            [textItemID]="textItemID"
+            [textKey]="textKeyValue"
             [facsID]="view.id"
             [imageNr]="view.nr"
             [sortOrder]="view.sortOrder"
@@ -357,12 +365,11 @@
 
   @else if (view.type === 'manuscripts') {
     <manuscripts
-          [textItemID]="textItemID"
+          [textKey]="textKeyValue"
           [msID]="view.id"
-          [searchMatches]="searchMatches"
+          [searchMatches]="searchMatchValues"
           (selectedMsID)="updateViewProperty('id', $event, i)"
           (selectedMsName)="updateViewProperty('title', $event, i, false)"
-          (openNewManView)="openNewView($event)"
           (openNewLegendView)="openNewView($event)"
     ></manuscripts>
   }
@@ -370,9 +377,9 @@
   @else if (view.type === 'variants') {
     @defer {
       <variants
-            [textItemID]="textItemID"
+            [textKey]="textKeyValue"
             [varID]="view.id"
-            [searchMatches]="searchMatches"
+            [searchMatches]="searchMatchValues"
             [sortOrder]="view.sortOrder"
             (selectedVarID)="updateViewProperty('id', $event, i)"
             (selectedVarName)="updateViewProperty('title', $event, i, false)"
@@ -389,7 +396,7 @@
     @defer {
       <illustrations
             [singleImage]="view.image"
-            [textItemID]="textItemID"
+            [textKey]="textKeyValue"
             (showAllImages)="updateIllustrationViewImage($event)"
             (setMobileModeActiveText)="setActiveMobileModeViewType(undefined, $event)"
       ></illustrations>
@@ -401,7 +408,7 @@
   @else if (view.type === 'legend') {
     @defer {
       <text-legend
-            [itemId]="textItemID"
+            [textKey]="textKeyValue"
             [scrollToElementId]="view.id"
       ></text-legend>
     } @loading (minimum 1s) {
@@ -410,20 +417,20 @@
   }
 
   @else if (view.type === 'metadata') {
-    <text-metadata [textItemID]="textItemID"></text-metadata>
+    <text-metadata [publicationID]="textKeyValue.publicationID"></text-metadata>
   }
 </ng-template>
 
 
 <!-- Add view popover template -->
-<ng-template #addViewPopoverTemplate let-enabledViewTypes>
+<ng-template #addViewPopoverTemplate let-viewTypes>
   <ion-popover #addViewPopover
         class="page-text-add-view-popover"
         reference="trigger"
         side="bottom"
         alignment="end"
-        [isOpen]="addViewPopoverisOpen"
-        (didDismiss)="addViewPopoverisOpen = false"
+        [isOpen]="addViewPopoverisOpen()"
+        (didDismiss)="dismissAddViewPopover()"
         [dismissOnSelect]="true"
         [ngStyle]="{
           '--background': 'transparent',
@@ -434,7 +441,7 @@
     <ng-template>
       <ion-content class="no-padding">
 
-        @for (type of enabledViewTypes; track type) {
+        @for (type of viewTypes; track type) {
           @if (!(mobileMode && type === 'showAll')) {
             <ion-button
                   class="custom-outline-button"
@@ -522,44 +529,50 @@
 
 <!-- Tooltip and info overlay template -->
 <ng-template #tooltipInfoOverlayTemplate>
+  @let viewOptions = viewOptionsService.show();
+  @let infoOverlayPositionValues = infoOverlayPosition();
+  @let infoOverlayTextValue = infoOverlayText();
+  @let toolTipPositionValue = toolTipPosition();
+  @let toolTipTextValue = toolTipText();
+
   <div
         class="toolTip tei teiContainer"
-        [class.show_comments]="viewOptionsService.show.comments"
-        [class.show_personInfo]="viewOptionsService.show.personInfo"
-        [class.show_placeInfo]="viewOptionsService.show.placeInfo"
-        [class.show_workInfo]="viewOptionsService.show.workInfo"
-        [class.show_normalisations]="viewOptionsService.show.normalisations"
-        [class.show_emendations]="viewOptionsService.show.emendations"
-        [class.show_abbreviations]="viewOptionsService.show.abbreviations"
+        [class.show_comments]="viewOptions.comments"
+        [class.show_personInfo]="viewOptions.personInfo"
+        [class.show_placeInfo]="viewOptions.placeInfo"
+        [class.show_workInfo]="viewOptions.workInfo"
+        [class.show_normalisations]="viewOptions.normalisations"
+        [class.show_emendations]="viewOptions.emendations"
+        [class.show_abbreviations]="viewOptions.abbreviations"
         [ngStyle]="{
-          'position': toolTipPosType,
-          'top': toolTipPosition.top,
-          'left': toolTipPosition.left,
-          'max-width': toolTipMaxWidth,
-          'transform': 'scale(' + toolTipScaleValue + ')'
+          'position': toolTipPosType(),
+          'top': toolTipPositionValue.top,
+          'left': toolTipPositionValue.left,
+          'max-width': toolTipMaxWidth(),
+          'transform': 'scale(' + toolTipScaleValue() + ')'
         }"
-        [innerHTML]="toolTipText | trustHtml"
-        [MathJax]="toolTipText"
+        [innerHTML]="toolTipTextValue | trustHtml"
+        [MathJax]="toolTipTextValue"
   ></div>
   <div tabindex="-1"
         class="infoOverlay tei teiContainer"
-        [class.show_comments]="viewOptionsService.show.comments"
-        [class.show_personInfo]="viewOptionsService.show.personInfo"
-        [class.show_placeInfo]="viewOptionsService.show.placeInfo"
-        [class.show_workInfo]="viewOptionsService.show.workInfo"
-        [class.show_normalisations]="viewOptionsService.show.normalisations"
-        [class.show_emendations]="viewOptionsService.show.emendations"
-        [class.show_abbreviations]="viewOptionsService.show.abbreviations"
+        [class.show_comments]="viewOptions.comments"
+        [class.show_personInfo]="viewOptions.personInfo"
+        [class.show_placeInfo]="viewOptions.placeInfo"
+        [class.show_workInfo]="viewOptions.workInfo"
+        [class.show_normalisations]="viewOptions.normalisations"
+        [class.show_emendations]="viewOptions.emendations"
+        [class.show_abbreviations]="viewOptions.abbreviations"
         [ngStyle]="{
-          'position': infoOverlayPosType,
-          'bottom': infoOverlayPosition.bottom,
-          'left': infoOverlayPosition.left,
-          'width': infoOverlayWidth
+          'position': infoOverlayPosType(),
+          'bottom': infoOverlayPositionValues.bottom,
+          'left': infoOverlayPositionValues.left,
+          'width': infoOverlayWidth()
         }"
   >
     <div class="infoOverlayHeader">
-      <p class="infoOverlayTitle" [innerHTML]="infoOverlayTitle"></p>
-      @if (infoOverlayTriggerElem) {
+      <p class="infoOverlayTitle" [innerHTML]="infoOverlayTitle()"></p>
+      @if (infoOverlayTriggerElem()) {
         <ion-button
               class="close close-info-overlay"
               fill="clear"
@@ -573,8 +586,8 @@
       }
     </div>
     <div class="infoOverlayContent"
-          [innerHTML]="infoOverlayText | trustHtml"
-          [MathJax]="infoOverlayText"
+          [innerHTML]="infoOverlayTextValue | trustHtml"
+          [MathJax]="infoOverlayTextValue"
     ></div>
   </div>
 </ng-template>

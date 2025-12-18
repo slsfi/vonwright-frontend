@@ -144,6 +144,11 @@ Iconset especially intended to be used with Ionic.
 SSR-compatible Markdown parser. Parses Markdown to HTML. Any HTML in the Markdown is passed through as it is.
 
 
+### [`marked-custom-heading-id`][npm_marked-custom-heading-id]
+
+An extension to `marked` supporting adding custom ids to headings in the [Markdown Extended Syntax](https://www.markdownguide.org/extended-syntax/#heading-ids): `# heading {#custom-id}`.
+
+
 ### [`marked-footnote`][npm_marked-footnote]
 
 An extension to `marked` supporting [GFM footnotes](https://docs.github.com/en/get-started/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax#footnotes) in Markdown.
@@ -193,6 +198,7 @@ Angular testing frameworks, not in use.
 [npm_htmlparser2]: https://www.npmjs.com/package/htmlparser2
 [npm_ionicons]: https://www.npmjs.com/package/ionicons
 [npm_marked]: https://www.npmjs.com/package/marked
+[npm_marked-custom-heading-id]: https://www.npmjs.com/package/marked-custom-heading-id
 [npm_marked-footnote]: https://www.npmjs.com/package/marked-footnote
 [npm_rxjs]: https://www.npmjs.com/package/rxjs
 [npm_tslib]: https://www.npmjs.com/package/tslib

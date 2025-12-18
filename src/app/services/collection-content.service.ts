@@ -1,107 +1,115 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, map } from 'rxjs';
 
 import { config } from '@config';
+import { TextKey } from '@models/collection.models';
+import { FacsimileApi } from '@models/facsimile.models';
+import { Manuscript, ManuscriptsApiResponse, toManuscript } from '@models/manuscript.models';
+import { PublicationMetadata, PublicationMetadataApiResponse, toPublicationMetadata } from '@models/metadata.models'
+import { ReadingText, ReadingTextApiResponse, toReadingText } from '@models/readingtext.models';
+import { toVariant, Variant, VariantsApiResponse } from '@models/variant.models';
 
 
 @Injectable({
   providedIn: 'root',
 })
 export class CollectionContentService {
+  private http = inject(HttpClient);
+
+  private readonly apiURL: string = `${config.app?.backendBaseURL ?? ''}/${config.app?.projectNameDB ?? ''}`;
+
   activeCollectionTextMobileModeView: number | undefined = undefined;
   previousReadViewTextId: string = '';
   readViewTextId: string = '';
   recentCollectionTextViews: any[] = [];
 
-  private apiURL: string = '';
-
-  constructor(
-    private http: HttpClient
-  ) {
-    const apiBaseURL = config.app?.backendBaseURL ?? '';
-    const projectName = config.app?.projectNameDB ?? '';
-    this.apiURL = apiBaseURL + '/' + projectName;
-  }
-
-  getTitle(id: string, language: string): Observable<any> {
-    const endpoint = `${this.apiURL}/text/${id}/1/tit/${language}`;
+  getTitle(collectionId: string, language: string): Observable<any> {
+    const endpoint = `${this.apiURL}/text/${collectionId}/1/tit/${language}`;
     return this.http.get(endpoint);
   }
 
-  getForeword(id: string, language: string): Observable<any> {
-    const endpoint = `${this.apiURL}/text/${id}/fore/${language}`;
+  getForeword(collectionId: string, language: string): Observable<any> {
+    const endpoint = `${this.apiURL}/text/${collectionId}/fore/${language}`;
     return this.http.get(endpoint);
   }
 
-  getIntroduction(id: string, language: string): Observable<any> {
-    const endpoint = `${this.apiURL}/text/${id}/1/inl/${language}`;
+  getIntroduction(collectionId: string, language: string): Observable<any> {
+    const endpoint = `${this.apiURL}/text/${collectionId}/1/inl/${language}`;
     return this.http.get(endpoint);
   }
 
-  getReadingText(id: string, language: string = ''): Observable<any> {
+  getReadingText(textKey: TextKey, language: string = ''): Observable<ReadingText> {
     const estFolder = language ? 'est-i18n' : 'est';
-    const idParts = id.split(';')[0].split('_');
-    const ch_id = idParts.length > 2 ? '/' + idParts[2] : '';
-    language = language ? '/' + language : '';
+    const chId = textKey.chapterID ? `/${textKey.chapterID}` : '';
+    const lang = language ? `/${language}` : '';
     const endpoint = `${this.apiURL}/text/`
-          + `${idParts[0]}/${idParts[1]}/${estFolder}${ch_id}${language}`;
+          + `${textKey.collectionID}/${textKey.publicationID}/${estFolder}${chId}${lang}`;
+    return this.http.get<ReadingTextApiResponse>(endpoint).pipe(
+      map(toReadingText)
+    );
+  }
+
+  getManuscripts(textKey: TextKey, msId?: number | string): Observable<Manuscript[]> {
+    const chId = textKey.chapterID ? `/${textKey.chapterID}` : '';
+    msId = msId ? `/${msId}` : (chId ? '' : '/');
+    const endpoint = `${this.apiURL}/text/${textKey.collectionID}/${textKey.publicationID}/ms${msId}${chId}`;
+
+    return this.http.get<ManuscriptsApiResponse>(endpoint).pipe(
+      map((res: ManuscriptsApiResponse) => (res.manuscripts ?? [])
+        .filter(m => !!m.manuscript_changes)  // filter out manuscripts with empty manuscript_changes
+        .map(toManuscript)
+      )
+    );
+  }
+
+  getManuscriptsList(textKey: TextKey): Observable<any> {
+    const endpoint = `${this.apiURL}/text/${textKey.collectionID}/${textKey.publicationID}/list/ms`;
     return this.http.get(endpoint);
   }
 
-  getManuscripts(id: string, ms_id?: number | string): Observable<any> {
-    const idParts = id.split(';')[0].split('_');
-    const ch_id = idParts.length > 2 ? '/' + idParts[2] : '';
-    ms_id = ms_id ? '/' + ms_id : '';
-    const endpoint = `${this.apiURL}/text/${idParts[0]}/${idParts[1]}/ms${ms_id}${ch_id}`;
+  getVariants(textKey: TextKey): Observable<Variant[]> {
+    const chId = textKey.chapterID ? `/${textKey.chapterID}` : '/';
+    const endpoint = `${this.apiURL}/text/${textKey.collectionID}/${textKey.publicationID}/var${chId}`;
+
+    return this.http.get<VariantsApiResponse>(endpoint).pipe(
+      map((res: VariantsApiResponse) => (res.variations ?? [])
+        .map(toVariant)
+      )
+    );
+  }
+
+  getFacsimiles(textKey: TextKey): Observable<FacsimileApi[]> {
+    const chId = textKey.chapterID ? `/${textKey.chapterID.replace('ch', '')}` : '';
+    const endpoint = `${this.apiURL}/facsimiles/${textKey.publicationID}${chId}`;
+    return this.http.get<FacsimileApi[]>(endpoint);
+  }
+
+  getMetadata(publicationId: string, language: string): Observable<PublicationMetadata> {
+    const endpoint = `${this.apiURL}/publications/${publicationId}/metadata/${language}`;
+    return this.http.get<PublicationMetadataApiResponse>(endpoint).pipe(
+      map(toPublicationMetadata)
+    );
+  }
+
+  getDownloadableIntroduction(collectionId: string, format: string, language: string): Observable<any> {
+    const endpoint = `${this.apiURL}/text/downloadable/${format}/${collectionId}/inl/${language}`;
     return this.http.get(endpoint);
   }
 
-  getManuscriptsList(id: string): Observable<any> {
-    const idParts = id.split(';')[0].split('_');
-    const endpoint = `${this.apiURL}/text/${idParts[0]}/${idParts[1]}/list/ms`;
-    return this.http.get(endpoint);
-  }
-
-  getVariants(id: string): Observable<any> {
-    const idParts = id.split(';')[0].split('_');
-    const ch_id = idParts.length > 2 ? '/' + idParts[2] : '';
-    const endpoint = `${this.apiURL}/text/${idParts[0]}/${idParts[1]}/var${ch_id}`;
-    return this.http.get(endpoint);
-  }
-
-  getFacsimiles(id: string): Observable<any> {
-    const idParts = id.split(';')[0].split('_');
-    const ch_id = idParts.length > 2 ? '/' + idParts[2].replace('ch', '') : '';
-    const endpoint = `${this.apiURL}/facsimiles/${idParts[1]}${ch_id}`;
-    return this.http.get(endpoint);
-  }
-
-  getMetadata(pub_id: string, language: string): Observable<any> {
-    const endpoint = `${this.apiURL}/publications/${pub_id}/metadata/${language}`;
-    return this.http.get(endpoint);
-  }
-
-  getDownloadableIntroduction(id: string, format: string, language: string): Observable<any> {
-    const endpoint = `${this.apiURL}/text/downloadable/${format}/${id}/inl/${language}`;
-    return this.http.get(endpoint);
-  }
-
-  getDownloadableReadingText(id: string, format: string, language: string = ''): Observable<any> {
+  getDownloadableReadingText(textKey: TextKey, format: string, language: string = ''): Observable<any> {
     const estFolder = language ? 'est-i18n' : 'est';
-    const idParts = id.split(';')[0].split('_');
-    const ch_id = idParts.length > 2 ? '/' + idParts[2] : '';
-    language = language ? '/' + language : '';
+    const ch_id = textKey.chapterID ? `/${textKey.chapterID}` : '';
+    const lang = language ? `/${language}` : '';
     const endpoint = `${this.apiURL}/text/downloadable/`
-          + `${format}/${idParts[0]}/${idParts[1]}/${estFolder}${ch_id}${language}`;
+          + `${format}/${textKey.collectionID}/${textKey.publicationID}/${estFolder}${ch_id}${lang}`;
     return this.http.get(endpoint);
   }
 
-  getDownloadableManuscript(id: string, msID: number, format: string): Observable<any> {
-    const idParts = id.split(';')[0].split('_');
-    const ch_id = idParts.length > 2 ? '/' + idParts[2] : '';
+  getDownloadableManuscript(textKey: TextKey, msID: number, format: string): Observable<any> {
+    const ch_id = textKey.chapterID ? `/${textKey.chapterID}` : '';
     const endpoint = `${this.apiURL}/text/downloadable/`
-          + `${format}/${idParts[0]}/${idParts[1]}/ms/${msID}${ch_id}`;
+          + `${format}/${textKey.collectionID}/${textKey.publicationID}/ms/${msID}${ch_id}`;
     return this.http.get(endpoint);
   }
 

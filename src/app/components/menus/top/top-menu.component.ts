@@ -1,107 +1,122 @@
-import { Component, EventEmitter, Inject, Input, LOCALE_ID, OnDestroy, OnInit, Output, DOCUMENT } from '@angular/core';
-import { NgStyle } from '@angular/common';
+import { Component, ChangeDetectionStrategy, DestroyRef, ElementRef, Injector, LOCALE_ID, NgZone, Renderer2, afterNextRender, inject, input, output, signal, viewChild } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { IonicModule } from '@ionic/angular';
 
 import { config } from '@config';
-import { isBrowser } from '@utility-functions';
+import { Language } from '@models/config.models';
 
 
+// ─────────────────────────────────────────────────────────────────────────────
+// * This component is zoneless-ready. *
+// ─────────────────────────────────────────────────────────────────────────────
 @Component({
   selector: 'top-menu',
   templateUrl: './top-menu.component.html',
   styleUrls: ['./top-menu.component.scss'],
-  imports: [NgStyle, IonicModule, RouterLink]
+  imports: [IonicModule, RouterLink],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class TopMenuComponent implements OnDestroy, OnInit {
-  @Input() currentRouterUrl: string = '';
-  @Input() showSideNav: boolean = false;
-  @Output() sideNavClick = new EventEmitter();
+export class TopMenuComponent {
+  // ─────────────────────────────────────────────────────────────────────────────
+  // Dependency injection, Input/Output signals, Fields, Local state signals
+  // ─────────────────────────────────────────────────────────────────────────────
+  protected readonly activeLocale = inject(LOCALE_ID);
+  private readonly destroyRef = inject(DestroyRef);
+  private readonly injector = inject(Injector);
+  private readonly ngZone = inject(NgZone);
+  private readonly renderer = inject(Renderer2);
 
-  currentLanguageLabel: string = '';
-  firstAboutPageId: string = '';
-  handleLanguageMenuClosure: any = null;
-  languageMenuOpen: boolean = false;
-  languageMenuWidth: number | null;
-  languages: {
-    code: string;
-    label: string
-  }[] = [];
-  showLanguageButton: boolean = true;
-  showTopAboutButton: boolean = true;
-  showTopContentButton: boolean = true;
-  showTopSearchButton: boolean = true;
-  _window: Window;
+  readonly currentRouterUrl = input<string>('');
+  readonly showSideNav = input<boolean>(false);
+  readonly sideNavClick = output();
 
-  constructor(
-    @Inject(LOCALE_ID) public activeLocale: string,
-    @Inject(DOCUMENT) private document: Document
-  ) {}
+  private readonly languageMenu = viewChild<ElementRef<HTMLElement>>('languageMenu');
+  private readonly languageMenuToggleBtn =
+    viewChild<ElementRef<HTMLElement>>('languageMenuToggleBtn');
 
-  ngOnInit() {
-    this._window = <any>this.document.defaultView;
-    this.showLanguageButton = config.component?.topMenu?.showLanguageButton ?? true;
-    this.showTopSearchButton = config.component?.topMenu?.showElasticSearchButton ?? true;
-    this.showTopContentButton = config.component?.topMenu?.showContentButton ?? true;
-    this.showTopAboutButton = config.component?.topMenu?.showAboutButton ?? true;
+  protected readonly firstAboutPageId = `03-${config.page?.about?.initialPageNode ?? '01'}`;
+  protected readonly languages: Language[] = config.app?.i18n?.languages ?? [];
+  private readonly currentLanguage?: Language = this.languages.find(
+    (l: Language) => l.code === this.activeLocale
+  );
+  protected readonly currentLanguageLabel = this.currentLanguage?.label ?? '';
+  protected readonly showLanguageButton = config.component?.topMenu?.showLanguageButton ?? true;
+  protected readonly showTopAboutButton = config.component?.topMenu?.showAboutButton ?? true;
+  protected readonly showTopContentButton = config.component?.topMenu?.showContentButton ?? true;
+  protected readonly showTopSearchButton = config.component?.topMenu?.showElasticSearchButton ?? true;
 
-    const initialAboutPageNode = config.page?.about?.initialPageNode ?? '01';
-    this.firstAboutPageId = "03-" + initialAboutPageNode;
+  readonly languageMenuOpen = signal<boolean>(false);
+  readonly languageMenuWidth = signal<number | null>(null);
 
-    this.languages = config.app?.i18n?.languages ?? [];
-    this.languages.forEach((languageObj: any) => {
-      if (languageObj.code === this.activeLocale) {
-        this.currentLanguageLabel = languageObj.label;
+  private unlistenClick?: () => void;
+  private unlistenFocusIn?: () => void;
+
+
+  // ─────────────────────────────────────────────────────────────────────────────
+  // Constructor: wire after-render DOM listeners and cleanup
+  // ─────────────────────────────────────────────────────────────────────────────
+
+  constructor() {
+    this.attachDomListeners();
+    this.registerCleanup();
+  }
+
+  private attachDomListeners() {
+    // Post-render wiring (browser-only): attach global listeners
+    // once the menu exists
+    afterNextRender({
+      earlyRead: () => {
+        return this.languageMenu()?.nativeElement ?? null;
+      },
+      write: (languageMenuElem) => {
+        if (languageMenuElem) {
+          // Attach listeners: close the language menu on click or focus 
+          // outside the menu.
+          const handler = (evt: Event) => {
+            const target = evt.target as Node | null;
+            if (target && !languageMenuElem.contains(target)) {
+              this.languageMenuOpen.set(false);
+            }
+          };
+          this.ngZone.runOutsideAngular(() => {
+            this.unlistenClick = this.renderer.listen('window', 'click', handler);
+            this.unlistenFocusIn = this.renderer.listen('window', 'focusin', handler);
+          });
+        }
       }
+    }, { injector: this.injector });
+  }
+
+  private registerCleanup() {
+    this.destroyRef.onDestroy(() => {
+      this.unlistenClick?.();
+      this.unlistenFocusIn?.();
     });
-    this.languageMenuWidth = null;
   }
 
-  ngOnDestroy() {
-    if (this.handleLanguageMenuClosure) {
-      window.removeEventListener('click', this.handleLanguageMenuClosure, false);
-      window.removeEventListener('focusin', this.handleLanguageMenuClosure, false);
-    }
-  }
 
-  public toggleSideMenu(event: any) {
+  // ─────────────────────────────────────────────────────────────────────────────
+  // UI actions
+  // ─────────────────────────────────────────────────────────────────────────────
+
+  toggleSideMenu(event: Event) {
     event.preventDefault();
     this.sideNavClick.emit();
   }
 
-  public toggleLanguageMenu(event: any) {
+  toggleLanguageMenu(event: Event) {
     event.stopPropagation();
 
-    if (!this.languageMenuOpen) {
+    if (!this.languageMenuOpen()) {
       // Set width of the language menu to the width of the toggle button
-      const languageToggleButtonElem = this.document.getElementById('language-menu-toggle-button');
-      if (languageToggleButtonElem && languageToggleButtonElem.offsetWidth > 100) {
-        this.languageMenuWidth = languageToggleButtonElem.offsetWidth;
-      } else {
-        this.languageMenuWidth = null;
-      }
-
-      // Open language menu
-      this.languageMenuOpen = true;
-
-      // Add event listeners so the language menu can be closed by clicking or moving focus outside it
-      if (isBrowser() && !this.handleLanguageMenuClosure) {
-        const languageMenuElem = this.document.getElementById('language-menu');
-        if (languageMenuElem) {
-          this.handleLanguageMenuClosure = (event: any) => !languageMenuElem.contains(event.target) && this.hideLanguageMenu();
-          window.addEventListener('click', this.handleLanguageMenuClosure, { passive: true });
-          window.addEventListener('focusin', this.handleLanguageMenuClosure, { passive: true });
-        }
-      }
+      // and open language menu.
+      const btn = this.languageMenuToggleBtn()?.nativeElement;
+      const w = btn?.offsetWidth ?? 0;
+      this.languageMenuWidth.set(w > 100 ? w : null);
+      this.languageMenuOpen.set(true);
     } else {
       // Close language menu
-      this.languageMenuOpen = false;
-    }
-  }
-
-  private hideLanguageMenu() {
-    if (this.languageMenuOpen) {
-      this.languageMenuOpen = false;
+      this.languageMenuOpen.set(false);
     }
   }
 

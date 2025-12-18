@@ -69,6 +69,11 @@ async function generateSitemap() {
     }
   }
 
+  // Get article-pages URLs
+  if (config.component?.mainSideMenu?.items?.articles && config.articles?.length) {
+    urlCounter += generateArticleURLs(config.articles, urlOrigin, locale);
+  }
+
   // Get ebook URLs
   if (config.component?.mainSideMenu?.items?.ebooks && config.ebooks?.length) {
     urlCounter += generateEbookURLs(config.ebooks, urlOrigin, locale);
@@ -146,6 +151,18 @@ function generateAboutPagesURLs(aboutPages, mdFolderNumber, urlOrigin, locale) {
     if (aboutPagesList[z]['type'] === 'file' && aboutPagesList[z]['id']) {
       const id = aboutPagesList[z]['id'].replace(locale + '-', '');
       const url = `${urlOrigin}/${locale}/about/${id}`;
+      appendToSitemapFile(url + '\n');
+      counter += 1;
+    }
+  }
+  return counter;
+}
+
+function generateArticleURLs(articles, urlOrigin, locale) {
+  let counter = 0;
+  for (let i = 0; i < articles.length; i++) {
+    if (articles[i]['language'] === locale) {
+      const url = `${urlOrigin}/${locale}/article/${articles[i]['routeName']}`;
       appendToSitemapFile(url + '\n');
       counter += 1;
     }

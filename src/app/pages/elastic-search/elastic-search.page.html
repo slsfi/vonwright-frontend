@@ -64,6 +64,8 @@
                         <ng-container i18n="@@ElasticSearch.Genre">Genre</ng-container>:
                       } @else if (activeFilterGroup.name === 'Collection') {
                         <ng-container i18n="@@ElasticSearch.Collection">Delutgåva</ng-container>:
+                      } @else if (activeFilterGroup.name === 'CollectionId') {
+                        <ng-container i18n="@@ElasticSearch.Collection">Delutgåva</ng-container>:
                       } @else if (activeFilterGroup.name === 'LetterSenderName') {
                         <ng-container i18n="@@ElasticSearch.LetterSenderName">Avsändare (brev)</ng-container>:
                       } @else if (activeFilterGroup.name === 'LetterReceiverName') {
@@ -76,6 +78,8 @@
                         <ng-container i18n="@@ElasticSearch.Region">Landskap</ng-container>:
                       } @else if (activeFilterGroup.name === 'Signum') {
                         <ng-container i18n="@@ElasticSearch.Signum">Arkivsignum</ng-container>:
+                      } @else if (activeFilterGroup.name === 'Language') {
+                        <ng-container i18n="@@ElasticSearch.Language">Språk</ng-container>:
                       }
                     </p>
                     <ul>
@@ -85,31 +89,39 @@
                                 (click)="unselectFilter(activeFilterGroup.name, filterKey)"
                                 class="custom-outline-button"
                           >
-                            @switch (filterKey.toString()) {
-                              @case ('est') {
-                                <ng-container i18n="@@ReadingText.ReadingText">Lästext</ng-container>
+                            @if (activeFilterGroup.name === 'Type') {
+                              @switch (filterKey.toString()) {
+                                @case ('est') {
+                                  <ng-container i18n="@@ReadingText.ReadingText">Lästext</ng-container>
+                                }
+                                @case ('com') {
+                                  <ng-container i18n="@@Commentary.Commentary">Kommentar</ng-container>
+                                }
+                                @case ('ms') {
+                                  <ng-container i18n="@@Manuscripts.Manuscript">Manuskript</ng-container>
+                                }
+                                @case ('var') {
+                                  <ng-container i18n="@@Variants.Variant">Tryckt variant</ng-container>
+                                }
+                                @case ('tit') {
+                                  <ng-container i18n="@@CollectionTitle.TitlePage">Titelblad</ng-container>
+                                }
+                                @case ('fore') {
+                                  <ng-container i18n="@@CollectionForeword.Foreword">Förord</ng-container>
+                                }
+                                @case ('inl') {
+                                  <ng-container i18n="@@CollectionIntroduction.Introduction">Inledning</ng-container>
+                                }
+                                @default {
+                                  {{getEllipsisString(filterKey.toString())}}
+                                }
                               }
-                              @case ('com') {
-                                <ng-container i18n="@@Commentary.Commentary">Kommentar</ng-container>
-                              }
-                              @case ('ms') {
-                                <ng-container i18n="@@Manuscripts.Manuscript">Manuskript</ng-container>
-                              }
-                              @case ('var') {
-                                <ng-container i18n="@@Variants.Variant">Tryckt variant</ng-container>
-                              }
-                              @case ('tit') {
-                                <ng-container i18n="@@CollectionTitle.TitlePage">Titelblad</ng-container>
-                              }
-                              @case ('fore') {
-                                <ng-container i18n="@@CollectionForeword.Foreword">Förord</ng-container>
-                              }
-                              @case ('inl') {
-                                <ng-container i18n="@@CollectionIntroduction.Introduction">Inledning</ng-container>
-                              }
-                              @default {
-                                {{getEllipsisString(filterKey.toString())}}
-                              }
+                            } @else if (activeFilterGroup.name === 'CollectionId') {
+                              {{filterKey | collectionTitle | async}}
+                            } @else if (activeFilterGroup.name === 'Language') {
+                              {{filterKey | langName}}
+                            } @else {
+                              {{getEllipsisString(filterKey.toString())}}
                             }
                             <ion-icon name="close" slot="end"></ion-icon>
                           </ion-button>
@@ -342,6 +354,8 @@
                     <ng-container i18n="@@ElasticSearch.Genre">Genre</ng-container>:
                   } @else if (filterGroup.name === 'Collection') {
                     <ng-container i18n="@@ElasticSearch.Collection">Delutgåva</ng-container>:
+                  } @else if (filterGroup.name === 'CollectionId') {
+                    <ng-container i18n="@@ElasticSearch.Collection">Delutgåva</ng-container>:
                   } @else if (filterGroup.name === 'LetterSenderName') {
                     <ng-container i18n="@@ElasticSearch.LetterSenderName">Avsändare (brev)</ng-container>:
                   } @else if (filterGroup.name === 'LetterReceiverName') {
@@ -354,6 +368,8 @@
                     <ng-container i18n="@@ElasticSearch.Region">Landskap</ng-container>:
                   } @else if (filterGroup.name === 'Signum') {
                     <ng-container i18n="@@ElasticSearch.Signum">Arkivsignum</ng-container>:
+                  } @else if (filterGroup.name === 'Language') {
+                    <ng-container i18n="@@ElasticSearch.Language">Språk</ng-container>:
                   }
                 </h3>
                 <ion-icon id="arrow-{{filterGroup.name}}" name="chevron-forward" [class.open]="filterGroup.open"></ion-icon>
@@ -412,8 +428,11 @@
                                   {{filter.key.toString()}}
                                 }
                               }
-                            }
-                            @else {
+                            } @else if (filterGroup.name === 'CollectionId') {
+                              {{filter.key | collectionTitle | async}}
+                            } @else if (filterGroup.name === 'Language') {
+                              {{filter.key | langName}}
+                            } @else {
                               {{filter.key_as_string || filter.key}}
                             }
                             <span [ngStyle]="{

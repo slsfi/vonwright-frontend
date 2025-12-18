@@ -1,4 +1,4 @@
-import { Component, Input, OnChanges, OnDestroy, OnInit, SimpleChanges } from '@angular/core';
+import { Component, OnChanges, OnDestroy, OnInit, SimpleChanges, inject, input } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { IonicModule } from '@ionic/angular';
 import { combineLatestWith, distinctUntilChanged, filter, map, Subscription } from 'rxjs';
@@ -26,13 +26,18 @@ import { enableFrontMatterPageOrTextViewType } from '@utility-functions';
   imports: [RouterLink, IonicModule, CollectionPagePathPipe, CollectionPagePositionQueryparamPipe]
 })
 export class TextChangerComponent implements OnChanges, OnDestroy, OnInit {
-  @Input() parentPageType: string = 'text';
+  private headService = inject(DocumentHeadService);
+  private platformService = inject(PlatformService);
+  private route = inject(ActivatedRoute);
+  private tocService = inject(CollectionTableOfContentsService);
+
+  readonly parentPageType = input<string>('text');
   // ionViewActive is true when the parent page component is active in the DOM,
   // i.e. the component has entered the Ionic life cycle hook ionViewWillEnter.
   // Set to false when the parent component has entered ionViewWillLeave life
   // cycle hook. This way we can react to ActivatedRoute changes only in active
   // components.
-  @Input() ionViewActive: boolean = true;
+  readonly ionViewActive = input<boolean>(true);
 
   activeMenuOrder: string = '';
   collectionId: string = '';
@@ -46,12 +51,8 @@ export class TextChangerComponent implements OnChanges, OnDestroy, OnInit {
   tocItemId: string = '';
   tocSubscr: Subscription | null = null;
 
-  constructor(
-    private headService: DocumentHeadService,
-    private platformService: PlatformService,
-    private route: ActivatedRoute,
-    private tocService: CollectionTableOfContentsService
-  ) {}
+  readonly nextLabel: string = $localize`:@@TextChanger.NextLabel:Följande text`;
+  readonly prevLabel: string = $localize`:@@TextChanger.PrevLabel:Föregående text`;
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes.ionViewActive?.currentValue && !changes.ionViewActive?.firstChange) {
@@ -67,7 +68,7 @@ export class TextChangerComponent implements OnChanges, OnDestroy, OnInit {
     // (the received TOC is already properly ordered) and to route
     // parameters, then act on changes to either.
     this.tocSubscr = this.tocService.getCurrentFlattenedCollectionToc().pipe(
-      filter(toc => this.ionViewActive && !!toc),
+      filter(toc => this.ionViewActive() && !!toc),
       combineLatestWith(this.route.paramMap, this.route.queryParamMap),
       map(([toc, paramMap, queryParamMap]) => ({
         toc,
@@ -143,20 +144,33 @@ export class TextChangerComponent implements OnChanges, OnDestroy, OnInit {
    * text, the parent text title is set as the document title.
    */
   private updateCurrentText() {
-    const foundTextIndex = this.getCurrentTextIndex();
-    if (foundTextIndex > -1) {
-      this.currentTocTextIndex = foundTextIndex;
+    const pageType = this.parentPageType()
+
+    // Initially search for ToC item matching tocItemId, which includes position.
+    // If not found, search for ToC item matching textItemId, which excludes
+    // position.
+    const tocItemIdIndex = this.getCurrentTextIndex(this.tocItemId, pageType);
+    const textItemIdIndex = tocItemIdIndex < 0
+          ? this.getCurrentTextIndex(this.textItemID, pageType)
+          : -1;
+    
+    if (tocItemIdIndex > -1) {
+      this.currentTocTextIndex = tocItemIdIndex;
+    } else if (textItemIdIndex > -1) {
+      this.currentTocTextIndex = textItemIdIndex;
     } else {
       console.error('Unable to find the current text in flattenedTOC in text-changer component.');
       this.currentTocTextIndex = 0;
     }
 
     // Set the document title to the current text title.
-    // Positioned item's title should not be set. Instead, if a frontmatter
-    // page ("page" key present), we have to search for the non-positioned
+    // Positioned item's title should not be set. Instead, if not a frontmatter
+    // page ("page" key missing), we have to search for the non-positioned
     // item's title.
-    const titleItemIndex = this.textPosition && !this.flattenedToc[this.currentTocTextIndex].page
-          ? this.flattenedToc.findIndex(({ itemId }) => itemId === this.textItemID)
+    const titleItemIndex = this.textPosition && pageType === 'text'
+          ? (textItemIdIndex < 0
+                ? this.getCurrentTextIndex(this.textItemID, pageType)
+                : textItemIdIndex)
           : this.currentTocTextIndex;
 
     const itemTitle = titleItemIndex > -1
@@ -166,12 +180,12 @@ export class TextChangerComponent implements OnChanges, OnDestroy, OnInit {
     this.headService.setTitle([itemTitle, this.collectionTitle]);
   }
 
-  private getCurrentTextIndex() {
+  private getCurrentTextIndex(searchItemId: string, pageType: string): number {
     return this.flattenedToc.findIndex(item => {
-      if (!item.page && item.itemId === this.tocItemId) {
+      if (!item.page && item.itemId === searchItemId) {
         return true;
       }
-      return item.page === this.parentPageType;
+      return item.page === pageType;
     });
   }
 }
