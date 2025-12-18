@@ -8,10 +8,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ## Unreleased
 
+
+
+## [2.4.2-production.1] – 2025-12-18
+
 ### Changed
 
-- Update to base version [`2.4.2`](https://github.com/slsfi/digital-edition-frontend-ng/releases/tag/2.4.2) from upstream, original repository.
-- Update Matomo analytics code snippet.
+- Update to base version [`2.4.2`](https://github.com/slsfi/digital-edition-frontend-ng/releases/tag/2.4.2) from upstream, original repository. ([0cae771](https://github.com/slsfi/vonwright-frontend/commit/0cae7717b78be8df5c6324f45861bfe407229b71))
+- Update Matomo analytics code snippet. ([b696c01](https://github.com/slsfi/vonwright-frontend/commit/b696c018448157d14a82f2af4f650ea0569f5e7c))
 
 
 
@@ -1310,6 +1314,7 @@ siteLogoDimensions: {
 [1.0.1]: https://github.com/slsfi/digital-edition-frontend-ng/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/slsfi/digital-edition-frontend-ng/releases/tag/v1.0.0
 
+[2.4.2-production.1]: https://github.com/slsfi/vonwright-frontend/compare/2.0.0-production.1...2.4.2-production.1
 [2.0.0-production.1]: https://github.com/slsfi/vonwright-frontend/compare/1.8.2-production.1...2.0.0-production.1
 [1.8.2-production.1]: https://github.com/slsfi/vonwright-frontend/compare/1.6.5-production.1...1.8.2-production.1
 [1.6.5-production.1]: https://github.com/slsfi/vonwright-frontend/compare/1.6.3-production.1...1.6.5-production.1
