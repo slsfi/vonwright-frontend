@@ -13,7 +13,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    image: ghcr.io/slsfi/vonwright-frontend:2.0.0-production.1
+    image: ghcr.io/slsfi/vonwright-frontend:2.4.2-production.1
     restart: unless-stopped
     volumes:
       - browser-static:/digital-edition-frontend-ng/dist/app/browser
