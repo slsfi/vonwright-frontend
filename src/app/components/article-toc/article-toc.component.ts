@@ -6,6 +6,9 @@ import { HeadingNode } from '@models/article.models';
 import { HtmlParserService } from '@services/html-parser.service';
 
 
+// ─────────────────────────────────────────────────────────────────────────────
+// * This component is zoneless-ready. *
+// ─────────────────────────────────────────────────────────────────────────────
 @Component({
   selector: 'article-toc',
   templateUrl: './article-toc.component.html',

@@ -1,4 +1,4 @@
-@if ((contentItems$ | async); as data) {
+@if (contentItems(); as data) {
   <ion-grid>
     <ion-row>
       @for (item of data; track item.id) {

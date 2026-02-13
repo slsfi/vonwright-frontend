@@ -1,23 +1,27 @@
+@let mobileModeValue = mobileMode();
+@let activeImageIndexValue = activeImageIndex();
+@let imageTitles = normImageTitles();
+
 <div class="full-page-modal">
-  <div class="facsimile-button-group">
+  <div #facsToolbar class="facsimile-button-group">
     <div class="action-buttons">
       <ion-fab>
-        @if (!mobileMode && imageURLs.length > 1) {
+        @if (!mobileModeValue && imageURLs.length > 1) {
           <ion-fab-button class="primary-fab-button" size="small" (click)="previous()" title="Föregående bild" i18n-title="@@Facsimiles.Previous">
             <ion-icon name="arrow-back" aria-label="Föregående bild" i18n-aria-label="@@Facsimiles.Previous"></ion-icon>
           </ion-fab-button>
         }
-        @if (!mobileMode && imageURLs.length > 1) {
+        @if (!mobileModeValue && imageURLs.length > 1) {
           <ion-fab-button class="primary-fab-button" size="small" (click)="next()" title="Följande bild" i18n-title="@@Facsimiles.Next">
             <ion-icon name="arrow-forward" aria-label="Följande bild" i18n-aria-label="@@Facsimiles.Next"></ion-icon>
           </ion-fab-button>
         }
-        @if (backsides.length > 0 && backsides[activeImageIndex]) {
-          <ion-fab-button size="small" (click)="showBackside = !showBackside" title="Visa/dölj frånsida" i18n-title="@@FullscreenImageViewer.ToggleReverseSide">
+        @if (backsides.length > 0 && backsides[activeImageIndexValue]) {
+          <ion-fab-button size="small" (click)="toggleBackside()" title="Visa/dölj frånsida" i18n-title="@@FullscreenImageViewer.ToggleReverseSide">
             <ion-icon name="repeat-outline" aria-label="Visa/dölj frånsida" i18n-aria-label="@@FullscreenImageViewer.ToggleReverseSide"></ion-icon>
           </ion-fab-button>
         }
-        @if (!mobileMode) {
+        @if (!mobileModeValue) {
           <ion-fab-button size="small" (click)="zoomIn()" title="Zooma in" i18n-title="@@Facsimiles.ZoomIn">
             <ion-icon name="add-outline" aria-label="Zooma in" i18n-aria-label="@@Facsimiles.ZoomIn"></ion-icon>
           </ion-fab-button>
@@ -31,7 +35,7 @@
         <ion-fab-button size="small" (click)="reset()" title="Återställ" i18n-title="@@Facsimiles.Reset">
           <ion-icon name="scan-outline" aria-label="Återställ" i18n-aria-label="@@Facsimiles.Reset"></ion-icon>
         </ion-fab-button>
-        @if ((imageDescriptions && imageDescriptions[activeImageIndex]) || (imageTitles && imageTitles[activeImageIndex])) {
+        @if ((imageDescriptions && imageDescriptions[activeImageIndexValue]) || (imageTitles && imageTitles[activeImageIndexValue])) {
           <ion-fab-button size="small" (click)="toggleImageDescription()" title="Visa/dölj beskrivning" i18n-title="@@FullscreenImageViewer.ToggleDescription">
             <ion-icon name="information-outline" aria-label="Visa/dölj beskrivning" i18n-aria-label="@@FullscreenImageViewer.ToggleDescription"></ion-icon>
           </ion-fab-button>
@@ -48,7 +52,7 @@
               min="1"
               [max]="imageURLs.length ? imageURLs.length : null"
               (ionChange)="setImageNr($event)"
-              [(ngModel)]="inputImageNumber"
+              [value]="inputImageNumber()"
         ></ion-input>
       }
       <ion-fab>
@@ -57,18 +61,18 @@
         </ion-fab-button>
       </ion-fab>
     </div>
-    @if ((imageDescriptions && imageDescriptions[activeImageIndex]) || (imageTitles && imageTitles[activeImageIndex])) {
-      <div class="image-description" [class.visuallyhidden]="!showDescription">
-        @if (imageTitles && imageTitles[activeImageIndex]) {
-          <span class="image-title" [innerHTML]="imageTitles[activeImageIndex] + ' '"></span>
+    @if ((imageDescriptions && imageDescriptions[activeImageIndexValue]) || (imageTitles && imageTitles[activeImageIndexValue])) {
+      <div class="image-description" [class.visuallyhidden]="!showDescription()">
+        @if (imageTitles && imageTitles[activeImageIndexValue]) {
+          <span class="image-title" [innerHTML]="imageTitles[activeImageIndexValue] + ' '"></span>
         }
-        @if (imageDescriptions && imageDescriptions[activeImageIndex]) {
-          <span [innerHTML]="imageDescriptions[activeImageIndex]"></span>
+        @if (imageDescriptions && imageDescriptions[activeImageIndexValue]) {
+          <span [innerHTML]="imageDescriptions[activeImageIndexValue]"></span>
         }
       </div>
     }
   </div>
-  @if (mobileMode) {
+  @if (mobileModeValue) {
     <ion-fab class="left-controls">
       @if (imageURLs.length > 1) {
         <ion-fab-button class="primary-fab-button" size="small" (click)="previous()" title="Föregående bild" i18n-title="@@Facsimiles.Previous">
@@ -93,18 +97,18 @@
   <div class="facsimile-image-wrapper">
     <img
           [src]="
-                  showBackside &&
-                  backsides[activeImageIndex] ?
-                  getBacksideUrl(imageURLs[activeImageIndex]) :
-                  imageURLs[activeImageIndex]
+                  showBackside() &&
+                  backsides[activeImageIndexValue] ?
+                  getBacksideUrl(imageURLs[activeImageIndexValue]) :
+                  imageURLs[activeImageIndexValue]
                   "
           alt="Skannat faksimil"
           i18n-alt="@@Facsimiles.AltText"
-          [ngStyle]="{'transform':'scale('+zoom+') translate3d('+prevX+'px, '+prevY+'px, 0px) rotate('+angle+'deg)', 'max-height':'calc(100vh - '+toolbarHeight+'px)'}"
+          [style]="imageStyle()"
           (wheel)="zoomWithMouseWheel($event)"
-          [draggableImage]="[prevX, prevY]"
-          [angle]="angle"
-          [zoom]="zoom"
+          [draggableImage]="[prevX(), prevY()]"
+          [angle]="angle()"
+          [zoom]="zoom()"
           (finalCoordinates)="setImageCoordinates($event)"
     >
   </div>

@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, DestroyRef, ElementRef, Injector, LOCALE_ID, NgZone, Renderer2, afterRenderEffect, computed, inject, input, signal, untracked } from '@angular/core';
 import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 import { IonicModule } from '@ionic/angular';
-import { catchError, of, switchMap, tap } from 'rxjs';
+import { catchError, Observable, of, switchMap, tap } from 'rxjs';
 
 import { TextKey } from '@models/collection.models';
 import { TrustHtmlPipe } from '@pipes/trust-html.pipe';
@@ -9,6 +9,9 @@ import { MarkdownService } from '@services/markdown.service';
 import { ScrollService } from '@services/scroll.service';
 
 
+// ─────────────────────────────────────────────────────────────────────────────
+// * This component is zoneless-ready. *
+// ─────────────────────────────────────────────────────────────────────────────
 @Component({
   selector: 'text-legend',
   templateUrl: './legend.component.html',
@@ -130,7 +133,7 @@ export class LegendComponent {
   // ─────────────────────────────────────────────────────────────────────────────
   // Data load with fallbacks
   // ─────────────────────────────────────────────────────────────────────────────
-  private loadLegend$(tk: TextKey) {
+  private loadLegend$(tk: TextKey): Observable<string> {
     const base = `${this.activeLocale}-${this.staticMdLegendFolderNumber}-${tk.collectionID}`;
     const primary   = `${base}-${tk.publicationID}`;
     const fallback1 = `${base}`;

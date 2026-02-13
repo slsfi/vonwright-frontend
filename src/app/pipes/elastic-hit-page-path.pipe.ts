@@ -1,6 +1,7 @@
 import { Pipe, PipeTransform } from '@angular/core';
 
 import { config } from '@config';
+import { Ebook } from '@models/ebook.models';
 import { splitFilename } from '@utility-functions';
 
 
@@ -13,7 +14,7 @@ import { splitFilename } from '@utility-functions';
   standalone: true
 })
 export class ElasticHitPagePathPipe implements PipeTransform {
-  readonly ebooks: any[] = config.ebooks ?? [];
+  readonly ebooks: Ebook[] = config.ebooks ?? [];
 
   transform(elasticHit: any): string {
     let path = '/';
@@ -34,7 +35,7 @@ export class ElasticHitPagePathPipe implements PipeTransform {
             + `/text/${elasticHit.source.publication_id}`;
     } else if (elasticHit.source.text_type === 'pdf') {
       const ebook = this.ebooks.find(
-        (e: any) => String(e.collectionId) === String(elasticHit.source.collection_id)
+        e => String(e.collectionId) === String(elasticHit.source.collection_id)
       );
 
       if (ebook?.filename) {

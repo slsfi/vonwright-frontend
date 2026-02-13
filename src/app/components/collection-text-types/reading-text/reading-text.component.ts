@@ -150,7 +150,7 @@ export class ReadingTextComponent {
   }
 
   private registerAfterRenderEffects() {
-    // After-render: attach DOM listeners abd perform scrolling when appropriate.
+    // After-render: attach DOM listeners and perform scrolling when appropriate.
     // Triggers when:
     //  - content finished loading,
     //  - textKey changed,

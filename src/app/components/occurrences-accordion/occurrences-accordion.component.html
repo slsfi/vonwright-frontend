@@ -1,10 +1,14 @@
-@if (isLoading) {
+@let loading = isLoading();
+@let occData = occurrenceData();
+@let entityType = type();
+
+@if (loading) {
   <ion-spinner class="loading" name="crescent"></ion-spinner>
 }
 
-@if (occurrenceData.length) {
+@if (occData.length) {
   <ul class="sd-occurrences" role="menu">
-    @for (collection of occurrenceData; track collection.collection_id) {
+    @for (collection of occData; track collection.collection_id) {
       <li
             [attr.aria-expanded]="!collection.hidden"
             [attr.aria-haspopup]="'menu'"
@@ -54,10 +58,10 @@
   </ul>
 }
 
-@if (simpleWorkMetadata && (type() === 'work' || type() === 'work_manifestation')) {
+@if (simpleWorkMetadata && (entityType === 'work' || entityType === 'work_manifestation')) {
   <p i18n="@@NamedEntity.WorkOccurrencesUnavailable">Förekomster för verk är inte tillgängliga.</p>
 } @else {
-  @if (!isLoading && occurrenceData.length < 1) {
+  @if (!loading && occData.length < 1) {
     <p i18n="@@NamedEntity.NoInfoFound">Ingen information hittades.</p>
   }
 }

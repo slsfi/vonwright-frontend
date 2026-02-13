@@ -18,6 +18,11 @@ export interface Collection {
   title: string;
 }
 
+export interface CollectionWithCover extends Collection {
+  imageAltText?: string;
+  imageURL?: string;
+}
+
 export const toCollection = (c: CollectionApiResponse): Collection => ({
   id: c.id,
   title: c.title ?? ''

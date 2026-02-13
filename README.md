@@ -31,22 +31,18 @@ The app is built on [Angular][angular] and uses [Ionic][ionic] web components.
 1. Install [Node.js][node.js] which includes [npm][npm]. The app is compatible with Node `^20.19.0`, `^22.12.0` and `^24.0.0`. The app is currently configured to run on Node `22`. Check your Node version with:
 
 ```
-Node --version
+node --version
 ```
 
-2. Install the [Angular CLI][angular_cli] globally:
-
-```
-npm install -g @angular/cli
-```
-
-3. [Clone][clone_repository] the repository locally and `cd` into the folder. On Windows you can use [GitHub Desktop][github_desktop] or [Git Bash][git_bash] (see [tutorial on Git Bash][gith_bash_tutorial]).
-
-4. Install dependencies:
+2. Install project dependencies:
 
 ```
 npm install
 ```
+
+The local Angular CLI from `node_modules` is used by the npm scripts.
+
+3. [Clone][clone_repository] the repository locally and `cd` into the folder. On Windows you can use [GitHub Desktop][github_desktop] or [Git Bash][git_bash] (see [tutorial on Git Bash][gith_bash_tutorial]).
 
 ### Running locally
 
@@ -82,8 +78,8 @@ Open your browser on http://localhost:4201/. You need to manually run the build 
 The platform consists of an [Angular frontend app][digital-edition-frontend-ng], a [Flask-driven REST API][digital_edition_api], a [backend search app][digital_edition_search] run by the Elastic (ELK) Stack, a [template for a backend files repository][digital_edition_required_files_template] and a [database template][digital_edition_db]. There is also a [tool for creating commentaries][digital_edition_commentary] to texts in [TEI-XML][TEI] format.
 
 
-[angular]: https://angular.io/
-[angular_cli]: https://angular.io/cli
+[angular]: https://angular.dev/
+[angular_cli]: https://angular.dev/cli
 [changelog]: CHANGELOG.md
 [clone_repository]: https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository
 [digital-edition-frontend-ng]: https://github.com/slsfi/digital-edition-frontend-ng

@@ -1,5 +1,6 @@
-import { Component, OnInit, inject, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, computed, effect, inject, input, signal } from '@angular/core';
 import { RouterModule } from '@angular/router';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { IonicModule } from '@ionic/angular';
 import { take } from 'rxjs';
 
@@ -13,112 +14,164 @@ import { NamedEntityService } from '@services/named-entity.service';
 import { sortArrayOfObjectsAlphabetically } from '@utility-functions';
 
 
+// ─────────────────────────────────────────────────────────────────────────────
+// * This component is zoneless-ready. *
+// ─────────────────────────────────────────────────────────────────────────────
 @Component({
   selector: 'occurrences-accordion',
   templateUrl: './occurrences-accordion.component.html',
   styleUrls: ['./occurrences-accordion.component.scss'],
-  imports: [IonicModule, RouterModule, CollectionPagePathPipe, OccurrenceCollectionTextPageQueryparamsPipe]
+  imports: [IonicModule, RouterModule, CollectionPagePathPipe, OccurrenceCollectionTextPageQueryparamsPipe],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class OccurrencesAccordionComponent implements OnInit {
+export class OccurrencesAccordionComponent {
+  // -----------------------------------------------------------------------------
+  // Dependency injection, Input signals, Fields, Local state signals
+  // -----------------------------------------------------------------------------
   private namedEntityService = inject(NamedEntityService);
   private tocService = inject(CollectionTableOfContentsService);
+  private destroyRef = inject(DestroyRef);
 
   readonly id = input<number>();
   readonly type = input<string>('');
 
   readonly simpleWorkMetadata: boolean = config.modal?.namedEntity?.useSimpleWorkMetadata ?? false;
+  private latestFetchToken = 0;
 
-  groupedTexts: any[] = [];
-  isLoading: boolean = true;
-  occurrenceData: any[] = [];
-  showPublishedStatus: number = 2;
-
-  ngOnInit() {
+  // -----------------------------------------------------------------------------
+  // Derived computeds (pure, no side-effects)
+  // -----------------------------------------------------------------------------
+  readonly groupedTexts = signal<any[]>([]);
+  readonly isLoading = signal<boolean>(true);
+  readonly occurrenceData = computed<any[]>(() => this.groupedTexts());
+  readonly showPublishedStatus = computed<number>(() => {
     const type = this.type();
     if (type === 'keyword') {
-      this.showPublishedStatus = config.page?.index?.keywords?.publishedStatus ?? 2;
-    } else if (type === 'person') {
-      this.showPublishedStatus = config.page?.index?.persons?.publishedStatus ?? 2;
-    } else if (type === 'place') {
-      this.showPublishedStatus = config.page?.index?.places?.publishedStatus ?? 2;
-    } else if (type === 'work') {
-      this.showPublishedStatus = config.page?.index?.works?.publishedStatus ?? 2;
+      return config.page?.index?.keywords?.publishedStatus ?? 2;
     }
-
-    const id = this.id();
-    if (type === 'work' && this.simpleWorkMetadata) {
-      this.isLoading = false;
-    } else if (id && type) {
-      this.getOccurrenceData(id);
+    if (type === 'person') {
+      return config.page?.index?.persons?.publishedStatus ?? 2;
     }
-  }
-
-  private getOccurrenceData(id: any) {
-    this.isLoading = true;
-    let objectType = this.type();
-    if (objectType === 'work') {
-      objectType = 'work_manifestation';
+    if (type === 'place') {
+      return config.page?.index?.places?.publishedStatus ?? 2;
     }
-    this.namedEntityService.getEntityOccurrences(objectType, id).subscribe({
-      next: (occ: any) => {
-        occ.forEach((item: any) => {
-          if (item.occurrences?.length) {
-            for (const occurence of item.occurrences) {
-              this.categorizeOccurrence(occurence);
-            }
-          }
-        });
-        // Sort collection names alphabetically
-        sortArrayOfObjectsAlphabetically(this.groupedTexts, 'name');
+    if (type === 'work') {
+      return config.page?.index?.works?.publishedStatus ?? 2;
+    }
+    return 2;
+  });
 
-        // Replace publication names (from the database) with the names
-        // in the collection TOC-file and sort by publication name.
-        this.updateAndSortPublicationNamesInOccurrenceResults();
+  // -----------------------------------------------------------------------------
+  // Constructor: wire side effects (data load)
+  // -----------------------------------------------------------------------------
+  constructor() {
+    effect(() => {
+      const id = this.id();
+      const type = this.type();
 
-        this.occurrenceData = this.groupedTexts;
-        this.isLoading = false;
-      },
-      error: (err: any) => {
-        console.error('Error getting occurrence texts', err);
-        this.isLoading = false;
+      if (type === 'work' && this.simpleWorkMetadata) {
+        this.latestFetchToken++;
+        this.groupedTexts.set([]);
+        this.isLoading.set(false);
+        return;
+      }
+
+      if (id && type) {
+        this.getOccurrenceData(id);
+      } else {
+        this.latestFetchToken++;
+        this.groupedTexts.set([]);
+        this.isLoading.set(false);
       }
     });
   }
 
-  private categorizeOccurrence(occurrence: Occurrence) {
+  // -----------------------------------------------------------------------------
+  // Data loading and transformation
+  // -----------------------------------------------------------------------------
+  private getOccurrenceData(id: number) {
+    this.isLoading.set(true);
+    this.groupedTexts.set([]);
+    // If occurrences are loading for one type/id pair and inputs change to another pair,
+    // a new fetch starts; this token lets us ignore late responses from the older fetch.
+    const fetchToken = ++this.latestFetchToken;
+
+    let objectType = this.type();
+    if (objectType === 'work') {
+      objectType = 'work_manifestation';
+    }
+
+    this.namedEntityService.getEntityOccurrences(objectType, String(id)).pipe(
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe({
+      next: (occ: any) => {
+        if (fetchToken !== this.latestFetchToken) {
+          return;
+        }
+
+        const nextGroupedTexts: any[] = [];
+        occ.forEach((item: any) => {
+          if (item.occurrences?.length) {
+            for (const occurence of item.occurrences) {
+              this.categorizeOccurrence(occurence, nextGroupedTexts);
+            }
+          }
+        });
+
+        // Sort collection names alphabetically
+        sortArrayOfObjectsAlphabetically(nextGroupedTexts, 'name');
+
+        // Replace publication names (from the database) with the names
+        // in the collection TOC-file and sort by publication name.
+        this.groupedTexts.set(nextGroupedTexts);
+        this.updateAndSortPublicationNamesInOccurrenceResults(fetchToken);
+
+        this.isLoading.set(false);
+      },
+      error: (err: any) => {
+        console.error('Error getting occurrence texts', err);
+        if (fetchToken === this.latestFetchToken) {
+          this.groupedTexts.set([]);
+          this.isLoading.set(false);
+        }
+      }
+    });
+  }
+
+  private categorizeOccurrence(occurrence: Occurrence, groupedTexts: any[]) {
     if (
-        occurrence.publication_id &&
-        !occurrence.publication_manuscript_id &&
-        !occurrence.publication_comment_id &&
-        !occurrence.publication_facsimile_id &&
-        !occurrence.publication_version_id
-      ) {
-        this.setOccurrenceType(occurrence, 'rt');
+      occurrence.publication_id &&
+      !occurrence.publication_manuscript_id &&
+      !occurrence.publication_comment_id &&
+      !occurrence.publication_facsimile_id &&
+      !occurrence.publication_version_id
+    ) {
+      this.setOccurrenceType(occurrence, 'rt', groupedTexts);
     } else {
       if (occurrence.publication_manuscript_id) {
-        this.setOccurrenceType(occurrence, 'ms');
+        this.setOccurrenceType(occurrence, 'ms', groupedTexts);
       }
       if (occurrence.publication_version_id) {
-        this.setOccurrenceType(occurrence, 'var');
+        this.setOccurrenceType(occurrence, 'var', groupedTexts);
       }
       if (occurrence.publication_comment_id) {
-        this.setOccurrenceType(occurrence, 'com');
+        this.setOccurrenceType(occurrence, 'com', groupedTexts);
       }
       if (occurrence.publication_facsimile_id) {
-        this.setOccurrenceType(occurrence, 'facs')
+        this.setOccurrenceType(occurrence, 'facs', groupedTexts);
       }
     }
   }
 
-  private setOccurrenceType(occ: Occurrence, type: string) {
+  private setOccurrenceType(occ: Occurrence, type: string, groupedTexts: any[]) {
     const newOccurrence = new SingleOccurrence();
     const fileName = occ.original_filename ?? (
       occ.collection_id + '_' + occ.publication_id + '.xml'
     );
 
     newOccurrence.linkID = fileName?.split('.xml')[0];
-    newOccurrence.collectionID = occ.collection_id && occ.publication_id ?
-      occ.collection_id + '_' + occ.publication_id
+    newOccurrence.collectionID = occ.collection_id && occ.publication_id
+      ? occ.collection_id + '_' + occ.publication_id
       : newOccurrence.linkID?.split('_' + type)[0];
     newOccurrence.filename = fileName;
     newOccurrence.textType = type;
@@ -130,29 +183,31 @@ export class OccurrencesAccordionComponent implements OnInit {
     newOccurrence.publication_facsimile_id = occ.publication_facsimile_id;
     newOccurrence.facsimilePage = occ.publication_facsimile_page;
     newOccurrence.description = occ.description || null;
-    this.setOccurrenceTree(newOccurrence, occ);
+    this.setOccurrenceTree(newOccurrence, occ, groupedTexts);
   }
 
-  private setOccurrenceTree(newOccurrence: any, occ: any) {
+  private setOccurrenceTree(newOccurrence: any, occ: any, groupedTexts: any[]) {
+    const publishedStatus = this.showPublishedStatus();
     let foundCollection = false;
-    for (let i = 0; i < this.groupedTexts.length; i++) {
-      if (this.groupedTexts[i].collection_id === occ.collection_id) {
+
+    for (let i = 0; i < groupedTexts.length; i++) {
+      if (groupedTexts[i].collection_id === occ.collection_id) {
         foundCollection = true;
         let foundPublication = false;
-        for (let j = 0; j < this.groupedTexts[i].publications.length; j++) {
-          if (this.groupedTexts[i].publications[j].publication_id === occ.publication_id) {
-            this.groupedTexts[i].publications[j].occurrences.push(newOccurrence);
+        for (let j = 0; j < groupedTexts[i].publications.length; j++) {
+          if (groupedTexts[i].publications[j].publication_id === occ.publication_id) {
+            groupedTexts[i].publications[j].occurrences.push(newOccurrence);
             foundPublication = true;
             break;
           }
         }
-        if (!foundPublication && occ.publication_published >= this.showPublishedStatus) {
+        if (!foundPublication && occ.publication_published >= publishedStatus) {
           const item = {
             publication_id: occ.publication_id,
             name: occ.publication_name,
             occurrences: [newOccurrence]
           };
-          this.groupedTexts[i].publications.push(item);
+          groupedTexts[i].publications.push(item);
         }
         break;
       }
@@ -162,7 +217,7 @@ export class OccurrencesAccordionComponent implements OnInit {
       if (occ.collection_name === undefined) {
         occ.collection_name = occ.publication_collection_name;
       }
-      if (occ.publication_published >= this.showPublishedStatus) {
+      if (occ.publication_published >= publishedStatus) {
         const item = {
           collection_id: occ.collection_id,
           name: occ.collection_name,
@@ -175,46 +230,85 @@ export class OccurrencesAccordionComponent implements OnInit {
             }
           ]
         };
-        this.groupedTexts.push(item);
+        groupedTexts.push(item);
       }
     }
   }
 
-  private updateAndSortPublicationNamesInOccurrenceResults() {
+  private updateAndSortPublicationNamesInOccurrenceResults(fetchToken: number) {
     // Loop through each collection with occurrence results, get TOC for each collection,
     // then loop through each publication with occurrence results in each collection and
     // update publication names from TOC-files. Finally, sort the publication names.
-    this.groupedTexts.forEach((item: any) => {
+    this.groupedTexts().forEach((item: any) => {
       if (item.collection_id && item.publications) {
-        this.tocService.getFlattenedTableOfContents(item.collection_id).pipe(take(1)).subscribe(
+        this.tocService.getFlattenedTableOfContents(item.collection_id).pipe(
+          take(1),
+          takeUntilDestroyed(this.destroyRef)
+        ).subscribe(
           (tocData: any) => {
-            item.publications.forEach((pub: any) => {
-              const id = item.collection_id + '_' + pub.publication_id;
-              tocData?.children?.forEach((tocItem: any) => {
-                if (id === tocItem['itemId']) {
-                  pub.occurrences[0].displayName = String(tocItem['text']);
-                  pub.name = String(tocItem['text']);
-                }
-              });
-              if (pub.occurrences?.length > 1) {
-                sortArrayOfObjectsAlphabetically(pub.occurrences, 'textType');
-              }
-            });
-            if (item.publications !== undefined) {
-              sortArrayOfObjectsAlphabetically(item.publications, 'name');
+            if (fetchToken !== this.latestFetchToken) {
+              return;
             }
+
+            const nextGroupedTexts = this.groupedTexts().map((currentCollection: any) => {
+              if (currentCollection.collection_id !== item.collection_id) {
+                return currentCollection;
+              }
+
+              const nextPublications = currentCollection.publications.map((pub: any) => {
+                const nextPublication = {
+                  ...pub,
+                  occurrences: [...pub.occurrences]
+                };
+
+                const id = currentCollection.collection_id + '_' + nextPublication.publication_id;
+                tocData?.children?.forEach((tocItem: any) => {
+                  if (id === tocItem['itemId']) {
+                    nextPublication.occurrences[0].displayName = String(tocItem['text']);
+                    nextPublication.name = String(tocItem['text']);
+                  }
+                });
+
+                if (nextPublication.occurrences?.length > 1) {
+                  sortArrayOfObjectsAlphabetically(nextPublication.occurrences, 'textType');
+                }
+
+                return nextPublication;
+              });
+
+              if (nextPublications !== undefined) {
+                sortArrayOfObjectsAlphabetically(nextPublications, 'name');
+              }
+
+              return {
+                ...currentCollection,
+                publications: nextPublications
+              };
+            });
+
+            this.groupedTexts.set(nextGroupedTexts);
           }
         );
       }
     });
   }
 
+  // -----------------------------------------------------------------------------
+  // Public UI actions (called from template)
+  // -----------------------------------------------------------------------------
   toggleList(id: any) {
-    for (let i = 0; i < this.groupedTexts.length; i++) {
-      if (id === this.groupedTexts[i]['collection_id']) {
-        this.groupedTexts[i].hidden ? this.groupedTexts[i].hidden = false : this.groupedTexts[i].hidden = true;
+    const nextGroupedTexts = this.groupedTexts().map((item: any) => {
+      if (id !== item.collection_id) {
+        return item;
       }
-    }
+
+      return {
+        ...item,
+        hidden: !item.hidden
+      };
+    });
+
+    this.groupedTexts.set(nextGroupedTexts);
   }
 
 }

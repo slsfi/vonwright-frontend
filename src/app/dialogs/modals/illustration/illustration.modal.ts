@@ -43,7 +43,7 @@ export class IllustrationModal implements OnInit {
 
   async zoomImage() {
     const params = {
-      activeImageIndex: 0,
+      startImageIndex: 0,
       imageURLs: [this.imgPath]
     };
 

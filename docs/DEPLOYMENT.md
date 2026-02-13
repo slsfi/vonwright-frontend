@@ -17,7 +17,7 @@ It’s recommended not to synchronise unreleased changes from the upstream repos
 
 ## Building
 
-A GitHub Actions [workflow][build_workflow] for automated builds is included in the repository. It will automatically build a new [Docker image][docker_image_reference] of the app on every new GitHub release in the repository and tag the Docker image with the release tag. When creating the new release, name the tag based on the version of the base app and append it with a branch identifier and an incremental build number.
+A GitHub Actions [workflow][build_workflow] for automated builds is included in the repository. It automatically builds and pushes a new [Docker image][docker_image_reference] of the app on pushes to `main`, on pushed tags, and when manually triggered (`workflow_dispatch`). When creating a new release tag, name the tag based on the version of the base app and append it with a branch identifier and an incremental build number.
 
 For example, if the base app is on version `1.0.2`, the release targets the `production` branch and this is the first build for this version in the `production` branch, the release should be tagged `1.0.2-production.1`. The next release should be tagged `1.0.2-production.2` (build number incremented by 1), provided that the base app remains on `1.0.2` and the release targets the `production` branch. When the semantic version of the base app changes, the build number is reset to 1, for instance: `1.1.0-production.1`.
 
@@ -26,17 +26,19 @@ The Docker images built this way are pushed to and stored in the [GitHub Contain
 **Important!** Before creating a new release, push a commit that updates:
 
 1. the image tag in [`compose.yml`][docker_compose_file] to the release tag you are going to use,
-2. the version property in [`package.json`][package_json] with the release tag (run `npm install` so [`package-lock.json`][package-lock_json] also gets updated),
+2. the version property in [`package.json`][package_json] and [`package-lock.json`][package-lock_json] with the release tag (recommended: run `npm version --no-git-tag-version <release-tag>` so both files are updated without changing dependency versions),
 3. the [changelog][changelog].
+
+If you edit `package.json` manually instead, run `npm install --package-lock-only` to synchronize lockfile metadata. Avoid using plain `npm install` just to update the lockfile, unless you intentionally want dependency resolution changes.
 
 
 ## Deployment
 
-You can starting a Docker container of the app from an image created in the step above by using the [`docker run`][docker_run_reference] command.
+You can start a Docker container of the app from an image created in the step above by using the [`docker run`][docker_run_reference] command.
 
-However, for easier configuration and better performance it is recommended you utilize [Docker Compose][docker_compose_reference] and the provided Compose file [`compose.yml`][docker_compose_file]. The Compose file defines an [nginx][nginx] web server to be used for serving static files in front of Node ([`nginx.conf`][nginx_conf]). This increases performance.
+However, for easier configuration and better performance it is recommended to use [Docker Compose][docker_compose_reference] and the provided Compose file [`compose.yml`][docker_compose_file]. The Compose file defines an [nginx][nginx] web server to be used for serving static files in front of Node ([`nginx.conf`][nginx_conf]). This increases performance.
 
-**Important!** nginx gets access to the static files through a [Docker volume][docker_volume_reference], which is defined in [`Dockerfile`][dockerfile]. Since volumes persist even if the container itself is deleted, and the content of a volume is not updated when the image is updated, you need to run
+**Important!** nginx gets access to the static files through a [Docker volume][docker_volume_reference], which is defined in [`compose.yml`][docker_compose_file]. Since volumes persist even if the container itself is deleted, and the content of a volume is not updated when the image is updated, you need to run
 
 ```
 docker compose pull && docker compose down --volumes && docker compose up -d

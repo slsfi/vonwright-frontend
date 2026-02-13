@@ -1,3 +1,9 @@
+@let collectionTitleValue = collectionTitle();
+@let publicationTitleValue = publicationTitle();
+@let publicationDataValue = publicationData();
+@let manuscripts = manuscriptsList();
+@let instructionsTextValue = instructionsText();
+
 <ion-header>
   <ion-toolbar>
     <ion-title i18n="@@DownloadTexts.DownloadAndPrint">Ladda ner och skriv ut</ion-title>
@@ -11,20 +17,20 @@
 
 <ion-content>
   <div class="modal-inner-wrapper">
-    @if (collectionTitle || publicationTitle) {
+    @if (collectionTitleValue || publicationTitleValue) {
       <h2 [ngClass]="introductionMode ? 'introductionMode' : 'readTextsMode'">
-        <span class="header-pub-title" [innerHTML]="publicationTitle"></span>
-        <span class="header-coll-title" [innerHTML]="collectionTitle"></span>
+        <span class="header-pub-title" [innerHTML]="publicationTitleValue"></span>
+        <span class="header-coll-title" [innerHTML]="collectionTitleValue"></span>
       </h2>
     }
 
-    @if (showLoadingError) {
+    @if (showLoadingError()) {
       <p class="errorMessage" i18n="@@DownloadTexts.TextLoadingError">Nedladdningen misslyckades. Vänligen försök igen och tillåt popup-fönster för webbplatsen.</p>
     }
-    @if (showMissingTextError) {
+    @if (showMissingTextError()) {
       <p class="errorMessage" i18n="@@DownloadTexts.MissingTextError">Texten saknas och går inte att ladda ner eller skriva ut.</p>
     }
-    @if (showPrintError) {
+    @if (showPrintError()) {
       <p class="errorMessage" i18n="@@DownloadTexts.OpenPrintError">Utskriftsversionen kunde inte öppnas i ett nytt fönster. Vänligen försök igen och tillåt popup-fönster för webbplatsen.</p>
     }
 
@@ -56,17 +62,17 @@
                 >Utskrift</ion-button>
               }
             }
-            @if (loadingIntro) {
+            @if (loadingIntro()) {
               <ion-spinner class="loading" name="crescent"></ion-spinner>
             }
           </ion-buttons>
         </div>
       }
 
-      @if ((publicationData$ | async); as publicationData) {
-        @if (readTextsMode && downloadFormatsEst.length && publicationData.original_filename) {
+      @if (publicationDataValue) {
+        @if (readTextsMode && downloadFormatsEst.length && publicationDataValue.original_filename) {
           @for (language of readTextLanguages; track language; let i = $index) {
-            @if (readTextLanguages.length < 2 || (readTextLanguages.length > 1 && publicationData.original_filename?.[language])) {
+            @if (readTextLanguages.length < 2 || (readTextLanguages.length > 1 && publicationDataValue.original_filename?.[language])) {
               <div class="dlt-group">
                 @if (readTextLanguages.length < 2) {
                   <h3 i18n="@@ReadingText.ReadingText">Lästext</h3>
@@ -104,7 +110,7 @@
                       >Utskrift</ion-button>
                     }
                   }
-                  @if (loadingEst && loadingGroupIndex === i) {
+                  @if (loadingEst() && loadingGroupIndex === i) {
                     <ion-spinner class="loading" name="crescent"></ion-spinner>
                   }
                 </ion-buttons>
@@ -112,7 +118,7 @@
             }
           }
         }
-        @if (readTextsMode && downloadFormatsCom.length && publicationData.publication_comment_id) {
+        @if (readTextsMode && downloadFormatsCom.length && publicationDataValue.publication_comment_id) {
           <div class="dlt-group">
             <h3 i18n="@@Commentary.Commentary">Kommentar</h3>
             <ion-buttons class="download-buttons">
@@ -139,7 +145,7 @@
                   >Utskrift</ion-button>
                 }
               }
-              @if (loadingCom) {
+              @if (loadingCom()) {
                 <ion-spinner class="loading" name="crescent"></ion-spinner>
               }
             </ion-buttons>
@@ -147,7 +153,7 @@
         }
       }
 
-      @if ((manuscriptsList$ | async); as manuscripts) {
+      @if (manuscripts) {
         @if (readTextsMode && downloadFormatsMs.length) {
           <div class="dlt-group">
             <h3 i18n="@@Manuscripts.Manuscript">Manuskript</h3>
@@ -179,7 +185,7 @@
                     >Utskrift</ion-button>
                   }
                 }
-                @if (loadingMs && loadingGroupIndex === i) {
+                @if (loadingMs() && loadingGroupIndex === i) {
                   <ion-spinner class="loading" name="crescent"></ion-spinner>
                 }
               </ion-buttons>
@@ -188,13 +194,11 @@
         }
       }
 
-      @if (downloadOptionsExist) {
-        <ng-container *ngTemplateOutlet="showNotice; context: {$implicit: (instructionsText$ | async)}"/>
-        <ng-template #showNotice let-instructionsText>
-          @if (copyrightText || instructionsText) {
+      @if (downloadOptionsExist()) {
+        @if (copyrightText || instructionsTextValue) {
             <div class="notice">
-              @if (instructionsText) {
-                <div class="markdown download-instructions" [innerHTML]="instructionsText | trustHtml"></div>
+              @if (instructionsTextValue) {
+                <div class="markdown download-instructions" [innerHTML]="instructionsTextValue | trustHtml"></div>
               }
               @if (copyrightText && !copyrightURL) {
                 <p class="copyright-notice"><ng-container i18n="@@DownloadTexts.CopyrightNoticeLabel">Licens</ng-container>: <span [innerHTML]="copyrightText"></span></p>
@@ -218,7 +222,6 @@
               }
             </div>
           }
-        </ng-template>
       } @else {
         <p class="no-dl-options" i18n="@@DownloadTexts.NoDownloads">Inga texter tillgängliga för nedladdning eller utskrift.</p>
       }

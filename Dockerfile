@@ -1,71 +1,63 @@
-# This Dockerfile leverages multi-stage builds so
-# only necessary build artifacts and resources are
-# included in the final image.
+# Multi-stage Docker build for the Angular SSR app.
+#
+# Design goals:
+# 1) Reproducible builds (`npm ci` + lockfile).
+# 2) Fast rebuilds (dependency layers cached separately from source files).
+# 3) Secure runtime image (non-root user + production dependencies only).
 
-# Define Angular major version used by the app, used to install
-# corresponding Angular CLI globally.
-ARG ANGULAR_MAJOR_VERSION=20
-
-# Enable passing the tag of the Node.js image as a build argument,
-# and define a default tag in case the build argument is not passed.
-# The Node.js image is used as the base image of the app,
-# https://hub.docker.com/_/node/.
+# Pin the Node base image by tag (set from CI workflow build arg).
 ARG NODE_IMAGE_TAG=22-alpine
 
 
-# 1. Create base image from official Node.js image.
+# 1) Shared base image used by all stages.
 FROM node:${NODE_IMAGE_TAG} AS base
-# Change working directory.
+# Keep one stable working directory in every stage.
 WORKDIR /digital-edition-frontend-ng
 
 
-# 2. Create intermediate build image, starting from base image.
-FROM base AS build
-# Redeclare ARG-variable to make it available in this stage.
-ARG ANGULAR_MAJOR_VERSION
-# Notify Docker that static browser content will be a volume,
-# so it can be used by nginx. The volume should automatically
-# be populated with the correct files from the image on first
-# docker compose up. On recreating the container 
-# docker compose down --volumes needs to be run before
-# running docker compose up since volumes are persistent and
-# won't be replaced when images are updated.
-VOLUME [ "/digital-edition-frontend-ng/dist/app/browser" ]
-# Copy all files from the source folder to the
-# workdir in the container filesystem.
+# 2) Install full dependencies required to build the app.
+FROM base AS deps
+# Copy only dependency manifests first so this layer is cacheable.
+COPY package.json package-lock.json ./
+# Deterministic install using package-lock.json.
+RUN npm ci
+
+
+# 3) Build stage: run prebuild scripts, SSR build, and static compression.
+FROM deps AS build
+# Copy application source after dependencies are installed.
 COPY . .
-# Install the Angular CLI globally.
-RUN npm install -g @angular/cli@${ANGULAR_MAJOR_VERSION}
-# Install app dependencies.
-RUN npm install
-# Run script that generates sitemap.txt.
+# Generate sitemap consumed by the app.
 RUN npm run generate-sitemap
-# Run script that generates static html files for collection menus.
+# Generate static HTML files for collection menus.
 RUN npm run generate-static-collection-menus
-# Build the Angular SSR app.
+# Build browser + server bundles for SSR.
 RUN npm run build:ssr
-# Create precompressed versions of static files (dist/app/browser/).
+# Pre-compress browser assets for nginx/static delivery.
 RUN npm run compress
 
 
-# 3. Create final image, starting from base image.
-FROM base AS final
-# Create a non-root user with a dedicated user group.
-RUN addgroup -S appgroup && adduser -S appuser -G appgroup
-# Copy package.json and package-lock.json from the
-# source folder to the workdir in the container filesystem.
+# 4) Install runtime dependencies only.
+FROM base AS prod-deps
+# Copy dependency manifests for runtime install.
 COPY package.json package-lock.json ./
-# Install production dependencies of the app only. This is
-# necessary because proxy-server.js, which is outside the
-# Angular build but runs the server, requires the 'express'
-# module.
-RUN npm install --omit=dev
-# Copy the dist folder from the build image to the final,
-# runtime image.
-COPY --from=build /digital-edition-frontend-ng/dist /digital-edition-frontend-ng/dist
-# Set NODE_ENV environment variable to production.
+# Install production dependencies only (needed by dist/app/proxy-server.js).
+RUN npm ci --omit=dev
+
+
+# 5) Final runtime image.
+FROM base AS final
+# Run as non-root for better container security.
+RUN addgroup -S appgroup && adduser -S appuser -G appgroup
+# Keep manifests in runtime image for traceability.
+COPY package.json package-lock.json ./
+# Copy production node_modules from dedicated stage.
+COPY --from=prod-deps /digital-edition-frontend-ng/node_modules ./node_modules
+# Copy build artifacts from the build stage.
+COPY --from=build /digital-edition-frontend-ng/dist ./dist
+# Ensure framework/runtime defaults to production mode.
 ENV NODE_ENV=production
-# Switch to the non-root user before running the app.
+# Drop privileges before launching the app.
 USER appuser
-# Run app.
-CMD ["node","dist/app/proxy-server.js"]
+# Start the Node SSR proxy server.
+CMD ["node", "dist/app/proxy-server.js"]

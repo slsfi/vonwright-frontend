@@ -116,7 +116,9 @@
 
     @if (showContentGrid) {
       <div class="content-grid-wrapper">
-        <content-grid></content-grid>
+        @defer {
+          <content-grid></content-grid>
+        }
       </div>
     }
 

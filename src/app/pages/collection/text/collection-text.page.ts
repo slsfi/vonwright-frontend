@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, ElementRef, Injector, LOCALE_ID, NgZone, OnInit, QueryList, Renderer2, ViewChild, ViewChildren, afterNextRender, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, ElementRef, Injector, LOCALE_ID, NgZone, OnInit, Renderer2, afterNextRender, inject, signal, viewChild, viewChildren } from '@angular/core';
 import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 import { Location } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -59,9 +59,9 @@ export class CollectionTextPage implements OnInit {
   protected viewOptionsService = inject(ViewOptionsService);
   private activeLocale = inject(LOCALE_ID);
 
-  @ViewChild('addViewPopover') addViewPopover: IonPopover;
-  @ViewChildren('fabColumnOptions') fabColumnOptions: QueryList<IonFabList>;
-  @ViewChildren('fabColumnOptionsButton') fabColumnOptionsButton: QueryList<IonFabButton>;
+  readonly addViewPopover = viewChild<IonPopover>('addViewPopover');
+  readonly fabColumnOptions = viewChildren<IonFabList>('fabColumnOptions');
+  readonly fabColumnOptionsButton = viewChildren<IonFabButton>('fabColumnOptionsButton');
 
   defaultViews: string[] = config.page?.text?.defaultViews ?? ['readingtext'];
   readonly enableLegacyIDs: boolean = config.collections?.enableLegacyIDs;
@@ -560,8 +560,8 @@ export class CollectionTextPage implements OnInit {
     const views = this.views();
     if (id > -1 && id < views.length - 1) {
       this.views.set(moveArrayItem(views, id, id + 1));
-      this.fabColumnOptions?.forEach(f => (f.activated = false));
-      this.fabColumnOptionsButton?.forEach(b => (b.activated = false));
+      this.fabColumnOptions()?.forEach(f => (f.activated = false));
+      this.fabColumnOptionsButton()?.forEach(b => (b.activated = false));
       this.updateViewsInRouterQueryParams(this.views());
     }
   }
@@ -574,8 +574,8 @@ export class CollectionTextPage implements OnInit {
     const views = this.views();
     if (id > 0 && id < views.length) {
       this.views.set(moveArrayItem(views, id, id - 1));
-      this.fabColumnOptions?.forEach(f => (f.activated = false));
-      this.fabColumnOptionsButton?.forEach(b => (b.activated = false));
+      this.fabColumnOptions()?.forEach(f => (f.activated = false));
+      this.fabColumnOptionsButton()?.forEach(b => (b.activated = false));
       this.updateViewsInRouterQueryParams(this.views());
     }
   }
@@ -1918,8 +1918,11 @@ export class CollectionTextPage implements OnInit {
   }
 
   showAddViewPopover(e: Event) {
-    this.addViewPopover.event = e;
-    this.addViewPopoverisOpen.set(true);
+    const popover = this.addViewPopover();
+    if (popover) {
+      popover.event = e;
+      this.addViewPopoverisOpen.set(true);
+    }
   }
 
   dismissAddViewPopover() {

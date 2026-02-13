@@ -267,7 +267,7 @@ export class IllustrationsComponent {
   async zoomImage(imageSrc: string) {
     this.selectedImage.set([imageSrc]);
     const params = {
-      activeImageIndex: 0,
+      startImageIndex: 0,
       imageURLs: this.selectedImage(),
     };
 

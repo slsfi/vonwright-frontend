@@ -7,6 +7,9 @@ import { PublicationMetadata } from '@models/metadata.models';
 import { CollectionContentService } from '@services/collection-content.service';
 
 
+// ─────────────────────────────────────────────────────────────────────────────
+// * This component is zoneless-ready. *
+// ─────────────────────────────────────────────────────────────────────────────
 @Component({
   selector: 'text-metadata',
   templateUrl: './metadata.component.html',

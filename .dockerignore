@@ -1,7 +1,34 @@
-# .dockerignore
-
+# Build artifacts and installed dependencies
+# These are produced inside docker build; sending local copies is unnecessary.
 dist
 node_modules
 .angular
+
+# VCS and CI metadata (not needed to build/run the app)
+.git
+.github
+
+# Local IDE/editor files
 .vscode
 .idea
+
+# Docs and local orchestration files (not used by Dockerfile build steps)
+docs
+README.md
+CHANGELOG.md
+compose.yml
+nginx.conf
+
+# OS/log noise
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.DS_Store
+Thumbs.db
+
+# Local environment files (may contain secrets)
+.env
+.env.*
+!.env.example

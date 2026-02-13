@@ -30,10 +30,10 @@ To first build and then run a Docker image of a local copy of the repository on 
 3. Run
 
 ```bash
-docker build --no-cache -t digital-edition-frontend-ng:test .
+docker build -t digital-edition-frontend-ng:test .
 ```
 
-(notice the dot at the end) to build the image from the current directory, where `digital-edition-frontend-ng:test` is the name and tag of the image. You can choose a different name and tag if you wish.
+(notice the dot at the end) to build the image from the current directory, where `digital-edition-frontend-ng:test` is the name and tag of the image. You can choose a different name and tag if you wish. Add `--no-cache` only when troubleshooting or when you want to force a fully fresh build.
 
 4. Run
 
@@ -54,10 +54,10 @@ In production, nginx is run in a Docker container in front of the app container 
 3. Run
 
 ```bash
-docker build --no-cache -t digital-edition-frontend-ng:test .
+docker build -t digital-edition-frontend-ng:test .
 ```
 
-(notice the dot at the end) to build the image from the current directory, where `digital-edition-frontend-ng:test` is the name and tag of the image. You can choose a different name and tag if you wish.
+(notice the dot at the end) to build the image from the current directory, where `digital-edition-frontend-ng:test` is the name and tag of the image. You can choose a different name and tag if you wish. Add `--no-cache` only when troubleshooting or when you want to force a fully fresh build.
 
 4. Replace the URL of `image` in the `web` service in [`compose.yml`][docker_compose_file] with `digital-edition-frontend-ng:test` (or the `name:tag` you built the image with in step 3). **Do not commit this change!**
 5. Run
@@ -79,7 +79,9 @@ docker compose down --volumes
 
 The Node.js Docker-image tag can be passed as a build argument to `Dockerfile` using the argument `NODE_IMAGE_TAG`. `Dockerfile` sets a default value for the argument if it is not passed.
 
-By default the app is built using GitHub Actions according to the workflow defined in `.github/workflows/docker-build-and-push.yml`, but you can also define your own build workflow. The Node.js image which is used as the base image for the build is defined in the workflow YAML-file and passed to `Dockerfile`.
+By default the app is built using GitHub Actions according to the workflow defined in `.github/workflows/docker-build-and-push.yml`, but you can also define your own build workflow. The workflow uses Docker Buildx (BuildKit) through `docker/build-push-action`, passes `NODE_IMAGE_TAG` to `Dockerfile`, and sets `pull: true` for the build step so base image layers are refreshed by the builder.
+
+The workflow also runs `docker pull node:${NODE_IMAGE_TAG}` before the build. This is intentional for explicitness and log visibility.
 
 When updating which Node.js image is used for the build, remember to update both `docker-build-and-push.yml` and `Dockerfile`.
 
@@ -108,7 +110,7 @@ For more detailed instructions see <https://angular.dev/cli/update>.
 When updating to a new major version of Angular:
 
 1. See the interactive [Angular update guide][angular_update_guide].
-2. Update the line in [`Dockerfile`][dockerfile] which indicates the Angular major version number: `ARG ANGULAR_MAJOR_VERSION=<major_version>`.
+2. Update Angular dependencies in `package.json`/`package-lock.json` (for example via `ng update`). The Docker build installs dependencies from the lockfile using `npm ci`, so there is no separate Angular version argument in [`Dockerfile`][dockerfile] to update.
 
 
 ### `@ionic`

@@ -1,11 +1,13 @@
-import { Component, Input, LOCALE_ID, OnDestroy, OnInit, DOCUMENT, inject } from '@angular/core';
-import { AsyncPipe, NgClass, NgStyle, NgTemplateOutlet } from '@angular/common';
+import { ChangeDetectionStrategy, Component, DestroyRef, Input, LOCALE_ID, DOCUMENT, inject, signal } from '@angular/core';
+import { NgClass, NgStyle } from '@angular/common';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { PRIMARY_OUTLET, Router, UrlSegment, UrlTree } from '@angular/router';
 import { IonicModule, ModalController } from '@ionic/angular';
 import { catchError, forkJoin, map, Observable, of, Subscription, tap } from 'rxjs';
 
 import { config } from '@config';
 import { TextKey } from '@models/collection.models';
+import { CorrespondentData, LetterData } from '@models/metadata.models';
 import { TrustHtmlPipe } from '@pipes/trust-html.pipe';
 import { CollectionContentService } from '@services/collection-content.service';
 import { CollectionsService } from '@services/collections.service';
@@ -17,16 +19,23 @@ import { MarkdownService } from '@services/markdown.service';
 import { ReferenceDataService } from '@services/reference-data.service';
 import { ViewOptionsService } from '@services/view-options.service';
 import { concatenateNames, isFileNotFoundHtml } from '@utility-functions';
-import { CorrespondentData, LetterData } from '@models/metadata.models';
 
 
+// ─────────────────────────────────────────────────────────────────────────────
+// * This component is zoneless-ready. *
+// ─────────────────────────────────────────────────────────────────────────────
 @Component({
   selector: 'modal-download-texts',
   templateUrl: './download-texts.modal.html',
   styleUrls: ['./download-texts.modal.scss'],
-  imports: [AsyncPipe, NgClass, NgStyle, NgTemplateOutlet, IonicModule, TrustHtmlPipe]
+  imports: [NgClass, NgStyle, IonicModule, TrustHtmlPipe],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class DownloadTextsModal implements OnDestroy, OnInit {
+export class DownloadTextsModal {
+  // ─────────────────────────────────────────────────────────────────────────────
+  // Dependency injection, @Inputs, fields and local signals
+  // ─────────────────────────────────────────────────────────────────────────────
+  private destroyRef = inject(DestroyRef);
   private collectionContentService = inject(CollectionContentService);
   private collectionsService = inject(CollectionsService);
   private commentService = inject(CommentService);
@@ -45,7 +54,8 @@ export class DownloadTextsModal implements OnDestroy, OnInit {
   @Input() textKey: TextKey | undefined = undefined;
   @Input() collectionId: string | undefined = undefined;
 
-  collectionTitle: string = '';
+  collectionTitle = signal('');
+
   commentTitle: string = '';
   copyrightText: string = '';
   copyrightURL: string = '';
@@ -54,33 +64,53 @@ export class DownloadTextsModal implements OnDestroy, OnInit {
   downloadFormatsEst: string[] = [];
   downloadFormatsIntro: string[] = [];
   downloadFormatsMs: string[] = [];
-  downloadOptionsExist: boolean = false;
+
+  downloadOptionsExist = signal(false);
+
   downloadTextSubscription: Subscription | null = null;
-  instructionsText$: Observable<string | null>;
+
+  instructionsText = signal<string | null>(null);
+
   introductionMode: boolean = false;
   introductionTitle: string = '';
-  loadingCom: boolean = false;
-  loadingEst: boolean = false;
-  loadingIntro: boolean = false;
-  loadingMs: boolean = false;
+
+  loadingCom = signal(false);
+
+  loadingEst = signal(false);
+
+  loadingIntro = signal(false);
+
+  loadingMs = signal(false);
+
   loadingGroupIndex: number = -1;
-  manuscriptsList$: Observable<any[]>;
+
+  manuscriptsList = signal<any[] | null>(null);
+
   readTextLanguages: string[] = [];
   referenceData: any = null;
-  pageTitleSubscr: Subscription | null = null;
   printTextSubscription: Subscription | null = null;
   printTranslation: string = '';
-  publicationData$: Observable<any>;
-  publicationTitle: string = '';
+
+  publicationData = signal<any | null>(null);
+
+  publicationTitle = signal('');
+
   readTextsMode: boolean = false;
   replaceImageAssetsPaths: boolean = true;
-  showLoadingError: boolean = false;
-  showMissingTextError: boolean = false;
-  showPrintError: boolean = false;
+
+  showLoadingError = signal(false);
+
+  showMissingTextError = signal(false);
+
+  showPrintError = signal(false);
+
   siteUrl: string = '';
   textSizeTranslation: string = '';
   urnResolverUrl: string = '';
 
+  // ─────────────────────────────────────────────────────────────────────────────
+  // Constructor
+  // ─────────────────────────────────────────────────────────────────────────────
   constructor() {
     // Get configs
     this.readTextLanguages = config.app?.i18n?.multilingualReadingTextLanguages ?? [];
@@ -137,8 +167,15 @@ export class DownloadTextsModal implements OnDestroy, OnInit {
     );
 
     this.replaceImageAssetsPaths = config.collections?.replaceImageAssetsPaths ?? true;
+    this.destroyRef.onDestroy(() => {
+      this.downloadTextSubscription?.unsubscribe();
+      this.printTextSubscription?.unsubscribe();
+    });
   }
 
+  // ─────────────────────────────────────────────────────────────────────────────
+  // Initialization and public UI actions
+  // ─────────────────────────────────────────────────────────────────────────────
   ngOnInit(): void {
     let instructionsTextMdNode: string = '06';
     // Set which page has initiated the download modal
@@ -148,15 +185,19 @@ export class DownloadTextsModal implements OnDestroy, OnInit {
       this.introductionMode = true;
       instructionsTextMdNode = '07';
       if (this.downloadFormatsIntro.length) {
-        this.downloadOptionsExist = true;
+        this.downloadOptionsExist.set(true);
       }
     }
 
     this.urnResolverUrl = this.referenceDataService.getUrnResolverUrl();
     this.currentUrl = this.document.defaultView?.location.href.split('?')[0] || '';
-    this.instructionsText$ = this.mdService.getParsedMdContent(
+    this.mdService.getParsedMdContent(
       this.activeLocale + '-12-' + instructionsTextMdNode
-    );
+    ).pipe(
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe((instructionsText: string | null) => {
+      this.instructionsText.set(instructionsText);
+    });
     this.setTranslations();
     this.setReferenceData();
 
@@ -165,11 +206,15 @@ export class DownloadTextsModal implements OnDestroy, OnInit {
 
       if (this.readTextsMode && this.textKey) {
         // Get publication title
-        this.pageTitleSubscr = this.headService.getCurrentPageTitle().subscribe(
+        this.headService.getCurrentPageTitle().pipe(
+          takeUntilDestroyed(this.destroyRef)
+        ).subscribe(
           (pubTitle: string) => {
-            this.publicationTitle = pubTitle?.slice(-1) === '.'
-                  ? pubTitle.slice(0, -1)
-                  : pubTitle;
+            this.publicationTitle.set(
+              pubTitle?.slice(-1) === '.'
+                ? pubTitle.slice(0, -1)
+                : pubTitle
+            );
           }
         );
 
@@ -177,44 +222,44 @@ export class DownloadTextsModal implements OnDestroy, OnInit {
           // Get publication data in order to determine if reading-texts and
           // comments are available. original_filename is used to determine if
           // reading-texts exist, and publication_comment_id if comments exist.
-          this.publicationData$ = this.collectionsService.getPublication(
+          this.collectionsService.getPublication(
             this.textKey.publicationID ?? ''
           ).pipe(
             tap((res: any) => {
               if (res?.original_filename) {
-                this.downloadOptionsExist = true;
+                this.downloadOptionsExist.set(true);
               }
             }),
             catchError((e: any) => {
               console.error('unable to get publication data', e);
               return of(null);
-            })
-          );
+            }),
+            takeUntilDestroyed(this.destroyRef)
+          ).subscribe((publicationData: any | null) => {
+            this.publicationData.set(publicationData);
+          });
         }
 
         if (this.downloadFormatsMs.length) {
           // Get a list of all manuscripts in the publication
-          this.manuscriptsList$ = this.collectionContentService.getManuscriptsList(
+          this.collectionContentService.getManuscriptsList(
             this.textKey
           ).pipe(
             tap((res: any) => {
               if (res?.manuscripts?.length) {
-                this.downloadOptionsExist = true;
+                this.downloadOptionsExist.set(true);
               }
             }),
             map((res: any) => {
               return res?.manuscripts?.length ? res.manuscripts : null;
-            })
-          );
+            }),
+            takeUntilDestroyed(this.destroyRef)
+          ).subscribe((manuscriptsList: any[] | null) => {
+            this.manuscriptsList.set(manuscriptsList);
+          });
         }
       }
     }
-  }
-
-  ngOnDestroy() {
-    this.downloadTextSubscription?.unsubscribe();
-    this.printTextSubscription?.unsubscribe();
-    this.pageTitleSubscr?.unsubscribe();
   }
 
   dismiss() {
@@ -222,9 +267,9 @@ export class DownloadTextsModal implements OnDestroy, OnInit {
   }
 
   initiateDownload(textType: string, format: string, language?: string, typeID?: number) {
-    this.showLoadingError = false;
-    this.showMissingTextError = false;
-    this.showPrintError = false;
+    this.showLoadingError.set(false);
+    this.showMissingTextError.set(false);
+    this.showPrintError.set(false);
     let mimetype = 'application/xml';
     let fileExtension = 'xml';
 
@@ -246,22 +291,22 @@ export class DownloadTextsModal implements OnDestroy, OnInit {
     let dlText$: Observable<any> | null = null;
 
     if (textType === 'intro') {
-      this.loadingIntro = true;
+      this.loadingIntro.set(true);
       dlText$ = this.collectionContentService.getDownloadableIntroduction(
         this.collectionId!, format, this.activeLocale
       );
     } else if (textType === 'rt') {
-      this.loadingEst = true;
+      this.loadingEst.set(true);
       dlText$ = this.collectionContentService.getDownloadableReadingText(
         this.textKey!, format, language
       );
     } else if (textType === 'com') {
-      this.loadingCom = true;
+      this.loadingCom.set(true);
       dlText$ = this.commentService.getDownloadableComments(
         this.textKey!, format
       );
     } else if (textType === 'ms') {
-      this.loadingMs = true;
+      this.loadingMs.set(true);
       dlText$ = this.collectionContentService.getDownloadableManuscript(
         this.textKey!, typeID || 0, format
       );
@@ -276,20 +321,20 @@ export class DownloadTextsModal implements OnDestroy, OnInit {
 
           if (textType === 'intro') {
             fileName = this.convertToFilename(
-              this.introductionTitle + '-' + this.collectionTitle
+              this.introductionTitle + '-' + this.collectionTitle()
             ) + '.' + fileExtension;
           } else if (textType === 'rt') {
             const langForFilename = language ? '_' + language : '';
-            fileName = this.convertToFilename(this.publicationTitle)
-                  + langForFilename + '-id-' + this.textKey!.publicationID
+            fileName = this.convertToFilename(this.publicationTitle())
+                  + langForFilename + '-id-' + this.textKey?.publicationID
                   + '.' + fileExtension;
           } else if (textType === 'com') {
             fileName = this.convertToFilename(
-              this.commentTitle + ' ' + this.publicationTitle
-            ) + '-id-' + this.textKey!.publicationID + '.' + fileExtension;
+              this.commentTitle + ' ' + this.publicationTitle()
+            ) + '-id-' + this.textKey?.publicationID + '.' + fileExtension;
           } else if (textType === 'ms') {
-            fileName = this.convertToFilename(this.publicationTitle)
-                  + '-id-' + this.textKey!.publicationID
+            fileName = this.convertToFilename(this.publicationTitle())
+                  + '-id-' + this.textKey?.publicationID
                   + '-ms-' + typeID + '.' + fileExtension;
           }
 
@@ -304,20 +349,20 @@ export class DownloadTextsModal implements OnDestroy, OnInit {
             URL.revokeObjectURL(blobUrl);
           } else {
             console.error('the text does not exist and can’t be downloaded');
-            this.showMissingTextError = true;
+            this.showMissingTextError.set(true);
           }
-          this.loadingIntro = false;
-          this.loadingEst = false;
-          this.loadingCom = false;
-          this.loadingMs = false;
+          this.loadingIntro.set(false);
+          this.loadingEst.set(false);
+          this.loadingCom.set(false);
+          this.loadingMs.set(false);
         },
         error: (e: any) => {
           console.error('error getting downloadable ' + textType + ' in ' + format + ' format', e);
-          this.loadingIntro = false;
-          this.loadingEst = false;
-          this.loadingCom = false;
-          this.loadingMs = false;
-          this.showLoadingError = true;
+          this.loadingIntro.set(false);
+          this.loadingEst.set(false);
+          this.loadingCom.set(false);
+          this.loadingMs.set(false);
+          this.showLoadingError.set(true);
         }
       });
     }
@@ -327,20 +372,20 @@ export class DownloadTextsModal implements OnDestroy, OnInit {
     if (language === 'default' || !language) {
       language = '';
     }
-    this.showLoadingError = false;
-    this.showMissingTextError = false;
-    this.showPrintError = false;
+    this.showLoadingError.set(false);
+    this.showMissingTextError.set(false);
+    this.showPrintError.set(false);
 
     let text$: Observable<any> | null = null;
 
     if (textType === 'intro') {
-      this.loadingIntro = true;
+      this.loadingIntro.set(true);
       text$ = this.collectionContentService.getIntroduction(this.collectionId!, this.activeLocale);
     } else if (textType === 'rt') {
-      this.loadingEst = true;
+      this.loadingEst.set(true);
       text$ = this.collectionContentService.getReadingText(this.textKey!, language);
     } else if (textType === 'com') {
-      this.loadingCom = true;
+      this.loadingCom.set(true);
       text$ = forkJoin([
         this.commentService.getComments(this.textKey!).pipe(
           catchError(error => of({ error }))
@@ -354,7 +399,7 @@ export class DownloadTextsModal implements OnDestroy, OnInit {
         })
       );
     } else if (textType === 'ms') {
-      this.loadingMs = true;
+      this.loadingMs.set(true);
       text$ = this.collectionContentService.getManuscripts(this.textKey!, typeID);
     }
 
@@ -393,40 +438,43 @@ export class DownloadTextsModal implements OnDestroy, OnInit {
                 newWindowRef.document.close();
                 newWindowRef.focus();
               } else {
-                this.showPrintError = true;
+                this.showPrintError.set(true);
                 console.log('unable to open new window');
               }
             } catch (e: any) {
-              this.showPrintError = true;
+              this.showPrintError.set(true);
               console.error('unable to open new window', e);
             }
 
           } else {
             if (textType === 'rt') {
-              this.showMissingTextError = true;
+              this.showMissingTextError.set(true);
             } else {
-              this.showPrintError = true;
+              this.showPrintError.set(true);
             }
             console.log('invalid text format for print version');
           }
 
-          this.loadingIntro = false;
-          this.loadingEst = false;
-          this.loadingCom = false;
-          this.loadingMs = false;
+          this.loadingIntro.set(false);
+          this.loadingEst.set(false);
+          this.loadingCom.set(false);
+          this.loadingMs.set(false);
         },
         error: (e: any) => {
           console.error('error loading text', e);
-          this.loadingIntro = false;
-          this.loadingEst = false;
-          this.loadingCom = false;
-          this.loadingMs = false;
-          this.showPrintError = true;
+          this.loadingIntro.set(false);
+          this.loadingEst.set(false);
+          this.loadingCom.set(false);
+          this.loadingMs.set(false);
+          this.showPrintError.set(true);
         }
       });
     }
   }
 
+  // ─────────────────────────────────────────────────────────────────────────────
+  // Private helpers
+  // ─────────────────────────────────────────────────────────────────────────────
   private getProcessedPrintIntro(text: string): string {
     if (this.replaceImageAssetsPaths) {
       text = text.replace(/src="images\//g, 'src="assets/images/');
@@ -436,7 +484,9 @@ export class DownloadTextsModal implements OnDestroy, OnInit {
   }
 
   private getProcessedPrintReadText(text: string, language?: string): string {
-    text = this.parserService.postprocessReadingText(text, this.textKey!.collectionID);
+    if (!this.textKey) return text;
+
+    text = this.parserService.postprocessReadingText(text, this.textKey.collectionID);
     text = text.replace('<p> </p><p> </p><section role="doc-endnotes"><ol class="tei footnotesList"></ol></section>', '');
     text = this.fixImagePaths(text);
     return this.constructHtmlForPrint(text, 'rt', language);
@@ -575,13 +625,13 @@ export class DownloadTextsModal implements OnDestroy, OnInit {
     if (textType === 'intro') {
       header += '    <p><b>' + this.introductionTitle + '</b></p>\n';
     } else if (textType === 'com') {
-      header += '    <p><b>' + this.commentTitle + ' ' + this.publicationTitle + '</b></p>\n';
+      header += '    <p><b>' + this.commentTitle + ' ' + this.publicationTitle() + '</b></p>\n';
     } else if (textType === 'ms') {
-      header += '    <p><b>' + $localize`:@@Manuscripts.Manuscript:Manuskript` + ': ' + this.publicationTitle + (typeTitle ? ' (' + typeTitle + ')' : '') + '</b></p>\n';
+      header += '    <p><b>' + $localize`:@@Manuscripts.Manuscript:Manuskript` + ': ' + this.publicationTitle() + (typeTitle ? ' (' + typeTitle + ')' : '') + '</b></p>\n';
     } else {
-      header += '    <p><b>' + this.publicationTitle + '</b></p>\n';
+      header += '    <p><b>' + this.publicationTitle() + '</b></p>\n';
     }
-    header += '    <p>' + this.collectionTitle + '</p>\n';
+    header += '    <p>' + this.collectionTitle() + '</p>\n';
     header += '    <p>' + $localize`:@@Site.Title:Webbplatsens titel` + (this.siteUrl ? (' – ' + '<a href="' + this.siteUrl + '">' + this.siteUrl + '</a>') : '') + '</p>\n';
     if ((textType === 'rt' || textType === 'intro') && this.referenceData) {
 
@@ -605,7 +655,7 @@ export class DownloadTextsModal implements OnDestroy, OnInit {
     }
     header += '<div class="tei teiContainer ' + this.getViewOptionsClassNames(textType) + '">\n';
     if (textType === 'com') {
-      header += '<h1 class="tei commentPublicationTitle">' + this.publicationTitle + '</h1>\n';
+      header += '<h1 class="tei commentPublicationTitle">' + this.publicationTitle() + '</h1>\n';
     }
 
     let closer = '</div>\n';
@@ -684,16 +734,16 @@ export class DownloadTextsModal implements OnDestroy, OnInit {
       if (this.introductionTitle) {
         title = this.introductionTitle + ' | ';
       }
-      title += this.collectionTitle;
+      title += this.collectionTitle();
       if (this.siteUrl) {
         title += ' | ' + this.siteUrl;
       }
     } else {
-      title = this.publicationTitle;
+      title = this.publicationTitle();
       if (title) {
         title += ' | ';
       }
-      title += this.collectionTitle;
+      title += this.collectionTitle();
       if (this.siteUrl) {
         title += ' | ' + this.siteUrl;
       }
@@ -709,7 +759,9 @@ export class DownloadTextsModal implements OnDestroy, OnInit {
     const currentUrlSegments: UrlSegment[] = currentUrlTree?.root?.children[PRIMARY_OUTLET]?.segments;
 
     if (currentUrlSegments?.length) {
-      this.referenceDataService.getReferenceData(currentUrlSegments).subscribe(
+      this.referenceDataService.getReferenceData(currentUrlSegments).pipe(
+        takeUntilDestroyed(this.destroyRef)
+      ).subscribe(
         (data: any) => {
           this.referenceData = data;
         }
@@ -758,12 +810,14 @@ export class DownloadTextsModal implements OnDestroy, OnInit {
     // Get collection title from database
     const coll_id = this.textKey?.collectionID ?? this.collectionId;
     if (coll_id) {
-      this.collectionsService.getCollection(coll_id).subscribe(
+      this.collectionsService.getCollection(coll_id).pipe(
+        takeUntilDestroyed(this.destroyRef)
+      ).subscribe(
         (collectionData: any) => {
           if (collectionData?.[0]?.['name']) {
-            this.collectionTitle = collectionData[0]['name'];
+            this.collectionTitle.set(collectionData[0]['name']);
           } else {
-            this.collectionTitle = '';
+            this.collectionTitle.set('');
           }
         }
       );

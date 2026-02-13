@@ -8,6 +8,63 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ## Unreleased
 
+### Changed
+
+- Update to base version [`2.4.6`](https://github.com/slsfi/digital-edition-frontend-ng/releases/tag/2.4.6) from upstream, original repository.
+
+
+
+## [2.4.6] – 2026-02-13
+
+### Changed
+
+- Update `nginx` to 1.28.2. ([3115154](https://github.com/slsfi/digital-edition-frontend-ng/commit/311515499f23f66474373759700974b8055c8849))
+
+
+
+## [2.4.5] – 2026-02-13
+
+### Changed
+
+- Update GitHub Actions in the Docker build-and-push workflow. ([5ca772c](https://github.com/slsfi/digital-edition-frontend-ng/commit/5ca772c73375e2f5c536c83a4a825ca4ce61b019))
+- Harden Docker build and refresh docs. ([a37575c](https://github.com/slsfi/digital-edition-frontend-ng/commit/a37575c7be1b1df29e7e2f0982ca9bf764d5d8b0))
+- Update README. ([5a714d2](https://github.com/slsfi/digital-edition-frontend-ng/commit/5a714d2ecaad5650ce56125e9a91ca475804f3c5))
+- Deps: update `marked` to 17.0.2. ([fefe9c7](https://github.com/slsfi/digital-edition-frontend-ng/commit/fefe9c786e9cdcc85146bb9a58c39234abddb58b))
+- Deps (dev): update `@types/node` to 22.19.11. ([1e8f8a4](https://github.com/slsfi/digital-edition-frontend-ng/commit/1e8f8a44f8a6eec1504ad3e3c0dd44fc3cdc53f4))
+- Deps: update transitive dependencies. ([b82405e](https://github.com/slsfi/digital-edition-frontend-ng/commit/b82405e0f3278d561c6d7cf3d8ab8efb4de50102))
+
+
+
+## [2.4.4] – 2026-02-10
+
+### Changed
+
+- Migrate content-grid, occurrences-accordion, pdf-viewer, and text-changer components to zoneless-ready. ([6794f33](https://github.com/slsfi/digital-edition-frontend-ng/commit/6794f33e65f0a6c1f3e3a501953e30ad0f972ac9), [89fb737](https://github.com/slsfi/digital-edition-frontend-ng/commit/89fb737b3895d7193b22df6e83d4e357f79d5a40), [bf5351f](https://github.com/slsfi/digital-edition-frontend-ng/commit/bf5351f8ee24c1f352bb36458cd61ab6a65279ca), [bf2d3a0](https://github.com/slsfi/digital-edition-frontend-ng/commit/bf2d3a0a39f6b9681f9c2618dc33176aef556ae1))
+- Migrate download-texts and fullscreen-image-viewer modals to zoneless-ready. ([17dec08](https://github.com/slsfi/digital-edition-frontend-ng/commit/17dec08c82dc7b54f0fa51ea568a9eae353d2c61), [45521de](https://github.com/slsfi/digital-edition-frontend-ng/commit/45521de7cdb8d33296d50e5bec76f1931a408995))
+- Migrate decorator query fields to signals. ([786b0be](https://github.com/slsfi/digital-edition-frontend-ng/commit/786b0be704d62d0c5a57103222aa85ed9b1be7fb))
+- Replace `HostListener` decorators with the `host` property on `Component` decorator. ([54e5d8e](https://github.com/slsfi/digital-edition-frontend-ng/commit/54e5d8ef28be0678b52bd5b3a3cc0a339f1aa759))
+- Defer loading content-grid on home page to the browser. ([aca23d9](https://github.com/slsfi/digital-edition-frontend-ng/commit/aca23d9f9ac5c3bab04859791ff7efc19a748bdf))
+- Deps: update `@angular/cli` to 20.3.16. ([1da60d7](https://github.com/slsfi/digital-edition-frontend-ng/commit/1da60d7a2ef0b1a72b9e6464fac46b592f7aa586), [7f59010](https://github.com/slsfi/digital-edition-frontend-ng/commit/7f59010047be7f4a03e4e6c5ec668e4fbc34ea78))
+- Deps: update `htmlparser2` to 10.1.0. ([04d2a73](https://github.com/slsfi/digital-edition-frontend-ng/commit/04d2a732871f59db52de92341808dda5b74003ca))
+- Deps (dev): update `@types/node` to 22.19.10. ([d08a223](https://github.com/slsfi/digital-edition-frontend-ng/commit/d08a2234b82d8e3b6c37c0db5beebe573896f8ee), [10d46f9](https://github.com/slsfi/digital-edition-frontend-ng/commit/10d46f99d0ae99a6f12d4a9200001cf480e7f5ad))
+- Deps (dev): update `karma-jasmine-html-reporter` to 2.2.0. ([8156fb9](https://github.com/slsfi/digital-edition-frontend-ng/commit/8156fb95bcfb8da2c4ccc5ee06d2b1ffde421b7d))
+- Deps: update transitive dependencies. ([4f35d4d](https://github.com/slsfi/digital-edition-frontend-ng/commit/4f35d4d4b24bcc19321547047885230aaf21258d), [bbe30f1](https://github.com/slsfi/digital-edition-frontend-ng/commit/bbe30f166c945a673e5a15ca211913535db55b44))
+
+### Fixed
+
+- Treat input variables as readonly in fullscreen image viewer modal. ([5b759a9](https://github.com/slsfi/digital-edition-frontend-ng/commit/5b759a97be0c5e3c69524479b4ab1b78ba71c21e))
+
+
+
+## [2.4.3] – 2026-01-14
+
+### Changed
+
+- Deps: update `@angular/cli` to 20.3.14 and `@angular/core` to 20.3.16. ([a16e200](https://github.com/slsfi/digital-edition-frontend-ng/commit/a16e20059d46ea3f13d9731616f23ffd15f8bcbb))
+- Deps (dev): update `@types/jasmine` to 5.1.15. ([0b64e97](https://github.com/slsfi/digital-edition-frontend-ng/commit/0b64e97b0b1ae9e0c023271812df289f4c1a53cb))
+- Deps (dev): update `@types/node` to 22.19.6. ([b223ba7](https://github.com/slsfi/digital-edition-frontend-ng/commit/b223ba7b18b5df85160478c0dfcb99160c44ff65))
+- Deps: update transitive dependencies. ([4891127](https://github.com/slsfi/digital-edition-frontend-ng/commit/48911278894ab311a61040abe67d345311c7d67f))
+
 
 
 ## [2.4.2-production.2] – 2026-01-13
@@ -31,7 +88,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ### Changed
 
-- Deps: update `angular/cli` to 20.3.13. ([5fa4eb0](https://github.com/slsfi/digital-edition-frontend-ng/commit/5fa4eb0759a2b71922020143b3ff42947ff7627b))
+- Deps: update `@angular/cli` to 20.3.13. ([5fa4eb0](https://github.com/slsfi/digital-edition-frontend-ng/commit/5fa4eb0759a2b71922020143b3ff42947ff7627b))
 - Deps (dev): update `@types/node` to 22.19.3. ([6ddc09c](https://github.com/slsfi/digital-edition-frontend-ng/commit/6ddc09c665a4040862c8ac1b092d83e56406842a))
 - Deps: update transitive dependencies. ([9f38091](https://github.com/slsfi/digital-edition-frontend-ng/commit/9f38091d50a5284d0bc91d5dca18ae0efc9b8f55))
 
@@ -55,7 +112,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ### Changed
 
-- Deps: update `angular/cli` to 20.3.12 and `angular/core` to 20.3.15. ([7ac3136](https://github.com/slsfi/digital-edition-frontend-ng/commit/7ac313673d8f9fa2e9bf08e333afb81b6948b41e), [0c6fc7d](https://github.com/slsfi/digital-edition-frontend-ng/commit/0c6fc7d96b6d8b597d1516c59c4dae2540fa1b5d))
+- Deps: update `@angular/cli` to 20.3.12 and `@angular/core` to 20.3.15. ([7ac3136](https://github.com/slsfi/digital-edition-frontend-ng/commit/7ac313673d8f9fa2e9bf08e333afb81b6948b41e), [0c6fc7d](https://github.com/slsfi/digital-edition-frontend-ng/commit/0c6fc7d96b6d8b597d1516c59c4dae2540fa1b5d))
 - Deps: update transitive dependencies. ([4fb05a8](https://github.com/slsfi/digital-edition-frontend-ng/commit/4fb05a831c431514fbd6a72f16a7c90e25a816c3))
 
 ### Fixed
@@ -87,7 +144,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ### Changed
 
-- Deps: update `angular/cli` to 20.3.11 and `angular/core` to 20.3.13. ([9755ca8](https://github.com/slsfi/digital-edition-frontend-ng/commit/9755ca8bf8e33032820f757fb22a41c6eeb45297))
+- Deps: update `@angular/cli` to 20.3.11 and `@angular/core` to 20.3.13. ([9755ca8](https://github.com/slsfi/digital-edition-frontend-ng/commit/9755ca8bf8e33032820f757fb22a41c6eeb45297))
 
 ### Fixed
 
@@ -123,7 +180,7 @@ CollectionId: {
 
 ### Changed
 
-- Deps: update `angular/cli` to 20.3.10 and `angular/core` to 20.3.12. ([3ebcdea](https://github.com/slsfi/digital-edition-frontend-ng/commit/3ebcdeae9703a7f2dc85a09947e455fe86cb37b8))
+- Deps: update `@angular/cli` to 20.3.10 and `@angular/core` to 20.3.12. ([3ebcdea](https://github.com/slsfi/digital-edition-frontend-ng/commit/3ebcdeae9703a7f2dc85a09947e455fe86cb37b8))
 - Deps (dev): update `@types/jasmine` to 5.1.13. ([809bfe5](https://github.com/slsfi/digital-edition-frontend-ng/commit/809bfe5861c83b7fd0c33adaff6f8ccc447e6b94))
 - Deps (dev): update `@types/node` to 22.19.1. ([af22375](https://github.com/slsfi/digital-edition-frontend-ng/commit/af223750a7d9eee88a67d27ab2838706fddb5ced))
 - Deps: update transitive dependencies. ([0a16a07](https://github.com/slsfi/digital-edition-frontend-ng/commit/0a16a072d15689a1cd113189b5712b97f1ffc5b7))
@@ -142,7 +199,7 @@ CollectionId: {
 ### Changed
 
 - Migrate static-html component to zoneless-ready. ([57c9a41](https://github.com/slsfi/digital-edition-frontend-ng/commit/57c9a41779e9caea498156b128ca7b231538d964))
-- Deps: update `angular/cli` to 20.3.9 and `angular/core` to 20.3.10. ([a16c184](https://github.com/slsfi/digital-edition-frontend-ng/commit/a16c1845d2f2e8068708e0b709f70387570e16ba))
+- Deps: update `@angular/cli` to 20.3.9 and `@angular/core` to 20.3.10. ([a16c184](https://github.com/slsfi/digital-edition-frontend-ng/commit/a16c1845d2f2e8068708e0b709f70387570e16ba))
 - Deps: update `marked` to 16.4.2. ([044fd43](https://github.com/slsfi/digital-edition-frontend-ng/commit/044fd4340c0d6076fdfd70798a9ec4959568dc68))
 - Deps (dev): update `@types/node` to 22.19.0. ([71fd3a2](https://github.com/slsfi/digital-edition-frontend-ng/commit/71fd3a2c60b8158c921a6d3d50da0b8536e77381))
 
@@ -164,7 +221,7 @@ CollectionId: {
 
 ### Changed
 
-- Deps: update `angular/cli` to 20.3.8 and `angular/core` to 20.3.9. ([95a31f5](https://github.com/slsfi/digital-edition-frontend-ng/commit/95a31f5e2eb98b3bd54a82e36cdd8a40335c00be))
+- Deps: update `@angular/cli` to 20.3.8 and `@angular/core` to 20.3.9. ([95a31f5](https://github.com/slsfi/digital-edition-frontend-ng/commit/95a31f5e2eb98b3bd54a82e36cdd8a40335c00be))
 - Deps: update `marked` to 16.4.1. ([478a9db](https://github.com/slsfi/digital-edition-frontend-ng/commit/478a9db8dfbd0e4db418736a5a0fbe4f44955512))
 - Deps (dev): update `@types/express` to 5.0.5. ([a560e6f](https://github.com/slsfi/digital-edition-frontend-ng/commit/a560e6f3fd27c30a1b42002936259f84233eb37c))
 - Deps (dev): update `@types/jasmine` to 5.1.12. ([2b0d499](https://github.com/slsfi/digital-edition-frontend-ng/commit/2b0d499f645f2e6be0570a877e8a571b15374598))
@@ -1269,7 +1326,11 @@ siteLogoDimensions: {
 
 
 
-[unreleased]: https://github.com/slsfi/digital-edition-frontend-ng/compare/2.4.2...HEAD
+[unreleased]: https://github.com/slsfi/digital-edition-frontend-ng/compare/2.4.6...HEAD
+[2.4.6]: https://github.com/slsfi/digital-edition-frontend-ng/compare/2.4.5...2.4.6
+[2.4.5]: https://github.com/slsfi/digital-edition-frontend-ng/compare/2.4.4...2.4.5
+[2.4.4]: https://github.com/slsfi/digital-edition-frontend-ng/compare/2.4.3...2.4.4
+[2.4.3]: https://github.com/slsfi/digital-edition-frontend-ng/compare/2.4.2...2.4.3
 [2.4.2]: https://github.com/slsfi/digital-edition-frontend-ng/compare/2.4.1...2.4.2
 [2.4.1]: https://github.com/slsfi/digital-edition-frontend-ng/compare/2.4.0...2.4.1
 [2.4.0]: https://github.com/slsfi/digital-edition-frontend-ng/compare/2.3.2...2.4.0

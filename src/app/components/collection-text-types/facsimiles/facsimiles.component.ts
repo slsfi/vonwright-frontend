@@ -364,7 +364,7 @@ export class FacsimilesComponent {
     const modal = await this.modalCtrl.create({
       component: FullscreenImageViewerModal,
       componentProps: {
-        activeImageIndex: this.facsNumber - 1,
+        startImageIndex: this.facsNumber - 1,
         imageURLs,
       },
       cssClass: 'fullscreen-image-viewer-modal',

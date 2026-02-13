@@ -6,6 +6,9 @@ import { TrustHtmlPipe } from '@pipes/trust-html.pipe';
 import { isBrowser } from '@utility-functions';
 
 
+// ─────────────────────────────────────────────────────────────────────────────
+// * This component is zoneless-ready. *
+// ─────────────────────────────────────────────────────────────────────────────
 @Component({
   selector: 'static-html',
   templateUrl: './static-html.component.html',

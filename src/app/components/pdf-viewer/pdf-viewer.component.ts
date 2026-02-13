@@ -1,23 +1,32 @@
-import { Component, LOCALE_ID, OnInit, ViewChild, DOCUMENT, inject, input } from '@angular/core';
-import { AsyncPipe, NgStyle } from '@angular/common';
+import { ChangeDetectionStrategy, Component, DOCUMENT, LOCALE_ID, computed, inject, input, signal, viewChild } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { NgStyle } from '@angular/common';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { ActivatedRoute } from '@angular/router';
 import { IonicModule, ModalController } from '@ionic/angular';
-import { map, Observable } from 'rxjs';
+import { map } from 'rxjs';
 
 import { config } from '@config';
 import { IsExternalURLPipe } from '@pipes/is-external-url.pipe';
 import { ReferenceDataModal } from '@modals/reference-data/reference-data.modal';
+import { Ebook } from '@models/ebook.models';
 
 
+// ─────────────────────────────────────────────────────────────────────────────
+// * This component is zoneless-ready. *
+// ─────────────────────────────────────────────────────────────────────────────
 @Component({
   selector: 'pdf-viewer',
   templateUrl: './pdf-viewer.component.html',
   styleUrls: ['./pdf-viewer.component.scss'],
-  imports: [AsyncPipe, NgStyle, IonicModule, IsExternalURLPipe],
+  imports: [NgStyle, IonicModule, IsExternalURLPipe],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   host: { ngSkipHydration: 'true' }
 })
-export class PdfViewerComponent implements OnInit {
+export class PdfViewerComponent {
+  // ─────────────────────────────────────────────────────────────────────────────
+  // Dependency injection, Input/Output signals, Fields, Local state signals
+  // ─────────────────────────────────────────────────────────────────────────────
   private modalController = inject(ModalController);
   private route = inject(ActivatedRoute);
   private sanitizer = inject(DomSanitizer);
@@ -25,56 +34,51 @@ export class PdfViewerComponent implements OnInit {
   private document = inject<Document>(DOCUMENT);
 
   readonly pdfFileName = input<string>('');
-  @ViewChild('downloadOptionsPopover') downloadOptionsPopover: any;
+  readonly downloadOptionsPopover = viewChild<any>('downloadOptionsPopover');
 
+  private readonly availableEbooks: Ebook[] = config.ebooks ?? [];
   readonly showURNButton: boolean = config.component?.epub?.showURNButton ?? false;
 
-  downloadPopoverIsOpen: boolean = false;
-  pageNumber: number | null = null;
-  pdfData: Record<string, any> = {};
-  pdfURL$: Observable<SafeResourceUrl | undefined>;
-  _window: Window | null = null;
+  downloadPopoverIsOpen = signal<boolean>(false);
+  _window: Window | null = <any>this.document.defaultView;
 
-  constructor() {
-    this._window = <any>this.document.defaultView;
-  }
-
-  ngOnInit() {
-    const availableEbooks: any[] = config.ebooks ?? [];
+  // ─────────────────────────────────────────────────────────────────────────────
+  // Derived computeds (pure, no side-effects)
+  // ─────────────────────────────────────────────────────────────────────────────
+  pdfData = computed<Ebook | undefined>(() => {
     const pdfFileName = this.pdfFileName();
-    for (const ebook of availableEbooks) {
-      if (ebook.filename === pdfFileName) {
-        this.pdfData = ebook;
-        break;
-      }
-    }
+    return this.availableEbooks.find(ebook => ebook.filename === pdfFileName);
+  });
 
-    const pdfFilePath = this.pdfData.externalFileURL
-          ? this.pdfData.externalFileURL
+  pdfFilePath = computed<string | undefined>(() => {
+    const pdfData = this.pdfData();
+    if (pdfData === undefined) return undefined;
+
+    return pdfData.externalFileURL
+          ? pdfData.externalFileURL
           : (
               (this._window?.location.origin ?? '')
               + (
                   this._window?.location.pathname.split('/')[1] === this.activeLocale
                   ? '/' + this.activeLocale : ''
                 )
-              + '/assets/ebooks/' + pdfFileName
+              + '/assets/ebooks/' + pdfData.filename
             );
+  });
 
-    this.pdfURL$ = this.route.queryParamMap.pipe(
+  params = toSignal(
+    this.route.queryParamMap.pipe(
       map(paramMap => {
         // Check if 'page' queryParam set to display a specific
         // page in the PDF
-        let pageNumber: number | null = null;
         const pageParam: string | null = paramMap.get('page');
-        if (pageParam) {
-          pageNumber = parseInt(pageParam, 10);  
-        }
-        this.pageNumber = pageNumber;
+        const pageNumber: number | null = pageParam
+              ? parseInt(pageParam, 10)
+              : null;
 
         // Check if 'q' queryParams set to highlight search terms
         // in the PDF
         const searchTerm: string = paramMap.getAll('q').join(' ');
-
         let pdfParams: string = pageNumber || searchTerm ? '#' : '';
         if (pdfParams) {
           if (pageNumber) {
@@ -88,18 +92,35 @@ export class PdfViewerComponent implements OnInit {
           }
         }
 
-        return this.sanitizer.bypassSecurityTrustResourceUrl(pdfFilePath + pdfParams);
+        return { pageNumber, pdfParams };
       })
-    );
-  }
+    )
+  );
+
+  pageNumber = computed<number | null>(() => this.params()?.pageNumber ?? null);
+
+  pdfURL = computed<SafeResourceUrl | undefined>(() => {
+    const filePath = this.pdfFilePath();
+    const params = this.params();
+    return filePath && params
+          ? this.sanitizer.bypassSecurityTrustResourceUrl(filePath + params.pdfParams)
+          : undefined;
+  });
+
+  // ─────────────────────────────────────────────────────────────────────────────
+  // Public UI actions (called from template)
+  // ─────────────────────────────────────────────────────────────────────────────
 
   openDownloadPopover(event: any) {
-    this.downloadOptionsPopover.event = event;
-    this.downloadPopoverIsOpen = true;
+    const popover = this.downloadOptionsPopover();
+    if (popover) {
+      popover.event = event;
+      this.downloadPopoverIsOpen.set(true);
+    }
   }
 
   closeDownloadPopover() {
-    this.downloadPopoverIsOpen = false;
+    this.downloadPopoverIsOpen.set(false);
   }
 
   async showReference() {

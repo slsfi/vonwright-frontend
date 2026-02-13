@@ -7,6 +7,7 @@ import { catchError, forkJoin, map, Observable, of } from 'rxjs';
 
 import { config } from '@config';
 import { Article } from '@models/article.models';
+import { Ebook } from '@models/ebook.models';
 import { Collection } from '@models/collection.models';
 import { MediaCollection } from '@models/media-collection.models';
 import { fromCollectionToMainMenuNode, fromMdToMainMenuNode, fromMediaCollectionToMainMenuNode, MainMenuGroupNode, MainMenuNode, MdMenuNodeApiResponse } from '@models/menu.models';
@@ -205,7 +206,9 @@ export class MainSideMenuComponent {
   }
 
   private getArticlePagesMenu(): Observable<MainMenuGroupNode> {
-    if (!config.articles?.length) {
+    const articles: Article[] = config.articles ?? [];
+
+    if (!articles.length) {
       return of({ menuType: 'article', menuData: [] });
     }
 
@@ -217,7 +220,7 @@ export class MainSideMenuComponent {
           return { menuType: 'article', menuData: [] };
         }
 
-        this.recursivelyMapArticleData(res, (config.articles as Article[]));
+        this.recursivelyMapArticleData(res, articles);
         const menuDataNode: MainMenuNode = fromMdToMainMenuNode(res, '/article');
         const menuData: MainMenuNode[] = config.component?.mainSideMenu?.ungroupArticles
               ? menuDataNode.children ?? []
@@ -234,8 +237,10 @@ export class MainSideMenuComponent {
 
   private getEbookPagesMenu(): Observable<MainMenuGroupNode> {
     let menuData: MainMenuNode[] = [];
-    if (config.ebooks?.length) {
-      config.ebooks.forEach((ebook: any) => {
+    const ebooks: Ebook[] = config.ebooks ?? [];
+
+    if (ebooks.length) {
+      ebooks.forEach((ebook: Ebook) => {
         const filenameparts = splitFilename(ebook.filename);
         menuData.push({
           id: filenameparts.name,
@@ -243,6 +248,7 @@ export class MainSideMenuComponent {
           parentPath: `/ebook/${filenameparts.extension}`
         });
       });
+
       if (menuData.length > 1) {
         menuData = [{
           title: $localize`:@@MainSideMenu.Ebooks:E-böcker`,

@@ -3,6 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 
 import { config } from '@config';
+import { Ebook } from '@models/ebook.models';
 import { splitFilename } from '@utility-functions';
 
 
@@ -22,7 +23,7 @@ export class EbookPage implements OnDestroy, OnInit {
   title: string = '';
 
   ngOnInit() {
-    const availableEbooks: any[] = config.ebooks ?? [];
+    const availableEbooks: Ebook[] = config.ebooks ?? [];
 
     this.routeParamsSubscr = this.route.params.subscribe(params => {
       if (params.filename && !params.type && !params.name) {
@@ -35,19 +36,11 @@ export class EbookPage implements OnDestroy, OnInit {
           );
         }
       } else {
-        this.filename = '';
-        this.title = '';
-        this.ebookType = '';
-        for (const ebook of availableEbooks) {
-          const requestedFilename = `${params.name}.${params.type}`;
-
-          if (ebook.filename === requestedFilename) {
-            this.filename = ebook.filename;
-            this.title = ebook.title;
-            this.ebookType = params.type;
-            break;
-          }
-        }
+        const requestedFilename = `${params.name}.${params.type}`;
+        const reqEbook = availableEbooks.find(ebook => ebook.filename === requestedFilename);
+        this.filename = reqEbook?.filename ?? '';
+        this.title = reqEbook?.title ?? '';
+        this.ebookType = params.type;
       }
     });
   }

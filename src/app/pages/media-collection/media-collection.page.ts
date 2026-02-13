@@ -551,7 +551,7 @@ export class MediaCollectionPage implements OnDestroy, OnInit {
     }
 
     const params = {
-      activeImageIndex: index,
+      startImageIndex: index,
       backsides: this.galleryBacksideImageURLs,
       imageDescriptions: this.galleryDescriptions,
       imageTitles: this.galleryTitles,
