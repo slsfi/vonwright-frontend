@@ -8,18 +8,22 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ## Unreleased
 
+
+
+## [2.6.1-production.1] – 2026-03-17
+
 ### Changed
 
-- Update to base version [`2.6.1`](https://github.com/slsfi/digital-edition-frontend-ng/releases/tag/2.6.1) from upstream, original repository.
-- Enable feature based routes and separate cookie policy page in config.
+- Update to base version [`2.6.1`](https://github.com/slsfi/digital-edition-frontend-ng/releases/tag/2.6.1) from upstream, original repository. ([a2296b8](https://github.com/slsfi/vonwright-frontend/commit/a2296b8811e8e679c33eaa317fe14ce0ae77311e))
+- Enable feature based routes and separate cookie policy page in config. ([a6b71ec](https://github.com/slsfi/vonwright-frontend/commit/a6b71ece5c66e004a5291087d883206fe8ce2797))
 
 ### Fixed
 
-- Badge URLs in `README.md`.
+- Badge URLs in `README.md`. ([edfeac9](https://github.com/slsfi/vonwright-frontend/commit/edfeac97d9fb27fec1730656fd5478de654f2e31))
 
 ### Removed
 
-- Cookie banner CSS from `custom.scss`.
+- Cookie banner CSS from `custom.scss`. ([617d624](https://github.com/slsfi/vonwright-frontend/commit/617d62402a867bc64987617f6b766a25fe84d6dc))
 
 
 
@@ -1498,6 +1502,7 @@ siteLogoDimensions: {
 [1.0.1]: https://github.com/slsfi/digital-edition-frontend-ng/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/slsfi/digital-edition-frontend-ng/releases/tag/v1.0.0
 
+[2.6.1-production.1]: https://github.com/slsfi/vonwright-frontend/compare/2.4.6-production.1...2.6.1-production.1
 [2.4.6-production.1]: https://github.com/slsfi/vonwright-frontend/compare/2.4.2-production.2...2.4.6-production.1
 [2.4.2-production.2]: https://github.com/slsfi/vonwright-frontend/compare/2.4.2-production.1...2.4.2-production.2
 [2.4.2-production.1]: https://github.com/slsfi/vonwright-frontend/compare/2.0.0-production.1...2.4.2-production.1
