@@ -1,0 +1,222 @@
+@let registerErrorValue = registerError();
+@let registrationCompletedValue = registrationCompleted();
+
+<ion-content>
+  <article>
+    <form [formGroup]="form" (ngSubmit)="attemptRegistration()" novalidate>
+      <h1 i18n="@@Register.Title">Skapa användarkonto</h1>
+
+      @if (registrationCompletedValue) {
+        <p class="auth-success center" i18n="@@Register.Success">Kontot har skapats. Kontrollera din inkorg och verifiera e-postadressen innan du loggar in.</p>
+      } @else {
+        <p class="center" i18n="@@Register.Description">Ange namn, e-postadress och lösenord samt <br>godkänn villkoren för att skapa ett konto.</p>
+
+        <section class="form-section">
+          <h2 i18n="@@Register.AccountSectionHeading">Kontouppgifter</h2>
+
+          <ion-input
+            formControlName="name"
+            type="text"
+            fill="outline"
+            labelPlacement="stacked"
+            autocomplete="name"
+            [maxlength]="registerNameMaxLength"
+            (ionInput)="clearFeedbackState()"
+            i18n-label="@@Register.NameLabel"
+            label="Förnamn och efternamn"
+          >
+          </ion-input>
+
+          @if (showControlError('name', 'required')) {
+            <p class="auth-error center" i18n="@@Register.NameRequired">Ange förnamn och efternamn.</p>
+          }
+
+          <ion-input
+            formControlName="email"
+            type="email"
+            fill="outline"
+            labelPlacement="stacked"
+            autocomplete="email"
+            inputmode="email"
+            (ionInput)="clearFeedbackState()"
+            i18n-label="@@Register.EmailLabel"
+            label="E-postadress"
+          >
+          </ion-input>
+
+          @if (showControlError('email', 'required')) {
+            <p class="auth-error center" i18n="@@Register.EmailRequired">Ange e-postadress.</p>
+          }
+          @if (showControlError('email', 'email')) {
+            <p class="auth-error center" i18n="@@Register.EmailInvalid">Ange en giltig e-postadress.</p>
+          }
+
+          <ion-input
+            formControlName="password"
+            type="password"
+            fill="outline"
+            labelPlacement="stacked"
+            autocomplete="new-password"
+            (ionInput)="clearFeedbackState()"
+            i18n-label="@@Register.PasswordLabel"
+            label="Lösenord"
+          >
+            <ion-input-password-toggle slot="end"></ion-input-password-toggle>
+          </ion-input>
+
+          <div class="password-requirements" i18n="@@Password.RequirementsHint">
+            <p>Lösenordet måste:</p>
+            <ul>
+              <li>vara minst 12 tecken långt</li>
+              <li>innehålla både små och stora bokstäver</li>
+              <li>innehålla minst en siffra eller ett specialtecken</li>
+            </ul>
+          </div>
+          @if (showPasswordRequirementsError()) {
+            <p class="auth-error center" i18n="@@Password.RequirementsError">Lösenordet uppfyller inte kraven ovan.</p>
+          }
+
+          <ion-input
+            formControlName="confirmPassword"
+            type="password"
+            fill="outline"
+            labelPlacement="stacked"
+            autocomplete="new-password"
+            (ionInput)="clearFeedbackState()"
+            i18n-label="@@Register.RepeatPasswordLabel"
+            label="Upprepa lösenordet"
+          >
+            <ion-input-password-toggle slot="end"></ion-input-password-toggle>
+          </ion-input>
+
+          @if (showPasswordMismatchError()) {
+            <p class="auth-error center" i18n="@@Password.DoesNotMatch">Lösenorden matchar inte.</p>
+          }
+        </section>
+
+        @if (showTermsOfUse || showPrivacyPolicy) {
+          <section class="form-section">
+            <h2 i18n="@@Register.LegalSectionHeading">Samtycke och villkor</h2>
+
+            @if (showTermsOfUse) {
+              <section class="legal-summary" [class.legal-error]="showControlError('acceptTermsOfUse', 'required')">
+                <ion-checkbox formControlName="acceptTermsOfUse" labelPlacement="end" justify="start" (ionChange)="clearFeedbackState()">
+                  <span i18n="@@Register.AcceptTermsCheckbox">Jag accepterar användarvillkoren.</span>
+                </ion-checkbox>
+
+                <p i18n="@@Register.TermsIntro">Användarkontot ger dig tillgång till upphovsrättsligt skyddat material som får användas endast för privata, pedagogiska och vetenskapliga ändamål.</p>
+
+                <details>
+                  <summary i18n="@@Register.TermsSummaryHeading">Sammanfattning av användarvillkoren</summary>
+                  <div class="summary-body" i18n="@@Register.TermsSummary">
+                    <p>Denna digitala utgåva tillgängliggör upphovs­rättsligt skyddat material. Materialet publiceras online med tillstånd av rätts­innehavarna.</p>
+                    <p>Utgåvan får användas för <b>privata, pedagogiska och veten­skapliga ändamål</b>. Du får läsa, studera och utforska innehållet samt citera kortare utdrag i den omfattning som är tillåten enligt lag, under förut­sättning att du anger källan. Text- och data­utvinning på materialet är tillåtet endast för vetenskaplig forskning.</p>
+                    <p>Det är inte tillåtet att kopiera, dela, återpublicera eller göra texterna eller bilderna tillgängliga på andra plattformar eller tjänster – inte ens för icke-kommersiella ändamål. Materialet får inte heller användas i kommersiellt syfte.</p>
+                  </div>
+                </details>
+
+                <p i18n="@@Register.TermsLink">Fullständiga villkor finns i <a [routerLink]="['/terms']" target="_blank">användarvillkoren</a>.</p>
+              </section>
+
+              @if (showControlError('acceptTermsOfUse', 'required')) {
+                <p class="auth-error center" i18n="@@Register.AcceptTermsRequired">Du måste acceptera användarvillkoren.</p>
+              }
+            }
+
+            @if (showPrivacyPolicy) {
+              <section class="legal-summary" [class.legal-error]="showControlError('acceptPrivacyPolicy', 'required')">
+                <ion-checkbox formControlName="acceptPrivacyPolicy" labelPlacement="end" justify="start" (ionChange)="clearFeedbackState()">
+                  <span i18n="@@Register.AcceptPrivacyCheckbox">Jag accepterar dataskyddsbeskrivningen.</span>
+                </ion-checkbox>
+
+                <p i18n="@@Register.PrivacyIntro">Vi behandlar dina personuppgifter för att skapa och administrera ditt användarkonto.</p>
+
+                <details>
+                  <summary i18n="@@Register.PrivacySummaryHeading">Sammanfattning av dataskyddsbeskrivningen</summary>
+                  <div class="summary-body" i18n="@@Register.PrivacySummary">
+                    <p>Vi behandlar ditt namn och din e-postadress för att skapa och administrera ditt användar­konto samt för att ge dig tillgång till den digitala utgåvan. Dina person­uppgifter lagras på servrar i Finland och sparas endast så länge det är nödvändigt för dessa ändamål.</p>
+                  </div>
+                </details>
+
+                <p i18n="@@Register.PrivacyLink">Mer information finns i <a [routerLink]="['/privacy-policy']" target="_blank">dataskyddsbeskrivningen</a>.</p>
+              </section>
+
+              @if (showControlError('acceptPrivacyPolicy', 'required')) {
+                <p class="auth-error center" i18n="@@Register.AcceptPrivacyRequired">Du måste acceptera dataskyddsbeskrivningen.</p>
+              }
+            }
+          </section>
+        }
+
+        <section class="form-section">
+          <h2 i18n="@@Register.OptionalSectionHeading">Ytterligare information (valfritt)</h2>
+
+          <ion-select
+            formControlName="country"
+            fill="outline"
+            labelPlacement="stacked"
+            interface="popover"
+            placeholder="Välj land"
+            i18n-label="@@Register.CountryLabel"
+            i18n-placeholder="@@Register.CountryPlaceholder"
+            label="Bosättningsland"
+            (ionChange)="clearFeedbackState()"
+          >
+            @for (countryOption of countryOptions; track countryOption.value) {
+              <ion-select-option [value]="countryOption.value">{{ countryOption.label }}</ion-select-option>
+            }
+          </ion-select>
+
+          <ion-select
+            formControlName="intendedUsage"
+            fill="outline"
+            labelPlacement="stacked"
+            interface="popover"
+            [multiple]="true"
+            placeholder="Välj ett eller flera ändamål"
+            i18n-label="@@Register.IntendedUsageLabel"
+            i18n-placeholder="@@Register.IntendedUsagePlaceholder"
+            label="Ändamål"
+            (ionChange)="clearFeedbackState()"
+          >
+            <ion-select-option value="personal" i18n="@@Register.IntendedUsagePersonal">Personliga</ion-select-option>
+            <ion-select-option value="educational" i18n="@@Register.IntendedUsageEducational">Pedagogiska</ion-select-option>
+            <ion-select-option value="scholarly" i18n="@@Register.IntendedUsageScholarly">Vetenskapliga</ion-select-option>
+          </ion-select>
+        </section>
+
+        @if (registerErrorValue === 'no_credentials') {
+          <p class="auth-error center" i18n="@@Register.NoCredentials">Ange förnamn och efternamn, e-postadress och lösenord.</p>
+        }
+        @if (registerErrorValue === 'password_too_short') {
+          <p class="auth-error center" i18n="@@Password.TooShort">Lösenordet är för kort.</p>
+        }
+        @if (registerErrorValue === 'user_already_exists') {
+          <p class="auth-error center" i18n="@@Register.UserAlreadyExists">Det finns redan ett verifierat konto med den här e-postadressen.</p>
+        }
+        @if (registerErrorValue === 'request_failed') {
+          <p class="auth-error center" i18n="@@Register.RequestFailed">Kontot kunde inte skapas. Försök igen senare.</p>
+        }
+
+        <ion-button
+          class="custom-button"
+          type="submit"
+          expand="block"
+          [disabled]="form.invalid"
+          i18n="@@Register.SubmitButton"
+        >Skapa konto</ion-button>
+
+        <div class="authentication-divider">
+          <span i18n="@@Auth.OrDivider">eller</span>
+        </div>
+      }
+      <p class="center" [class.no-margins]="!registrationCompletedValue">
+        <a
+          [routerLink]="['/login']"
+          [queryParams]="authRedirectNavigationQueryParams"
+          i18n="@@Register.BackToLogin"
+        >Tillbaka till inloggning</a>
+      </p>
+    </form>
+  </article>
+</ion-content>

@@ -9,6 +9,7 @@ import { GalleryItem } from '@models/gallery-item-models';
 import { MediaCollection } from '@models/media-collection.models';
 import { FullscreenImageViewerModal } from '@modals/fullscreen-image-viewer/fullscreen-image-viewer.modal';
 import { DocumentHeadService } from '@services/document-head.service';
+import { FacsimileImageService } from '@services/facsimile-image.service';
 import { MarkdownService } from '@services/markdown.service';
 import { MediaCollectionService } from '@services/media-collection.service';
 import { UrlService } from '@services/url.service';
@@ -28,6 +29,7 @@ export class MediaCollectionPage implements OnDestroy, OnInit {
   private mdService = inject(MarkdownService);
   private mediaCollectionService = inject(MediaCollectionService);
   private modalController = inject(ModalController);
+  private facsimileImageService = inject(FacsimileImageService);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private urlService = inject(UrlService);
@@ -60,6 +62,9 @@ export class MediaCollectionPage implements OnDestroy, OnInit {
   filterOptionsPersons: any[] = [];
   filterOptionsPlaces: any[] = [];
   filterOptionsSubscription: Subscription | null = null;
+  galleryThumbObjectURLsByID: Record<string, string | null> = {};
+  galleryThumbResolutionSubscription: Subscription | null = null;
+  galleryThumbResolvedURLsByID: Record<string, string> = {};
   filterResultCount: number = -1;
   galleryBacksideImageURLs: (string | undefined)[] = [];
   galleryData: GalleryItem[] = [];
@@ -119,7 +124,9 @@ export class MediaCollectionPage implements OnDestroy, OnInit {
         if (this.allMediaCollections.length < 1) {
           this.loadMediaCollections();
         } else {
+          this.clearGalleryThumbResolution();
           this.galleryData = this.allMediaCollections;
+          this.resolveGalleryThumbURLs();
           if (shouldSetFilters) {
             this.setFilterOptionsAndApplyActiveFilters();
           } else {
@@ -175,22 +182,26 @@ export class MediaCollectionPage implements OnDestroy, OnInit {
 
   ngOnDestroy() {
     this.filterOptionsSubscription?.unsubscribe();
+    this.clearGalleryThumbResolution();
     this.urlParametersSubscription?.unsubscribe();
   }
 
   private loadMediaCollections() {
+    this.clearGalleryThumbResolution();
     this.galleryData = [];
 
     this.mediaCollectionService.getMediaCollections(this.activeLocale).subscribe(
       (collections: MediaCollection[]) => {
         this.allMediaCollections = this.getTransformedGalleryData(collections);
         this.galleryData = this.allMediaCollections;
+        this.resolveGalleryThumbURLs();
         this.setFilterOptionsAndApplyActiveFilters();
       }
     );
   }
 
   private loadSingleMediaCollection(mediaCollectionID: string) {
+    this.clearGalleryThumbResolution();
     this.galleryData = [];
 
     // Get all media collections if not yet loaded, set current collection title and description
@@ -227,15 +238,18 @@ export class MediaCollectionPage implements OnDestroy, OnInit {
     this.mediaCollectionService.getSingleMediaCollection(mediaCollectionID, this.activeLocale).subscribe(
       (galleryItems: any[]) => {
         this.galleryData = this.getTransformedGalleryData(galleryItems, true);
+        this.resolveGalleryThumbURLs();
         this.setFilterOptionsAndApplyActiveFilters();
       }
     );
   }
 
   private loadNamedEntityGallery(objectID: string, objectType: string) {
+    this.clearGalleryThumbResolution();
     this.mediaCollectionService.getNamedEntityOccInMediaColls(objectType, objectID).subscribe(
       (occurrences: any) => {
         this.galleryData = this.getTransformedGalleryData(occurrences, true);
+        this.resolveGalleryThumbURLs();
 
         if (objectType === 'person') {
           this.mediaCollectionTitle = occurrences[0]['full_name'];
@@ -252,6 +266,38 @@ export class MediaCollectionPage implements OnDestroy, OnInit {
         this.setGalleryZoomedImageData();
       }
     );
+  }
+
+  private clearGalleryThumbResolution() {
+    this.galleryThumbResolutionSubscription?.unsubscribe();
+    this.galleryThumbResolutionSubscription = null;
+
+    Object.values(this.galleryThumbObjectURLsByID).forEach((objectURL: string | null) => {
+      this.facsimileImageService.revokeObjectURL(objectURL);
+    });
+    this.galleryThumbObjectURLsByID = {};
+    this.galleryThumbResolvedURLsByID = {};
+  }
+
+  private resolveGalleryThumbURLs() {
+    // TODO(hydration): Gallery thumbnail components use `ngSkipHydration` on
+    // their hosts as a temporary safeguard. In auth-enabled mode, browser rendering
+    // may replace URL src with a blob URL after bootstrap. When client hydration
+    // is enabled in this app, make initial SSR/client src deterministic and then
+    // remove the skip marker.
+    // We resolve via FacsimileImageService so authenticated image requests can
+    // go through HttpClient + interceptors instead of plain <img src> fetching.
+    this.clearGalleryThumbResolution();
+
+    this.galleryThumbResolutionSubscription = new Subscription();
+    this.galleryData.forEach((item: GalleryItem) => {
+      const subscription = this.facsimileImageService.resolveImageSrc(item.imageURLThumb ?? null).subscribe((resolvedImage) => {
+        this.galleryThumbObjectURLsByID[item.id] = resolvedImage.objectURL;
+        this.galleryThumbResolvedURLsByID[item.id] = resolvedImage.src;
+        this.cdRef.markForCheck();
+      });
+      this.galleryThumbResolutionSubscription?.add(subscription);
+    });
   }
 
   private getTransformedGalleryData(galleryItems: MediaCollection[], singleGallery = false): GalleryItem[] {

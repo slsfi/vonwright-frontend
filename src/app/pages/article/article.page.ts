@@ -4,9 +4,7 @@ import { ModalController, PopoverController } from '@ionic/angular';
 import { Observable, Subscription, switchMap, tap } from 'rxjs';
 
 import { config } from '@config';
-import { ReferenceDataModal } from '@modals/reference-data/reference-data.modal';
 import { Article } from '@models/article.models';
-import { ViewOptionsPopover } from '@popovers/view-options/view-options.popover';
 import { MarkdownService } from '@services/markdown.service';
 import { PlatformService } from '@services/platform.service';
 import { ScrollService } from '@services/scroll.service';
@@ -101,6 +99,7 @@ export class ArticlePage implements OnInit, OnDestroy {
       'pageBreakEdition': false
     };
 
+    const { ViewOptionsPopover } = await import('@popovers/view-options/view-options.popover');
     const popover = await this.popoverCtrl.create({
       component: ViewOptionsPopover,
       componentProps: { toggles },
@@ -114,6 +113,7 @@ export class ArticlePage implements OnInit, OnDestroy {
   }
 
   async showReference() {
+    const { ReferenceDataModal } = await import('@modals/reference-data/reference-data.modal');
     // Get URL of Page and then the URI
     const modal = await this.modalController.create({
       component: ReferenceDataModal,

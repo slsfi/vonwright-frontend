@@ -4,6 +4,7 @@ import { UrlSegment } from '@angular/router';
 import { Observable, catchError, of, switchMap } from 'rxjs';
 
 import { config } from '@config';
+import { ReferenceData, ReferenceDataApiResponse, toReferenceData } from '@models/metadata.models';
 
 
 @Injectable({
@@ -15,7 +16,7 @@ export class ReferenceDataService {
 
   private readonly urnResolverUrl: string = config.modal?.referenceData?.URNResolverURL ?? 'https://urn.fi/';
 
-  getReferenceData(urlSegments: UrlSegment[]): Observable<any> {
+  getReferenceData(urlSegments: UrlSegment[]): Observable<ReferenceData | null> {
     let url = '/';
     for (let i = 0; i < urlSegments?.length; i++) {
       const separator = i > 0 ? '/' : '';
@@ -28,24 +29,28 @@ export class ReferenceDataService {
     const endpoint = `${config.app.backendBaseURL}/${config.app.projectNameDB}/urn/${url}/`;
 
     return this.http.get(endpoint).pipe(
-      switchMap((data: any) => {
-        if (data && Array.isArray(data) && data.length > 0) {
-          if (data.length > 1) {
-            for (let i = 0; i < data.length; i++) {
-              if (data[i]['deleted'] === 0) {
-                data = data[i];
+      switchMap((resp: any) => {
+        let data: ReferenceData | null = null;
+
+        if (resp && Array.isArray(resp) && resp.length > 0) {
+          if (resp.length > 1) {
+            for (let i = 0; i < resp.length; i++) {
+              if (resp[i]['deleted'] === 0) {
+                data = toReferenceData(resp[i] as ReferenceDataApiResponse);
                 break;
               }
             }
           } else {
-            data = data[0];
+            data = toReferenceData(resp[0] as ReferenceDataApiResponse);
           }
         } else if (
-          !data?.urn &&
-          !data?.reference_text &&
-          !data?.intro_reference_text
+          !resp?.urn &&
+          !resp?.reference_text &&
+          !resp?.intro_reference_text
         ) {
           data = null;
+        } else {
+          data = toReferenceData(resp as ReferenceDataApiResponse);
         }
 
         // Remove trailing comma from reference_text if present

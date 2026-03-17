@@ -200,7 +200,7 @@ export class TooltipService {
     return text;
   }
 
-  constructYearBornDeceasedString(dateBorn?: string, dateDeceased?: string) {
+  constructYearBornDeceasedString(dateBorn?: string | null, dateDeceased?: string | null): string {
     // Get the born and deceased years without leading zeros and possible 'BC' indicators
     const yearBorn =
       dateBorn !== undefined && dateBorn !== null

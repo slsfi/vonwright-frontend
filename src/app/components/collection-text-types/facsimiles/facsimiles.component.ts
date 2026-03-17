@@ -12,6 +12,7 @@ import { ExternalFacsimile, Facsimile, FacsimileApi, toExternalFacsimile, toFacs
 import { TextKey } from '@models/collection.models';
 import { TrustHtmlPipe } from '@pipes/trust-html.pipe';
 import { CollectionContentService } from '@services/collection-content.service';
+import { FacsimileImageService } from '@services/facsimile-image.service';
 import { PlatformService } from '@services/platform.service';
 import { sortArrayOfObjectsNumerically } from '@utility-functions';
 
@@ -24,7 +25,8 @@ import { sortArrayOfObjectsNumerically } from '@utility-functions';
   templateUrl: './facsimiles.component.html',
   styleUrls: ['./facsimiles.component.scss'],
   imports: [NgStyle, FormsModule, IonicModule, DraggableImageDirective, TrustHtmlPipe],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  host: { ngSkipHydration: 'true' }
 })
 export class FacsimilesComponent {
   // ─────────────────────────────────────────────────────────────────────────────
@@ -33,9 +35,11 @@ export class FacsimilesComponent {
   private alertCtrl = inject(AlertController);
   private collectionContentService = inject(CollectionContentService);
   private destroyRef = inject(DestroyRef);
+  private facsimileImageService = inject(FacsimileImageService);
   private injector = inject(Injector);
   private modalCtrl = inject(ModalController);
   private platformService = inject(PlatformService);
+  private currentFacsimileObjectURL: string | null = null;
 
   readonly facsID = input<number | undefined>();
   readonly imageNr = input<number | undefined>();
@@ -62,6 +66,9 @@ export class FacsimilesComponent {
 
   externalFacsimiles = signal<ExternalFacsimile[]>([]);
   facsimiles = signal<Facsimile[]>([]);
+  facsimileImageLoading = signal(false);
+  facsimileImageSrc = signal<string>('');
+  private facsimileImageReloadToken = signal(0);
   facsURLDefault = signal<string>('');                 // base URL for images
   loading = signal(true);
   selectedFacsimile = signal<Facsimile | null>(null);  // current "internal" facsimile
@@ -76,6 +83,8 @@ export class FacsimilesComponent {
   constructor() {
     this.loadFacsimiles();
     this.registerOutputEmissions();
+    this.registerImageLoading();
+    this.destroyRef.onDestroy(() => this.revokeCurrentFacsimileObjectURL());
   }
 
   private loadFacsimiles() {
@@ -199,6 +208,55 @@ export class FacsimilesComponent {
     }, { injector: this.injector });
   }
 
+  private registerImageLoading() {
+    // TODO(hydration): This component host uses `ngSkipHydration` as a temporary
+    // safeguard. In auth-enabled mode, browser rendering
+    // may replace URL src with a blob URL after bootstrap. When client hydration
+    // is enabled in this app, make initial SSR/client src deterministic and then
+    // remove the skip marker.
+    // Keep image src in sync with selected facsimile/page.
+    // We resolve through FacsimileImageService so authenticated image requests can
+    // go through HttpClient + interceptors instead of plain <img src> fetching.
+    effect((onCleanup) => {
+      this.facsimileImageReloadToken();
+      const imageURL = this.getCurrentFacsimileImageURL();
+      if (!imageURL) {
+        this.facsimileImageLoading.set(false);
+      } else {
+        this.facsimileImageLoading.set(true);
+      }
+
+      const sub = this.facsimileImageService.resolveImageSrc(imageURL, {
+        onFetchError: (error: unknown) => console.error(error)
+      }).subscribe((resolvedImage) => {
+        this.revokeCurrentFacsimileObjectURL();
+        this.currentFacsimileObjectURL = resolvedImage.objectURL;
+        this.facsimileImageSrc.set(resolvedImage.src);
+        this.facsimileImageLoading.set(false);
+      });
+
+      onCleanup(() => sub.unsubscribe());
+    }, { injector: this.injector });
+  }
+
+  private getCurrentFacsimileImageURL(): string | null {
+    // External facsimiles are handled as links, so no image URL is resolved here.
+    const selectedFacs = this.selectedFacsimile();
+    if (!selectedFacs || this.selectedIsExternal() || !this.facsNumber) {
+      return null;
+    }
+
+    return this.facsURLAlternate
+      ? `${this.facsURLAlternate}/${selectedFacs.publication_facsimile_collection_id}/${this.facsSize}/${this.facsNumber}.jpg`
+      : `${this.facsURLDefault()}${this.facsNumber}${this.facsSize ? `/${this.facsSize}` : ''}`;
+  }
+
+  private revokeCurrentFacsimileObjectURL() {
+    // Revoke old blob URL whenever image changes or component is destroyed.
+    this.facsimileImageService.revokeObjectURL(this.currentFacsimileObjectURL);
+    this.currentFacsimileObjectURL = null;
+  }
+
 
   // ─────────────────────────────────────────────────────────────────────────────
   // Selection helpers
@@ -267,6 +325,7 @@ export class FacsimilesComponent {
 
     const start = (initialImageNr !== undefined) ? initialImageNr : facs.page;
     this.facsNumber = Math.max(1, Math.min(this.numberOfImages || 1, start || 1));
+    this.triggerFacsimileImageReload();
   }
 
   private changeFacsimile(isExternal: boolean, facs?: Facsimile) {
@@ -387,6 +446,7 @@ export class FacsimilesComponent {
     }
 
     this.selectedImageNr.emit(this.facsNumber);
+    this.triggerFacsimileImageReload();
   }
 
   previous() {
@@ -395,6 +455,7 @@ export class FacsimilesComponent {
     }
     this.facsNumber = this.facsNumber > 1 ? this.facsNumber - 1 : this.numberOfImages;
     this.selectedImageNr.emit(this.facsNumber);
+    this.triggerFacsimileImageReload();
   }
 
   next() {
@@ -403,6 +464,7 @@ export class FacsimilesComponent {
     }
     this.facsNumber = this.facsNumber < this.numberOfImages ? this.facsNumber + 1 : 1;
     this.selectedImageNr.emit(this.facsNumber);
+    this.triggerFacsimileImageReload();
   }
 
   zoomIn() {
@@ -444,6 +506,12 @@ export class FacsimilesComponent {
   setImageCoordinates(coords: number[]) {
     this.prevX = coords[0] ?? 0;
     this.prevY = coords[1] ?? 0;
+  }
+
+  private triggerFacsimileImageReload() {
+    // facsNumber is a plain field (not a signal), so use a token signal to trigger
+    // the image loading effect when the current page changes.
+    this.facsimileImageReloadToken.update((value: number) => value + 1);
   }
 
 }

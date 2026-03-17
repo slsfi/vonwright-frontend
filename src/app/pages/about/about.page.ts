@@ -1,6 +1,6 @@
 import { Component, ElementRef, LOCALE_ID, NgZone, OnDestroy, OnInit, Renderer2, inject } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
-import { Observable, Subscription, switchMap } from 'rxjs';
+import { ActivatedRoute, Data, Router } from '@angular/router';
+import { combineLatest, distinctUntilChanged, map, Observable, of, Subscription, switchMap } from 'rxjs';
 
 import { MarkdownService } from '@services/markdown.service';
 import { ScrollService } from '@services/scroll.service';
@@ -39,11 +39,26 @@ export class AboutPage implements OnInit, OnDestroy {
       });
     }
 
-    this.markdownText$ = this.route.params.pipe(
-      switchMap(({id}) => {
+    const loadErrorMessage = '<p>' + $localize`:@@About.LoadingError:Sidans innehåll kunde inte laddas.` + '</p>';
+    const parentRouteData$ = this.route.parent ? this.route.parent.data : of({} as Data);
+
+    this.markdownText$ = combineLatest([
+      this.route.params,
+      this.route.data,
+      parentRouteData$
+    ]).pipe(
+      map(([params, routeData, parentRouteData]) => {
+        return params['id'] ?? routeData['backendPageId'] ?? parentRouteData['backendPageId'] ?? null;
+      }),
+      distinctUntilChanged(),
+      switchMap((id: string | null) => {
+        if (!id) {
+          return of(loadErrorMessage);
+        }
+
         return this.mdService.getParsedMdContent(
           this.activeLocale + '-' + id,
-          '<p>' + $localize`:@@About.LoadingError:Sidans innehåll kunde inte laddas.` + '</p>'
+          loadErrorMessage
         );
       })
     );
@@ -94,20 +109,20 @@ export class AboutPage implements OnInit, OnDestroy {
 
   private scrollToFragment(targetElemId: string, delayMs: number = 500) {
     if (!isBrowser()) return;
-  
+
     this.ngZone.runOutsideAngular(() => {
       let attemptsLeft = 10;
-  
+
       const tryScroll = () => {
         if (attemptsLeft-- < 1) return;
-  
+
         const scrollTargetElem = document.querySelector(
           'page-about:not([ion-page-hidden]):not(.ion-page-hidden) [id="' + targetElemId + '"]'
         );
         const scrollContainerElem = document.querySelector(
           'page-about:not([ion-page-hidden]):not(.ion-page-hidden) ion-content'
         )?.shadowRoot?.querySelector('[part="scroll"]');
-  
+
         if (scrollTargetElem && scrollContainerElem) {
           this.scrollService.scrollElementIntoView(
             scrollTargetElem as HTMLElement, 'top', 0, 'smooth', scrollContainerElem as HTMLElement
@@ -116,9 +131,9 @@ export class AboutPage implements OnInit, OnDestroy {
           setTimeout(tryScroll, delayMs);
         }
       };
-  
+
       tryScroll();
     });
   }
-  
+
 }

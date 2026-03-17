@@ -1,3 +1,6 @@
+@let refData = referenceData();
+@let resolverURL = urnResolverUrl();
+
 <ion-header>
   <ion-toolbar>
     <ion-title i18n="@@Reference.Reference">Källhänvisning</ion-title>
@@ -15,16 +18,16 @@
       <h2 i18n="@@Reference.ReferToThisPage">Hänvisa till denna sida</h2>
     }
     <div class="modal-inner-box">
-      @if (permaLinkTranslation && referenceData?.urn) {
+      @if (permaLinkTranslation && refData?.urn) {
         <h3><ng-container i18n="@@Reference.Permalink">Beständig webbadress</ng-container>:</h3>
       }
-      @if (referenceData?.urn) {
-        <p class="urn"><a target="_blank" [href]="urnResolverUrl + referenceData.urn">{{urnResolverUrl + referenceData.urn}}</a></p>
+      @if (refData?.urn) {
+        <p class="urn"><a target="_blank" [href]="resolverURL + refData?.urn">{{resolverURL + refData?.urn}}</a></p>
       } @else {
         <p class="urn" i18n="@@Reference.None">Sidan saknar beständig webbadress</p>
       }
 
-      @if (referenceData?.reference_text) {
+      @if (refData?.reference_text) {
         @if (origin === 'page-title') {
           <h3><ng-container i18n="@@Reference.ReferToCollection">Hänvisa till denna delutgåva</ng-container>:</h3>
         } @else if (origin === 'page-foreword') {
@@ -40,12 +43,12 @@
         } @else if (origin === 'page-article') {
           <h3><ng-container i18n="@@Reference.ReferToArticle">Hänvisa till denna artikel</ng-container>:</h3>
         }
-        <p [innerHTML]="referenceData.reference_text + (referenceData.urn ? ', ' + urnResolverUrl + referenceData.urn : currentUrl ? ', ' + currentUrl : '')"></p>
+        <p [innerHTML]="referenceText()"></p>
       }
 
-      @if (referenceData?.intro_reference_text && origin !== 'page-introduction') {
+      @if (refData?.intro_reference_text && origin !== 'page-introduction') {
         <h3><ng-container i18n="@@Reference.ReferToIntroduction">Hänvisa till denna inledning</ng-container>:</h3>
-        <p [innerHTML]="referenceData.intro_reference_text"></p>
+        <p [innerHTML]="refData?.intro_reference_text"></p>
       }
     </div>
   </div>

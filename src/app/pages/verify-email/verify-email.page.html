@@ -1,0 +1,28 @@
+@let emailVerificationInProgressValue = emailVerificationInProgress();
+@let emailVerificationCompletedValue = emailVerificationCompleted();
+@let verifyEmailErrorValue = verifyEmailError();
+
+<ion-content>
+  <article>
+    <div class="narrow-wrap">
+      <h1 i18n="@@VerifyEmail.Title">Verifiera e-postadress</h1>
+
+      @if (emailVerificationInProgressValue) {
+        <p class="center" i18n="@@VerifyEmail.Verifying">Verifierar din e-postadress ...</p>
+      }
+      @if (emailVerificationCompletedValue) {
+        <p class="auth-success center" i18n="@@VerifyEmail.Success">Din e-postadress har verifierats. Du kan nu logga in på ditt konto.</p>
+      }
+      @if (verifyEmailErrorValue === 'invalid_link') {
+        <p class="auth-error center" i18n="@@VerifyEmail.InvalidLink">Verifieringslänken är ogiltig eller har löpt ut.</p>
+      }
+      @if (verifyEmailErrorValue === 'request_failed') {
+        <p class="auth-error center" i18n="@@VerifyEmail.RequestFailed">Verifieringen misslyckades. Försök igen senare.</p>
+      }
+
+      <p class="center no-margins">
+        <a [routerLink]="['/login']" i18n="@@VerifyEmail.BackToLogin">Till inloggning</a>
+      </p>
+    </div>
+  </article>
+</ion-content>

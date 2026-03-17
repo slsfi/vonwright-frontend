@@ -1,3 +1,8 @@
+@let isLoading = showLoading();
+@let personTypes = filterPersonTypes() ?? [];
+@let categoryTypes = filterCategoryTypes() ?? [];
+@let placeCountries = filterPlaceCountries() ?? [];
+
 <ion-header>
   <ion-toolbar>
     <ion-title i18n="@@IndexFilter.Filters">Avgränsningar</ion-title>
@@ -10,12 +15,10 @@
 </ion-header>
 
 <ion-content>
-  @if (showLoading) {
+  @if (isLoading) {
     <ion-spinner class="loading" name="crescent"></ion-spinner>
-  }
-
-  @if (!showLoading) {
-    @if (shouldFilterYear) {
+  } @else {
+    @if (shouldFilterYear()) {
       <ion-list>
         <ion-list-header>
           <ion-label i18n="@@IndexFilter.Born">Födda</ion-label>
@@ -26,36 +29,36 @@
         </div>
       </ion-list>
     }
-    @if (filterPersonTypes?.length) {
+    @if (personTypes.length) {
       <ion-list>
         <ion-list-header>
           <ion-label i18n="@@IndexFilter.PersonTypes">Personkategorier</ion-label>
         </ion-list-header>
-        @for (filterPT of filterPersonTypes; track $index) {
+        @for (filterPT of personTypes; track $index) {
           <ion-item>
             <ion-toggle justify="space-between" [enableOnOffLabels]="true" [(ngModel)]="filterPT.selected">{{filterPT.name}}</ion-toggle>
           </ion-item>
         }
       </ion-list>
     }
-    @if (filterCategoryTypes?.length) {
+    @if (categoryTypes.length) {
       <ion-list>
         <ion-list-header>
           <ion-label i18n="@@IndexFilter.KeywordTypes">Ämneskategorier</ion-label>
         </ion-list-header>
-        @for (filterCT of filterCategoryTypes; track $index) {
+        @for (filterCT of categoryTypes; track $index) {
           <ion-item>
             <ion-toggle justify="space-between" [enableOnOffLabels]="true" [(ngModel)]="filterCT.selected">{{filterCT.name}}</ion-toggle>
           </ion-item>
         }
       </ion-list>
     }
-    @if (filterPlaceCountries?.length) {
+    @if (placeCountries.length) {
       <ion-list>
         <ion-list-header>
           <ion-label i18n="@@IndexFilter.Countries">Länder</ion-label>
         </ion-list-header>
-        @for (filterC of filterPlaceCountries; track $index) {
+        @for (filterC of placeCountries; track $index) {
           <ion-item>
             <ion-toggle justify="space-between" [enableOnOffLabels]="true" [(ngModel)]="filterC.selected">{{filterC.name}}</ion-toggle>
           </ion-item>
@@ -69,7 +72,7 @@
   <ion-toolbar>
     <ion-buttons slot="end">
       <ion-button class="custom-outline-button" fill="outline" (click)="cancel()" i18n="@@BasicActions.Cancel">Avbryt</ion-button>
-      @if (!showLoading) {
+      @if (!isLoading) {
         <ion-button class="custom-button" (click)="apply()" i18n="@@IndexFilter.Apply">Verkställ</ion-button>
       }
     </ion-buttons>

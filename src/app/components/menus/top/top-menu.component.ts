@@ -1,9 +1,11 @@
-import { Component, ChangeDetectionStrategy, DestroyRef, ElementRef, Injector, LOCALE_ID, NgZone, Renderer2, afterNextRender, inject, input, output, signal, viewChild } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { Component, ChangeDetectionStrategy, DestroyRef, ElementRef, Injector, LOCALE_ID, NgZone, Renderer2, afterNextRender, computed, inject, input, output, signal, viewChild } from '@angular/core';
+import { Router, RouterLink } from '@angular/router';
 import { IonicModule } from '@ionic/angular';
 
 import { config } from '@config';
 import { Language } from '@models/config.models';
+import { AuthService } from '@services/auth.service';
+import { AUTH_ENABLED } from '@tokens/auth.tokens';
 
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -25,6 +27,11 @@ export class TopMenuComponent {
   private readonly injector = inject(Injector);
   private readonly ngZone = inject(NgZone);
   private readonly renderer = inject(Renderer2);
+  private readonly router = inject(Router);
+  private readonly authEnabled = inject(AUTH_ENABLED);
+  private authService: AuthService | null = null;
+  private readonly authMenuLoginLabel = $localize`:@@TopMenu.Login:Logga in`;
+  private readonly authMenuLogoutLabel = $localize`:@@TopMenu.Logout:Logga ut`;
 
   readonly currentRouterUrl = input<string>('');
   readonly showSideNav = input<boolean>(false);
@@ -44,6 +51,16 @@ export class TopMenuComponent {
   protected readonly showTopAboutButton = config.component?.topMenu?.showAboutButton ?? true;
   protected readonly showTopContentButton = config.component?.topMenu?.showContentButton ?? true;
   protected readonly showTopSearchButton = config.component?.topMenu?.showElasticSearchButton ?? true;
+  protected readonly showTopAuthButton = this.authEnabled;
+  protected readonly hideTopSearchButtonOnMobile = this.authEnabled && this.showLanguageButton;
+  protected readonly isAuthenticated = computed(() => this.authEnabled
+    ? this.getAuthService().isAuthenticated()
+    : false
+  );
+  protected readonly authMenuTitle = computed(() => this.isAuthenticated()
+    ? this.authMenuLogoutLabel
+    : this.authMenuLoginLabel
+  );
 
   readonly languageMenuOpen = signal<boolean>(false);
   readonly languageMenuWidth = signal<number | null>(null);
@@ -94,6 +111,17 @@ export class TopMenuComponent {
     });
   }
 
+  /**
+   * Lazy auth service resolution so projects with disabled auth do not
+   * initialize AuthService from this component.
+   */
+  private getAuthService(): AuthService {
+    if (!this.authService) {
+      this.authService = this.injector.get(AuthService);
+    }
+    return this.authService;
+  }
+
 
   // ─────────────────────────────────────────────────────────────────────────────
   // UI actions
@@ -118,6 +146,12 @@ export class TopMenuComponent {
       // Close language menu
       this.languageMenuOpen.set(false);
     }
+  }
+
+  logout(event: Event) {
+    event.preventDefault();
+    this.getAuthService().logout();
+    this.router.navigateByUrl('/login');
   }
 
 }

@@ -1,0 +1,97 @@
+@let loginErrorValue = loginError();
+
+<ion-content>
+  <article>
+    <form [formGroup]="form" (ngSubmit)="attemptLogin()" novalidate>
+      <h1 i18n="@@Login.Title">Logga in</h1>
+
+      <p class="center" i18n="@@Login.AccountNeededForAccess">För att komma åt innehållet i den digitala utgåvan behöver du ett användarkonto.</p>
+      @if (passwordResetSuccess) {
+        <p class="auth-success center" i18n="@@Login.PasswordResetSuccess">Lösenordet har återställts. Du kan nu logga in med ditt nya lösenord.</p>
+      }
+
+      <ion-input
+        formControlName="email"
+        type="email"
+        fill="outline"
+        labelPlacement="stacked"
+        autocomplete="email"
+        inputmode="email"
+        (ionInput)="clearAuthError()"
+        i18n-label="@@Login.EmailLabel"
+        label="E-postadress"
+      >
+      </ion-input>
+
+      @if (form.controls.email.touched && form.controls.email.hasError('required')) {
+        <p class="auth-error center" i18n="@@Login.EmailRequired">Ange e-postadress.</p>
+      }
+      @if (form.controls.email.touched && form.controls.email.hasError('email')) {
+        <p class="auth-error center" i18n="@@Login.EmailInvalid">Ange en giltig e-postadress.</p>
+      }
+
+      <ion-input
+        formControlName="password"
+        type="password"
+        fill="outline"
+        labelPlacement="stacked"
+        autocomplete="current-password"
+        (ionInput)="clearAuthError()"
+        i18n-label="@@Login.PasswordLabel"
+        label="Lösenord"
+      >
+        <ion-input-password-toggle slot="end"></ion-input-password-toggle>
+      </ion-input>
+      <p class="forgot-password"><a [routerLink]="['/forgot-password']" i18n="@@Login.ForgotPassword">Glömt lösenordet?</a></p>
+      @if (loginErrorValue === 'invalid_credentials') {
+        <p class="auth-error center" i18n="@@Login.InvalidCredentials">Fel e-postadress eller lösenord.</p>
+      }
+      @if (loginErrorValue === 'email_not_verified') {
+        <p class="auth-error" i18n="@@Login.EmailNotVerified">Du måste verifiera din e-postadress innan du kan logga in. Kontrollera din inkorg för ett e-postmeddelande med en verifieringslänk. Om länken har gått ut eller om du inte har fått något e-postmeddelande måste du registrera dig igen.</p>
+      }
+      @if (loginErrorValue === 'no_credentials') {
+        <p class="auth-error center" i18n="@@Login.NoCredentials">Ange e-postadress och lösenord.</p>
+      }
+      @if (loginErrorValue === 'request_failed') {
+        <p class="auth-error center" i18n="@@Login.RequestFailed">Inloggningen misslyckades. Försök igen senare.</p>
+      }
+
+      <ion-button
+        class="custom-button"
+        type="submit"
+        expand="block"
+        [disabled]="form.invalid"
+        i18n="@@Login.SubmitButton"
+      >Logga in</ion-button>
+
+      <div class="authentication-divider">
+        <span i18n="@@Auth.OrDivider">eller</span>
+      </div>
+      <p class="center no-margins">
+        <a
+          [routerLink]="['/register']"
+          [queryParams]="authRedirectNavigationQueryParams"
+          i18n="@@Login.CreateAccount"
+        >Skapa ett användarkonto</a>
+      </p>
+    </form>
+  </article>
+  @if (showTermsLink || showPrivacyPolicyLink) {
+    <footer class="legal-consent-footer">
+      @if (showTermsLink && showPrivacyPolicyLink) {
+        <p class="legal-consent" i18n="@@Login.ConsentTermsAndPrivacy">
+          Genom att logga in godkänner du <a [routerLink]="['/terms']">användarvillkoren</a> och
+          <a [routerLink]="['/privacy-policy']">dataskyddsbeskrivningen</a>.
+        </p>
+      } @else if (showTermsLink) {
+        <p class="legal-consent" i18n="@@Login.ConsentTermsOnly">
+          Genom att logga in godkänner du <a [routerLink]="['/terms']">användarvillkoren</a>.
+        </p>
+      } @else if (showPrivacyPolicyLink) {
+        <p class="legal-consent" i18n="@@Login.ConsentPrivacyOnly">
+          Genom att logga in godkänner du <a [routerLink]="['/privacy-policy']">dataskyddsbeskrivningen</a>.
+        </p>
+      }
+    </footer>
+  }
+</ion-content>

@@ -4,8 +4,6 @@ import { ModalController, PopoverController } from '@ionic/angular';
 import { catchError, combineLatest, map, Observable, of, switchMap, tap } from 'rxjs';
 
 import { config } from '@config';
-import { ReferenceDataModal } from '@modals/reference-data/reference-data.modal';
-import { ViewOptionsPopover } from '@popovers/view-options/view-options.popover';
 import { CollectionContentService } from '@services/collection-content.service';
 import { HtmlParserService } from '@services/html-parser.service';
 import { PlatformService } from '@services/platform.service';
@@ -107,6 +105,7 @@ export class CollectionForewordPage implements OnInit {
       'pageBreakEdition': false
     };
 
+    const { ViewOptionsPopover } = await import('@popovers/view-options/view-options.popover');
     const popover = await this.popoverCtrl.create({
       component: ViewOptionsPopover,
       componentProps: { toggles },
@@ -120,6 +119,7 @@ export class CollectionForewordPage implements OnInit {
   }
 
   async showReference() {
+    const { ReferenceDataModal } = await import('@modals/reference-data/reference-data.modal');
     const modal = await this.modalController.create({
       component: ReferenceDataModal,
       componentProps: { origin: 'page-foreword' }

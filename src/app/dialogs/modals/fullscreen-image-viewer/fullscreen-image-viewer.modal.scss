@@ -115,6 +115,18 @@
     position: relative;
     touch-action: none;
     z-index: 1;
+
+    .facsimile-image-loading {
+      --color: var(--fab-button-primary-background-color);
+      left: 50%;
+      pointer-events: none;
+      position: fixed;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 4;
+      height: 100px;
+      width: 100px;
+    }
   
     img {
       cursor: move;

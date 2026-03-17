@@ -95,21 +95,21 @@
     </ion-fab>
   }
   <div class="facsimile-image-wrapper">
-    <img
-          [src]="
-                  showBackside() &&
-                  backsides[activeImageIndexValue] ?
-                  getBacksideUrl(imageURLs[activeImageIndexValue]) :
-                  imageURLs[activeImageIndexValue]
-                  "
-          alt="Skannat faksimil"
-          i18n-alt="@@Facsimiles.AltText"
-          [style]="imageStyle()"
-          (wheel)="zoomWithMouseWheel($event)"
-          [draggableImage]="[prevX(), prevY()]"
-          [angle]="angle()"
-          [zoom]="zoom()"
-          (finalCoordinates)="setImageCoordinates($event)"
-    >
+    @if (imageLoading()) {
+      <ion-spinner class="facsimile-image-loading" name="crescent"></ion-spinner>
+    }
+    @if (resolvedImageSrc()) {
+      <img
+            [attr.src]="resolvedImageSrc()"
+            alt="Skannat faksimil"
+            i18n-alt="@@Facsimiles.AltText"
+            [style]="imageStyle()"
+            (wheel)="zoomWithMouseWheel($event)"
+            [draggableImage]="[prevX(), prevY()]"
+            [angle]="angle()"
+            [zoom]="zoom()"
+            (finalCoordinates)="setImageCoordinates($event)"
+      >
+    }
   </div>
 </div>

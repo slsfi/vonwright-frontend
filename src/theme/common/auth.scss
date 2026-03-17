@@ -1,0 +1,90 @@
+/* General styles for pages that manage authentication-related stuff. */
+
+ion-content::part(scroll) {
+  display: flex;
+  flex-direction: column;
+}
+
+article {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding-block: 3.5rem 1.5rem;
+}
+
+form,
+div.narrow-wrap {
+  width: min(100%, 28rem);
+  display: grid;
+  gap: 1.25rem;
+}
+
+form > :not(h1),
+div.narrow-wrap > :not(h1) {
+  font-size: 1.125rem;
+}
+
+h1 {
+  margin: 0 0 0.25rem;
+  text-align: center;
+}
+
+p {
+  line-height: 1.5;
+}
+
+.center {
+  text-align: center;
+}
+
+.auth-error {
+  margin-top: 0;
+  margin: 0 0 0.2rem 0;
+  color: #a10606;
+}
+
+.auth-success {
+  margin: 0 0 0.2rem 0;
+  color: #166a2f;
+}
+
+.no-margins {
+  margin: 0;
+}
+
+ion-input.input-fill-outline {
+  --highlight-color-focused: var(--outline-button-color);
+  --highlight-color-valid: var(--outline-button-color);
+  --highlight-color-invalid: #a10606;
+}
+
+.authentication-divider {
+  width: 100%;
+  margin-block: 1.5rem;
+  justify-content: center;
+  align-items: center;
+  display: flex;
+  position: relative;
+
+  span {
+    background-color: var(--main-background-color);
+    padding-inline: 0.75rem;
+    z-index: 1;
+  }
+
+  &::after {
+    content: "";
+    background-color: #b8b8b8;
+    height: 1px;
+    position: absolute;
+    left: 0;
+    right: 0;
+  }
+}
+
+ion-button.button.custom-button {
+  margin-top: 1rem;
+  min-height: 42px;
+}

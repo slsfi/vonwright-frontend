@@ -1,0 +1,30 @@
+@let email = authenticatedEmail();
+
+<ion-content>
+  <article>
+    <div class="narrow-wrap">
+      <h1 i18n="@@Account.Title">Användarkonto</h1>
+      @if (email) {
+        <p class="center"><ng-container i18n="@@Account.DescriptionWithEmail">Du är inloggad med e-postadressen</ng-container><br> {{ email }}</p>
+      } @else {
+        <p class="center" i18n="@@Account.Description">Du är inloggad.</p>
+      }
+      <p i18n="@@Account.DeleteAccountInstruction">Om du vill radera ditt konto, skicka ett meddelande från din kontoadress till <a href="mailto:info@sls.fi">info@sls.fi</a> med rubriken ”SLS digitala utgåvor, radera konto”.</p>
+      <ion-button
+        type="button"
+        expand="block"
+        class="custom-button"
+        [routerLink]="['/change-password']"
+        i18n="@@Account.ChangePasswordButton"
+      >Ändra lösenord</ion-button>
+
+      <ion-button
+        type="button"
+        expand="block"
+        class="custom-button"
+        (click)="logout()"
+        i18n="@@Account.LogoutButton"
+      >Logga ut</ion-button>
+    </div>
+  </article>
+</ion-content>

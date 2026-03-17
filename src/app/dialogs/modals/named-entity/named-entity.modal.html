@@ -1,3 +1,5 @@
+@let data = objectData();
+
 <ion-header>
   <ion-toolbar>
     <ion-title>
@@ -21,28 +23,26 @@
 
 <ion-content>
   <div class="modal-inner-wrapper">
-    @if ((objectData$ | async); as data) {
-      @if (data) {
-        <div class="sd-header">
-          <h2>
-            @if (data?.details?.occupation && showOccupation) {<span class="occupation">{{data.details.occupation}} – </span>}<span class="title" [innerHTML]="data?.details?.title"></span>@if (data?.details?.year_born_deceased || data?.details?.lived_between) {<span class="date" [innerHTML]="data?.details?.lived_between ? ' (' + data.details.lived_between + ')' : ' ' + data.details.year_born_deceased"></span>}@if (data?.details?.latitude && data?.details?.longitude) {<span class="coordinates"> (<a [href]="'https://www.openstreetmap.org/?mlat=' + data.details.latitude + '&mlon=' + data.details.longitude" target="_blank"><ng-container i18n="@@NamedEntity.Latitude">lat.</ng-container> {{data.details.latitude}}, <ng-container i18n="@@NamedEntity.Longitude">long.</ng-container> {{data.details.longitude}}</a>)</span>}
-          </h2>
-          @if (data?.media?.imageUrl) {
-            <div class="media_image_wrapper">
-              <img alt="occurrence image" [src]="data.media.imageUrl">
-            </div>
-          }
-          @if (data?.media?.description) {
-            <div class="media_description">
-              {{data.media.description}}
-            </div>
-          }
-        </div>
-      }
+    @if (data) {
+      <div class="sd-header">
+        <h2>
+          @if (data?.details?.occupation && showOccupation) {<span class="occupation">{{data.details.occupation}} – </span>}<span class="title" [innerHTML]="data?.details?.title"></span>@if (data?.details?.year_born_deceased || data?.details?.lived_between) {<span class="date" [innerHTML]="data?.details?.lived_between ? ' (' + data.details.lived_between + ')' : ' ' + data.details.year_born_deceased"></span>}@if (data?.details?.latitude && data?.details?.longitude) {<span class="coordinates"> (<a [href]="'https://www.openstreetmap.org/?mlat=' + data.details.latitude + '&mlon=' + data.details.longitude" target="_blank"><ng-container i18n="@@NamedEntity.Latitude">lat.</ng-container> {{data.details.latitude}}, <ng-container i18n="@@NamedEntity.Longitude">long.</ng-container> {{data.details.longitude}}</a>)</span>}
+        </h2>
+        @if (data?.media?.imageUrl) {
+          <div class="media_image_wrapper">
+            <img alt="occurrence image" [src]="data.media.imageUrl">
+          </div>
+        }
+        @if (data?.media?.description) {
+          <div class="media_description">
+            {{data.media.description}}
+          </div>
+        }
+      </div>
 
-      @if ((showCityRegionCountry && (data?.details?.city || data?.details?.region || data?.details?.country)) || data?.details?.place_of_birth || (data?.details?.type && showType) || data?.details?.source || data?.details?.publisher || data?.details?.published_year || data?.details?.isbn || (data?.details?.author_data?.length && data?.details?.author_data[0]) || data?.details?.journal || data?.details?.description || data?.articles?.length || data?.galleryOccurrences?.length || (showAliasAndPrevLastName && (data?.details?.alias || data?.details?.previous_last_name))) {
+      @if ((showCityRegionCountry && (data?.details?.city || data?.details?.region || data?.details?.country)) || data?.details?.place_of_birth || (data?.details?.type && showType) || data?.details?.source || data?.details?.publisher || data?.details?.published_year || data?.details?.isbn || (data?.details?.author_data?.length && data?.details?.author_data?.[0]) || data?.details?.journal || data?.details?.description || data?.articles?.length || data?.galleryOccurrences?.length || (showAliasAndPrevLastName && (data?.details?.alias || data?.details?.previous_last_name))) {
         <div class="modal-inner-box">
-          @if ((showCityRegionCountry && (data?.details?.city || data?.details?.region || data?.details?.country)) || data?.details?.place_of_birth || (data?.details?.type && showType) || data?.details?.source || data?.details?.publisher || data?.details?.published_year || data?.details?.isbn || (data?.details?.author_data?.length && data?.details?.author_data[0]) || data?.details?.journal || (data?.details?.description && showDescriptionLabel) || data?.articles?.length) {
+          @if ((showCityRegionCountry && (data?.details?.city || data?.details?.region || data?.details?.country)) || data?.details?.place_of_birth || (data?.details?.type && showType) || data?.details?.source || data?.details?.publisher || data?.details?.published_year || data?.details?.isbn || (data?.details?.author_data?.length && data?.details?.author_data?.[0]) || data?.details?.journal || (data?.details?.description && showDescriptionLabel) || data?.articles?.length) {
             <dl>
               @if (data?.details?.city && showCityRegionCountry) {
                 <div class="city">
@@ -80,7 +80,7 @@
                   <dd><a [href]="data.details.source" target="_blank">{{data.details.source}}</a></dd>
                 </div>
               }
-              @if (data?.details?.author_data?.length && data?.details?.author_data[0]) {
+              @if (data?.details?.author_data?.length && data?.details?.author_data?.[0]) {
                 <div class="authors">
                   <dt i18n="@@NamedEntity.Authors">Författare</dt>
                   <dd>
@@ -117,11 +117,11 @@
                   <dd>{{data.details.journal}}</dd>
                 </div>
               }
-              @if (data?.articleData?.length) {
+              @if (data?.articles?.length) {
                 <div class="articles">
                   <dt i18n="@@NamedEntity.Articles">Artiklar</dt>
                   <dd>
-                    @for (article of data.articleData; track $index; let i = $index; let lastArticle = $last) {
+                    @for (article of data.articles; track $index; let i = $index; let lastArticle = $last) {
                       <span class="article_count">{{i+1}}.</span> <span class="article_description">{{article.description}}</span><span class="article_link"> – <a [href]="article.pdf_path" target="_blank" i18n="@@NamedEntity.DownloadPDF">ladda ner pdf</a></span>
                       @if (!lastArticle) {
                         <br>
@@ -159,7 +159,7 @@
         <occurrences-accordion [id]="data?.details?.id" [type]="type"></occurrences-accordion>
       }
     } @else {
-      @if (loadingErrorData$ | async) {
+      @if (loadingErrorData()) {
         <div class="modal-inner-box">
           <p i18n="@@NamedEntity.NoInfoFound">Ingen information hittades.</p>
         </div>

@@ -1,0 +1,139 @@
+// Import general styles for authentication-related pages
+@use "../../../theme/common/auth.scss";
+
+form {
+  padding-bottom: 5rem;
+  width: min(100%, 33rem);
+}
+
+.form-section {
+  display: grid;
+  gap: 1.25rem;
+  margin-top: 1rem;
+}
+
+.form-section + .form-section {
+  margin-top: 3rem;
+}
+
+.form-section h2 {
+  margin: 0 0 0.35rem;
+  padding-bottom: 0.55rem;
+  border-bottom: 2px solid #444444;
+  color: #292929;
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.form-section ion-input,
+.form-section ion-select {
+  display: block;
+}
+
+form .password-requirements {
+  font-size: 1rem;
+  margin: -0.3rem 0 0 1rem;
+
+  p {
+    margin: 0;
+  }
+
+  ul {
+    margin: 0 0 0.5em 0;
+  }
+
+  + .auth-error {
+    margin-bottom: 0.5em;
+    margin-top: -0.5em;
+  }
+}
+
+.legal-summary {
+  margin-top: 0;
+  padding: 0.9rem 1rem;
+  border: 1px solid #b5b5b5;
+  border-radius: 4px;
+
+  + .legal-summary {
+    margin-top: 0.4rem;
+  }
+
+  &:hover {
+    border-color: #404040;
+  }
+
+  &.legal-error {
+    border-color: #a10606;
+  }
+
+  h2 {
+    margin: 0 0 0.35rem;
+    font-size: 1.25rem;
+  }
+
+  p {
+    margin: 0.5em 0;
+    font-size: 1rem;
+  }
+
+  p:last-of-type {
+    margin-bottom: 0;
+  }
+}
+
+.legal-link-row {
+  margin-top: 0.5rem;
+}
+
+details {
+  padding: .5em .5em 0 .5em;
+
+  ul li {
+    line-height: 1.5;
+  }
+
+  ul li + li {
+    padding-top: 0.75em;
+  }
+}
+
+summary {
+  cursor: pointer;
+  font-size: 1rem;
+  margin: -.5em -.5em 0;
+  padding: .5em .5em .5em 0;
+
+  &:hover {
+    opacity: 0.7;
+  }
+}
+
+details[open] {
+  border-bottom: 1px solid #aaa;
+  padding: .5em;
+
+  summary {
+    border-bottom: 1px solid #aaa;
+    margin-bottom: .5em;
+  }
+}
+
+.summary-body {
+  padding: 0 0 0 0.5em;
+
+  p:last-of-type {
+    margin-bottom: 0;
+  }
+}
+
+ion-select.select-fill-outline {
+  --highlight-color-focused: var(--outline-button-color);
+  --highlight-color-valid: var(--outline-button-color);
+  --highlight-color-invalid: #a10606;
+}
+
+ion-button.button.custom-button {
+  margin-top: 2.5rem;
+}

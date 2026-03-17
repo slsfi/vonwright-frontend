@@ -30,11 +30,30 @@
     </li>
   }
   @if (showTopSearchButton) {
-    <li class="search-button" role="menuitem">
+    <li
+      class="search-button"
+      [class.mobile-hidden]="hideTopSearchButtonOnMobile"
+      role="menuitem"
+    >
       <a [routerLink]="['/search']">
         <ion-icon name="search-sharp"></ion-icon>
         <span class="side-title" i18n="@@TopMenu.Search">Sök</span>
       </a>
+    </li>
+  }
+  @if (showTopAuthButton) {
+    <li class="auth-button" role="menuitem">
+      @if (isAuthenticated()) {
+        <button (click)="logout($event)" type="button">
+          <ion-icon name="log-out-sharp"></ion-icon>
+          <span class="side-title">{{authMenuTitle()}}</span>
+        </button>
+      } @else {
+        <a [routerLink]="['/login']">
+          <ion-icon name="log-in-sharp"></ion-icon>
+          <span class="side-title">{{authMenuTitle()}}</span>
+        </a>
+      }
     </li>
   }
   @if (showLanguageButton && currentLanguageLabel && languages.length > 1) {

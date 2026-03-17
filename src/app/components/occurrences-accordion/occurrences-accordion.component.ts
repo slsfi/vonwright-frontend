@@ -32,7 +32,7 @@ export class OccurrencesAccordionComponent {
   private tocService = inject(CollectionTableOfContentsService);
   private destroyRef = inject(DestroyRef);
 
-  readonly id = input<number>();
+  readonly id = input<number | null | undefined>();
   readonly type = input<string>('');
 
   readonly simpleWorkMetadata: boolean = config.modal?.namedEntity?.useSimpleWorkMetadata ?? false;

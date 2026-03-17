@@ -73,3 +73,7 @@ Thumbs.db
 # Static html files
 /src/static-html/collection-toc/*
 !/src/static-html/collection-toc/.gitkeep
+
+# Generated route artifacts
+/src/app/app.routes.generated.ts
+/src/app/auth-protected-route-paths.generated.ts

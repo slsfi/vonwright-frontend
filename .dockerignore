@@ -3,6 +3,8 @@
 dist
 node_modules
 .angular
+src/app/app.routes.generated.ts
+src/app/auth-protected-route-paths.generated.ts
 
 # VCS and CI metadata (not needed to build/run the app)
 .git
@@ -18,6 +20,7 @@ README.md
 CHANGELOG.md
 compose.yml
 nginx.conf
+scripts/benchmark-ssr.js
 
 # OS/log noise
 *.log

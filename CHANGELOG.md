@@ -8,6 +8,104 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ## Unreleased
 
+### Changed
+
+- Update to base version [`2.6.1`](https://github.com/slsfi/digital-edition-frontend-ng/releases/tag/2.6.1) from upstream, original repository.
+
+
+
+## [2.6.1] – 2026-03-13
+
+### Changed
+
+- Deps: update `@angular/core` to 20.3.18. ([7330ec2](https://github.com/slsfi/digital-edition-frontend-ng/commit/7330ec2ae217ba6da5dcd699e560f258486e9515))
+- Deps: update transitive dependencies. ([15d3be4](https://github.com/slsfi/digital-edition-frontend-ng/commit/15d3be4b1dfff40f313a9daf28561b8d1ff4bb7b))
+
+
+
+## [2.6.0] – 2026-03-12
+
+### Added
+
+- Optional authentication-guarded routing and token-based authentication flow. Auth-guarded routing is disabled by default and can be enabled by setting `app.auth.enabled` to `true` in the config. Auth API base URL can be set with `app.auth.backendAuthBaseURL` – if missing, auth service falls back to the origin of `app.backendBaseURL`. For details about this feature, see the [development notes](docs/DEVELOPMENT.md). ([e6934d4](https://github.com/slsfi/digital-edition-frontend-ng/commit/e6934d490642beacc5f9dacbe5451b65e52eed42))
+- App-level rate limiting for dynamic SSR render requests (`express-rate-limit`). Added config option `app.ssr.trustProxyHops` (default: `2`) to control how many proxy hops Express trusts when resolving `req.ip` for the limiter. ([aecc962](https://github.com/slsfi/digital-edition-frontend-ng/commit/aecc9624b5e01a3daa3ba2d6ff75edc313559d29))
+- SSR auth-mismatch mitigation for auth-enabled mode: generate auth-guarded route path metadata and force client-rendered index HTML (CSR shell) for those protected requests in `server.ts`, while non-protected routes stay on SSR. Also add auth-enabled-only `ngSkipHydration` markers for `top-menu` and `main-side-menu` in `app.component.html` to avoid future hydration mismatches on public SSR pages. ([67f5d93](https://github.com/slsfi/digital-edition-frontend-ng/commit/67f5d93cc10716c5d5bddd3439958c0a329d6161))
+- Auth: change password flow. ([1fc38c0](https://github.com/slsfi/digital-edition-frontend-ng/commit/1fc38c01346be78b29c2826e2cf3b09e015026db), [c44f4d4](https://github.com/slsfi/digital-edition-frontend-ng/commit/c44f4d4b013e831ccd4ce826c0c464b8b4dafcd9))
+- Auth: `register` page for creating an account. ([398abef](https://github.com/slsfi/digital-edition-frontend-ng/commit/398abef2fb7189b8edf3fd855864acaf4abeaccb))
+- Auth: `verify-email` page for email-verification links. ([4591dec](https://github.com/slsfi/digital-edition-frontend-ng/commit/4591dec1288b91e07387b804471b14f33742127c), [ef24a5e](https://github.com/slsfi/digital-edition-frontend-ng/commit/ef24a5efccf18d6451c5c95a909aac68c8c04083), [47bad48](https://github.com/slsfi/digital-edition-frontend-ng/commit/47bad48ec8c4073e0180d45aeff6674f1ad0b13d))
+- [`AGENTS.md`](AGENTS.md) that serves as a contributor guide for this repository. ([42e593b](https://github.com/slsfi/digital-edition-frontend-ng/commit/42e593b8d74a44b2527cd30a4cfb25a766e5a402))
+- Test script for verifying UTF-8 encoding of all files under `/src`. ([594df55](https://github.com/slsfi/digital-edition-frontend-ng/commit/594df55a6c8e66e8af71806e04fb14f40cf45308), [d0667eb](https://github.com/slsfi/digital-edition-frontend-ng/commit/d0667eb7047d6b45d101a99a2d2f104fa09e80e1))
+- Route-level session validation for auth-guarded pages that do not fetch backend data: routes can opt in with `data.requiresSessionValidation`, and `AuthService` now validates `/session/validate` with throttling/deduplication before allowing navigation. ([a2c0ec6](https://github.com/slsfi/digital-edition-frontend-ng/commit/a2c0ec6361edcbfbab3899e6c1abdc1ce5106f97))
+- Login/logout button to the top menu. ([e658aa9](https://github.com/slsfi/digital-edition-frontend-ng/commit/e658aa9a11b0a3d849046f7be6521a9e3b54798e))
+
+### Changed
+
+- Auth: Map login errors from backend error codes. ([15d75e1](https://github.com/slsfi/digital-edition-frontend-ng/commit/15d75e11ea517e9c20a49c8fb12653e980de9801))
+- Auth: refactor redirect URL resolution into a shared utility for guard/service flows, centralize auth endpoint URL construction in `AuthService`, and avoid unnecessary refresh-token reads in the interceptor error path. ([7807b4d](https://github.com/slsfi/digital-edition-frontend-ng/commit/7807b4d60b362f43be31cd2967f4fce385cb2f43))
+- Deps: update `@angular/cli` to 20.3.20. ([31bcc2b](https://github.com/slsfi/digital-edition-frontend-ng/commit/31bcc2b991c9c29d9b1b3cc02e7209955143d63f), [501d707](https://github.com/slsfi/digital-edition-frontend-ng/commit/501d7077aa93d1fce9f107b2fbd9d9fea97bed6e))
+- Deps: update `express-rate-limit` to 8.3.1. ([abc647b](https://github.com/slsfi/digital-edition-frontend-ng/commit/abc647b677b47e67296b2f2388a4526c79f79d22))
+- Deps: update `marked` to 17.0.4. ([c22116f](https://github.com/slsfi/digital-edition-frontend-ng/commit/c22116fb8fbdd2a05e0542e83ae73907a95df678))
+- Deps (dev): update `@types/node` to 22.19.15. ([8e36b96](https://github.com/slsfi/digital-edition-frontend-ng/commit/8e36b96c817f3edffa415dff885d74a025fcd302))
+- Deps (dev): update `ng-extract-i18n-merge` to 3.3.0. In `angular.json`, remove `projects.app.architect.extract-i18n.configurations`. ([76389f2](https://github.com/slsfi/digital-edition-frontend-ng/commit/76389f29063c967bea96ffbad1e42cb8d556564f))
+- Deps: update transitive dependencies. ([83b5bfd](https://github.com/slsfi/digital-edition-frontend-ng/commit/83b5bfddce69f85afda28639d7361cbcac9c26d3), [a14786a](https://github.com/slsfi/digital-edition-frontend-ng/commit/a14786a5c664ec1f35ff8882dbfe9f0562574072))
+- Update Docker Actions in the Docker build-and-push workflow. ([78b7593](https://github.com/slsfi/digital-edition-frontend-ng/commit/78b7593c97b705eaba36bdd123a5466d4a049fd1))
+
+### Fixed
+
+- Auth: clear partial token state and logout on 401 without refresh token. ([3af6a7c](https://github.com/slsfi/digital-edition-frontend-ng/commit/3af6a7c4d028ac2daf5ff6ae62b1b18c0fb5946c))
+- Auth: resolve password change flow by route segment. ([2f2ab14](https://github.com/slsfi/digital-edition-frontend-ng/commit/2f2ab142b2dfea4ffa110846cb5fc41dc790c89c))
+- Set document titles for forgot/change/reset password routes. ([85af789](https://github.com/slsfi/digital-edition-frontend-ng/commit/85af7893300c18884ccce23aac615bafdda8b0ac))
+- Move terms page before privacy policy page in main side menu. ([77ee5d0](https://github.com/slsfi/digital-edition-frontend-ng/commit/77ee5d0e817d7365aaf7d3ceecfd62047c7d0544))
+- Hydration: move invalid `ngSkipHydration` usage off plain `<div>` elements onto valid component hosts in facsimile viewers, and wrap media-collection thumbnails in a dedicated hydration-skipped component. ([47d17e4](https://github.com/slsfi/digital-edition-frontend-ng/commit/47d17e44f98d125690aa08a912f0a74d81ae5951))
+
+
+
+## [2.5.1] – 2026-02-27
+
+### Changed
+
+- Deps: update `@angular/core` to 20.3.17 `@angular/cli` to 20.3.18. ([505241b](https://github.com/slsfi/digital-edition-frontend-ng/commit/505241bb2539cffeee8b63a3bcc7c34f6b86db29), [308e768](https://github.com/slsfi/digital-edition-frontend-ng/commit/308e76872bf62363ebbca45e17c4bda8f73c0455))
+- Deps (dev): update `@types/node` to 22.19.13. ([a46e892](https://github.com/slsfi/digital-edition-frontend-ng/commit/a46e8921225f14c2de242f45bfa97d96957a0539))
+- Deps: update transitive dependencies. ([ce6631c](https://github.com/slsfi/digital-edition-frontend-ng/commit/ce6631c0ab5c2249c4d2eeecd231268f0215b7aa), [084b573](https://github.com/slsfi/digital-edition-frontend-ng/commit/084b57330be2076817ce5071d46e33abed644e28))
+
+### Fixed
+
+- Configure `CommonEngine` `allowedHosts` for Angular SSRF host validation. ([43fe018](https://github.com/slsfi/digital-edition-frontend-ng/commit/43fe018f2e79cc2a9c4bfedd8ba656f9fda6c555))
+
+
+
+## [2.5.0] – 2026-02-20
+
+### Added
+
+- Support for dedicated cookie policy, privacy policy, terms of use, and accessibility statement pages. The content of these must be defined in Markdown files in the backend (Markdown folder named `05`: the cookie policy file must have id `01`, the privacy policy `02`, the terms of use `03`, and the accessibility statement `04`). The pages can be enabled in the main side menu by setting the following flags in `component.mainSideMenu.items` in the config to `true`: `cookiePolicy`, `privacyPolicy`, `termsOfUse`, `accessibilityStatement` (all default to `false`). ([ad9af28](https://github.com/slsfi/digital-edition-frontend-ng/commit/ad9af2803972b50e83d61ccf246f57f92640660a))
+- Config-driven feature-based production route generation (disabled by default): enable by setting `app.prebuild.featureBasedRoutes` to `true` in the config. `src/app/app.routes.ts` remains the canonical full route list, `src/app/app.routes.generated.ts` is generated for production builds (or copied 1:1 when the feature is disabled), production uses file replacement to switch route files, and sitemap inclusion now follows the same route-enable logic (excluding `search` and `index/:type` by design). ([96f611a](https://github.com/slsfi/digital-edition-frontend-ng/commit/96f611a538f0535e90aaba51877c3d11b2b9e80c))
+- Benchmark script for measuring SSR performance, with development docs. ([1c76329](https://github.com/slsfi/digital-edition-frontend-ng/commit/1c7632959b2368c720076fc519c4797b1ca5d849), [545ec87](https://github.com/slsfi/digital-edition-frontend-ng/commit/545ec8775eff3c85cfd8d8e1c5a4c3f9aa5570bd))
+- SSR smoke test script for validating key server-rendered HTML responses on localhost, with development docs. ([947b57b](https://github.com/slsfi/digital-edition-frontend-ng/commit/947b57b7f9e3e6f12b3471cf35249624d4d52c32), [2137fe0](https://github.com/slsfi/digital-edition-frontend-ng/commit/2137fe0d5d392db36307058a270909bdedc888fd))
+
+### Changed
+
+- Remove GHA cache export/import from Docker build and push workflow. ([fa0cb88](https://github.com/slsfi/digital-edition-frontend-ng/commit/fa0cb880fa476018c7f9b1b0efc52923b21e5d80))
+- Migrate illustration, index-filter, named-entity, and reference-data modals to zoneless-ready. ([bbe69a0](https://github.com/slsfi/digital-edition-frontend-ng/commit/bbe69a0bc2e0132269a2f45e03fe8ca89ce22b2a), [c57e1f6](https://github.com/slsfi/digital-edition-frontend-ng/commit/c57e1f6e69fa9583951f82929e5d9f1a89ad2927), [dac6de4](https://github.com/slsfi/digital-edition-frontend-ng/commit/dac6de4cf85d72500a2ba249ed4816a3e5f3479c), [a5d5c93](https://github.com/slsfi/digital-edition-frontend-ng/commit/a5d5c93084f8fc2ce7aeed65fbfb76ae18bc8a86))
+- Collection side menu: clarify highlight state naming and expansion semantics. ([42f1715](https://github.com/slsfi/digital-edition-frontend-ng/commit/42f171528937a3f6c9190764e174febb98eebadb))
+- Math-Jax directive: switch from `ngOnChanges` to `afterRenderEffect`. ([343fad8](https://github.com/slsfi/digital-edition-frontend-ng/commit/343fad870cc0030b3cc86a5066d63fa3ba510a8b))
+- Lazy-load modal/popover components via dynamic imports on page actions. ([66bdfb9](https://github.com/slsfi/digital-edition-frontend-ng/commit/66bdfb9014788ab1d593b5edf0c95c0413c80c04))
+- Avoid collection-text query-param route churn via platform-specific sync service. ([b3dd705](https://github.com/slsfi/digital-edition-frontend-ng/commit/b3dd7053c8d0b451a742584224d1e54701400980))
+- Add shared RouteStateSourceService for collection text/introduction pages. ([c51de43](https://github.com/slsfi/digital-edition-frontend-ng/commit/c51de43c9cec5a5b12e07386dbc82acd676186d7))
+- Skip legacy-id prefetch on server in collection text page. ([c6c5044](https://github.com/slsfi/digital-edition-frontend-ng/commit/c6c50445f714372e30fa78dcc10b6e5bb3b96963))
+- Skip static-html defer placeholder when static collection menus are disabled. ([63b29d1](https://github.com/slsfi/digital-edition-frontend-ng/commit/63b29d18f876d69c62239ed2e29b5e2f34269266))
+- Use platform-specific navigation source in AppComponent. ([2e0809b](https://github.com/slsfi/digital-edition-frontend-ng/commit/2e0809b5e448a2bcb1876b7277d1fa488ec04288))
+- Disable route preloading on server via platform strategy providers. ([f0856f3](https://github.com/slsfi/digital-edition-frontend-ng/commit/f0856f300b7f55522d2f294941af34ae56799c4e))
+- Default lazy-route preloading to idle-if-fast in browser. ([1d334e0](https://github.com/slsfi/digital-edition-frontend-ng/commit/1d334e08f33ed579232ddd5755f1e114b99fa9ef))
+- Deps: update `marked` to 17.0.3. ([aec1860](https://github.com/slsfi/digital-edition-frontend-ng/commit/aec1860ee48ea906ff2f023b9adf363bf4bbd163))
+- Deps: update transitive dependencies. ([b44b9bf](https://github.com/slsfi/digital-edition-frontend-ng/commit/b44b9bfd02f5b0ded9f4dc5c4bd41649f94ac935), [476f667](https://github.com/slsfi/digital-edition-frontend-ng/commit/476f66796c3dfae039b007566f7722a3e9d5e56e))
+
+### Fixed
+
+- Collection side menu: prevent branch collapse while keeping selectedMenu bounded. ([aa1ec93](https://github.com/slsfi/digital-edition-frontend-ng/commit/aa1ec939151976118be1d2cbbf5ce6793685199a))
+- Collection side menu: support repeat-click collapse for highlighted branch links. ([4cf2dcc](https://github.com/slsfi/digital-edition-frontend-ng/commit/4cf2dcc871cd5e9cdb4fb8b90c1322153ffeb26e))
+- Resolve canonical/og URLs from SSR request origin and path. ([e4414db](https://github.com/slsfi/digital-edition-frontend-ng/commit/e4414db2c5d2d3ccff5b6891ee468787c4ac9d46))
+
 
 
 ## [2.4.6-production.1] – 2026-02-13
@@ -1330,7 +1428,11 @@ siteLogoDimensions: {
 
 
 
-[unreleased]: https://github.com/slsfi/digital-edition-frontend-ng/compare/2.4.6...HEAD
+[unreleased]: https://github.com/slsfi/digital-edition-frontend-ng/compare/2.6.1...HEAD
+[2.6.1]: https://github.com/slsfi/digital-edition-frontend-ng/compare/2.6.0...2.6.1
+[2.6.0]: https://github.com/slsfi/digital-edition-frontend-ng/compare/2.5.1...2.6.0
+[2.5.1]: https://github.com/slsfi/digital-edition-frontend-ng/compare/2.5.0...2.5.1
+[2.5.0]: https://github.com/slsfi/digital-edition-frontend-ng/compare/2.4.6...2.5.0
 [2.4.6]: https://github.com/slsfi/digital-edition-frontend-ng/compare/2.4.5...2.4.6
 [2.4.5]: https://github.com/slsfi/digital-edition-frontend-ng/compare/2.4.4...2.4.5
 [2.4.4]: https://github.com/slsfi/digital-edition-frontend-ng/compare/2.4.3...2.4.4

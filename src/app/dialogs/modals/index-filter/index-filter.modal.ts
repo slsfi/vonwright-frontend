@@ -1,33 +1,44 @@
-import { Component, Input, OnInit, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, Input, OnInit, inject, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { IonicModule, ModalController } from '@ionic/angular';
 
 import { NamedEntityService } from '@services/named-entity.service';
 
 
+// ─────────────────────────────────────────────────────────────────────────────
+// * This component is zoneless-ready. *
+// ─────────────────────────────────────────────────────────────────────────────
 @Component({
   selector: 'modal-index-filter',
   templateUrl: './index-filter.modal.html',
   styleUrls: ['./index-filter.modal.scss'],
-  imports: [FormsModule, IonicModule]
+  imports: [FormsModule, IonicModule],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class IndexFilterModal implements OnInit {
+  // ─────────────────────────────────────────────────────────────────────────────
+  // Dependency injection, @Input properties, local state signals
+  // ─────────────────────────────────────────────────────────────────────────────
+  private destroyRef = inject(DestroyRef);
   private modalCtrl = inject(ModalController);
   private namedEntityService = inject(NamedEntityService);
 
   @Input() activeFilters: any = undefined;
   @Input() searchType: string = '';
 
-  filterCategoryTypes?: any[];
-  filterCollections?: any[];
-  filterPersonTypes?: any[];
-  filterPlaceCountries?: any[];
+  filterCategoryTypes = signal<any[] | undefined>(undefined);
+  filterCollections = signal<any[] | undefined>(undefined);
+  filterPersonTypes = signal<any[] | undefined>(undefined);
+  filterPlaceCountries = signal<any[] | undefined>(undefined);
   filterYearMax?: number;
   filterYearMin?: number;
-  isEmpty: boolean = false;
-  shouldFilterYear = false;
-  showLoading: boolean = false;
+  shouldFilterYear = signal(false);
+  showLoading = signal(false);
 
+  // ─────────────────────────────────────────────────────────────────────────────
+  // Lifecycle wiring
+  // ─────────────────────────────────────────────────────────────────────────────
   ngOnInit() {
     if (this.activeFilters?.filterYearMin) {
       this.filterYearMin = Number(this.activeFilters.filterYearMin);
@@ -37,11 +48,14 @@ export class IndexFilterModal implements OnInit {
     }
 
     if (this.searchType === 'persons') {
-      this.shouldFilterYear = true;
+      this.shouldFilterYear.set(true);
     }
     this.setFilters();
   }
 
+  // ─────────────────────────────────────────────────────────────────────────────
+  // Public UI actions (called from template)
+  // ─────────────────────────────────────────────────────────────────────────────
   cancel() {
     return this.modalCtrl.dismiss(null, 'close');
   }
@@ -60,8 +74,9 @@ export class IndexFilterModal implements OnInit {
       filters['filterYearMax'] = this.filterYearMax;
     }
 
-    if (this.filterCollections) {
-      for (const filter of this.filterCollections) {
+    const currentFilterCollections = this.filterCollections();
+    if (currentFilterCollections) {
+      for (const filter of currentFilterCollections) {
         if (filter.selected) {
           filterCollections.push(filter);
         }
@@ -69,8 +84,9 @@ export class IndexFilterModal implements OnInit {
       filters['filterCollections'] = filterCollections;
     }
 
-    if (this.filterPersonTypes) {
-      for (const filter of this.filterPersonTypes) {
+    const currentFilterPersonTypes = this.filterPersonTypes();
+    if (currentFilterPersonTypes) {
+      for (const filter of currentFilterPersonTypes) {
         if (filter.selected) {
           filterPersonTypes.push(filter);
         }
@@ -78,8 +94,9 @@ export class IndexFilterModal implements OnInit {
       filters['filterPersonTypes'] = filterPersonTypes;
     }
 
-    if (this.filterCategoryTypes) {
-      for (const filter of this.filterCategoryTypes) {
+    const currentFilterCategoryTypes = this.filterCategoryTypes();
+    if (currentFilterCategoryTypes) {
+      for (const filter of currentFilterCategoryTypes) {
         if (filter.selected) {
           filterCategoryTypes.push(filter);
         }
@@ -87,8 +104,9 @@ export class IndexFilterModal implements OnInit {
       filters['filterCategoryTypes'] = filterCategoryTypes;
     }
 
-    if (this.filterPlaceCountries) {
-      for (const filter of this.filterPlaceCountries) {
+    const currentFilterPlaceCountries = this.filterPlaceCountries();
+    if (currentFilterPlaceCountries) {
+      for (const filter of currentFilterPlaceCountries) {
         if (filter.selected) {
           filterPlaceCountries.push(filter);
         }
@@ -96,24 +114,29 @@ export class IndexFilterModal implements OnInit {
       filters['filterPlaceCountries'] = filterPlaceCountries;
     }
 
-    this.checkIfFiltersEmpty(filters);
-    filters['isEmpty'] = this.isEmpty;
+    this.normalizePersonYearFilters(filters);
+    filters['isEmpty'] = this.areFiltersEmpty(filters);
 
     return this.modalCtrl.dismiss(filters, 'apply');
   }
 
+  // ─────────────────────────────────────────────────────────────────────────────
+  // Internal helpers
+  // ─────────────────────────────────────────────────────────────────────────────
   private setFilters() {
-    this.showLoading = true;
+    this.showLoading.set(true);
     const typeKey: string = (this.searchType === 'persons') ? 'filterPersonTypes'
           : (this.searchType === 'places') ? 'filterPlaceCountries'
           : 'filterCategoryTypes';
 
-    this.namedEntityService.getFilterOptionsFromElastic(this.searchType).subscribe(
+    this.namedEntityService.getFilterOptionsFromElastic(this.searchType).pipe(
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe(
       (res: any) => {
         const buckets = res?.aggregations?.types?.buckets;
         buckets?.forEach((cat: any) => {
           cat.name = cat.key;
-          if (this.activeFilters[typeKey] && this.activeFilters[typeKey].length > 0) {
+          if (this.activeFilters?.[typeKey] && this.activeFilters[typeKey].length > 0) {
             for (let i = 0; i < this.activeFilters[typeKey].length; i++) {
               if (cat.name === this.activeFilters[typeKey][i].name) {
                 cat.selected = true;
@@ -127,45 +150,52 @@ export class IndexFilterModal implements OnInit {
           }
         });
         if (this.searchType === 'persons') {
-          this.filterPersonTypes = buckets;
+          this.filterPersonTypes.set(buckets);
         } else if (this.searchType === 'places') {
-          this.filterPlaceCountries = buckets;
+          this.filterPlaceCountries.set(buckets);
         } else if (this.searchType === 'keywords') {
-          this.filterCategoryTypes = buckets;
+          this.filterCategoryTypes.set(buckets);
         }
-        this.showLoading = false;
+        this.showLoading.set(false);
       }
     );
   }
 
-  private checkIfFiltersEmpty(filters: any) {
+  private normalizePersonYearFilters(filters: any) {
+    if (this.searchType !== 'persons') {
+      return;
+    }
+
+    const d = new Date();
+    if (!filters['filterYearMin'] && filters['filterYearMax']) {
+      filters['filterYearMin'] = 1;
+    }
+    if (
+      (filters['filterYearMin'] && !filters['filterYearMax']) ||
+      (Number(filters['filterYearMax']) > d.getFullYear())
+    ) {
+      filters['filterYearMax'] = d.getFullYear();
+    }
+  }
+
+  private areFiltersEmpty(filters: any): boolean {
     if (this.searchType === 'persons') {
-      const d = new Date();
-      if (!filters['filterYearMin'] && filters['filterYearMax']) {
-        filters['filterYearMin'] = 1;
-      }
-      if (
-        (filters['filterYearMin'] && !filters['filterYearMax']) ||
-        (Number(filters['filterYearMax']) > d.getFullYear())
-      ) {
-        filters['filterYearMax'] = d.getFullYear();
-      }
-      if (
+      return (
         !filters['filterYearMin'] &&
         !filters['filterYearMax'] &&
         filters['filterPersonTypes'].length < 1
-      ) {
-        this.isEmpty = true;
-      }
+      );
     }
 
-    if (this.searchType === 'places' && filters['filterPlaceCountries'].length < 1) {
-      this.isEmpty = true;
+    if (this.searchType === 'places') {
+      return filters['filterPlaceCountries'].length < 1;
     }
 
-    if (this.searchType === 'keywords' && filters['filterCategoryTypes'].length < 1) {
-      this.isEmpty = true;
+    if (this.searchType === 'keywords') {
+      return filters['filterCategoryTypes'].length < 1;
     }
+
+    return false;
   }
 
 }

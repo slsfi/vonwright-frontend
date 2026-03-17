@@ -168,6 +168,12 @@ ul {
         display: none;
       }
     }
+
+    @media only screen and (max-width: 480px) {
+      &.mobile-hidden {
+        display: none;
+      }
+    }
   }
 
   @media only screen and (max-width: 1020px) {

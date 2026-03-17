@@ -1,20 +1,16 @@
 // Import general styles for the side menu, these are common with the collection-side-menu
 @use "../../../../theme/common/side-menu.scss";
 
+:host {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+}
+
 li.home-menu-item {
   background-color: var(--side-menu-back-button-background-color);
   border-bottom: 1px solid var(--side-menu-divider-color);
   color: var(--side-menu-back-button-text-color);
-
-  ion-icon {
-    color: var(--side-menu-back-button-text-color);
-    font-size: 1.5rem;
-    margin-right: 0.5rem;
-
-    &.home-icon {
-      margin-inline-start: auto;
-    }
-  }
 
   a {
     height: 50px;
@@ -23,6 +19,49 @@ li.home-menu-item {
 
     .label {
       border-bottom: 0;
+    }
+  }
+}
+
+li.icon-menu-item {
+  ion-icon {
+    &.item-icon {
+      margin-right: 0.375rem;
+      margin-inline-start: auto;
+      font-size: 1.75rem;
+    }
+
+    &.home-icon {
+      color: var(--side-menu-back-button-text-color);
+      font-size: 1.5rem;
+      margin-right: 0.5rem;
+    }
+
+    &.log-in-icon {
+      font-size: 2rem;
+    }
+  }
+}
+
+ul.secondary-menu-list {
+  margin-top: auto;
+
+  li {
+    a,
+    button {
+      font-size: .9375rem;
+      line-height: 1.3rem;
+    }
+    a:not(.menu-highlight),
+    button:not(.menu-highlight) {
+      color: var(--side-menu-description-text-color);
+    }
+  }
+
+  li:first-of-type {
+    margin-top: -1px; // makes the top border overlap with the bottom border of the last item of the primary menu list, when the two lists are merged because the content is tall
+    .label {
+      border-top: 1px solid var(--side-menu-divider-color);
     }
   }
 }

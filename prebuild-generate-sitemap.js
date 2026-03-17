@@ -4,6 +4,25 @@ const common = require('./prebuild-common-fns');
 
 const configFilepath = 'src/assets/config/config.ts';
 const sitemapFilename = 'sitemap.txt';
+const SITEMAP_EXCLUDED_ROUTE_PATH_KEYS = Object.freeze([
+  'login',
+  'account',
+  'forgot-password',
+  'reset-password',
+  'change-password',
+  'register',
+  'verify-email'
+]);
+const AUTH_PROTECTED_ROUTE_PATH_KEYS = Object.freeze([
+  'collection/:collectionID/cover',
+  'collection/:collectionID/title',
+  'collection/:collectionID/foreword',
+  'collection/:collectionID/introduction',
+  'collection/:collectionID/text',
+  'index/:type',
+  'media-collection',
+  'search'
+]);
 
 generateSitemap();
 
@@ -14,7 +33,10 @@ generateSitemap();
  * in config.ts to fetch data about the project and generate the
  * URLs to all unique pages. The following page types are included:
  * - Home
+ * - Content
  * - About
+ * - Root-level static pages
+ * - Article
  * - Ebook
  * - Collection
  * - Media collection
@@ -23,6 +45,11 @@ generateSitemap();
  */
 async function generateSitemap() {
   const config = common.getConfig(configFilepath);
+  const authEnabled = config.app?.auth?.enabled === true;
+  const routeIncludeByPath = getSitemapRouteIncludeByPath(
+    common.getRouteIncludeByPath(config),
+    authEnabled
+  );
   const generateSitemap = config.app?.prebuild?.sitemap ?? true;
   
   if (generateSitemap) {
@@ -61,8 +88,23 @@ async function generateSitemap() {
     urlCounter += 1;
   }
 
+  // Add root-level routes where URL generation needs no external data.
+  const rootPages = [
+    { route: 'content', routePathKey: 'content' },
+    { route: 'cookie-policy', routePathKey: 'cookie-policy' },
+    { route: 'privacy-policy', routePathKey: 'privacy-policy' },
+    { route: 'terms', routePathKey: 'terms' },
+    { route: 'accessibility-statement', routePathKey: 'accessibility-statement' }
+  ];
+  const enabledRootPageRoutes = rootPages
+    .filter((page) => routeIncludeByPath[page.routePathKey])
+    .map((page) => page.route);
+  if (enabledRootPageRoutes.length) {
+    urlCounter += generateRootPageURLs(enabledRootPageRoutes, urlOrigin, locale);
+  }
+
   // Get about-pages URLs
-  if (config.component?.mainSideMenu?.items?.about) {
+  if (routeIncludeByPath['about']) {
     let aboutPages = await common.fetchWithRetry(APIBase + '/static-pages-toc/' + locale);
     if (aboutPages && aboutPages.children) {
       urlCounter += generateAboutPagesURLs(aboutPages.children, '03', urlOrigin, locale);
@@ -70,17 +112,22 @@ async function generateSitemap() {
   }
 
   // Get article-pages URLs
-  if (config.component?.mainSideMenu?.items?.articles && config.articles?.length) {
+  if (routeIncludeByPath['article']) {
     urlCounter += generateArticleURLs(config.articles, urlOrigin, locale);
   }
 
   // Get ebook URLs
-  if (config.component?.mainSideMenu?.items?.ebooks && config.ebooks?.length) {
+  if (routeIncludeByPath['ebook']) {
     urlCounter += generateEbookURLs(config.ebooks, urlOrigin, locale);
   }
 
   // Get collection URLs
-  if (config.collections?.order?.length) {
+  const collectionRouteEnabled = routeIncludeByPath['collection/:collectionID/text']
+    || routeIncludeByPath['collection/:collectionID/cover']
+    || routeIncludeByPath['collection/:collectionID/title']
+    || routeIncludeByPath['collection/:collectionID/foreword']
+    || routeIncludeByPath['collection/:collectionID/introduction'];
+  if (collectionRouteEnabled && config.collections?.order?.length) {
     let collectionsEndpoint = APIBase + '/collections';
     if (multilingualCollectionTOC) {
       collectionsEndpoint += '/' + locale;
@@ -97,19 +144,28 @@ async function generateSitemap() {
       const collections = allCollections.filter(coll => includedCollectionIds.includes(coll.id));
 
       if (collections) {
-        const fmPages = ['cover', 'title', 'foreword', 'introduction']
+        const fmPages = [
+          { part: 'cover', routePathKey: 'collection/:collectionID/cover' },
+          { part: 'title', routePathKey: 'collection/:collectionID/title' },
+          { part: 'foreword', routePathKey: 'collection/:collectionID/foreword' },
+          { part: 'introduction', routePathKey: 'collection/:collectionID/introduction' }
+        ];
 
         for (const fmPage of fmPages) {
-          urlCounter += await generateCollectionURLs(collections, fmPage, urlOrigin, locale, config);
+          if (routeIncludeByPath[fmPage.routePathKey]) {
+            urlCounter += await generateCollectionURLs(collections, fmPage.part, urlOrigin, locale, config);
+          }
         }
 
-        urlCounter += await generateCollectionURLs(collections, 'text', urlOrigin, locale, config, APIBase, multilingualCollectionTOC);
+        if (routeIncludeByPath['collection/:collectionID/text']) {
+          urlCounter += await generateCollectionURLs(collections, 'text', urlOrigin, locale, config, APIBase, multilingualCollectionTOC);
+        }
       }
     }
   }
 
   // Get media collection URLs
-  if (config.component?.mainSideMenu?.items?.mediaCollections) {
+  if (routeIncludeByPath['media-collection']) {
     const mediaCollections = await common.fetchWithRetry(APIBase + '/gallery/data/' + locale);
     if (mediaCollections && mediaCollections.length) {
       urlCounter += await generateMediaCollectionURLs(mediaCollections, urlOrigin, locale);
@@ -118,6 +174,24 @@ async function generateSitemap() {
 
   const summary = `Generated URLs: ${urlCounter}\n`;
   console.log(summary);
+}
+
+function getSitemapRouteIncludeByPath(routeIncludeByPath, authEnabled) {
+  const includeByPath = { ...routeIncludeByPath };
+
+  for (const routePathKey of SITEMAP_EXCLUDED_ROUTE_PATH_KEYS) {
+    includeByPath[routePathKey] = false;
+  }
+
+  if (!authEnabled) {
+    return includeByPath;
+  }
+
+  for (const routePathKey of AUTH_PROTECTED_ROUTE_PATH_KEYS) {
+    includeByPath[routePathKey] = false;
+  }
+
+  return includeByPath;
 }
 
 function initializeSitemapFile(urlOrigin, locale) {
@@ -166,6 +240,16 @@ function generateArticleURLs(articles, urlOrigin, locale) {
       appendToSitemapFile(url + '\n');
       counter += 1;
     }
+  }
+  return counter;
+}
+
+function generateRootPageURLs(routes, urlOrigin, locale) {
+  let counter = 0;
+  for (let i = 0; i < routes.length; i++) {
+    const url = `${urlOrigin}/${locale}/${routes[i]}`;
+    appendToSitemapFile(url + '\n');
+    counter += 1;
   }
   return counter;
 }

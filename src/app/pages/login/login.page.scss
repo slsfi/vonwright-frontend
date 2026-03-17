@@ -1,0 +1,18 @@
+// Import general styles for authentication-related pages
+@use "../../../theme/common/auth.scss";
+
+.forgot-password {
+  margin: -0.35rem 0 0 0;
+  text-align: right;
+}
+
+.legal-consent-footer {
+  margin-top: auto;
+  padding: 2rem 0 0.75rem;
+}
+
+.legal-consent {
+  margin: 0;
+  text-align: center;
+  font-size: 0.9375rem;
+}

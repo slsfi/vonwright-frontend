@@ -2,11 +2,20 @@
 
   <header>
     <nav class="top-navigation" aria-labelledby="top-menu-label">
-      <top-menu
-            (sideNavClick)="toggleSideNav()"
-            [showSideNav]="showSideNav"
-            [currentRouterUrl]="currentRouterUrl"
-      ></top-menu>
+      @if (authEnabled) {
+        <top-menu
+              ngSkipHydration
+              (sideNavClick)="toggleSideNav()"
+              [showSideNav]="showSideNav"
+              [currentRouterUrl]="currentRouterUrl"
+        ></top-menu>
+      } @else {
+        <top-menu
+              (sideNavClick)="toggleSideNav()"
+              [showSideNav]="showSideNav"
+              [currentRouterUrl]="currentRouterUrl"
+        ></top-menu>
+      }
     </nav>
     @if (enableRouterLoadingBar) {
       <ion-progress-bar
@@ -23,10 +32,18 @@
           [attr.aria-labelledby]="showCollectionSideMenu ? 'side-menu-collection-title' : 'main-side-menu-label'"
     >
       @if (mountMainSideMenu) {
-        <main-side-menu
-              [class.visuallyhidden]="showCollectionSideMenu"
-              [urlSegments]="currentUrlSegments"
-        ></main-side-menu>
+        @if (authEnabled) {
+          <main-side-menu
+                ngSkipHydration
+                [class.visuallyhidden]="showCollectionSideMenu"
+                [urlSegments]="currentUrlSegments"
+          ></main-side-menu>
+        } @else {
+          <main-side-menu
+                [class.visuallyhidden]="showCollectionSideMenu"
+                [urlSegments]="currentUrlSegments"
+          ></main-side-menu>
+        }
       }
 
       @if (showCollectionSideMenu && !enableCollectionSideMenuSSR) {
@@ -47,7 +64,9 @@
                 [sideMenuToggled]="showSideNav"
           ></collection-side-menu>
         } @placeholder {
-          <static-html [type]="'collection-toc'" [id]="collectionID"></static-html>
+          @if (prebuiltCollectionMenus) {
+            <static-html [type]="'collection-toc'" [id]="collectionID"></static-html>
+          }
         } @loading (minimum 1s) {
           <ion-spinner class="loading" name="crescent"></ion-spinner>
         }

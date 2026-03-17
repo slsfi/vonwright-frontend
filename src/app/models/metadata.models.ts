@@ -133,6 +133,26 @@ export interface PublicationMetadata {
   translations: TranslationMetadata[];
 }
 
+export interface ReferenceData {
+  intro_reference_text: string | null;
+  reference_text: string | null;
+  urn: string | null;
+}
+
+export interface ReferenceDataApiResponse {
+  date_created?: string | null;
+  date_modified?: string | null;
+  deleted?: number | null;
+  id?: number | null;
+  intro_reference_text?: string | null;
+  legacy_id?: string | null;
+  project_id?: number | null;
+  reference_text?: string | null;
+  url?: string | null;
+  urn?: string | null;
+  [key: string]: unknown;
+}
+
 export const toCorrespondent = (
   c: CorrespondentDataApiResponse
 ): CorrespondentData => ({
@@ -167,4 +187,12 @@ export const toPublicationMetadata = (
   recipient: m.recipient ?? [],
   sender: m.sender ?? [],
   translations: m.translations ?? []
+});
+
+export const toReferenceData = (
+  r: ReferenceDataApiResponse
+): ReferenceData => ({
+  intro_reference_text: r.intro_reference_text ?? null,
+  reference_text: r.reference_text ?? null,
+  urn: r.urn ?? null
 });

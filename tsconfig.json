@@ -35,6 +35,12 @@
       "@directives/*": [
         "src/app/directives/*"
       ],
+      "@guards/*": [
+        "src/app/guards/*"
+      ],
+      "@interceptors/*": [
+        "src/app/interceptors/*"
+      ],
       "@modals/*": [
         "src/app/dialogs/modals/*"
       ],
@@ -49,6 +55,9 @@
       ],
       "@services/*": [
         "src/app/services/*"
+      ],
+      "@tokens/*": [
+        "src/app/tokens/*"
       ],
       "@utility-functions": [
         "src/app/utils/utility-functions"

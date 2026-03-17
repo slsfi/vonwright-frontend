@@ -1,0 +1,6 @@
+// Import general styles for authentication-related pages
+@use "../../../theme/common/auth.scss";
+
+p + p {
+  margin-top: 0;
+}

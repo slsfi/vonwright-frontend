@@ -59,6 +59,16 @@
     touch-action: none;
     z-index: 3;
 
+    .facsimile-image-loading {
+        position: absolute;
+        left: 50%;
+        top: calc(40% - 78px);
+        transform: translate(-50%);
+        z-index: 2;
+        height: 50px;
+        width: 50px;
+    }
+
     img {
         cursor: move;
         display: block;

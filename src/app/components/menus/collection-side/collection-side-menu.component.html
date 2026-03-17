@@ -1,5 +1,5 @@
-@let highlItem = currentMenuItemId();
-@let selectedMenuValues = selectedMenu();
+@let highlItem = highlightedMenuItemId();
+@let expandedMenuIdValues = expandedMenuIds();
 
 @if (!isLoading()) {
   @let sortValues = sortOptions();
@@ -90,13 +90,14 @@
           [attr.data-id]="item.itemId ? 'toc_' + item.itemId : ''"
           [attr.aria-current]="highlItem === item.itemId ? 'page' : null"
           [attr.aria-haspopup]="item.children ? 'menu' : null"
-          [attr.aria-expanded]="item.children ? (selectedMenuValues | arrayIncludesAny:[item.itemId, item.nodeId]) : null"
+          [attr.aria-expanded]="item.children ? (expandedMenuIdValues | arrayIncludesAny:[item.itemId, item.nodeId]) : null"
           role="menuitem"
     >
       @if (item.itemId) {
         <a
               [routerLink]="item.itemId | collectionPagePath"
               [queryParams]="item.itemId | collectionPagePositionQueryparam"
+              (click)="onBranchLinkClick($event, item)"
               [class.menu-highlight]="highlItem === item.itemId"
               [class.submenu-label]="item.children"
         >
@@ -112,7 +113,7 @@
       }
       @if (item.children) {
         <ul role="menu"
-              [class.open]="selectedMenuValues | arrayIncludesAny:[item.itemId, item.nodeId]"
+              [class.open]="expandedMenuIdValues | arrayIncludesAny:[item.itemId, item.nodeId]"
         >
           <ng-container *ngTemplateOutlet="recursiveMenu; context: {$implicit: item.children}"/>
         </ul>
@@ -138,7 +139,7 @@
     <ion-icon name="chevron-forward-outline"
           class="item-icon-r toggle-icon"
           aria-hidden="true"
-          [class.open]="selectedMenuValues | arrayIncludesAny:[item.itemId, item.nodeId]"
+          [class.open]="expandedMenuIdValues | arrayIncludesAny:[item.itemId, item.nodeId]"
     ></ion-icon>
   }
 </ng-template>

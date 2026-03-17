@@ -22,15 +22,19 @@ async function generateStaticCollectionMenus() {
   const config = common.getConfig(configFilepath);
   const generateStaticMenus = config.app?.prebuild?.staticCollectionMenus ?? true;
   const ssrCollectionSideMenu = config.app?.ssr?.collectionSideMenu ?? false;
+  const authEnabled = config.app?.auth?.enabled === true;
 
-  if (generateStaticMenus && !ssrCollectionSideMenu) {
-    console.log('Generating static collection menus ...');
-  } else if (generateStaticMenus && ssrCollectionSideMenu) {
+  if (authEnabled) {
+    console.log('Skipping generation of static collection menus, auth is enabled.\n');
+    return;
+  } else if (!generateStaticMenus) {
+    console.log('Skipping generation of static collection menus, disabled in config.\n');
+    return;
+  } else if (ssrCollectionSideMenu) {
     console.log('Skipping generation of static collection menus, server-side rendering of collection side menu is enabled.\n');
     return;
   } else {
-    console.log('Skipping generation of static collection menus, disabled in config.\n');
-    return;
+    console.log('Generating static collection menus ...');
   }
 
   const projectName = config.app?.projectNameDB ?? '';

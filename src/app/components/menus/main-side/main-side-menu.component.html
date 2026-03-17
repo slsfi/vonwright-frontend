@@ -1,11 +1,18 @@
-@let menu = mainMenu();
-@let open = selectedMenu();
-@let hl   = highlightedNodeId();
+@let primaryItems = primaryMenu();
+@let secondaryItems = secondaryMenu();
+@let expandedMenuIdValues = expandedMenuIds();
+@let hl = highlightedNodeId();
+@let auth = isAuthenticated();
 
 <h2 id="main-side-menu-label" class="screen-reader-only" i18n="@@MainSideMenu.AriaLabel">Sekundär meny</h2>
-@if (menu.length) {
-  <ul role="menu">
-    <ng-container *ngTemplateOutlet="recursiveMenu; context: {$implicit: menu}"/>
+@if (primaryItems.length) {
+  <ul role="menu" class="primary-menu-list">
+    <ng-container *ngTemplateOutlet="recursiveMenu; context: {$implicit: primaryItems}"/>
+  </ul>
+}
+@if (secondaryItems.length) {
+  <ul role="menu" class="secondary-menu-list">
+    <ng-container *ngTemplateOutlet="recursiveMenu; context: {$implicit: secondaryItems}"/>
   </ul>
 }
 
@@ -14,19 +21,28 @@
     <li
           [attr.aria-current]="hl === item.nodeId ? 'page' : null"
           [attr.aria-haspopup]="item.children ? 'menu' : null"
-          [attr.aria-expanded]="item.children ? (open | arrayIncludes:item.nodeId) : null"
+          [attr.aria-expanded]="item.children ? (expandedMenuIdValues | arrayIncludes:item.nodeId) : null"
           role="menuitem"
           [class.home-menu-item]="item.menuType === 'home'"
+          [class.icon-menu-item]="item.menuType === 'home' || item.menuType === 'auth'"
     >
       @if (!item.children) {
         <a
-              [routerLink]="item.parentPath | parentChildPagePath: item.id"
+              [routerLink]="item.menuType === 'auth'
+                ? authMenuPath()
+                : (item.parentPath | parentChildPagePath: item.id)"
               [class.menu-highlight]="hl === item.nodeId"
               [class.submenu-label]="item.children"
         >
           <ng-container *ngTemplateOutlet="menuItemContent; context: {$implicit: item}"/>
           @if (item.menuType === 'home') {
-            <ion-icon aria-hidden="true" name="home-sharp" class="home-icon"></ion-icon>
+            <ion-icon aria-hidden="true" name="home-sharp" class="item-icon home-icon"></ion-icon>
+          } @else if (item.menuType === 'auth') {
+            @if (auth) {
+              <ion-icon aria-hidden="true" name="person-circle-sharp" class="item-icon account-icon"></ion-icon>
+            } @else {
+              <ion-icon aria-hidden="true" name="log-in-sharp" class="item-icon log-in-icon"></ion-icon>
+            }
           }
         </a>
       }
@@ -40,7 +56,7 @@
       }
       @if (item.children) {
         <ul role="menu"
-              [class.open]="open | arrayIncludes:item.nodeId"
+              [class.open]="expandedMenuIdValues | arrayIncludes:item.nodeId"
         >
           <ng-container *ngTemplateOutlet="recursiveMenu; context: {$implicit: item.children}"/>
         </ul>
@@ -50,12 +66,12 @@
 </ng-template>
 
 <ng-template #menuItemContent let-item>
-  <span class="label">{{item.title}}</span>
+  <span class="label">{{item.menuType === 'auth' ? authMenuTitle() : item.title}}</span>
   @if (item.children) {
     <ion-icon name="chevron-forward-outline"
           class="item-icon-r toggle-icon"
           aria-hidden="true"
-          [class.open]="open | arrayIncludes:item.nodeId"
+          [class.open]="expandedMenuIdValues | arrayIncludes:item.nodeId"
     ></ion-icon>
   }
 </ng-template>

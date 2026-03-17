@@ -4,6 +4,11 @@ import { AboutPage } from './about.page';
 
 const routes: Routes = [
   {
+    path: '',
+    pathMatch: 'full',
+    component: AboutPage,
+  },
+  {
     path: ':id',
     component: AboutPage,
   }

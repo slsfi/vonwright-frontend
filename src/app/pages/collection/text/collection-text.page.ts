@@ -1,17 +1,12 @@
 import { ChangeDetectionStrategy, Component, DestroyRef, ElementRef, Injector, LOCALE_ID, NgZone, OnInit, Renderer2, afterNextRender, inject, signal, viewChild, viewChildren } from '@angular/core';
 import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
-import { Location } from '@angular/common';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { IonFabButton, IonFabList, IonPopover, ModalController, PopoverController } from '@ionic/angular';
-import { combineLatest, distinctUntilChanged, filter, Observable } from 'rxjs';
+import { distinctUntilChanged, Observable } from 'rxjs';
 
 import { config } from '@config';
-import { DownloadTextsModal } from '@modals/download-texts/download-texts.modal';
-import { NamedEntityModal } from '@modals/named-entity/named-entity.modal';
-import { ReferenceDataModal } from '@modals/reference-data/reference-data.modal';
 import { TextKey, ViewState, ViewType, ViewUid } from '@models/collection.models';
 import { Illustration } from '@models/illustration.models';
-import { ViewOptionsPopover } from '@popovers/view-options/view-options.popover';
 import { CollectionContentService } from '@services/collection-content.service';
 import { CollectionsService } from '@services/collections.service';
 import { DocumentHeadService } from '@services/document-head.service';
@@ -21,7 +16,9 @@ import { ScrollService } from '@services/scroll.service';
 import { TooltipService } from '@services/tooltip.service';
 import { UrlService } from '@services/url.service';
 import { ViewOptionsService } from '@services/view-options.service';
-import { enableFrontMatterPageOrTextViewType, moveArrayItem } from '@utility-functions';
+import { CollectionTextViewsQueryParamSyncService } from '@services/collection-text-views-query-param-sync.service';
+import { RouteStateSourceService } from '@services/route-state-source.service';
+import { enableFrontMatterPageOrTextViewType, isBrowser, moveArrayItem } from '@utility-functions';
 
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -44,7 +41,6 @@ export class CollectionTextPage implements OnInit {
   private elementRef = inject(ElementRef);
   private headService = inject(DocumentHeadService);
   private injector = inject(Injector);
-  private location = inject(Location);
   private modalCtrl = inject(ModalController);
   private ngZone = inject(NgZone);
   private parserService = inject(HtmlParserService);
@@ -52,10 +48,11 @@ export class CollectionTextPage implements OnInit {
   private popoverCtrl = inject(PopoverController);
   private renderer2 = inject(Renderer2);
   private route = inject(ActivatedRoute);
-  private router = inject(Router);
+  private routeStateSource = inject(RouteStateSourceService);
   private scrollService = inject(ScrollService);
   private tooltipService = inject(TooltipService);
   private urlService = inject(UrlService);
+  private viewsQueryParamSync = inject(CollectionTextViewsQueryParamSyncService);
   protected viewOptionsService = inject(ViewOptionsService);
   private activeLocale = inject(LOCALE_ID);
 
@@ -159,18 +156,20 @@ export class CollectionTextPage implements OnInit {
 
   /**
    * Wire route + queryParam reactions.
-   * Subscribes to the route’s path parameters and query parameters and keeps the
-   * component’s state in sync with the URL — only while the page is active.
    *
-   * Converts the `activeComponent` signal to an Observable (`active$`) and
-   * gates emissions with `filter(([, , active]) => active)`. This prevents any
-   * updates while the page is cached/inactive in Ionic’s `IonRouterOutlet`.
+   * Keeps component state in sync with route path params and query params.
+   * The `activeComponent` signal is converted to an Observable (`active$`)
+   * and used to gate browser-side emissions, so updates run only while this
+   * page is active (important with Ionic `IonRouterOutlet` page caching).
+   *
+   * Route-state retrieval is delegated to a platform-specific source:
+   * - Browser: reactive stream of route/query changes, gated by `active$`.
+   * - Server (SSR): single snapshot emission for the current request.
    */
   private initRouteSync() {
-    combineLatest([this.route.params, this.route.queryParams, this.active$]).pipe(
-      filter(([, , active]) => active === true),
+    this.routeStateSource.get(this.route, this.active$).pipe(
       takeUntilDestroyed(this.destroyRef)
-    ).subscribe(([params, queryParams]) => {
+    ).subscribe(({ params, queryParams }) => {
       this.onRouteParams(params);
       this.onQueryParams(queryParams);
     });
@@ -199,7 +198,7 @@ export class CollectionTextPage implements OnInit {
       this.collectionContentService.previousReadViewTextId = this.collectionContentService.readViewTextId;
       this.collectionContentService.readViewTextId = routeTextItemID;
 
-      if (this.enableLegacyIDs) {
+      if (this.enableLegacyIDs && isBrowser()) {
         this.setCollectionAndPublicationLegacyId(publicationID);
       }
 
@@ -270,22 +269,7 @@ export class CollectionTextPage implements OnInit {
         }
       }
 
-      // Clear the array keeping track of recently open views in
-      // text service and populate it with the current ones.
-      this.collectionContentService.recentCollectionTextViews = [];
-      parsedViews.forEach((v: ViewState) => {
-        const cachedViewObj: ViewState = { type: v.type };
-        if (
-          v.sortOrder &&
-          (
-            v.type === 'variants' ||
-            v.type === 'facsimiles'
-          )
-        ) {
-          cachedViewObj.sortOrder = v.sortOrder;
-        }
-        this.collectionContentService.recentCollectionTextViews.push(cachedViewObj);
-      });
+      this.cacheRecentViews(parsedViews);
     } else {
       this.setViews();
     }
@@ -384,15 +368,16 @@ export class CollectionTextPage implements OnInit {
     //      c) default view types.
     const currentViews = this.views();
     const enabledViewTypes = this.enabledViewTypes();
+    let nextViews = currentViews;
+    let typesOnly = false;
 
     if (currentViews.length > 0) {
       // a) show current views
-      this.updateViewsInRouterQueryParams(currentViews);
-      this.setActiveViewInMobileMode(currentViews);
+      nextViews = currentViews;
     } else if (this.collectionContentService.recentCollectionTextViews.length > 0) {
       // b) show recent view types
       // if different collection than previously pass type of views only
-      const typesOnly =
+      typesOnly =
         this.textKey().collectionID !==
         this.collectionContentService.previousReadViewTextId.split('_')[0];
 
@@ -413,17 +398,40 @@ export class CollectionTextPage implements OnInit {
         }
       }
 
-      newViews = this.ensureUids(newViews)[0];
-      this.updateViewsInRouterQueryParams(newViews, typesOnly);
-      this.setActiveViewInMobileMode(newViews);
+      nextViews = this.ensureUids(newViews)[0];
     } else {
       // c) show default view types
-      const defaultViews = this.ensureUids(
+      nextViews = this.ensureUids(
         this.computeDefaultViewTypes(enabledViewTypes)
       )[0];
-      this.updateViewsInRouterQueryParams(defaultViews);
-      this.setActiveViewInMobileMode(defaultViews);
     }
+
+    if (nextViews !== currentViews) {
+      this.views.set(nextViews);
+    }
+    this.cacheRecentViews(nextViews);
+    // Keep URL in sync without triggering an extra route cycle.
+    this.updateViewsInRouterQueryParams(nextViews, typesOnly, true);
+    this.setActiveViewInMobileMode(nextViews);
+  }
+
+  private cacheRecentViews(views: ViewState[]) {
+    // Clear the array keeping track of recently open views in
+    // text service and populate it with the current ones.
+    this.collectionContentService.recentCollectionTextViews = [];
+    views.forEach((v: ViewState) => {
+      const cachedViewObj: ViewState = { type: v.type };
+      if (
+        v.sortOrder &&
+        (
+          v.type === 'variants' ||
+          v.type === 'facsimiles'
+        )
+      ) {
+        cachedViewObj.sortOrder = v.sortOrder;
+      }
+      this.collectionContentService.recentCollectionTextViews.push(cachedViewObj);
+    });
   }
 
   /**
@@ -640,25 +648,7 @@ export class CollectionTextPage implements OnInit {
 
     const nextViewsParam = this.urlService.stringify(trimmedViews, true);
 
-    if (silent) {
-      // Build a UrlTree, then replace the URL WITHOUT navigating.
-      const tree = this.router.createUrlTree([], {
-        relativeTo: this.route,
-        queryParams: { views: nextViewsParam },
-        queryParamsHandling: 'merge',
-      });
-
-      // This updates the address bar (like replaceUrl) but does
-      // NOT fire a new navigation.
-      this.location.replaceState(this.router.serializeUrl(tree));
-    } else {
-      this.router.navigate([], {
-        relativeTo: this.route,
-        queryParams: { views: nextViewsParam },
-        queryParamsHandling: 'merge',
-        replaceUrl: true
-      });
-    }
+    this.viewsQueryParamSync.update(nextViewsParam, this.route, silent);
   }
 
   /**
@@ -1878,6 +1868,7 @@ export class CollectionTextPage implements OnInit {
   }
 
   private async showSemanticDataObjectModal(id: string, type: string) {
+    const { NamedEntityModal } = await import('@modals/named-entity/named-entity.modal');
     const modal = await this.modalCtrl.create({
       component: NamedEntityModal,
       componentProps: { id, type }
@@ -1887,6 +1878,7 @@ export class CollectionTextPage implements OnInit {
   }
 
   async showViewOptionsPopover(event: any) {
+    const { ViewOptionsPopover } = await import('@popovers/view-options/view-options.popover');
     const popover = await this.popoverCtrl.create({
       component: ViewOptionsPopover,
       cssClass: 'view-options-popover',
@@ -1899,6 +1891,7 @@ export class CollectionTextPage implements OnInit {
   }
 
   async showReference() {
+    const { ReferenceDataModal } = await import('@modals/reference-data/reference-data.modal');
     // Get URL of Page and then the URI
     const modal = await this.modalCtrl.create({
       component: ReferenceDataModal,
@@ -1909,6 +1902,7 @@ export class CollectionTextPage implements OnInit {
   }
 
   async showDownloadModal() {
+    const { DownloadTextsModal } = await import('@modals/download-texts/download-texts.modal');
     const modal = await this.modalCtrl.create({
       component: DownloadTextsModal,
       componentProps: { origin: 'page-text', textKey: this.textKey() }

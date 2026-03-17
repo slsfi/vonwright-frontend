@@ -1,11 +1,12 @@
-import { Component, OnDestroy, OnInit, inject } from '@angular/core';
-import { NavigationEnd, Params, PRIMARY_OUTLET, Router, UrlSegment, UrlTree } from '@angular/router';
-import { filter, Subscription } from 'rxjs';
+import { Component, DestroyRef, OnInit, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { Params, PRIMARY_OUTLET, Router, UrlSegment, UrlTree } from '@angular/router';
 
 import { config } from '@config';
 import { CollectionTableOfContentsService } from '@services/collection-toc.service';
 import { DocumentHeadService } from '@services/document-head.service';
 import { PlatformService } from '@services/platform.service';
+import { RouterNavigationSourceService } from '@services/router-navigation-source.service';
 import { isBrowser } from '@utility-functions';
 
 
@@ -15,14 +16,18 @@ import { isBrowser } from '@utility-functions';
   styleUrls: ['./app.component.scss'],
   standalone: false
 })
-export class AppComponent implements OnDestroy, OnInit {
+export class AppComponent implements OnInit {
+  private destroyRef = inject(DestroyRef);
   private headService = inject(DocumentHeadService);
   private platformService = inject(PlatformService);
   private router = inject(Router);
+  private routerNavigationSource = inject(RouterNavigationSourceService);
   private tocService = inject(CollectionTableOfContentsService);
 
   readonly enableCollectionSideMenuSSR: boolean = config.app?.ssr?.collectionSideMenu ?? false;
+  readonly prebuiltCollectionMenus: boolean = config.app?.prebuild?.staticCollectionMenus ?? true;
   readonly enableRouterLoadingBar: boolean = config.app?.enableRouterLoadingBar ?? false;
+  readonly authEnabled: boolean = config?.app?.auth?.enabled === true;
 
   appIsStarting: boolean = true;
   collectionID: string = '';
@@ -34,7 +39,6 @@ export class AppComponent implements OnDestroy, OnInit {
   mobileMode: boolean = true;
   mountMainSideMenu: boolean = false;
   previousRouterUrl: string = '';
-  routerEventsSubscription: Subscription;
   showCollectionSideMenu: boolean = false;
   showSideNav: boolean = false;
 
@@ -48,12 +52,12 @@ export class AppComponent implements OnDestroy, OnInit {
     // og:title is set by this.headService.setTitle
     this.headService.setCommonOpenGraphTags();
 
-    this.routerEventsSubscription = this.router.events.pipe(
-      filter(event => event instanceof NavigationEnd)
-    ).subscribe((event: any) => {
+    this.routerNavigationSource.get(this.router).pipe(
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe((url: string) => {
       this.previousRouterUrl = this.currentRouterUrl;
-      this.currentRouterUrl = event.url;
-      const currentUrlTree: UrlTree = this.router.parseUrl(event.url);
+      this.currentRouterUrl = url;
+      const currentUrlTree: UrlTree = this.router.parseUrl(url);
       this.currentUrlSegments = currentUrlTree?.root?.children[PRIMARY_OUTLET]?.segments;
 
       // Check if a collection page in order to show collection side
@@ -81,8 +85,10 @@ export class AppComponent implements OnDestroy, OnInit {
         // Clear the collection TOC loaded in the collection side menu
         // to prevent the previous TOC from flashing in view when
         // entering another collection.
-        this.collectionID = '';
-        this.tocService.setCurrentCollectionToc('');
+        if (this.collectionID) {
+          this.collectionID = '';
+          this.tocService.setCurrentCollectionToc('');
+        }
       }
 
       // Hide side menu if:
@@ -141,10 +147,6 @@ export class AppComponent implements OnDestroy, OnInit {
     });
   }
 
-  ngOnDestroy(): void {
-    this.routerEventsSubscription?.unsubscribe();
-  }
-
   toggleSideNav() {
     this.showSideNav = !this.showSideNav;
   }
@@ -166,6 +168,18 @@ export class AppComponent implements OnDestroy, OnInit {
         return;
       case 'search':
         this.headService.setTitle([$localize`:@@TopMenu.Search:Sök`]);
+        return;
+      case 'register':
+        this.headService.setTitle([$localize`:@@Register.Title:Skapa användarkonto`]);
+        return;
+      case 'forgot-password':
+        this.headService.setTitle([$localize`:@@ForgotPassword.Title:Glömt lösenordet?`]);
+        return;
+      case 'change-password':
+        this.headService.setTitle([$localize`:@@ForgotPassword.ChangeTitle:Ändra lösenord`]);
+        return;
+      case 'reset-password':
+        this.headService.setTitle([$localize`:@@ResetPassword.Title:Nytt lösenord`]);
         return;
       default:
         !routeBasePath && this.headService.setTitle();

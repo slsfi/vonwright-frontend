@@ -1,14 +1,9 @@
-import { Component, ElementRef, LOCALE_ID, NgZone, OnDestroy, OnInit, Renderer2, inject } from '@angular/core';
+import { Component, DestroyRef, ElementRef, LOCALE_ID, NgZone, OnDestroy, OnInit, Renderer2, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ModalController, PopoverController } from '@ionic/angular';
-import { combineLatest, map, Subscription } from 'rxjs';
 
 import { config } from '@config';
-import { DownloadTextsModal } from '@modals/download-texts/download-texts.modal';
-import { IllustrationModal } from '@modals/illustration/illustration.modal';
-import { NamedEntityModal } from '@modals/named-entity/named-entity.modal';
-import { ReferenceDataModal } from '@modals/reference-data/reference-data.modal';
-import { ViewOptionsPopover } from '@popovers/view-options/view-options.popover';
 import { CollectionContentService } from '@services/collection-content.service';
 import { CollectionsService } from '@services/collections.service';
 import { HtmlParserService } from '@services/html-parser.service';
@@ -16,6 +11,7 @@ import { PlatformService } from '@services/platform.service';
 import { ScrollService } from '@services/scroll.service';
 import { TooltipService } from '@services/tooltip.service';
 import { ViewOptionsService } from '@services/view-options.service';
+import { RouteStateSourceService } from '@services/route-state-source.service';
 import { isBrowser } from '@utility-functions';
 
 
@@ -28,6 +24,7 @@ import { isBrowser } from '@utility-functions';
 export class CollectionIntroductionPage implements OnInit, OnDestroy {
   private collectionContentService = inject(CollectionContentService);
   private collectionsService = inject(CollectionsService);
+  private destroyRef = inject(DestroyRef);
   private elementRef = inject(ElementRef);
   private modalCtrl = inject(ModalController);
   private ngZone = inject(NgZone);
@@ -37,6 +34,7 @@ export class CollectionIntroductionPage implements OnInit, OnDestroy {
   private renderer2 = inject(Renderer2);
   private tooltipService = inject(TooltipService);
   private route = inject(ActivatedRoute);
+  private routeStateSource = inject(RouteStateSourceService);
   private router = inject(Router);
   private scrollService = inject(ScrollService);
   viewOptionsService = inject(ViewOptionsService);
@@ -78,7 +76,6 @@ export class CollectionIntroductionPage implements OnInit, OnDestroy {
   toolTipScaleValue: number | null = null;
   toolTipText: string = '';
   tooltipVisible: boolean = false;
-  urlParametersSubscription: Subscription | null = null;
   userIsTouching: boolean = false;
 
   private unlistenClickEvents?: () => void;
@@ -117,11 +114,10 @@ export class CollectionIntroductionPage implements OnInit, OnDestroy {
   ngOnInit() {
     this.mobileMode = this.platformService.isMobile();
 
-    this.urlParametersSubscription = combineLatest(
-      [this.route.params, this.route.queryParams]
-    ).pipe(
-      map(([params, queryParams]) => ({...params, ...queryParams}))
-    ).subscribe(routeParams => {
+    this.routeStateSource.get(this.route).pipe(
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe(({ params, queryParams }) => {
+      const routeParams = { ...params, ...queryParams };
       
       // Check if there is a text position in the route params
       // (comes from queryParams)
@@ -159,7 +155,6 @@ export class CollectionIntroductionPage implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    this.urlParametersSubscription?.unsubscribe();
     this.unlistenClickEvents?.();
     this.unlistenKeyUpEnterEvents?.();
     this.unlistenMouseoverEvents?.();
@@ -815,6 +810,7 @@ export class CollectionIntroductionPage implements OnInit, OnDestroy {
   }
 
   async showSemanticDataObjectModal(id: string, type: string) {
+    const { NamedEntityModal } = await import('@modals/named-entity/named-entity.modal');
     const modal = await this.modalCtrl.create({
       component: NamedEntityModal,
       componentProps: { id, type }
@@ -824,6 +820,7 @@ export class CollectionIntroductionPage implements OnInit, OnDestroy {
   }
 
   async showIllustrationModal(imageNumber: string) {
+    const { IllustrationModal } = await import('@modals/illustration/illustration.modal');
     const modal = await this.modalCtrl.create({
       component: IllustrationModal,
       componentProps: { 'imageNumber': imageNumber }
@@ -834,6 +831,7 @@ export class CollectionIntroductionPage implements OnInit, OnDestroy {
 
   async showViewOptionsPopover(event: any) {
     const toggles = this.viewOptionsTogglesIntro;
+    const { ViewOptionsPopover } = await import('@popovers/view-options/view-options.popover');
     const popover = await this.popoverCtrl.create({
       component: ViewOptionsPopover,
       componentProps: { toggles },
@@ -847,6 +845,7 @@ export class CollectionIntroductionPage implements OnInit, OnDestroy {
   }
 
   async showReference() {
+    const { ReferenceDataModal } = await import('@modals/reference-data/reference-data.modal');
     const modal = await this.modalCtrl.create({
       component: ReferenceDataModal,
       componentProps: { origin: 'page-introduction' }
@@ -856,6 +855,7 @@ export class CollectionIntroductionPage implements OnInit, OnDestroy {
   }
 
   async showDownloadModal() {
+    const { DownloadTextsModal } = await import('@modals/download-texts/download-texts.modal');
     const modal = await this.modalCtrl.create({
       component: DownloadTextsModal,
       componentProps: { origin: 'page-introduction', collectionId: this.collectionID }

@@ -1,3 +1,6 @@
+@let path = imgPath();
+@let data = imgMetadata();
+
 <ion-header>
   <ion-toolbar>
     <ion-title i18n="@@Illustrations.Illustration">Illustration</ion-title>
@@ -11,37 +14,37 @@
 
 <ion-content>
   <div class="modal-inner-wrapper">
-    @if (imgPath) {
+    @if (path) {
       <button class="illustration-thumb"
             (click)="zoomImage()"
             aria-haspopup="dialog"
             aria-label="Zooma in"
             i18n-aria-label="@@Facsimiles.ZoomIn"
       >
-        <img [alt]="imgMetadata?.media_title_translation || 'Illustration'" [src]="imgPath">
+        <img [alt]="data?.media_title_translation || 'Illustration'" [src]="path">
       </button>
     }
-    @if (imgMetadata) {
+    @if (data) {
       <div class="illustration-metadata">
-        @if (imgMetadata.full_name || imgMetadata.media_title_translation) {
-          <p><b>@if (imgMetadata.full_name) {
-            {{imgMetadata.full_name}}
-            }@if (imgMetadata.full_name && imgMetadata.media_title_translation) {, }@if (imgMetadata.media_title_translation) {
-            <i>{{imgMetadata.media_title_translation}}</i>
+        @if (data?.full_name || data?.media_title_translation) {
+          <p><b>@if (data?.full_name) {
+            {{data?.full_name}}
+            }@if (data?.full_name && data?.media_title_translation) {, }@if (data?.media_title_translation) {
+            <i>{{data?.media_title_translation}}</i>
           }</b></p>
         }
-        @if (imgMetadata.media_art_technique_translation) {
-          <p>{{imgMetadata.media_art_technique_translation}}</p>
+        @if (data?.media_art_technique_translation) {
+          <p>{{data?.media_art_technique_translation}}</p>
         }
-        @if (imgMetadata.media_collection_title_translation) {
-          <p>{{imgMetadata.media_collection_title_translation}}</p>
+        @if (data?.media_collection_title_translation) {
+          <p>{{data?.media_collection_title_translation}}</p>
         }
-        @if (imgMetadata.art_location) {
-          <p>{{imgMetadata.art_location}}</p>
+        @if (data?.art_location) {
+          <p>{{data?.art_location}}</p>
         }
-        @if (imgMetadata.media_collection_id) {
+        @if (data?.media_collection_id) {
           <p class="media-collection-link">
-            <a [routerLink]="['/media-collection', imgMetadata.media_collection_id]">
+            <a [routerLink]="['/media-collection', data?.media_collection_id]">
               <ion-icon name="images" aria-hidden="true"></ion-icon> <ng-container i18n="@@Illustrations.OpenMediaCollection">Öppna bildbanken</ng-container>
             </a>
           </p>

@@ -15,6 +15,11 @@ export interface MainMenuGroupNode {
   menuData: MainMenuNode[];
 }
 
+export interface CollectionTocPathNode {
+  id: string;
+  leaf: boolean;
+}
+
 export interface MdMenuNodeApiResponse {
   basename: string;
   children?: MdMenuNodeApiResponse[];

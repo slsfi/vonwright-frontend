@@ -69,23 +69,25 @@
 
     @if (facsNumber && !selectedIsExt && selectedFacs) {
       <div class="facsimile-image-wrapper">
-        <img #facsimg
-              [src]="facsURLAlternate
-                    ? facsURLAlternate + '/' + selectedFacs!.publication_facsimile_collection_id +
-                    '/' + facsSize + '/' + facsNumber + '.jpg'
-                    : facsURLDefault() + facsNumber + (facsSize ? '/' + facsSize : '')"
-              alt="Skannat faksimil"
-              i18n-alt="@@Facsimiles.AltText"
-              loading="lazy"
-              [ngStyle]="{
-                transform: 'scale(' + zoom + ') translate3d(' + prevX + 'px, ' + prevY + 'px, 0px) rotate(' + angle + 'deg)'
-              }"
-              (wheel)="zoomWithMouseWheel(facsimg, $event)"
-              [draggableImage]="[prevX, prevY]"
-              [angle]="angle"
-              [zoom]="zoom"
-              (finalCoordinates)="setImageCoordinates($event)"
-        >
+        @if (facsimileImageLoading()) {
+          <ion-spinner class="facsimile-image-loading" name="crescent"></ion-spinner>
+        }
+        @if (facsimileImageSrc()) {
+          <img #facsimg
+                [attr.src]="facsimileImageSrc()"
+                alt="Skannat faksimil"
+                i18n-alt="@@Facsimiles.AltText"
+                loading="lazy"
+                [ngStyle]="{
+                  transform: 'scale(' + zoom + ') translate3d(' + prevX + 'px, ' + prevY + 'px, 0px) rotate(' + angle + 'deg)'
+                }"
+                (wheel)="zoomWithMouseWheel(facsimg, $event)"
+                [draggableImage]="[prevX, prevY]"
+                [angle]="angle"
+                [zoom]="zoom"
+                (finalCoordinates)="setImageCoordinates($event)"
+          >
+        }
       </div>
     }
 

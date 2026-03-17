@@ -22,7 +22,8 @@ export class StaticHtmlComponent {
   readonly type = input<string>('');
   readonly id = input<string>('');
 
-  readonly prebuiltCollectionMenus: boolean = config.app?.prebuild?.staticCollectionMenus ?? true;
+  readonly prebuiltCollectionMenus: boolean =
+    (config.app?.prebuild?.staticCollectionMenus ?? true) && config.app?.auth?.enabled !== true;
 
   readonly staticContent = signal<string>('');
 
