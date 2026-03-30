@@ -1,5 +1,5 @@
-import { Component, inject } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Component, inject, OnDestroy } from '@angular/core';
+import { Router } from '@angular/router';
 import { FormBuilder, Validators } from '@angular/forms';
 
 import { config } from '@config';
@@ -12,9 +12,8 @@ import { AuthService } from '@services/auth.service';
   styleUrls: ['./login.page.scss'],
   standalone: false
 })
-export class LoginPage {
+export class LoginPage implements OnDestroy {
   private readonly formBuilder = inject(FormBuilder);
-  private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly authService = inject(AuthService);
 
@@ -23,12 +22,20 @@ export class LoginPage {
     password: ['', [Validators.required]]
   });
   readonly loginError = this.authService.loginError;
-  readonly passwordResetSuccess: boolean = this.route.snapshot.queryParamMap.get('passwordReset') === 'success';
+  readonly loginInProgress = this.authService.loginInProgress;
   readonly showTermsLink: boolean = config.component?.mainSideMenu?.items?.termsOfUse === true;
   readonly showPrivacyPolicyLink: boolean = config.component?.mainSideMenu?.items?.privacyPolicy === true;
 
   get authRedirectNavigationQueryParams(): Record<string, unknown> {
     return getAuthRedirectNavigationQueryParams(this.router, this.router.url);
+  }
+
+  ionViewWillLeave(): void {
+    this.clearFeedbackState();
+  }
+
+  ngOnDestroy(): void {
+    this.clearFeedbackState();
   }
 
   attemptLogin(): void {
@@ -42,6 +49,10 @@ export class LoginPage {
   }
 
   clearAuthError(): void {
+    this.authService.clearLoginError();
+  }
+
+  private clearFeedbackState(): void {
     this.authService.clearLoginError();
   }
 }

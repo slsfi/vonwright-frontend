@@ -883,6 +883,12 @@
         <target>Ange e-postadress.</target>
       </segment>
     </unit>
+    <unit id="ForgotPassword.InProgress">
+      <segment state="initial">
+        <source>Skickar länk ...</source>
+        <target>Skickar länk ...</target>
+      </segment>
+    </unit>
     <unit id="ForgotPassword.RequestFailed">
       <segment state="initial">
         <source>Begäran om återställning misslyckades. Försök igen senare.</source>
@@ -1065,8 +1071,8 @@
     </unit>
     <unit id="Login.AccountNeededForAccess">
       <segment state="initial">
-        <source>För att komma åt innehållet i den digitala utgåvan behöver du ett användarkonto.</source>
-        <target>För att komma åt innehållet i den digitala utgåvan behöver du ett användarkonto.</target>
+        <source>För att komma åt innehållet i den digitala utgåvan behöver du ett <pc id="0" equivStart="START_LINK" equivEnd="CLOSE_LINK" type="link" dispStart="&lt;a [routerLink]=&quot;[&apos;/register&apos;]&quot; [queryParams]=&quot;authRedirectNavigationQueryParams&quot;&gt;" dispEnd="&lt;/a&gt;">användarkonto</pc>.</source>
+        <target>För att komma åt innehållet i den digitala utgåvan behöver du ett <pc id="0" equivStart="START_LINK" equivEnd="CLOSE_LINK" type="link" dispStart="&lt;a [routerLink]=&quot;[&apos;/register&apos;]&quot; [queryParams]=&quot;authRedirectNavigationQueryParams&quot;&gt;" dispEnd="&lt;/a&gt;">användarkonto</pc>.</target>
       </segment>
     </unit>
     <unit id="Login.ConsentPrivacyOnly">
@@ -1123,6 +1129,12 @@
         <target>Glömt lösenordet?</target>
       </segment>
     </unit>
+    <unit id="Login.InProgress">
+      <segment state="initial">
+        <source>Loggar in ...</source>
+        <target>Loggar in ...</target>
+      </segment>
+    </unit>
     <unit id="Login.InvalidCredentials">
       <segment state="initial">
         <source>Fel e-postadress eller lösenord.</source>
@@ -1139,12 +1151,6 @@
       <segment state="initial">
         <source>Lösenord</source>
         <target>Lösenord</target>
-      </segment>
-    </unit>
-    <unit id="Login.PasswordResetSuccess">
-      <segment state="initial">
-        <source>Lösenordet har återställts. Du kan nu logga in med ditt nya lösenord.</source>
-        <target>Lösenordet har återställts. Du kan nu logga in med ditt nya lösenord.</target>
       </segment>
     </unit>
     <unit id="Login.RequestFailed">
@@ -1915,6 +1921,12 @@
         <target>Ange e-postadress.</target>
       </segment>
     </unit>
+    <unit id="Register.InProgress">
+      <segment state="initial">
+        <source>Skapar konto ...</source>
+        <target>Skapar konto ...</target>
+      </segment>
+    </unit>
     <unit id="Register.IntendedUsageEducational">
       <segment state="initial">
         <source>Pedagogiska</source>
@@ -2079,14 +2091,14 @@
     </unit>
     <unit id="ResetPassword.InProgress">
       <segment state="initial">
-        <source>Sparar ditt nya lösenord ...</source>
-        <target>Sparar ditt nya lösenord ...</target>
+        <source>Sparar lösenord ...</source>
+        <target>Sparar lösenord ...</target>
       </segment>
     </unit>
     <unit id="ResetPassword.InvalidLink">
       <segment state="initial">
-        <source>Återställningslänken är ogiltig eller har löpt ut.</source>
-        <target>Återställningslänken är ogiltig eller har löpt ut.</target>
+        <source>Länken för att byta lösenord är ogiltig eller har löpt ut. Du måste beställa en ny länk för att byta lösenord.</source>
+        <target>Länken för att byta lösenord är ogiltig eller har löpt ut. Du måste beställa en ny länk för att byta lösenord.</target>
       </segment>
     </unit>
     <unit id="ResetPassword.NoCredentials">
@@ -2109,8 +2121,8 @@
     </unit>
     <unit id="ResetPassword.RequestFailed">
       <segment state="initial">
-        <source>Återställningen av lösenordet misslyckades. Försök igen senare.</source>
-        <target>Återställningen av lösenordet misslyckades. Försök igen senare.</target>
+        <source>Lösenordet kunde inte sparas. Försök igen senare.</source>
+        <target>Lösenordet kunde inte sparas. Försök igen senare.</target>
       </segment>
     </unit>
     <unit id="ResetPassword.SubmitButton">
@@ -2121,8 +2133,8 @@
     </unit>
     <unit id="ResetPassword.Success">
       <segment state="initial">
-        <source>Lösenordet har återställts. Du kan nu logga in med ditt nya lösenord.</source>
-        <target>Lösenordet har återställts. Du kan nu logga in med ditt nya lösenord.</target>
+        <source>Lösenordet har sparats. Du kan nu logga in med ditt nya lösenord.</source>
+        <target>Lösenordet har sparats. Du kan nu logga in med ditt nya lösenord.</target>
       </segment>
     </unit>
     <unit id="ResetPassword.Title">
@@ -2186,18 +2198,6 @@
         <target>Innehåll</target>
       </segment>
     </unit>
-    <unit id="TopMenu.Menu">
-      <segment state="initial">
-        <source>Meny</source>
-        <target>Meny</target>
-      </segment>
-    </unit>
-    <unit id="TopMenu.Search">
-      <segment state="initial">
-        <source>Sök</source>
-        <target>Sök</target>
-      </segment>
-    </unit>
     <unit id="TopMenu.Login">
       <segment state="initial">
         <source>Logga in</source>
@@ -2208,6 +2208,18 @@
       <segment state="initial">
         <source>Logga ut</source>
         <target>Logga ut</target>
+      </segment>
+    </unit>
+    <unit id="TopMenu.Menu">
+      <segment state="initial">
+        <source>Meny</source>
+        <target>Meny</target>
+      </segment>
+    </unit>
+    <unit id="TopMenu.Search">
+      <segment state="initial">
+        <source>Sök</source>
+        <target>Sök</target>
       </segment>
     </unit>
     <unit id="Variants.ChangeVariant">
@@ -2302,8 +2314,8 @@
     </unit>
     <unit id="VerifyEmail.Verifying">
       <segment state="initial">
-        <source>Verifierar din e-postadress ...</source>
-        <target>Verifierar din e-postadress ...</target>
+        <source>Verifierar din e-postadress ...</source>
+        <target>Verifierar din e-postadress ...</target>
       </segment>
     </unit>
     <unit id="ViewOptions.Abbreviation">

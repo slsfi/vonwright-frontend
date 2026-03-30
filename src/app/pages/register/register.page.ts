@@ -86,6 +86,7 @@ export class RegisterPage implements OnDestroy {
   }, { validators: passwordMatchValidator() });
   readonly passwordComplexityErrorKey = PASSWORD_COMPLEXITY_ERROR_KEY;
   readonly registerError = this.authService.registerError;
+  readonly registerInProgress = this.authService.registerInProgress;
   readonly registrationCompleted = this.authService.registrationCompleted;
 
   /**
@@ -151,13 +152,25 @@ export class RegisterPage implements OnDestroy {
     const passwordControl = this.form.controls.password;
 
     return passwordControl.touched
-      && (passwordControl.hasError('minlength') || passwordControl.hasError(this.passwordComplexityErrorKey));
+      && (
+        passwordControl.hasError('minlength')
+        || passwordControl.hasError('required')
+        || passwordControl.hasError(this.passwordComplexityErrorKey)
+      );
   }
 
   /**
    * Indicates whether the form-level password confirmation validator has failed.
    */
   showPasswordMismatchError(): boolean {
-    return this.form.hasError('password_mismatch');
+    const confirmPasswordControl = this.form.controls.confirmPassword;
+    return (
+      this.form.hasError('password_mismatch')
+      || (
+        this.form.controls.password.valid
+        && confirmPasswordControl.touched
+        && confirmPasswordControl.hasError('required')
+      )
+    );
   }
 }

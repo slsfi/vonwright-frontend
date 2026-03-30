@@ -1,5 +1,5 @@
-import { Component, inject } from '@angular/core';
-import { DOCUMENT } from '@angular/common';
+import { Component, inject, OnDestroy } from '@angular/core';
+import { Location } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 
 import { AuthService } from '@services/auth.service';
@@ -10,40 +10,64 @@ import { AuthService } from '@services/auth.service';
   styleUrls: ['./verify-email.page.scss'],
   standalone: false
 })
-export class VerifyEmailPage {
-  private readonly document = inject(DOCUMENT);
+export class VerifyEmailPage implements OnDestroy {
+  private readonly location = inject(Location);
   private readonly route = inject(ActivatedRoute);
   private readonly authService = inject(AuthService);
-  private readonly jwtToken: string = this.resolveJwtTokenFromFragment(this.route.snapshot.fragment);
+  private hasConsumedJwtToken = false;
 
   readonly verifyEmailError = this.authService.verifyEmailError;
   readonly emailVerificationCompleted = this.authService.emailVerificationCompleted;
   readonly emailVerificationInProgress = this.authService.emailVerificationInProgress;
 
-  constructor() {
+  ionViewWillEnter(): void {
+    const jwtToken = this.resolveJwtTokenFromFragment(this.route.snapshot.fragment);
+    if (jwtToken) {
+      this.hasConsumedJwtToken = true;
+      this.startVerificationFlow(jwtToken);
+      return;
+    }
+
+    if (this.hasConsumedJwtToken) {
+      this.authService.clearVerifyEmailState();
+      return;
+    }
+
+    this.startVerificationFlow('');
+  }
+
+  ionViewWillLeave(): void {
+    this.authService.clearVerifyEmailState();
+  }
+
+  ngOnDestroy(): void {
+    this.authService.clearVerifyEmailState();
+  }
+
+  private startVerificationFlow(jwtToken: string = this.resolveJwtTokenFromFragment(this.route.snapshot.fragment)): void {
     this.authService.clearVerifyEmailState();
     this.scrubJwtFromAddressBar();
-    this.authService.verifyEmail(this.jwtToken);
+    this.authService.verifyEmail(jwtToken);
   }
 
   private scrubJwtFromAddressBar(): void {
-    const windowRef = this.document.defaultView;
-    if (!windowRef) {
+    const rawFragment = this.route.snapshot.fragment;
+    if (typeof rawFragment !== 'string' || rawFragment.length === 0) {
       return;
     }
 
     try {
-      const url = new URL(windowRef.location.href);
-      const rawFragment = url.hash.startsWith('#') ? url.hash.slice(1) : url.hash;
       const fragmentParams = new URLSearchParams(rawFragment);
       if (!fragmentParams.has('jwt')) {
         return;
       }
 
       fragmentParams.delete('jwt');
+      const currentPath = this.location.path();
+      const [path, query = ''] = currentPath.split('?');
       const fragment = fragmentParams.toString();
-      const sanitizedUrl = `${url.pathname}${url.search}${fragment ? `#${fragment}` : ''}`;
-      windowRef.history.replaceState(windowRef.history.state, '', sanitizedUrl);
+      const sanitizedPath = `${path}${fragment ? `#${fragment}` : ''}`;
+      this.location.replaceState(sanitizedPath, query);
     } catch {
       // Ignore parsing/history errors; verification can proceed with in-memory token.
     }

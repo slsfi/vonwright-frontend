@@ -39,17 +39,6 @@ p {
   text-align: center;
 }
 
-.auth-error {
-  margin-top: 0;
-  margin: 0 0 0.2rem 0;
-  color: #a10606;
-}
-
-.auth-success {
-  margin: 0 0 0.2rem 0;
-  color: #166a2f;
-}
-
 .no-margins {
   margin: 0;
 }
@@ -58,6 +47,10 @@ ion-input.input-fill-outline {
   --highlight-color-focused: var(--outline-button-color);
   --highlight-color-valid: var(--outline-button-color);
   --highlight-color-invalid: #a10606;
+}
+
+auth-status-message + ion-input {
+  margin-top: 1.5rem;
 }
 
 .authentication-divider {
@@ -87,4 +80,20 @@ ion-input.input-fill-outline {
 ion-button.button.custom-button {
   margin-top: 1rem;
   min-height: 42px;
+}
+
+.button-content {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.625em;
+}
+
+.button-spinner {
+  width: 1.375rem;
+  height: 1.375rem;
+}
+
+.hide-spinner {
+  display: none;
 }

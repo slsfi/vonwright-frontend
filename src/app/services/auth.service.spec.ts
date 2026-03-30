@@ -91,6 +91,7 @@ describe('AuthService', () => {
     const service = createService();
 
     service.login('user@example.com', 'secret');
+    expect(service.loginInProgress()).toBeTrue();
 
     const request = httpMock.expectOne((req) => req.url.endsWith('/auth/login'));
     request.flush({
@@ -105,6 +106,7 @@ describe('AuthService', () => {
     expect(tokenMap.get('auth_email')).toBe('user@example.com');
     expect(service.isAuthenticated()).toBeTrue();
     expect(service.authenticatedEmail()).toBe('user@example.com');
+    expect(service.loginInProgress()).toBeFalse();
     expect(service.loginError()).toBeNull();
     expect(router.navigateByUrl).toHaveBeenCalledWith('/account');
   });
@@ -267,11 +269,13 @@ describe('AuthService', () => {
     const service = createService();
 
     service.login('user@example.com', 'wrong-password');
+    expect(service.loginInProgress()).toBeTrue();
 
     const request = httpMock.expectOne((req) => req.url.endsWith('/auth/login'));
     request.flush({ detail: 'invalid credentials' }, { status: 401, statusText: 'Unauthorized' });
 
     expect(service.isAuthenticated()).toBeFalse();
+    expect(service.loginInProgress()).toBeFalse();
     expect(service.loginError()).toBe('invalid_credentials');
     expect(tokenMap.has('access_token')).toBeFalse();
     expect(tokenMap.has('refresh_token')).toBeFalse();
@@ -347,6 +351,7 @@ describe('AuthService', () => {
     const service = createService();
 
     service.register(' Test User ', ' user@example.com ', 'new-password-1234', ' FI ', ['personal', 'scholarly']);
+    expect(service.registerInProgress()).toBeTrue();
 
     const request = httpMock.expectOne((req) => req.url.endsWith('/auth/register'));
     expect(request.request.body).toEqual({
@@ -360,6 +365,7 @@ describe('AuthService', () => {
     request.flush({ msg: 'User was created' }, { status: 201, statusText: 'Created' });
 
     expect(service.registerError()).toBeNull();
+    expect(service.registerInProgress()).toBeFalse();
     expect(service.registrationCompleted()).toBeTrue();
   });
 
@@ -424,11 +430,13 @@ describe('AuthService', () => {
     const service = createService();
 
     service.register('Test User', 'user@example.com', 'new-password-1234');
+    expect(service.registerInProgress()).toBeTrue();
 
     const request = httpMock.expectOne((req) => req.url.endsWith('/auth/register'));
     request.flush({ detail: 'server error' }, { status: 500, statusText: 'Server Error' });
 
     expect(service.registerError()).toBe('request_failed');
+    expect(service.registerInProgress()).toBeFalse();
     expect(service.registrationCompleted()).toBeFalse();
   });
 
@@ -450,12 +458,14 @@ describe('AuthService', () => {
     const service = createService();
 
     service.requestPasswordReset(' user@example.com ');
+    expect(service.forgotPasswordInProgress()).toBeTrue();
 
     const request = httpMock.expectOne((req) => req.url.endsWith('/auth/forgot_password'));
     expect(request.request.body).toEqual({ email: 'user@example.com', language: 'en' });
     request.flush({ msg: 'Password reset email sent' });
 
     expect(service.forgotPasswordError()).toBeNull();
+    expect(service.forgotPasswordInProgress()).toBeFalse();
     expect(service.passwordResetRequested()).toBeTrue();
   });
 
@@ -487,11 +497,13 @@ describe('AuthService', () => {
     const service = createService();
 
     service.requestPasswordReset('user@example.com');
+    expect(service.forgotPasswordInProgress()).toBeTrue();
 
     const request = httpMock.expectOne((req) => req.url.endsWith('/auth/forgot_password'));
     request.flush({ detail: 'server error' }, { status: 500, statusText: 'Server Error' });
 
     expect(service.forgotPasswordError()).toBe('request_failed');
+    expect(service.forgotPasswordInProgress()).toBeFalse();
     expect(service.passwordResetRequested()).toBeFalse();
   });
 
@@ -509,7 +521,7 @@ describe('AuthService', () => {
     expect(service.passwordResetRequested()).toBeFalse();
   });
 
-  it('submits new password with jwt token, logs out, and redirects to login on success', () => {
+  it('submits new password with jwt token, logs out, and marks reset as completed on success', () => {
     tokenMap.set('access_token', 'existing-access-token');
     tokenMap.set('refresh_token', 'existing-refresh-token');
     tokenMap.set('auth_email', 'user@example.com');
@@ -531,7 +543,7 @@ describe('AuthService', () => {
     expect(tokenMap.has('refresh_token')).toBeFalse();
     expect(tokenMap.has('auth_email')).toBeFalse();
     expect(redirectStorage.clearReturnUrl).toHaveBeenCalledTimes(1);
-    expect(router.navigateByUrl).toHaveBeenCalledWith('/login?passwordReset=success');
+    expect(router.navigateByUrl).not.toHaveBeenCalled();
   });
 
   it('does not call backend reset endpoint when jwt token is missing', () => {

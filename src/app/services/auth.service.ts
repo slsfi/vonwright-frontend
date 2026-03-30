@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable, LOCALE_ID, signal } from '@angular/core';
 import { Router } from '@angular/router';
-import { BehaviorSubject, catchError, filter, finalize, map, Observable, of, shareReplay, take, throwError } from 'rxjs';
+import { BehaviorSubject, catchError, delay, dematerialize, filter, finalize, map, materialize, Observable, of, shareReplay, take, throwError } from 'rxjs';
 
 import { config } from '@config';
 import {
@@ -30,6 +30,7 @@ import { AuthTokenStorageService } from '@services/auth-token-storage.service';
 
 const AUTH_EMAIL_STORAGE_KEY = 'auth_email';
 const DEFAULT_SESSION_VALIDATION_TTL_MS = 2 * 60 * 1000;  // = 2 minutes
+const EMAIL_VERIFICATION_UI_DELAY_MS = 2000;
 
 export type LoginErrorCode = 'no_credentials' | 'email_not_verified' | 'invalid_credentials' | 'request_failed';
 export type RegisterErrorCode = 'no_credentials' | 'password_too_short' | 'user_already_exists' | 'request_failed';
@@ -74,12 +75,18 @@ export class AuthService {
   readonly isAuthenticated = this._isAuthenticated.asReadonly();
   private readonly _loginError = signal<LoginErrorCode | null>(null);
   readonly loginError = this._loginError.asReadonly();
+  private readonly _loginInProgress = signal<boolean>(false);
+  readonly loginInProgress = this._loginInProgress.asReadonly();
   private readonly _registerError = signal<RegisterErrorCode | null>(null);
   readonly registerError = this._registerError.asReadonly();
+  private readonly _registerInProgress = signal<boolean>(false);
+  readonly registerInProgress = this._registerInProgress.asReadonly();
   private readonly _registrationCompleted = signal<boolean>(false);
   readonly registrationCompleted = this._registrationCompleted.asReadonly();
   private readonly _forgotPasswordError = signal<ForgotPasswordErrorCode | null>(null);
   readonly forgotPasswordError = this._forgotPasswordError.asReadonly();
+  private readonly _forgotPasswordInProgress = signal<boolean>(false);
+  readonly forgotPasswordInProgress = this._forgotPasswordInProgress.asReadonly();
   private readonly _passwordResetRequested = signal<boolean>(false);
   readonly passwordResetRequested = this._passwordResetRequested.asReadonly();
   private readonly _resetPasswordError = signal<ResetPasswordErrorCode | null>(null);
@@ -184,10 +191,19 @@ export class AuthService {
    *   can retry credentials and still land on intended page.
    */
   login(email: string, password: string, redirectURL?: string): void {
+    if (this._loginInProgress()) {
+      return;
+    }
+
     this._loginError.set(null);
+    this._loginInProgress.set(true);
     const url = this.buildBackendAuthURL('auth/login');
     const body: LoginRequest = { email, password };
-    this.http.post<LoginResponse>(url, body).subscribe({
+    this.http.post<LoginResponse>(url, body).pipe(
+      finalize(() => {
+        this._loginInProgress.set(false);
+      })
+    ).subscribe({
       next: (response) => {
         const { access_token, refresh_token } = response;
         const normalizedEmail = email.trim();
@@ -223,8 +239,13 @@ export class AuthService {
     country?: string,
     intendedUsage?: readonly RegisterIntendedUsage[]
   ): void {
+    if (this._registerInProgress()) {
+      return;
+    }
+
     this._registerError.set(null);
     this._registrationCompleted.set(false);
+    this._registerInProgress.set(true);
     const normalizedName = name.trim();
     const normalizedEmail = email.trim();
     const normalizedCountry = country?.trim();
@@ -241,7 +262,11 @@ export class AuthService {
     if (intendedUsage && intendedUsage.length > 0) {
       body.intended_usage = intendedUsage.join(';');
     }
-    this.http.post<RegisterResponse>(url, body).subscribe({
+    this.http.post<RegisterResponse>(url, body).pipe(
+      finalize(() => {
+        this._registerInProgress.set(false);
+      })
+    ).subscribe({
       next: () => {
         this._registrationCompleted.set(true);
       },
@@ -256,6 +281,7 @@ export class AuthService {
    */
   clearRegisterState(): void {
     this._registerError.set(null);
+    this._registerInProgress.set(false);
     this._registrationCompleted.set(false);
   }
 
@@ -263,15 +289,24 @@ export class AuthService {
    * Requests a password reset email for the provided user address.
    */
   requestPasswordReset(email: string): void {
+    if (this._forgotPasswordInProgress()) {
+      return;
+    }
+
     this._forgotPasswordError.set(null);
     this._passwordResetRequested.set(false);
+    this._forgotPasswordInProgress.set(true);
     const normalizedEmail = email.trim();
     const url = this.buildBackendAuthURL('auth/forgot_password');
     const body: ForgotPasswordRequest = {
       email: normalizedEmail,
       language: this.resolveAuthRequestLanguage()
     };
-    this.http.post<ForgotPasswordResponse>(url, body).subscribe({
+    this.http.post<ForgotPasswordResponse>(url, body).pipe(
+      finalize(() => {
+        this._forgotPasswordInProgress.set(false);
+      })
+    ).subscribe({
       next: () => {
         this._passwordResetRequested.set(true);
       },
@@ -295,6 +330,7 @@ export class AuthService {
    */
   clearForgotPasswordState(): void {
     this._forgotPasswordError.set(null);
+    this._forgotPasswordInProgress.set(false);
     this._passwordResetRequested.set(false);
   }
 
@@ -302,9 +338,12 @@ export class AuthService {
    * Submits a new password using a password reset JWT token.
    */
   resetPassword(jwtToken: string, password: string): void {
+    if (this._passwordResetInProgress()) {
+      return;
+    }
+
     this._resetPasswordError.set(null);
     this._passwordResetCompleted.set(false);
-    this._passwordResetInProgress.set(false);
 
     const normalizedToken = jwtToken.trim();
     if (!normalizedToken) {
@@ -317,15 +356,16 @@ export class AuthService {
     const url = this.buildBackendAuthURL('auth/reset_password');
     const headers = { Authorization: `Bearer ${normalizedToken}` };
     const body: ResetPasswordRequest = { password };
-    this.http.post<ResetPasswordResponse>(url, body, { headers }).subscribe({
-      next: () => {
+    this.http.post<ResetPasswordResponse>(url, body, { headers }).pipe(
+      finalize(() => {
         this._passwordResetInProgress.set(false);
+      })
+    ).subscribe({
+      next: () => {
         this._passwordResetCompleted.set(true);
         this.logout();
-        this.router.navigateByUrl('/login?passwordReset=success');
       },
       error: (error) => {
-        this._passwordResetInProgress.set(false);
         this._resetPasswordError.set(this.resolveAuthErrorCode(error, this.resetPasswordErrorResolverMap));
       }
     });
@@ -342,6 +382,9 @@ export class AuthService {
 
   /**
    * Verifies a user's email address using a verification JWT token.
+   * The resolution of the backend response is delayed by
+   * EMAIL_VERIFICATION_UI_DELAY_MS milliseconds so the UI has time to
+   * show a "processing" message to the user.
    */
   verifyEmail(jwtToken: string): void {
     this._verifyEmailError.set(null);
@@ -358,13 +401,18 @@ export class AuthService {
 
     const url = this.buildBackendAuthURL('auth/verify_email');
     const headers = { Authorization: `Bearer ${normalizedToken}` };
-    this.http.post<VerifyEmailResponse>(url, null, { headers }).subscribe({
-      next: () => {
+    this.http.post<VerifyEmailResponse>(url, null, { headers }).pipe(
+      materialize(),
+      delay(EMAIL_VERIFICATION_UI_DELAY_MS),
+      dematerialize(),
+      finalize(() => {
         this._emailVerificationInProgress.set(false);
+      })
+    ).subscribe({
+      next: () => {
         this._emailVerificationCompleted.set(true);
       },
       error: (error) => {
-        this._emailVerificationInProgress.set(false);
         this._verifyEmailError.set(this.resolveAuthErrorCode(error, this.verifyEmailErrorResolverMap));
       }
     });

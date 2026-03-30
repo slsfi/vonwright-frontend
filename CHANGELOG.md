@@ -8,6 +8,41 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ## Unreleased
 
+### Changed
+
+- Update to base version [`2.6.3`](https://github.com/slsfi/digital-edition-frontend-ng/releases/tag/2.6.3) from upstream, original repository.
+
+
+
+## [2.6.3] – 2026-03-30
+
+### Changed
+
+- Update `nginx` to 1.28.3. ([388e100](https://github.com/slsfi/digital-edition-frontend-ng/commit/388e100d9440b567b56950ab22bf8b5725b18ab1))
+- Deps: update `@angular/cli` to 20.3.22. ([081b15b](https://github.com/slsfi/digital-edition-frontend-ng/commit/081b15bafbc1992351a4acdd57ad4574bdf8221d))
+- Deps: update `htmlparser2` to 12.0.0. ([4c93476](https://github.com/slsfi/digital-edition-frontend-ng/commit/4c93476b2c3a03a0856b36151243e941e80c93ed))
+- Deps: update `marked` to 17.0.5. ([6ad7e40](https://github.com/slsfi/digital-edition-frontend-ng/commit/6ad7e40e0dee0f3d67bf5b818cd7642f9474fbcc))
+- Deps: update transitive dependencies. ([02add5b](https://github.com/slsfi/digital-edition-frontend-ng/commit/02add5bc968433772092f787b6ed2d0258817db1))
+
+
+
+## [2.6.2] – 2026-03-20
+
+### Changed
+
+- Docs: add to-do note about main side menu articles wrapper label. ([1b37144](https://github.com/slsfi/digital-edition-frontend-ng/commit/1b37144f0d4d785116a3a102cb55628b54f04d41))
+- Auth: use Angular location APIs for JWT URL cleanup. ([6346a37](https://github.com/slsfi/digital-edition-frontend-ng/commit/6346a37f4abb3094781cc8a382e156ce6b481478))
+- Auth: show immediate in-flight feedback in login, register, forgot-password, and reset-password submit buttons, disable repeated submits while requests are in progress, and keep reset-password completion on the page instead of redirecting to login. ([5cecf92](https://github.com/slsfi/digital-edition-frontend-ng/commit/5cecf92066669992790e907fa68d5620a42a5f92))
+- Auth: improve status message styling. ([23110eb](https://github.com/slsfi/digital-edition-frontend-ng/commit/23110eb328a681e1a98e2f1e128ac1a49c3363a9))
+- Auth: link to registration page from login page. ([854c0ce](https://github.com/slsfi/digital-edition-frontend-ng/commit/854c0ceb66438c60c9226dd0057055be332b3f5a))
+- Deps: update `@angular/cli` to 20.3.21. ([5fbbeb4](https://github.com/slsfi/digital-edition-frontend-ng/commit/5fbbeb493499490b481c61a043405bd2d6cac6d6))
+- Deps: update transitive dependencies. ([867ef86](https://github.com/slsfi/digital-edition-frontend-ng/commit/867ef86a15ca6813c3e6c316637f9172c919fbf3))
+
+### Fixed
+
+- Clear transient feedback on cached auth pages. ([3f294fa](https://github.com/slsfi/digital-edition-frontend-ng/commit/3f294fadd4d908ae50d95aa16cfc55eee4eec2d3))
+- Auth: treat invalid link as terminal state for password reset page. ([dade0f6](https://github.com/slsfi/digital-edition-frontend-ng/commit/dade0f60ec05ce6cc50735bdd362a931bdd606ce))
+
 
 
 ## [2.6.1-production.1] – 2026-03-17
@@ -1441,7 +1476,9 @@ siteLogoDimensions: {
 
 
 
-[unreleased]: https://github.com/slsfi/digital-edition-frontend-ng/compare/2.6.1...HEAD
+[unreleased]: https://github.com/slsfi/digital-edition-frontend-ng/compare/2.6.3...HEAD
+[2.6.3]: https://github.com/slsfi/digital-edition-frontend-ng/compare/2.6.2...2.6.3
+[2.6.2]: https://github.com/slsfi/digital-edition-frontend-ng/compare/2.6.1...2.6.2
 [2.6.1]: https://github.com/slsfi/digital-edition-frontend-ng/compare/2.6.0...2.6.1
 [2.6.0]: https://github.com/slsfi/digital-edition-frontend-ng/compare/2.5.1...2.6.0
 [2.5.1]: https://github.com/slsfi/digital-edition-frontend-ng/compare/2.5.0...2.5.1

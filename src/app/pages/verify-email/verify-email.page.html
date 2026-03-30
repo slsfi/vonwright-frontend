@@ -8,16 +8,32 @@
       <h1 i18n="@@VerifyEmail.Title">Verifiera e-postadress</h1>
 
       @if (emailVerificationInProgressValue) {
-        <p class="center" i18n="@@VerifyEmail.Verifying">Verifierar din e-postadress ...</p>
+        <auth-status-message
+          type="processing"
+          i18n-message="@@VerifyEmail.Verifying"
+          message="Verifierar din e-postadress ..."
+        ></auth-status-message>
       }
       @if (emailVerificationCompletedValue) {
-        <p class="auth-success center" i18n="@@VerifyEmail.Success">Din e-postadress har verifierats. Du kan nu logga in på ditt konto.</p>
+        <auth-status-message
+          type="success"
+          i18n-message="@@VerifyEmail.Success"
+          message="Din e-postadress har verifierats. Du kan nu logga in på ditt konto."
+        ></auth-status-message>
       }
       @if (verifyEmailErrorValue === 'invalid_link') {
-        <p class="auth-error center" i18n="@@VerifyEmail.InvalidLink">Verifieringslänken är ogiltig eller har löpt ut.</p>
+        <auth-status-message
+          type="error"
+          i18n-message="@@VerifyEmail.InvalidLink"
+          message="Verifieringslänken är ogiltig eller har löpt ut."
+        ></auth-status-message>
       }
       @if (verifyEmailErrorValue === 'request_failed') {
-        <p class="auth-error center" i18n="@@VerifyEmail.RequestFailed">Verifieringen misslyckades. Försök igen senare.</p>
+        <auth-status-message
+          type="error"
+          i18n-message="@@VerifyEmail.RequestFailed"
+          message="Verifieringen misslyckades. Försök igen senare."
+        ></auth-status-message>
       }
 
       <p class="center no-margins">

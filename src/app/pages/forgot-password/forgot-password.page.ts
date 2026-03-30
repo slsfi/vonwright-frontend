@@ -24,6 +24,7 @@ export class ForgotPasswordPage implements OnDestroy {
     email: ['', [Validators.required, Validators.email]]
   });
   readonly forgotPasswordError = this.authService.forgotPasswordError;
+  readonly forgotPasswordInProgress = this.authService.forgotPasswordInProgress;
   readonly passwordResetRequested = this.authService.passwordResetRequested;
 
   constructor() {

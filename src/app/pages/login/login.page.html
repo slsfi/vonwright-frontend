@@ -1,14 +1,12 @@
 @let loginErrorValue = loginError();
+@let loginInProgressValue = loginInProgress();
 
 <ion-content>
   <article>
     <form [formGroup]="form" (ngSubmit)="attemptLogin()" novalidate>
       <h1 i18n="@@Login.Title">Logga in</h1>
 
-      <p class="center" i18n="@@Login.AccountNeededForAccess">För att komma åt innehållet i den digitala utgåvan behöver du ett användarkonto.</p>
-      @if (passwordResetSuccess) {
-        <p class="auth-success center" i18n="@@Login.PasswordResetSuccess">Lösenordet har återställts. Du kan nu logga in med ditt nya lösenord.</p>
-      }
+      <p class="center" i18n="@@Login.AccountNeededForAccess">För att komma åt innehållet i den digitala utgåvan behöver du ett <a [routerLink]="['/register']" [queryParams]="authRedirectNavigationQueryParams">användarkonto</a>.</p>
 
       <ion-input
         formControlName="email"
@@ -17,6 +15,7 @@
         labelPlacement="stacked"
         autocomplete="email"
         inputmode="email"
+        [readonly]="loginInProgressValue"
         (ionInput)="clearAuthError()"
         i18n-label="@@Login.EmailLabel"
         label="E-postadress"
@@ -24,10 +23,18 @@
       </ion-input>
 
       @if (form.controls.email.touched && form.controls.email.hasError('required')) {
-        <p class="auth-error center" i18n="@@Login.EmailRequired">Ange e-postadress.</p>
+        <auth-status-message
+          type="error"
+          i18n-message="@@Login.EmailRequired"
+          message="Ange e-postadress."
+        ></auth-status-message>
       }
       @if (form.controls.email.touched && form.controls.email.hasError('email')) {
-        <p class="auth-error center" i18n="@@Login.EmailInvalid">Ange en giltig e-postadress.</p>
+        <auth-status-message
+          type="error"
+          i18n-message="@@Login.EmailInvalid"
+          message="Ange en giltig e-postadress."
+        ></auth-status-message>
       }
 
       <ion-input
@@ -36,33 +43,64 @@
         fill="outline"
         labelPlacement="stacked"
         autocomplete="current-password"
+        [readonly]="loginInProgressValue"
         (ionInput)="clearAuthError()"
         i18n-label="@@Login.PasswordLabel"
         label="Lösenord"
       >
         <ion-input-password-toggle slot="end"></ion-input-password-toggle>
       </ion-input>
+      
       <p class="forgot-password"><a [routerLink]="['/forgot-password']" i18n="@@Login.ForgotPassword">Glömt lösenordet?</a></p>
-      @if (loginErrorValue === 'invalid_credentials') {
-        <p class="auth-error center" i18n="@@Login.InvalidCredentials">Fel e-postadress eller lösenord.</p>
-      }
-      @if (loginErrorValue === 'email_not_verified') {
-        <p class="auth-error" i18n="@@Login.EmailNotVerified">Du måste verifiera din e-postadress innan du kan logga in. Kontrollera din inkorg för ett e-postmeddelande med en verifieringslänk. Om länken har gått ut eller om du inte har fått något e-postmeddelande måste du registrera dig igen.</p>
-      }
-      @if (loginErrorValue === 'no_credentials') {
-        <p class="auth-error center" i18n="@@Login.NoCredentials">Ange e-postadress och lösenord.</p>
-      }
-      @if (loginErrorValue === 'request_failed') {
-        <p class="auth-error center" i18n="@@Login.RequestFailed">Inloggningen misslyckades. Försök igen senare.</p>
+
+      @if (loginErrorValue) {
+        @if (loginErrorValue === 'invalid_credentials') {
+          <auth-status-message
+            type="error"
+            i18n-message="@@Login.InvalidCredentials"
+            message="Fel e-postadress eller lösenord."
+          ></auth-status-message>
+        } @else if (loginErrorValue === 'email_not_verified') {
+          <auth-status-message
+            type="error"
+            i18n-message="@@Login.EmailNotVerified"
+            message="Du måste verifiera din e-postadress innan du kan logga in. Kontrollera din inkorg för ett e-postmeddelande med en verifieringslänk. Om länken har gått ut eller om du inte har fått något e-postmeddelande måste du registrera dig igen."
+          ></auth-status-message>
+        } @else if (loginErrorValue === 'no_credentials') {
+          <auth-status-message
+            type="error"
+            i18n-message="@@Login.NoCredentials"
+            message="Ange e-postadress och lösenord."
+          ></auth-status-message>
+        } @else {
+          <auth-status-message
+            type="error"
+            i18n-message="@@Login.RequestFailed"
+            message="Inloggningen misslyckades. Försök igen senare."
+          ></auth-status-message>
+        }
       }
 
       <ion-button
         class="custom-button"
         type="submit"
         expand="block"
-        [disabled]="form.invalid"
-        i18n="@@Login.SubmitButton"
-      >Logga in</ion-button>
+        [disabled]="form.invalid || loginInProgressValue"
+      >
+        <span class="button-content">
+          <ion-spinner
+            class="button-spinner"
+            [class.hide-spinner]="!loginInProgressValue"
+            name="crescent"
+            aria-hidden="true"
+          ></ion-spinner>
+          @if (loginInProgressValue) {
+            <ng-container i18n="@@Login.InProgress">Loggar in ...</ng-container>
+          } @else {
+            <ng-container i18n="@@Login.SubmitButton">Logga in</ng-container>
+          }
+        </span>
+      </ion-button>
 
       <div class="authentication-divider">
         <span i18n="@@Auth.OrDivider">eller</span>
@@ -76,6 +114,7 @@
       </p>
     </form>
   </article>
+
   @if (showTermsLink || showPrivacyPolicyLink) {
     <footer class="legal-consent-footer">
       @if (showTermsLink && showPrivacyPolicyLink) {

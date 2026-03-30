@@ -1,5 +1,5 @@
-import { Component, inject } from '@angular/core';
-import { DOCUMENT } from '@angular/common';
+import { Component, inject, OnDestroy } from '@angular/core';
+import { Location } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { FormBuilder, Validators } from '@angular/forms';
 
@@ -16,12 +16,12 @@ import { AuthService } from '@services/auth.service';
   styleUrls: ['./reset-password.page.scss'],
   standalone: false
 })
-export class ResetPasswordPage {
-  private readonly document = inject(DOCUMENT);
+export class ResetPasswordPage implements OnDestroy {
+  private readonly location = inject(Location);
   private readonly route = inject(ActivatedRoute);
   private readonly formBuilder = inject(FormBuilder);
   private readonly authService = inject(AuthService);
-  private readonly jwtToken: string = this.resolveJwtTokenFromFragment(this.route.snapshot.fragment);
+  private jwtToken = '';
 
   readonly form = this.formBuilder.nonNullable.group({
     password: ['', getPasswordFieldValidators()],
@@ -32,8 +32,16 @@ export class ResetPasswordPage {
   readonly passwordResetCompleted = this.authService.passwordResetCompleted;
   readonly passwordResetInProgress = this.authService.passwordResetInProgress;
 
-  constructor() {
-    this.scrubJwtFromAddressBar();
+  ionViewWillEnter(): void {
+    this.initializeResetState();
+  }
+
+  ionViewWillLeave(): void {
+    this.authService.clearResetPasswordState();
+  }
+
+  ngOnDestroy(): void {
+    this.authService.clearResetPasswordState();
   }
 
   attemptPasswordReset(): void {
@@ -50,24 +58,35 @@ export class ResetPasswordPage {
     this.authService.clearResetPasswordState();
   }
 
+  private initializeResetState(): void {
+    this.authService.clearResetPasswordState();
+    const jwtTokenFromFragment = this.resolveJwtTokenFromFragment(this.route.snapshot.fragment);
+    if (!jwtTokenFromFragment) {
+      return;
+    }
+
+    this.jwtToken = jwtTokenFromFragment;
+    this.scrubJwtFromAddressBar();
+  }
+
   private scrubJwtFromAddressBar(): void {
-    const windowRef = this.document.defaultView;
-    if (!windowRef) {
+    const rawFragment = this.route.snapshot.fragment;
+    if (typeof rawFragment !== 'string' || rawFragment.length === 0) {
       return;
     }
 
     try {
-      const url = new URL(windowRef.location.href);
-      const rawFragment = url.hash.startsWith('#') ? url.hash.slice(1) : url.hash;
       const fragmentParams = new URLSearchParams(rawFragment);
       if (!fragmentParams.has('jwt')) {
         return;
       }
 
       fragmentParams.delete('jwt');
+      const currentPath = this.location.path();
+      const [path, query = ''] = currentPath.split('?');
       const fragment = fragmentParams.toString();
-      const sanitizedUrl = `${url.pathname}${url.search}${fragment ? `#${fragment}` : ''}`;
-      windowRef.history.replaceState(windowRef.history.state, '', sanitizedUrl);
+      const sanitizedPath = `${path}${fragment ? `#${fragment}` : ''}`;
+      this.location.replaceState(sanitizedPath, query);
     } catch {
       // Ignore parsing/history errors; reset flow can proceed with in-memory token.
     }

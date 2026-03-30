@@ -1,0 +1,8 @@
+<div
+  [class.auth-success]="type() === 'success'"
+  [class.auth-error]="type() === 'error'"
+  [class.auth-processing]="type() === 'processing'"
+>
+  <ion-icon [name]="iconName()" aria-hidden="true"></ion-icon>
+  <p>{{ message() }}</p>
+</div>

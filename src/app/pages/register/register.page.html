@@ -1,4 +1,5 @@
 @let registerErrorValue = registerError();
+@let registerInProgressValue = registerInProgress();
 @let registrationCompletedValue = registrationCompleted();
 
 <ion-content>
@@ -7,7 +8,11 @@
       <h1 i18n="@@Register.Title">Skapa användarkonto</h1>
 
       @if (registrationCompletedValue) {
-        <p class="auth-success center" i18n="@@Register.Success">Kontot har skapats. Kontrollera din inkorg och verifiera e-postadressen innan du loggar in.</p>
+        <auth-status-message
+          type="success"
+          i18n-message="@@Register.Success"
+          message="Kontot har skapats. Kontrollera din inkorg och verifiera e-postadressen innan du loggar in."
+        ></auth-status-message>
       } @else {
         <p class="center" i18n="@@Register.Description">Ange namn, e-postadress och lösenord samt <br>godkänn villkoren för att skapa ett konto.</p>
 
@@ -21,6 +26,7 @@
             labelPlacement="stacked"
             autocomplete="name"
             [maxlength]="registerNameMaxLength"
+            [readonly]="registerInProgressValue"
             (ionInput)="clearFeedbackState()"
             i18n-label="@@Register.NameLabel"
             label="Förnamn och efternamn"
@@ -28,7 +34,11 @@
           </ion-input>
 
           @if (showControlError('name', 'required')) {
-            <p class="auth-error center" i18n="@@Register.NameRequired">Ange förnamn och efternamn.</p>
+            <auth-status-message
+              type="error"
+              i18n-message="@@Register.NameRequired"
+              message="Ange förnamn och efternamn."
+            ></auth-status-message>
           }
 
           <ion-input
@@ -38,6 +48,7 @@
             labelPlacement="stacked"
             autocomplete="email"
             inputmode="email"
+            [readonly]="registerInProgressValue"
             (ionInput)="clearFeedbackState()"
             i18n-label="@@Register.EmailLabel"
             label="E-postadress"
@@ -45,10 +56,18 @@
           </ion-input>
 
           @if (showControlError('email', 'required')) {
-            <p class="auth-error center" i18n="@@Register.EmailRequired">Ange e-postadress.</p>
+            <auth-status-message
+              type="error"
+              i18n-message="@@Register.EmailRequired"
+              message="Ange e-postadress."
+            ></auth-status-message>
           }
           @if (showControlError('email', 'email')) {
-            <p class="auth-error center" i18n="@@Register.EmailInvalid">Ange en giltig e-postadress.</p>
+            <auth-status-message
+              type="error"
+              i18n-message="@@Register.EmailInvalid"
+              message="Ange en giltig e-postadress."
+            ></auth-status-message>
           }
 
           <ion-input
@@ -57,6 +76,7 @@
             fill="outline"
             labelPlacement="stacked"
             autocomplete="new-password"
+            [readonly]="registerInProgressValue"
             (ionInput)="clearFeedbackState()"
             i18n-label="@@Register.PasswordLabel"
             label="Lösenord"
@@ -73,7 +93,11 @@
             </ul>
           </div>
           @if (showPasswordRequirementsError()) {
-            <p class="auth-error center" i18n="@@Password.RequirementsError">Lösenordet uppfyller inte kraven ovan.</p>
+            <auth-status-message
+              type="error"
+              i18n-message="@@Password.RequirementsError"
+              message="Lösenordet uppfyller inte kraven ovan."
+            ></auth-status-message>
           }
 
           <ion-input
@@ -82,6 +106,7 @@
             fill="outline"
             labelPlacement="stacked"
             autocomplete="new-password"
+            [readonly]="registerInProgressValue"
             (ionInput)="clearFeedbackState()"
             i18n-label="@@Register.RepeatPasswordLabel"
             label="Upprepa lösenordet"
@@ -90,7 +115,11 @@
           </ion-input>
 
           @if (showPasswordMismatchError()) {
-            <p class="auth-error center" i18n="@@Password.DoesNotMatch">Lösenorden matchar inte.</p>
+            <auth-status-message
+              type="error"
+              i18n-message="@@Password.DoesNotMatch"
+              message="Lösenorden matchar inte."
+            ></auth-status-message>
           }
         </section>
 
@@ -100,7 +129,7 @@
 
             @if (showTermsOfUse) {
               <section class="legal-summary" [class.legal-error]="showControlError('acceptTermsOfUse', 'required')">
-                <ion-checkbox formControlName="acceptTermsOfUse" labelPlacement="end" justify="start" (ionChange)="clearFeedbackState()">
+                <ion-checkbox formControlName="acceptTermsOfUse" labelPlacement="end" justify="start" [disabled]="registerInProgressValue" (ionChange)="clearFeedbackState()">
                   <span i18n="@@Register.AcceptTermsCheckbox">Jag accepterar användarvillkoren.</span>
                 </ion-checkbox>
 
@@ -119,13 +148,17 @@
               </section>
 
               @if (showControlError('acceptTermsOfUse', 'required')) {
-                <p class="auth-error center" i18n="@@Register.AcceptTermsRequired">Du måste acceptera användarvillkoren.</p>
+                <auth-status-message
+                  type="error"
+                  i18n-message="@@Register.AcceptTermsRequired"
+                  message="Du måste acceptera användarvillkoren."
+                ></auth-status-message>
               }
             }
 
             @if (showPrivacyPolicy) {
               <section class="legal-summary" [class.legal-error]="showControlError('acceptPrivacyPolicy', 'required')">
-                <ion-checkbox formControlName="acceptPrivacyPolicy" labelPlacement="end" justify="start" (ionChange)="clearFeedbackState()">
+                <ion-checkbox formControlName="acceptPrivacyPolicy" labelPlacement="end" justify="start" [disabled]="registerInProgressValue" (ionChange)="clearFeedbackState()">
                   <span i18n="@@Register.AcceptPrivacyCheckbox">Jag accepterar dataskyddsbeskrivningen.</span>
                 </ion-checkbox>
 
@@ -142,7 +175,11 @@
               </section>
 
               @if (showControlError('acceptPrivacyPolicy', 'required')) {
-                <p class="auth-error center" i18n="@@Register.AcceptPrivacyRequired">Du måste acceptera dataskyddsbeskrivningen.</p>
+                <auth-status-message
+                  type="error"
+                  i18n-message="@@Register.AcceptPrivacyRequired"
+                  message="Du måste acceptera dataskyddsbeskrivningen."
+                ></auth-status-message>
               }
             }
           </section>
@@ -156,6 +193,7 @@
             fill="outline"
             labelPlacement="stacked"
             interface="popover"
+            [disabled]="registerInProgressValue"
             placeholder="Välj land"
             i18n-label="@@Register.CountryLabel"
             i18n-placeholder="@@Register.CountryPlaceholder"
@@ -173,6 +211,7 @@
             labelPlacement="stacked"
             interface="popover"
             [multiple]="true"
+            [disabled]="registerInProgressValue"
             placeholder="Välj ett eller flera ändamål"
             i18n-label="@@Register.IntendedUsageLabel"
             i18n-placeholder="@@Register.IntendedUsagePlaceholder"
@@ -186,25 +225,54 @@
         </section>
 
         @if (registerErrorValue === 'no_credentials') {
-          <p class="auth-error center" i18n="@@Register.NoCredentials">Ange förnamn och efternamn, e-postadress och lösenord.</p>
+          <auth-status-message
+            type="error"
+            i18n-message="@@Register.NoCredentials"
+            message="Ange förnamn och efternamn, e-postadress och lösenord."
+          ></auth-status-message>
         }
         @if (registerErrorValue === 'password_too_short') {
-          <p class="auth-error center" i18n="@@Password.TooShort">Lösenordet är för kort.</p>
+          <auth-status-message
+            type="error"
+            i18n-message="@@Password.TooShort"
+            message="Lösenordet är för kort."
+          ></auth-status-message>
         }
         @if (registerErrorValue === 'user_already_exists') {
-          <p class="auth-error center" i18n="@@Register.UserAlreadyExists">Det finns redan ett verifierat konto med den här e-postadressen.</p>
+          <auth-status-message
+            type="error"
+            i18n-message="@@Register.UserAlreadyExists"
+            message="Det finns redan ett verifierat konto med den här e-postadressen."
+          ></auth-status-message>
         }
         @if (registerErrorValue === 'request_failed') {
-          <p class="auth-error center" i18n="@@Register.RequestFailed">Kontot kunde inte skapas. Försök igen senare.</p>
+          <auth-status-message
+            type="error"
+            i18n-message="@@Register.RequestFailed"
+            message="Kontot kunde inte skapas. Försök igen senare."
+          ></auth-status-message>
         }
 
         <ion-button
           class="custom-button"
           type="submit"
           expand="block"
-          [disabled]="form.invalid"
-          i18n="@@Register.SubmitButton"
-        >Skapa konto</ion-button>
+          [disabled]="form.invalid || registerInProgressValue"
+        >
+          <span class="button-content">
+            <ion-spinner
+              class="button-spinner"
+              [class.hide-spinner]="!registerInProgressValue"
+              name="crescent"
+              aria-hidden="true"
+            ></ion-spinner>
+            @if (registerInProgressValue) {
+              <ng-container i18n="@@Register.InProgress">Skapar konto ...</ng-container>
+            } @else {
+              <ng-container i18n="@@Register.SubmitButton">Skapa konto</ng-container>
+            }
+          </span>
+        </ion-button>
 
         <div class="authentication-divider">
           <span i18n="@@Auth.OrDivider">eller</span>
