@@ -124,7 +124,7 @@
     <unit id="BasicActions.SearchEllipsis">
       <segment state="initial">
         <source>Sök ...</source>
-        <target>Search ...</target>
+        <target>Search...</target>
       </segment>
     </unit>
     <unit id="BasicActions.ShowMore">
@@ -388,7 +388,7 @@
     <unit id="Commentary.Manuscript.Title">
       <segment state="initial">
         <source>Manuskriptbeskrivning</source>
-        <target>Manuskriptbeskrivning</target>
+        <target>Manuscript description</target>
       </segment>
     </unit>
     <unit id="Commentary.Manuscript.Type">
@@ -604,7 +604,7 @@
     <unit id="ElasticSearch.LoadingFilters">
       <segment state="initial">
         <source>Ett ögonblick, laddar sökavgränsningar ...</source>
-        <target>Just a moment, loading filters ...</target>
+        <target>Just a moment, loading filters...</target>
       </segment>
     </unit>
     <unit id="ElasticSearch.NewestFirst">
@@ -880,13 +880,13 @@
     <unit id="ForgotPassword.EmailRequired">
       <segment state="initial">
         <source>Ange e-postadress.</source>
-        <target>Ange e-postadress.</target>
+        <target>Enter email address.</target>
       </segment>
     </unit>
     <unit id="ForgotPassword.InProgress">
       <segment state="initial">
         <source>Skickar länk ...</source>
-        <target>Sending link ...</target>
+        <target>Sending link...</target>
       </segment>
     </unit>
     <unit id="ForgotPassword.RequestFailed">
@@ -994,7 +994,7 @@
     <unit id="Index.SearchPlaceholder">
       <segment state="initial">
         <source>Sök ...</source>
-        <target>Search ...</target>
+        <target>Search...</target>
       </segment>
     </unit>
     <unit id="Index.ShownRecords">
@@ -1054,7 +1054,7 @@
     <unit id="Language.Undefined">
       <segment state="initial">
         <source>odefinierat</source>
-        <target>Undefined</target>
+        <target>undefined</target>
       </segment>
     </unit>
     <unit id="Legend.Legend">
@@ -1132,7 +1132,7 @@
     <unit id="Login.InProgress">
       <segment state="initial">
         <source>Loggar in ...</source>
-        <target>Logging in ...</target>
+        <target>Logging in...</target>
       </segment>
     </unit>
     <unit id="Login.InvalidCredentials">
@@ -1330,7 +1330,7 @@
     <unit id="Manuscripts.ShowNormalized">
       <segment state="initial">
         <source>Visa ändringar inarbetade</source>
-        <target>Visa ändringar inarbetade</target>
+        <target>Show all revisions applied</target>
       </segment>
     </unit>
     <unit id="MediaCollection.AllMediaCollections">
@@ -1924,7 +1924,7 @@
     <unit id="Register.InProgress">
       <segment state="initial">
         <source>Skapar konto ...</source>
-        <target>Creating account ...</target>
+        <target>Creating account...</target>
       </segment>
     </unit>
     <unit id="Register.IntendedUsageEducational">

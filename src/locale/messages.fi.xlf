@@ -388,7 +388,7 @@
     <unit id="Commentary.Manuscript.Title">
       <segment state="initial">
         <source>Manuskriptbeskrivning</source>
-        <target>Manuskriptbeskrivning</target>
+        <target>Kuvaus käsikirjoituksesta</target>
       </segment>
     </unit>
     <unit id="Commentary.Manuscript.Type">
@@ -880,7 +880,7 @@
     <unit id="ForgotPassword.EmailRequired">
       <segment state="initial">
         <source>Ange e-postadress.</source>
-        <target>Ange e-postadress.</target>
+        <target>Syötä sähköpostiosoite.</target>
       </segment>
     </unit>
     <unit id="ForgotPassword.InProgress">
@@ -1054,7 +1054,7 @@
     <unit id="Language.Undefined">
       <segment state="initial">
         <source>odefinierat</source>
-        <target>Määrittämätön</target>
+        <target>määrittämätön</target>
       </segment>
     </unit>
     <unit id="Legend.Legend">
