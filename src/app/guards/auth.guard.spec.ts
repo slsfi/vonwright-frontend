@@ -1,7 +1,7 @@
 import { signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { CanActivateFn, UrlTree, provideRouter } from '@angular/router';
-import { firstValueFrom, isObservable, of, throwError } from 'rxjs';
+import { firstValueFrom, isObservable, of, Subject, throwError } from 'rxjs';
 
 import {
   AuthRedirectStorageService,
@@ -17,7 +17,10 @@ describe('authGuard', () => {
     TestBed.runInInjectionContext(() => authGuard(...guardParameters));
   const isAuthenticated = signal<boolean>(false);
   let validateSessionIfStale: jasmine.Spy<() => any>;
-  let authRedirectStorage: jasmine.SpyObj<Pick<AuthRedirectStorageService, 'storeReturnUrl' | 'consumeReturnUrl'>>;
+  let waitForStartupValidation: jasmine.Spy<() => any>;
+  let authRedirectStorage: jasmine.SpyObj<
+    Pick<AuthRedirectStorageService, 'storeReturnUrl' | 'consumeReturnUrl' | 'clearReturnUrl'>
+  >;
 
   function asUrl(value: unknown): string | null {
     return value instanceof UrlTree ? value.toString() : null;
@@ -43,16 +46,17 @@ describe('authGuard', () => {
     beforeEach(() => {
       isAuthenticated.set(false);
       validateSessionIfStale = jasmine.createSpy('validateSessionIfStale').and.returnValue(of(true));
+      waitForStartupValidation = jasmine.createSpy('waitForStartupValidation').and.returnValue(of(true));
       authRedirectStorage = jasmine.createSpyObj<
-        Pick<AuthRedirectStorageService, 'storeReturnUrl' | 'consumeReturnUrl'>
-      >('AuthRedirectStorageService', ['storeReturnUrl', 'consumeReturnUrl']);
+        Pick<AuthRedirectStorageService, 'storeReturnUrl' | 'consumeReturnUrl' | 'clearReturnUrl'>
+      >('AuthRedirectStorageService', ['storeReturnUrl', 'consumeReturnUrl', 'clearReturnUrl']);
       authRedirectStorage.storeReturnUrl.and.returnValue(true);
       authRedirectStorage.consumeReturnUrl.and.returnValue(null);
       TestBed.configureTestingModule({
         providers: [
           provideRouter([]),
           { provide: AUTH_ENABLED, useValue: false },
-          { provide: AuthService, useValue: { isAuthenticated, validateSessionIfStale } },
+          { provide: AuthService, useValue: { isAuthenticated, validateSessionIfStale, waitForStartupValidation } },
           { provide: AuthRedirectStorageService, useValue: authRedirectStorage }
         ]
       });
@@ -72,28 +76,62 @@ describe('authGuard', () => {
     beforeEach(() => {
       isAuthenticated.set(false);
       validateSessionIfStale = jasmine.createSpy('validateSessionIfStale').and.returnValue(of(true));
+      waitForStartupValidation = jasmine.createSpy('waitForStartupValidation').and.returnValue(of(true));
       authRedirectStorage = jasmine.createSpyObj<
-        Pick<AuthRedirectStorageService, 'storeReturnUrl' | 'consumeReturnUrl'>
-      >('AuthRedirectStorageService', ['storeReturnUrl', 'consumeReturnUrl']);
+        Pick<AuthRedirectStorageService, 'storeReturnUrl' | 'consumeReturnUrl' | 'clearReturnUrl'>
+      >('AuthRedirectStorageService', ['storeReturnUrl', 'consumeReturnUrl', 'clearReturnUrl']);
       authRedirectStorage.storeReturnUrl.and.returnValue(true);
       authRedirectStorage.consumeReturnUrl.and.returnValue(null);
       TestBed.configureTestingModule({
         providers: [
           provideRouter([]),
           { provide: AUTH_ENABLED, useValue: true },
-          { provide: AuthService, useValue: { isAuthenticated, validateSessionIfStale } },
+          { provide: AuthService, useValue: { isAuthenticated, validateSessionIfStale, waitForStartupValidation } },
           { provide: AuthRedirectStorageService, useValue: authRedirectStorage }
         ]
       });
     });
 
-    it('allows protected route when authenticated', () => {
+    it('allows protected route when authenticated', async () => {
       isAuthenticated.set(true);
 
       const result = runGuard('/collection/123/text');
 
-      expect(result).toBe(true);
+      expect(await resolveGuardResult(result)).toBe(true);
       expect(validateSessionIfStale).not.toHaveBeenCalled();
+    });
+
+    it('waits for startup validation before allowing a protected route', async () => {
+      const startupValidation = new Subject<boolean>();
+      waitForStartupValidation.and.returnValue(startupValidation.asObservable());
+      const result = runGuard('/collection/123/text');
+      const resolvedResult = resolveGuardResult(result);
+
+      expect(authRedirectStorage.storeReturnUrl).not.toHaveBeenCalled();
+      isAuthenticated.set(true);
+      startupValidation.next(true);
+      startupValidation.complete();
+
+      expect(await resolvedResult).toBe(true);
+      expect(validateSessionIfStale).not.toHaveBeenCalled();
+    });
+
+    it('redirects protected route to /login when startup validation fails', async () => {
+      waitForStartupValidation.and.returnValue(of(false));
+
+      const result = runGuard('/collection/123/text');
+      const resolvedResult = await resolveGuardResult(result);
+
+      expect(authRedirectStorage.storeReturnUrl).toHaveBeenCalledWith('/collection/123/text');
+      expect(asUrl(resolvedResult)).toBe(`/login?${AUTH_REDIRECT_MARKER_QUERY_PARAM}=${AUTH_REDIRECT_MARKER_VALUE}`);
+    });
+
+    it('allows /login when startup validation fails', async () => {
+      waitForStartupValidation.and.returnValue(of(false));
+
+      const result = runGuard('/login');
+
+      expect(await resolveGuardResult(result)).toBe(true);
     });
 
     it('validates session for routes requiring session validation when authenticated', async () => {
@@ -120,6 +158,20 @@ describe('authGuard', () => {
       );
     });
 
+    it('redirects to /login when session validation fails with 422', async () => {
+      isAuthenticated.set(true);
+      validateSessionIfStale.and.returnValue(throwError(() => ({ status: 422 })));
+
+      const result = runGuard('/account', { requiresSessionValidation: true });
+      const resolvedResult = await resolveGuardResult(result);
+
+      expect(resolvedResult).toEqual(jasmine.any(UrlTree));
+      expect(authRedirectStorage.storeReturnUrl).toHaveBeenCalledWith('/account');
+      expect(asUrl(resolvedResult)).toBe(
+        `/login?${AUTH_REDIRECT_MARKER_QUERY_PARAM}=${AUTH_REDIRECT_MARKER_VALUE}`
+      );
+    });
+
     it('fails open when session validation fails with non-401 error', async () => {
       isAuthenticated.set(true);
       validateSessionIfStale.and.returnValue(throwError(() => ({ status: 503 })));
@@ -130,115 +182,128 @@ describe('authGuard', () => {
       expect(authRedirectStorage.storeReturnUrl).not.toHaveBeenCalled();
     });
 
-    it('redirects protected route to /login when unauthenticated', () => {
+    it('redirects protected route to /login when unauthenticated', async () => {
       const result = runGuard('/collection/123/text');
+      const resolvedResult = await resolveGuardResult(result);
 
+      expect(authRedirectStorage.clearReturnUrl).toHaveBeenCalledTimes(1);
       expect(authRedirectStorage.storeReturnUrl).toHaveBeenCalledWith('/collection/123/text');
-      expect(asUrl(result)).toBe(`/login?${AUTH_REDIRECT_MARKER_QUERY_PARAM}=${AUTH_REDIRECT_MARKER_VALUE}`);
+      expect(asUrl(resolvedResult)).toBe(`/login?${AUTH_REDIRECT_MARKER_QUERY_PARAM}=${AUTH_REDIRECT_MARKER_VALUE}`);
     });
 
-    it('falls back to legacy returnUrl query param when marker storage fails', () => {
+    it('falls back to legacy returnUrl query param when marker storage fails', async () => {
       authRedirectStorage.storeReturnUrl.and.returnValue(false);
 
       const result = runGuard('/collection/123/text');
+      const resolvedResult = await resolveGuardResult(result);
 
-      expect(asUrl(result)).toBe('/login?returnUrl=%2Fcollection%2F123%2Ftext');
+      expect(authRedirectStorage.clearReturnUrl).toHaveBeenCalledTimes(1);
+      expect(asUrl(resolvedResult)).toBe('/login?returnUrl=%2Fcollection%2F123%2Ftext');
     });
 
-    it('allows /login when unauthenticated', () => {
+    it('allows /login when unauthenticated', async () => {
       const result = runGuard('/login');
 
-      expect(result).toBe(true);
+      expect(await resolveGuardResult(result)).toBe(true);
     });
 
-    it('allows /register when unauthenticated', () => {
+    it('allows /register when unauthenticated', async () => {
       const result = runGuard('/register');
 
-      expect(result).toBe(true);
+      expect(await resolveGuardResult(result)).toBe(true);
     });
 
-    it('allows /login marker flow when unauthenticated without consuming stored return URL', () => {
+    it('allows /login marker flow when unauthenticated without consuming stored return URL', async () => {
       const result = runGuard(`/login?${AUTH_REDIRECT_MARKER_QUERY_PARAM}=${AUTH_REDIRECT_MARKER_VALUE}`);
 
-      expect(result).toBe(true);
+      expect(await resolveGuardResult(result)).toBe(true);
       expect(authRedirectStorage.consumeReturnUrl).not.toHaveBeenCalled();
     });
 
-    it('redirects /login to / when authenticated and returnUrl is missing', () => {
+    it('redirects /login to / when authenticated and returnUrl is missing', async () => {
       isAuthenticated.set(true);
 
       const result = runGuard('/login');
+      const resolvedResult = await resolveGuardResult(result);
 
-      expect(asUrl(result)).toBe('/');
+      expect(asUrl(resolvedResult)).toBe('/');
     });
 
-    it('redirects /register to / when authenticated', () => {
+    it('redirects /register to / when authenticated', async () => {
       isAuthenticated.set(true);
 
       const result = runGuard('/register');
+      const resolvedResult = await resolveGuardResult(result);
 
-      expect(asUrl(result)).toBe('/');
+      expect(asUrl(resolvedResult)).toBe('/');
     });
 
-    it('redirects /login to returnUrl when authenticated', () => {
+    it('redirects /login to returnUrl when authenticated', async () => {
       isAuthenticated.set(true);
 
       const result = runGuard('/login?returnUrl=%2Fsearch');
+      const resolvedResult = await resolveGuardResult(result);
 
-      expect(asUrl(result)).toBe('/search');
+      expect(asUrl(resolvedResult)).toBe('/search');
     });
 
-    it('redirects /login marker flow to stored URL when authenticated', () => {
+    it('redirects /login marker flow to stored URL when authenticated', async () => {
       isAuthenticated.set(true);
       authRedirectStorage.consumeReturnUrl.and.returnValue('/collection/123/text');
 
       const result = runGuard(`/login?${AUTH_REDIRECT_MARKER_QUERY_PARAM}=${AUTH_REDIRECT_MARKER_VALUE}`);
+      const resolvedResult = await resolveGuardResult(result);
 
       expect(authRedirectStorage.consumeReturnUrl).toHaveBeenCalledTimes(1);
-      expect(asUrl(result)).toBe('/collection/123/text');
+      expect(asUrl(resolvedResult)).toBe('/collection/123/text');
     });
 
-    it('ignores non-matching marker value and uses legacy returnUrl when authenticated', () => {
+    it('ignores non-matching marker value and uses legacy returnUrl when authenticated', async () => {
       isAuthenticated.set(true);
 
       const result = runGuard('/login?rt=unexpected&returnUrl=%2Fsearch');
+      const resolvedResult = await resolveGuardResult(result);
 
       expect(authRedirectStorage.consumeReturnUrl).not.toHaveBeenCalled();
-      expect(asUrl(result)).toBe('/search');
+      expect(asUrl(resolvedResult)).toBe('/search');
     });
 
-    it('falls back to / when stored marker URL is missing or invalid', () => {
+    it('falls back to / when stored marker URL is missing or invalid', async () => {
       isAuthenticated.set(true);
       authRedirectStorage.consumeReturnUrl.and.returnValue('//evil.example');
 
       const result = runGuard(`/login?${AUTH_REDIRECT_MARKER_QUERY_PARAM}=${AUTH_REDIRECT_MARKER_VALUE}`);
+      const resolvedResult = await resolveGuardResult(result);
 
-      expect(asUrl(result)).toBe('/');
+      expect(asUrl(resolvedResult)).toBe('/');
     });
 
-    it('ignores unsafe returnUrl and redirects /login to / when authenticated', () => {
+    it('ignores unsafe returnUrl and redirects /login to / when authenticated', async () => {
       isAuthenticated.set(true);
 
       const result = runGuard('/login?returnUrl=%2F%2Fevil.example');
+      const resolvedResult = await resolveGuardResult(result);
 
-      expect(asUrl(result)).toBe('/');
+      expect(asUrl(resolvedResult)).toBe('/');
     });
 
-    it('ignores login-loop returnUrl and redirects /login to / when authenticated', () => {
+    it('ignores login-loop returnUrl and redirects /login to / when authenticated', async () => {
       isAuthenticated.set(true);
 
       const result = runGuard('/login?returnUrl=%2Flogin%3FreturnUrl%3D%252Fsearch');
+      const resolvedResult = await resolveGuardResult(result);
 
-      expect(asUrl(result)).toBe('/');
+      expect(asUrl(resolvedResult)).toBe('/');
     });
 
-    it('ignores too-long returnUrl and redirects /login to / when authenticated', () => {
+    it('ignores too-long returnUrl and redirects /login to / when authenticated', async () => {
       isAuthenticated.set(true);
       const longReturnUrl = `/${'a'.repeat(2001)}`;
 
       const result = runGuard(`/login?returnUrl=${encodeURIComponent(longReturnUrl)}`);
+      const resolvedResult = await resolveGuardResult(result);
 
-      expect(asUrl(result)).toBe('/');
+      expect(asUrl(resolvedResult)).toBe('/');
     });
   });
 });

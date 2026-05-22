@@ -1,10 +1,11 @@
 import { DefaultUrlSerializer, Router, UrlTree } from '@angular/router';
 
 import {
+  AuthRedirectStorageService,
   AUTH_REDIRECT_MARKER_QUERY_PARAM,
   AUTH_REDIRECT_MARKER_VALUE
 } from '@services/auth-redirect-storage.service';
-import { getAuthRedirectNavigationQueryParams } from './auth-redirect-url.utils';
+import { createLoginRedirectQueryParams, getAuthRedirectNavigationQueryParams } from './auth-redirect-url.utils';
 
 describe('auth-redirect-url utils', () => {
   function createRouter(): Pick<Router, 'parseUrl'> {
@@ -75,5 +76,46 @@ describe('auth-redirect-url utils', () => {
     const result = getAuthRedirectNavigationQueryParams(router as Router, '/login?returnUrl=%2Fsearch');
 
     expect(result).toEqual({});
+  });
+
+  it('builds marker-based login redirect params when storage is available', () => {
+    const router = createRouter();
+    const authRedirectStorage: Pick<AuthRedirectStorageService, 'storeReturnUrl' | 'clearReturnUrl'> = {
+      storeReturnUrl: () => true,
+      clearReturnUrl: jasmine.createSpy('clearReturnUrl')
+    };
+
+    const result = createLoginRedirectQueryParams(router as Router, authRedirectStorage, '/collection/123/text');
+
+    expect(authRedirectStorage.clearReturnUrl).toHaveBeenCalledTimes(1);
+    expect(result).toEqual({
+      [AUTH_REDIRECT_MARKER_QUERY_PARAM]: AUTH_REDIRECT_MARKER_VALUE
+    });
+  });
+
+  it('falls back to legacy returnUrl when storage is unavailable', () => {
+    const router = createRouter();
+    const authRedirectStorage: Pick<AuthRedirectStorageService, 'storeReturnUrl' | 'clearReturnUrl'> = {
+      storeReturnUrl: () => false,
+      clearReturnUrl: jasmine.createSpy('clearReturnUrl')
+    };
+
+    const result = createLoginRedirectQueryParams(router as Router, authRedirectStorage, '/collection/123/text');
+
+    expect(result).toEqual({ returnUrl: '/collection/123/text' });
+  });
+
+  it('returns undefined redirect params for unsafe targets', () => {
+    const router = createRouter();
+    const authRedirectStorage: Pick<AuthRedirectStorageService, 'storeReturnUrl' | 'clearReturnUrl'> = {
+      storeReturnUrl: jasmine.createSpy('storeReturnUrl').and.returnValue(true),
+      clearReturnUrl: jasmine.createSpy('clearReturnUrl')
+    };
+
+    const result = createLoginRedirectQueryParams(router as Router, authRedirectStorage, '//evil.example');
+
+    expect(authRedirectStorage.clearReturnUrl).toHaveBeenCalledTimes(1);
+    expect(authRedirectStorage.storeReturnUrl).not.toHaveBeenCalled();
+    expect(result).toBeUndefined();
   });
 });

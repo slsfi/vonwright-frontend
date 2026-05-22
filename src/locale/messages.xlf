@@ -898,17 +898,17 @@
     </unit>
     <unit id="Login.ConsentPrivacyOnly">
       <segment>
-        <source> Genom att logga in godkänner du <pc id="0" equivStart="START_LINK" equivEnd="CLOSE_LINK" type="link" dispStart="&lt;a [routerLink]=&quot;[&apos;/privacy-policy&apos;]&quot;&gt;" dispEnd="&lt;/a&gt;">dataskyddsbeskrivningen</pc>. </source>
+        <source>Genom att logga in godkänner du <pc id="0" equivStart="START_LINK" equivEnd="CLOSE_LINK" type="link" dispStart="&lt;a [routerLink]=&quot;[&apos;/privacy-policy&apos;]&quot;&gt;" dispEnd="&lt;/a&gt;">dataskyddsbeskrivningen</pc>.</source>
       </segment>
     </unit>
     <unit id="Login.ConsentTermsAndPrivacy">
       <segment>
-        <source> Genom att logga in godkänner du <pc id="0" equivStart="START_LINK" equivEnd="CLOSE_LINK" type="link" dispStart="&lt;a [routerLink]=&quot;[&apos;/terms&apos;]&quot;&gt;" dispEnd="&lt;/a&gt;">användarvillkoren</pc> och <pc id="1" equivStart="START_LINK_1" equivEnd="CLOSE_LINK" type="link" dispStart="&lt;a [routerLink]=&quot;[&apos;/privacy-policy&apos;]&quot;&gt;" dispEnd="&lt;/a&gt;">dataskyddsbeskrivningen</pc>. </source>
+        <source>Genom att logga in godkänner du <pc id="0" equivStart="START_LINK" equivEnd="CLOSE_LINK" type="link" dispStart="&lt;a [routerLink]=&quot;[&apos;/terms&apos;]&quot;&gt;" dispEnd="&lt;/a&gt;">användarvillkoren</pc> och <pc id="1" equivStart="START_LINK_1" equivEnd="CLOSE_LINK" type="link" dispStart="&lt;a [routerLink]=&quot;[&apos;/privacy-policy&apos;]&quot;&gt;" dispEnd="&lt;/a&gt;">dataskyddsbeskrivningen</pc>.</source>
       </segment>
     </unit>
     <unit id="Login.ConsentTermsOnly">
       <segment>
-        <source> Genom att logga in godkänner du <pc id="0" equivStart="START_LINK" equivEnd="CLOSE_LINK" type="link" dispStart="&lt;a [routerLink]=&quot;[&apos;/terms&apos;]&quot;&gt;" dispEnd="&lt;/a&gt;">användarvillkoren</pc>. </source>
+        <source>Genom att logga in godkänner du <pc id="0" equivStart="START_LINK" equivEnd="CLOSE_LINK" type="link" dispStart="&lt;a [routerLink]=&quot;[&apos;/terms&apos;]&quot;&gt;" dispEnd="&lt;/a&gt;">användarvillkoren</pc>.</source>
       </segment>
     </unit>
     <unit id="Login.CreateAccount">
@@ -1163,7 +1163,7 @@
     </unit>
     <unit id="Metadata.ArchiveInfo">
       <segment>
-        <source>Arkivkälla för faksimilet</source>
+        <source>Arkivkälla</source>
       </segment>
     </unit>
     <unit id="Metadata.Author">
@@ -1183,7 +1183,7 @@
     </unit>
     <unit id="Metadata.ExternalUrl">
       <segment>
-        <source>Extern länk för faksimilet</source>
+        <source>Extern länk</source>
       </segment>
     </unit>
     <unit id="Metadata.Facsimile">
@@ -1196,14 +1196,49 @@
         <source>Faksimil</source>
       </segment>
     </unit>
-    <unit id="Metadata.FacsimileTitle">
+    <unit id="Metadata.FacsimileSummary">
       <segment>
-        <source>Faksimilets titel</source>
+        <source>Faksimilinfo</source>
       </segment>
     </unit>
     <unit id="Metadata.ImageNumberInfo">
       <segment>
-        <source>Bildernas nummer i digitalarkivet</source>
+        <source>Bildernas nummer <ph id="0" equiv="LINE_BREAK" type="fmt" disp="&lt;br&gt;"/>i digitalarkivet</source>
+      </segment>
+    </unit>
+    <unit id="Metadata.Keywords">
+      <segment>
+        <source>Ämnesord</source>
+      </segment>
+    </unit>
+    <unit id="Metadata.Language">
+      <segment>
+        <source>Språk</source>
+      </segment>
+    </unit>
+    <unit id="Metadata.Licence">
+      <segment>
+        <source>Licens</source>
+      </segment>
+    </unit>
+    <unit id="Metadata.LicenceEncoding">
+      <segment>
+        <source>Licens för TEI-filen</source>
+      </segment>
+    </unit>
+    <unit id="Metadata.LicenceWork">
+      <segment>
+        <source>Licens för verket</source>
+      </segment>
+    </unit>
+    <unit id="Metadata.Manuscript">
+      <segment>
+        <source>Manuskript</source>
+      </segment>
+    </unit>
+    <unit id="Metadata.Manuscripts">
+      <segment>
+        <source>Manuskript</source>
       </segment>
     </unit>
     <unit id="Metadata.Metadata">
@@ -1221,14 +1256,54 @@
         <source>Antal bilder</source>
       </segment>
     </unit>
+    <unit id="Metadata.OrigDate">
+      <segment>
+        <source>Datering</source>
+      </segment>
+    </unit>
     <unit id="Metadata.OriginalLanguage">
       <segment>
         <source>Originalspråk</source>
       </segment>
     </unit>
+    <unit id="Metadata.Overview">
+      <segment>
+        <source>Översikt</source>
+      </segment>
+    </unit>
+    <unit id="Metadata.Persons">
+      <segment>
+        <source>Personer</source>
+      </segment>
+    </unit>
+    <unit id="Metadata.PhysDescription">
+      <segment>
+        <source>Fysisk beskrivning</source>
+      </segment>
+    </unit>
+    <unit id="Metadata.PhysDimensions">
+      <segment>
+        <source>Fysiska mått</source>
+      </segment>
+    </unit>
+    <unit id="Metadata.Places">
+      <segment>
+        <source>Orter</source>
+      </segment>
+    </unit>
     <unit id="Metadata.PublicationDate">
       <segment>
         <source>Datering</source>
+      </segment>
+    </unit>
+    <unit id="Metadata.PublicationGenre">
+      <segment>
+        <source>Genre</source>
+      </segment>
+    </unit>
+    <unit id="Metadata.PublicationLanguage">
+      <segment>
+        <source>Språk</source>
       </segment>
     </unit>
     <unit id="Metadata.PublicationSubtitle">
@@ -1256,6 +1331,16 @@
         <source>Mottagare</source>
       </segment>
     </unit>
+    <unit id="Metadata.Responsibility">
+      <segment>
+        <source>Bearbetning</source>
+      </segment>
+    </unit>
+    <unit id="Metadata.Rights">
+      <segment>
+        <source>Rättigheter</source>
+      </segment>
+    </unit>
     <unit id="Metadata.Sender">
       <segment>
         <source>Avsändare</source>
@@ -1266,6 +1351,16 @@
         <source>Avsändare</source>
       </segment>
     </unit>
+    <unit id="Metadata.SourceArchive">
+      <segment>
+        <source>Arkivkälla</source>
+      </segment>
+    </unit>
+    <unit id="Metadata.SourceBibl">
+      <segment>
+        <source>Bibliografisk källa</source>
+      </segment>
+    </unit>
     <unit id="Metadata.Translation">
       <segment>
         <source>Översättning</source>
@@ -1274,6 +1369,31 @@
     <unit id="Metadata.Translations">
       <segment>
         <source>Översättningar</source>
+      </segment>
+    </unit>
+    <unit id="Metadata.Untitled">
+      <segment>
+        <source>[saknar titel]</source>
+      </segment>
+    </unit>
+    <unit id="Metadata.Variant">
+      <segment>
+        <source>Tryckt variant</source>
+      </segment>
+    </unit>
+    <unit id="Metadata.VariantBaseText">
+      <segment>
+        <source>Grundtext</source>
+      </segment>
+    </unit>
+    <unit id="Metadata.Variants">
+      <segment>
+        <source>Tryckta varianter</source>
+      </segment>
+    </unit>
+    <unit id="Metadata.VariantText">
+      <segment>
+        <source>Variant</source>
       </segment>
     </unit>
     <unit id="NamedEntity.Articles">
@@ -1438,7 +1558,7 @@
     </unit>
     <unit id="Password.TooShort">
       <segment>
-        <source>Lösenordet är för kort.</source>
+        <source>Lösenordet måste vara minst 12 tecken långt.</source>
       </segment>
     </unit>
     <unit id="PdfViewer.DownloadPdf">
@@ -1713,7 +1833,7 @@
     </unit>
     <unit id="Register.TermsSummary">
       <segment>
-        <source><pc id="0" equivStart="START_PARAGRAPH" equivEnd="CLOSE_PARAGRAPH" type="other" dispStart="&lt;p&gt;" dispEnd="&lt;/p&gt;">Denna digitala utgåva tillgängliggör upphovs­rättsligt skyddat material. Materialet publiceras online med tillstånd av rätts­innehavarna.</pc><pc id="1" equivStart="START_PARAGRAPH" equivEnd="CLOSE_PARAGRAPH" type="other" dispStart="&lt;p&gt;" dispEnd="&lt;/p&gt;">Utgåvan får användas för <pc id="2" equivStart="START_BOLD_TEXT" equivEnd="CLOSE_BOLD_TEXT" type="fmt" dispStart="&lt;b&gt;" dispEnd="&lt;/b&gt;">privata, pedagogiska och veten­skapliga ändamål</pc>. Du får läsa, studera och utforska innehållet samt citera kortare utdrag i den omfattning som är tillåten enligt lag, under förut­sättning att du anger källan. Text- och data­utvinning på materialet är tillåtet endast för vetenskaplig forskning.</pc><pc id="3" equivStart="START_PARAGRAPH" equivEnd="CLOSE_PARAGRAPH" type="other" dispStart="&lt;p&gt;" dispEnd="&lt;/p&gt;">Det är inte tillåtet att kopiera, dela, återpublicera eller göra texterna eller bilderna tillgängliga på andra plattformar eller tjänster – inte ens för icke-kommersiella ändamål. Materialet får inte heller användas i kommersiellt syfte.</pc></source>
+        <source><pc id="0" equivStart="START_PARAGRAPH" equivEnd="CLOSE_PARAGRAPH" type="other" dispStart="&lt;p&gt;" dispEnd="&lt;/p&gt;">Denna digitala utgåva tillgängliggör upphovs­rättsligt skyddat material. Materialet publiceras på nätet med tillstånd av rätts­innehavarna.</pc><pc id="1" equivStart="START_PARAGRAPH" equivEnd="CLOSE_PARAGRAPH" type="other" dispStart="&lt;p&gt;" dispEnd="&lt;/p&gt;">Utgåvan får användas för <pc id="2" equivStart="START_BOLD_TEXT" equivEnd="CLOSE_BOLD_TEXT" type="fmt" dispStart="&lt;b&gt;" dispEnd="&lt;/b&gt;">privata, pedagogiska och veten­skapliga ändamål</pc>. Du får läsa, studera och utforska innehållet samt citera kortare utdrag i den omfattning som är tillåten enligt lag, under förut­sättning att du anger källan. Text- och data­utvinning på materialet är tillåten endast för vetenskaplig forskning.</pc><pc id="3" equivStart="START_PARAGRAPH" equivEnd="CLOSE_PARAGRAPH" type="other" dispStart="&lt;p&gt;" dispEnd="&lt;/p&gt;">Det är inte tillåtet att kopiera, dela, återpublicera eller göra texterna eller bilderna tillgängliga på andra plattformar eller tjänster – inte ens för icke-kommersiella ändamål. Materialet får inte heller användas i kommersiellt syfte.</pc></source>
       </segment>
     </unit>
     <unit id="Register.TermsSummaryHeading">

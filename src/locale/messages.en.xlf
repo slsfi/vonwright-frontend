@@ -730,7 +730,7 @@
     <unit id="Facsimiles.ChangeFacsimile">
       <segment state="initial">
         <source>Byt faksimil</source>
-        <target>Select facsimile</target>
+        <target>Change facsimile</target>
       </segment>
     </unit>
     <unit id="Facsimiles.Error">
@@ -748,7 +748,7 @@
     <unit id="Facsimiles.Facsimile">
       <segment state="initial">
         <source>Faksimil</source>
-        <target>Facsimiles</target>
+        <target>Facsimile</target>
       </segment>
     </unit>
     <unit id="Facsimiles.Fullscreen">
@@ -1077,20 +1077,20 @@
     </unit>
     <unit id="Login.ConsentPrivacyOnly">
       <segment state="initial">
-        <source> Genom att logga in godkänner du <pc id="0" equivStart="START_LINK" equivEnd="CLOSE_LINK" type="link" dispStart="&lt;a [routerLink]=&quot;[&apos;/privacy-policy&apos;]&quot;&gt;" dispEnd="&lt;/a&gt;">dataskyddsbeskrivningen</pc>. </source>
-        <target> By logging in, you accept the <pc id="0" equivStart="START_LINK" equivEnd="CLOSE_LINK" type="link" dispStart="&lt;a [routerLink]=&quot;[&apos;/privacy-policy&apos;]&quot;&gt;" dispEnd="&lt;/a&gt;">privacy policy</pc>. </target>
+        <source>Genom att logga in godkänner du <pc id="0" equivStart="START_LINK" equivEnd="CLOSE_LINK" type="link" dispStart="&lt;a [routerLink]=&quot;[&apos;/privacy-policy&apos;]&quot;&gt;" dispEnd="&lt;/a&gt;">dataskyddsbeskrivningen</pc>.</source>
+        <target>By logging in, you accept the <pc id="0" equivStart="START_LINK" equivEnd="CLOSE_LINK" type="link" dispStart="&lt;a [routerLink]=&quot;[&apos;/privacy-policy&apos;]&quot;&gt;" dispEnd="&lt;/a&gt;">Privacy policy</pc>.</target>
       </segment>
     </unit>
     <unit id="Login.ConsentTermsAndPrivacy">
       <segment state="initial">
-        <source> Genom att logga in godkänner du <pc id="0" equivStart="START_LINK" equivEnd="CLOSE_LINK" type="link" dispStart="&lt;a [routerLink]=&quot;[&apos;/terms&apos;]&quot;&gt;" dispEnd="&lt;/a&gt;">användarvillkoren</pc> och <pc id="1" equivStart="START_LINK_1" equivEnd="CLOSE_LINK" type="link" dispStart="&lt;a [routerLink]=&quot;[&apos;/privacy-policy&apos;]&quot;&gt;" dispEnd="&lt;/a&gt;">dataskyddsbeskrivningen</pc>. </source>
-        <target> By logging in, you accept the <pc id="0" equivStart="START_LINK" equivEnd="CLOSE_LINK" type="link" dispStart="&lt;a [routerLink]=&quot;[&apos;/terms&apos;]&quot;&gt;" dispEnd="&lt;/a&gt;">terms of use</pc> and <pc id="1" equivStart="START_LINK_1" equivEnd="CLOSE_LINK" type="link" dispStart="&lt;a [routerLink]=&quot;[&apos;/privacy-policy&apos;]&quot;&gt;" dispEnd="&lt;/a&gt;">privacy policy</pc>. </target>
+        <source>Genom att logga in godkänner du <pc id="0" equivStart="START_LINK" equivEnd="CLOSE_LINK" type="link" dispStart="&lt;a [routerLink]=&quot;[&apos;/terms&apos;]&quot;&gt;" dispEnd="&lt;/a&gt;">användarvillkoren</pc> och <pc id="1" equivStart="START_LINK_1" equivEnd="CLOSE_LINK" type="link" dispStart="&lt;a [routerLink]=&quot;[&apos;/privacy-policy&apos;]&quot;&gt;" dispEnd="&lt;/a&gt;">dataskyddsbeskrivningen</pc>.</source>
+        <target>By logging in, you accept the <pc id="0" equivStart="START_LINK" equivEnd="CLOSE_LINK" type="link" dispStart="&lt;a [routerLink]=&quot;[&apos;/terms&apos;]&quot;&gt;" dispEnd="&lt;/a&gt;">Terms of use</pc> and <pc id="1" equivStart="START_LINK_1" equivEnd="CLOSE_LINK" type="link" dispStart="&lt;a [routerLink]=&quot;[&apos;/privacy-policy&apos;]&quot;&gt;" dispEnd="&lt;/a&gt;">Privacy policy</pc>.</target>
       </segment>
     </unit>
     <unit id="Login.ConsentTermsOnly">
       <segment state="initial">
-        <source> Genom att logga in godkänner du <pc id="0" equivStart="START_LINK" equivEnd="CLOSE_LINK" type="link" dispStart="&lt;a [routerLink]=&quot;[&apos;/terms&apos;]&quot;&gt;" dispEnd="&lt;/a&gt;">användarvillkoren</pc>. </source>
-        <target> By logging in, you accept the <pc id="0" equivStart="START_LINK" equivEnd="CLOSE_LINK" type="link" dispStart="&lt;a [routerLink]=&quot;[&apos;/terms&apos;]&quot;&gt;" dispEnd="&lt;/a&gt;">terms of use</pc>. </target>
+        <source>Genom att logga in godkänner du <pc id="0" equivStart="START_LINK" equivEnd="CLOSE_LINK" type="link" dispStart="&lt;a [routerLink]=&quot;[&apos;/terms&apos;]&quot;&gt;" dispEnd="&lt;/a&gt;">användarvillkoren</pc>.</source>
+        <target>By logging in, you accept the <pc id="0" equivStart="START_LINK" equivEnd="CLOSE_LINK" type="link" dispStart="&lt;a [routerLink]=&quot;[&apos;/terms&apos;]&quot;&gt;" dispEnd="&lt;/a&gt;">Terms of use</pc>.</target>
       </segment>
     </unit>
     <unit id="Login.CreateAccount">
@@ -1395,7 +1395,7 @@
     </unit>
     <unit id="Metadata.ArchiveInfo">
       <segment state="initial">
-        <source>Arkivkälla för faksimilet</source>
+        <source>Arkivkälla</source>
         <target>Archive</target>
       </segment>
     </unit>
@@ -1419,7 +1419,7 @@
     </unit>
     <unit id="Metadata.ExternalUrl">
       <segment state="initial">
-        <source>Extern länk för faksimilet</source>
+        <source>Extern länk</source>
         <target>Link</target>
       </segment>
     </unit>
@@ -1435,16 +1435,58 @@
         <target>Facsimiles</target>
       </segment>
     </unit>
-    <unit id="Metadata.FacsimileTitle">
+    <unit id="Metadata.FacsimileSummary">
       <segment state="initial">
-        <source>Faksimilets titel</source>
-        <target>Facsimile title</target>
+        <source>Faksimilinfo</source>
+        <target>Facsimile info</target>
       </segment>
     </unit>
     <unit id="Metadata.ImageNumberInfo">
       <segment state="initial">
-        <source>Bildernas nummer i digitalarkivet</source>
+        <source>Bildernas nummer <ph id="0" equiv="LINE_BREAK" type="fmt" disp="&lt;br&gt;"/>i digitalarkivet</source>
         <target>Image number info</target>
+      </segment>
+    </unit>
+    <unit id="Metadata.Keywords">
+      <segment state="initial">
+        <source>Ämnesord</source>
+        <target>Keywords</target>
+      </segment>
+    </unit>
+    <unit id="Metadata.Language">
+      <segment state="initial">
+        <source>Språk</source>
+        <target>Language</target>
+      </segment>
+    </unit>
+    <unit id="Metadata.Licence">
+      <segment state="initial">
+        <source>Licens</source>
+        <target>Licence</target>
+      </segment>
+    </unit>
+    <unit id="Metadata.LicenceEncoding">
+      <segment state="initial">
+        <source>Licens för TEI-filen</source>
+        <target>Licence for the TEI-file</target>
+      </segment>
+    </unit>
+    <unit id="Metadata.LicenceWork">
+      <segment state="initial">
+        <source>Licens för verket</source>
+        <target>Licens for the work</target>
+      </segment>
+    </unit>
+    <unit id="Metadata.Manuscript">
+      <segment state="initial">
+        <source>Manuskript</source>
+        <target>Manuscript</target>
+      </segment>
+    </unit>
+    <unit id="Metadata.Manuscripts">
+      <segment state="initial">
+        <source>Manuskript</source>
+        <target>Manuscripts</target>
       </segment>
     </unit>
     <unit id="Metadata.Metadata">
@@ -1465,16 +1507,64 @@
         <target>Number of images</target>
       </segment>
     </unit>
+    <unit id="Metadata.OrigDate">
+      <segment state="initial">
+        <source>Datering</source>
+        <target>Date</target>
+      </segment>
+    </unit>
     <unit id="Metadata.OriginalLanguage">
       <segment state="initial">
         <source>Originalspråk</source>
         <target>Original language</target>
       </segment>
     </unit>
+    <unit id="Metadata.Overview">
+      <segment state="initial">
+        <source>Översikt</source>
+        <target>Overview</target>
+      </segment>
+    </unit>
+    <unit id="Metadata.Persons">
+      <segment state="initial">
+        <source>Personer</source>
+        <target>Persons</target>
+      </segment>
+    </unit>
+    <unit id="Metadata.PhysDescription">
+      <segment state="initial">
+        <source>Fysisk beskrivning</source>
+        <target>Physical description</target>
+      </segment>
+    </unit>
+    <unit id="Metadata.PhysDimensions">
+      <segment state="initial">
+        <source>Fysiska mått</source>
+        <target>Dimensions</target>
+      </segment>
+    </unit>
+    <unit id="Metadata.Places">
+      <segment state="initial">
+        <source>Orter</source>
+        <target>Places</target>
+      </segment>
+    </unit>
     <unit id="Metadata.PublicationDate">
       <segment state="initial">
         <source>Datering</source>
         <target>Date</target>
+      </segment>
+    </unit>
+    <unit id="Metadata.PublicationGenre">
+      <segment state="initial">
+        <source>Genre</source>
+        <target>Genre</target>
+      </segment>
+    </unit>
+    <unit id="Metadata.PublicationLanguage">
+      <segment state="initial">
+        <source>Språk</source>
+        <target>Language</target>
       </segment>
     </unit>
     <unit id="Metadata.PublicationSubtitle">
@@ -1507,6 +1597,18 @@
         <target>Recipients</target>
       </segment>
     </unit>
+    <unit id="Metadata.Responsibility">
+      <segment state="initial">
+        <source>Bearbetning</source>
+        <target>Preparation</target>
+      </segment>
+    </unit>
+    <unit id="Metadata.Rights">
+      <segment state="initial">
+        <source>Rättigheter</source>
+        <target>Rights</target>
+      </segment>
+    </unit>
     <unit id="Metadata.Sender">
       <segment state="initial">
         <source>Avsändare</source>
@@ -1519,6 +1621,18 @@
         <target>Senders</target>
       </segment>
     </unit>
+    <unit id="Metadata.SourceArchive">
+      <segment state="initial">
+        <source>Arkivkälla</source>
+        <target>Source archive</target>
+      </segment>
+    </unit>
+    <unit id="Metadata.SourceBibl">
+      <segment state="initial">
+        <source>Bibliografisk källa</source>
+        <target>Bibliographic source</target>
+      </segment>
+    </unit>
     <unit id="Metadata.Translation">
       <segment state="initial">
         <source>Översättning</source>
@@ -1529,6 +1643,36 @@
       <segment state="initial">
         <source>Översättningar</source>
         <target>Translations</target>
+      </segment>
+    </unit>
+    <unit id="Metadata.Untitled">
+      <segment state="initial">
+        <source>[saknar titel]</source>
+        <target>[untitled]</target>
+      </segment>
+    </unit>
+    <unit id="Metadata.Variant">
+      <segment state="initial">
+        <source>Tryckt variant</source>
+        <target>Printed variant</target>
+      </segment>
+    </unit>
+    <unit id="Metadata.VariantBaseText">
+      <segment state="initial">
+        <source>Grundtext</source>
+        <target>Base text</target>
+      </segment>
+    </unit>
+    <unit id="Metadata.Variants">
+      <segment state="initial">
+        <source>Tryckta varianter</source>
+        <target>Printed variants</target>
+      </segment>
+    </unit>
+    <unit id="Metadata.VariantText">
+      <segment state="initial">
+        <source>Variant</source>
+        <target>Variant</target>
       </segment>
     </unit>
     <unit id="NamedEntity.Articles">
@@ -1725,8 +1869,8 @@
     </unit>
     <unit id="Password.TooShort">
       <segment state="initial">
-        <source>Lösenordet är för kort.</source>
-        <target>The password is too short.</target>
+        <source>Lösenordet måste vara minst 12 tecken långt.</source>
+        <target>The password must be at least 12 characters long.</target>
       </segment>
     </unit>
     <unit id="PdfViewer.DownloadPdf">
@@ -1852,25 +1996,25 @@
     <unit id="Register.AcceptPrivacyCheckbox">
       <segment state="initial">
         <source>Jag accepterar dataskyddsbeskrivningen.</source>
-        <target>I accept the privacy policy.</target>
+        <target>I accept the Privacy policy.</target>
       </segment>
     </unit>
     <unit id="Register.AcceptPrivacyRequired">
       <segment state="initial">
         <source>Du måste acceptera dataskyddsbeskrivningen.</source>
-        <target>You must accept the privacy policy.</target>
+        <target>You must accept the Privacy policy.</target>
       </segment>
     </unit>
     <unit id="Register.AcceptTermsCheckbox">
       <segment state="initial">
         <source>Jag accepterar användarvillkoren.</source>
-        <target>I accept the terms of use.</target>
+        <target>I accept the Terms of use.</target>
       </segment>
     </unit>
     <unit id="Register.AcceptTermsRequired">
       <segment state="initial">
         <source>Du måste acceptera användarvillkoren.</source>
-        <target>You must accept the terms of use.</target>
+        <target>You must accept the Terms of use.</target>
       </segment>
     </unit>
     <unit id="Register.AccountSectionHeading">
@@ -2002,7 +2146,7 @@
     <unit id="Register.PrivacyLink">
       <segment state="initial">
         <source>Mer information finns i <pc id="0" equivStart="START_LINK" equivEnd="CLOSE_LINK" type="link" dispStart="&lt;a [routerLink]=&quot;[&apos;/privacy-policy&apos;]&quot; target=&quot;_blank&quot;&gt;" dispEnd="&lt;/a&gt;">dataskyddsbeskrivningen</pc>.</source>
-        <target>You can find more information in the <pc id="0" equivStart="START_LINK" equivEnd="CLOSE_LINK" type="link" dispStart="&lt;a [routerLink]=&quot;[&apos;/privacy-policy&apos;]&quot; target=&quot;_blank&quot;&gt;" dispEnd="&lt;/a&gt;">privacy policy</pc>.</target>
+        <target>You can find more information in the <pc id="0" equivStart="START_LINK" equivEnd="CLOSE_LINK" type="link" dispStart="&lt;a [routerLink]=&quot;[&apos;/privacy-policy&apos;]&quot; target=&quot;_blank&quot;&gt;" dispEnd="&lt;/a&gt;">Privacy policy</pc>.</target>
       </segment>
     </unit>
     <unit id="Register.PrivacySummary">
@@ -2014,7 +2158,7 @@
     <unit id="Register.PrivacySummaryHeading">
       <segment state="initial">
         <source>Sammanfattning av dataskyddsbeskrivningen</source>
-        <target>Summary of privacy policy</target>
+        <target>Summary of the Privacy policy</target>
       </segment>
     </unit>
     <unit id="Register.RepeatPasswordLabel">
@@ -2050,19 +2194,19 @@
     <unit id="Register.TermsLink">
       <segment state="initial">
         <source>Fullständiga villkor finns i <pc id="0" equivStart="START_LINK" equivEnd="CLOSE_LINK" type="link" dispStart="&lt;a [routerLink]=&quot;[&apos;/terms&apos;]&quot; target=&quot;_blank&quot;&gt;" dispEnd="&lt;/a&gt;">användarvillkoren</pc>.</source>
-        <target>The full terms and conditions are set out in the <pc id="0" equivStart="START_LINK" equivEnd="CLOSE_LINK" type="link" dispStart="&lt;a [routerLink]=&quot;[&apos;/terms&apos;]&quot; target=&quot;_blank&quot;&gt;" dispEnd="&lt;/a&gt;">terms of Use</pc>.</target>
+        <target>The full terms and conditions are set out in the <pc id="0" equivStart="START_LINK" equivEnd="CLOSE_LINK" type="link" dispStart="&lt;a [routerLink]=&quot;[&apos;/terms&apos;]&quot; target=&quot;_blank&quot;&gt;" dispEnd="&lt;/a&gt;">Terms of use</pc>.</target>
       </segment>
     </unit>
     <unit id="Register.TermsSummary">
       <segment state="initial">
-        <source><pc id="0" equivStart="START_PARAGRAPH" equivEnd="CLOSE_PARAGRAPH" type="other" dispStart="&lt;p&gt;" dispEnd="&lt;/p&gt;">Denna digitala utgåva tillgängliggör upphovs­rättsligt skyddat material. Materialet publiceras online med tillstånd av rätts­innehavarna.</pc><pc id="1" equivStart="START_PARAGRAPH" equivEnd="CLOSE_PARAGRAPH" type="other" dispStart="&lt;p&gt;" dispEnd="&lt;/p&gt;">Utgåvan får användas för <pc id="2" equivStart="START_BOLD_TEXT" equivEnd="CLOSE_BOLD_TEXT" type="fmt" dispStart="&lt;b&gt;" dispEnd="&lt;/b&gt;">privata, pedagogiska och veten­skapliga ändamål</pc>. Du får läsa, studera och utforska innehållet samt citera kortare utdrag i den omfattning som är tillåten enligt lag, under förut­sättning att du anger källan. Text- och data­utvinning på materialet är tillåtet endast för vetenskaplig forskning.</pc><pc id="3" equivStart="START_PARAGRAPH" equivEnd="CLOSE_PARAGRAPH" type="other" dispStart="&lt;p&gt;" dispEnd="&lt;/p&gt;">Det är inte tillåtet att kopiera, dela, återpublicera eller göra texterna eller bilderna tillgängliga på andra plattformar eller tjänster – inte ens för icke-kommersiella ändamål. Materialet får inte heller användas i kommersiellt syfte.</pc></source>
-        <target><pc id="0" equivStart="START_PARAGRAPH" equivEnd="CLOSE_PARAGRAPH" type="other" dispStart="&lt;p&gt;" dispEnd="&lt;/p&gt;">This digital edition makes copyright-protected material available. The material is published online with the permission of the rights holders.</pc><pc id="1" equivStart="START_PARAGRAPH" equivEnd="CLOSE_PARAGRAPH" type="other" dispStart="&lt;p&gt;" dispEnd="&lt;/p&gt;">The edition may be used for <pc id="2" equivStart="START_BOLD_TEXT" equivEnd="CLOSE_BOLD_TEXT" type="fmt" dispStart="&lt;b&gt;" dispEnd="&lt;/b&gt;">personal, educational, and scholarly purposes</pc>. You may read, study, and explore the content, and quote short passages where quotation is permitted by law, provided that the source is cited. Text and data mining of the material is permitted only for scientific research.</pc><pc id="3" equivStart="START_PARAGRAPH" equivEnd="CLOSE_PARAGRAPH" type="other" dispStart="&lt;p&gt;" dispEnd="&lt;/p&gt;">It is not permitted to copy, share, republish, or otherwise make the texts or images available on other platforms or services – not even for non-commercial purposes. The material may not be used for commercial purposes.</pc></target>
+        <source><pc id="0" equivStart="START_PARAGRAPH" equivEnd="CLOSE_PARAGRAPH" type="other" dispStart="&lt;p&gt;" dispEnd="&lt;/p&gt;">Denna digitala utgåva tillgängliggör upphovs­rättsligt skyddat material. Materialet publiceras på nätet med tillstånd av rätts­innehavarna.</pc><pc id="1" equivStart="START_PARAGRAPH" equivEnd="CLOSE_PARAGRAPH" type="other" dispStart="&lt;p&gt;" dispEnd="&lt;/p&gt;">Utgåvan får användas för <pc id="2" equivStart="START_BOLD_TEXT" equivEnd="CLOSE_BOLD_TEXT" type="fmt" dispStart="&lt;b&gt;" dispEnd="&lt;/b&gt;">privata, pedagogiska och veten­skapliga ändamål</pc>. Du får läsa, studera och utforska innehållet samt citera kortare utdrag i den omfattning som är tillåten enligt lag, under förut­sättning att du anger källan. Text- och data­utvinning på materialet är tillåten endast för vetenskaplig forskning.</pc><pc id="3" equivStart="START_PARAGRAPH" equivEnd="CLOSE_PARAGRAPH" type="other" dispStart="&lt;p&gt;" dispEnd="&lt;/p&gt;">Det är inte tillåtet att kopiera, dela, återpublicera eller göra texterna eller bilderna tillgängliga på andra plattformar eller tjänster – inte ens för icke-kommersiella ändamål. Materialet får inte heller användas i kommersiellt syfte.</pc></source>
+        <target><pc id="0" equivStart="START_PARAGRAPH" equivEnd="CLOSE_PARAGRAPH" type="other" dispStart="&lt;p&gt;" dispEnd="&lt;/p&gt;">This digital edition makes copyright-protected material available. The material is published online with the permission of the rights holders.</pc><pc id="1" equivStart="START_PARAGRAPH" equivEnd="CLOSE_PARAGRAPH" type="other" dispStart="&lt;p&gt;" dispEnd="&lt;/p&gt;">The edition may be used for <pc id="2" equivStart="START_BOLD_TEXT" equivEnd="CLOSE_BOLD_TEXT" type="fmt" dispStart="&lt;b&gt;" dispEnd="&lt;/b&gt;">personal, educational, and scholarly purposes</pc>. You may read, study, and explore the content, and quote short passages where quotation is permitted by law, provided that the source is cited. Text and data mining of the material is permitted only for purposes of scholarly research.</pc><pc id="3" equivStart="START_PARAGRAPH" equivEnd="CLOSE_PARAGRAPH" type="other" dispStart="&lt;p&gt;" dispEnd="&lt;/p&gt;">It is not permitted to copy, share, republish, or otherwise make the texts or images available on other platforms or services – not even for non-commercial purposes. The material may not be used for commercial purposes.</pc></target>
       </segment>
     </unit>
     <unit id="Register.TermsSummaryHeading">
       <segment state="initial">
         <source>Sammanfattning av användarvillkoren</source>
-        <target>Summary of the terms of Use</target>
+        <target>Summary of the Terms of use</target>
       </segment>
     </unit>
     <unit id="Register.Title">

@@ -285,6 +285,12 @@ function getAuthProtectedRoutePaths(routeBlocks, authEnabled) {
   return extractAuthProtectedRoutePaths(routeBlocks);
 }
 
+function getAuthProtectedRoutePathsFromSourceFile(routesFilepath, authEnabled) {
+  const sourceContent = fs.readFileSync(path.join(__dirname, routesFilepath), 'utf-8');
+  const routeBlocks = extractRouteBlocks(sourceContent);
+  return getAuthProtectedRoutePaths(routeBlocks, authEnabled);
+}
+
 function extractAuthProtectedRoutePaths(routeBlocks) {
   const paths = routeBlocks
     .filter(isAuthProtectedRouteBlock)
@@ -451,6 +457,7 @@ module.exports = {
   getRoutePath,
   stripCommentsPreserveLiterals,
   getAuthProtectedRoutePaths,
+  getAuthProtectedRoutePathsFromSourceFile,
   extractAuthProtectedRoutePaths,
   isAuthProtectedRouteBlock
 };

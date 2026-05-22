@@ -186,6 +186,15 @@ test('current app.routes.ts yields no protected paths when auth is disabled', ()
   assert.deepStrictEqual(paths, []);
 });
 
+test('current app.routes.ts includes content in protected paths when auth is enabled', () => {
+  const routesPath = path.join(__dirname, '../src/app/app.routes.ts');
+  const source = fs.readFileSync(routesPath, 'utf-8');
+  const blocks = extractRouteBlocks(source);
+  const paths = getAuthProtectedRoutePaths(blocks, true);
+
+  assert.ok(paths.includes('content'));
+});
+
 let passed = 0;
 for (const { name, fn } of tests) {
   try {

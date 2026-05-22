@@ -95,6 +95,32 @@ export function resolveLoginRouteRedirectURL(
   return getSafeInternalRedirectURL(router, queryParams['returnUrl']);
 }
 
+/**
+ * Builds query params for redirecting to a guest auth route while preserving a
+ * safe post-login target when possible.
+ *
+ * Stored marker-based redirects take precedence when session storage is
+ * available; otherwise the helper falls back to the legacy `returnUrl` query
+ * parameter. Any previously stored redirect target is cleared first so stale
+ * values cannot leak into later auth flows.
+ */
+export function createLoginRedirectQueryParams(
+  router: Router,
+  authRedirectStorage: Pick<AuthRedirectStorageService, 'storeReturnUrl' | 'clearReturnUrl'>,
+  targetUrl: string
+): QueryParams | undefined {
+  const safeTargetURL = getSafeInternalRedirectURL(router, targetUrl);
+  authRedirectStorage.clearReturnUrl();
+
+  if (safeTargetURL && authRedirectStorage.storeReturnUrl(safeTargetURL)) {
+    return {
+      [AUTH_REDIRECT_MARKER_QUERY_PARAM]: AUTH_REDIRECT_MARKER_VALUE
+    };
+  }
+
+  return safeTargetURL ? { returnUrl: safeTargetURL } : undefined;
+}
+
 export function getAuthRedirectNavigationQueryParams(router: Router, currentUrl: string): QueryParams {
   const queryParams = getQueryParams(router, currentUrl);
   if (!queryParams) {

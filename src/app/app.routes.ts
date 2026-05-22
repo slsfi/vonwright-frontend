@@ -47,7 +47,8 @@ export const routes: Routes = [
   },
   {
     path: 'content',
-    loadChildren: () => import('./pages/content/content.module').then(m => m.ContentPageModule)
+    loadChildren: () => import('./pages/content/content.module').then(m => m.ContentPageModule),
+    canActivate: [authGuard]
   },
   {
     path: 'collection/:collectionID/cover',

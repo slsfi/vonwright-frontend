@@ -8,6 +8,47 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ## Unreleased
 
+### Changed
+
+- Update to base version [`2.7.0`](https://github.com/slsfi/digital-edition-frontend-ng/releases/tag/2.7.0) from upstream, original repository.
+
+
+
+## [2.7.0] – 2026-05-22
+
+### Added
+
+- Broaden publication metadata support in the text metadata UI. The supported field contract is documented in [`docs/PUBLICATION-METADATA.md`](docs/PUBLICATION-METADATA.md). ([a051729](https://github.com/slsfi/digital-edition-frontend-ng/commit/a051729162a9834b64c9930d6b05f49c7f1dd9a7), [d1c33b9](https://github.com/slsfi/digital-edition-frontend-ng/commit/d1c33b9a1fc7ae8ca72e262e40fe9fd8358a6234), [7a7840c](https://github.com/slsfi/digital-edition-frontend-ng/commit/7a7840c0e59ef0a03c4455f523a6086f996866be))
+
+### Changed
+
+- Improve UI for publication metadata. ([fcfe2de](https://github.com/slsfi/digital-edition-frontend-ng/commit/fcfe2dee4340e38fce849559c40972ac25770686), [c43aa07](https://github.com/slsfi/digital-edition-frontend-ng/commit/c43aa0733405690cb1c5a20bac858499cf34a824), [d6a19cc](https://github.com/slsfi/digital-edition-frontend-ng/commit/d6a19cca6ba6f6120a1b421b162a5b7db6b37915))
+- Update `nginx` to 1.30.1. ([5d8f654](https://github.com/slsfi/digital-edition-frontend-ng/commit/5d8f6544af3091ae1636fed8d0ca48a9c2be40b7))
+- Deps: update `@angular/core` to 20.3.21 and `@angular/cli` to 20.3.26. ([822ad9b](https://github.com/slsfi/digital-edition-frontend-ng/commit/822ad9b0f105d2fd5240db87dea4a50d0582c65a), [359c03e](https://github.com/slsfi/digital-edition-frontend-ng/commit/359c03e4207b0c1a842cf2137b07e4ffcd2bdb2c))
+- Deps: update `express-rate-limit` to 8.5.2. ([e1842be](https://github.com/slsfi/digital-edition-frontend-ng/commit/e1842be6cacf5b0146be04f7425b6aed42b0cb6d), [e2e84d8](https://github.com/slsfi/digital-edition-frontend-ng/commit/e2e84d8d0911729c6b96cd056356ec1f53bbc7b5))
+- Deps: update `marked` to 18.0.4. ([e569689](https://github.com/slsfi/digital-edition-frontend-ng/commit/e569689d9d908aaaa1789c465d3cbdc1e4b46328), [c984fb9](https://github.com/slsfi/digital-edition-frontend-ng/commit/c984fb902de96abacd5cd5c3db710b25a113807b))
+- Deps (dev): update `@types/node` to 22.19.19. ([6b8888f](https://github.com/slsfi/digital-edition-frontend-ng/commit/6b8888f1fdac1f4ec8f03f99acbba9ed8953a75d))
+- Deps: update transitive dependencies. ([54adbd9](https://github.com/slsfi/digital-edition-frontend-ng/commit/54adbd9372c66789c6cd2973abbbb48cfbe2019e), [45811ca](https://github.com/slsfi/digital-edition-frontend-ng/commit/45811caae26dbd45987be52d63fa17cccfa468a1), [7410f9f](https://github.com/slsfi/digital-edition-frontend-ng/commit/7410f9fbe2ddd0728fa7805ab95e4e51d4ca1fe6), [66a7c1e](https://github.com/slsfi/digital-edition-frontend-ng/commit/66a7c1e829bd52f5d5b27137f75323aba25aaa6b), [2464f50](https://github.com/slsfi/digital-edition-frontend-ng/commit/2464f50adac13d3bc46a7def4d6c56b9ade31cdf))
+
+### Fixed
+
+- Translations. ([b25e64e](https://github.com/slsfi/digital-edition-frontend-ng/commit/b25e64e39846a4b6451557c03b8da4ec4e98fdb8), [f22a276](https://github.com/slsfi/digital-edition-frontend-ng/commit/f22a27610f204b42e47421754aeb002b53bac760), [eaf77ce](https://github.com/slsfi/digital-edition-frontend-ng/commit/eaf77ce9406e5616d57ee7df66831aded8b67e1f))
+- Test-entrypoint for running Angular specs. ([753d0a7](https://github.com/slsfi/digital-edition-frontend-ng/commit/753d0a74b49ee0c1705d1f2f4578f8b1dd0e3948))
+- Auth: keep requests with caller-supplied `Authorization` headers out of the interceptor-managed refresh flow, and on terminal refresh auth failures redirect to `/login` while preserving the current safe internal route through forced re-authentication via shared guard/interceptor redirect-query construction. ([af85ac7](https://github.com/slsfi/digital-edition-frontend-ng/commit/af85ac77d32073dc28e2c95a60a36efaa7c2a59e))
+- Auth: treat `/session/validate` backend `422` responses as terminal auth failures alongside `401`, so malformed/unusable bearer tokens on protected route validation clear auth state and redirect to `/login`. ([b948f5f](https://github.com/slsfi/digital-edition-frontend-ng/commit/b948f5ffedf3a82772736248badd0334e81326e2))
+- Auth: require restored token pairs to pass one-time startup `/session/validate` before marking the user authenticated, and wait for that bootstrap check in the auth guard. ([627702a](https://github.com/slsfi/digital-edition-frontend-ng/commit/627702a46a06b0cb6914f283056fec39d0ccd941))
+- Auth: require refreshed access tokens to pass `/session/validate` before storing them or retrying failed backend requests. ([97e7845](https://github.com/slsfi/digital-edition-frontend-ng/commit/97e7845ba5402e95b0a4b3fbd675aaee1eec6dbf))
+- Publication metadata: allow missing and unknown backend fields while normalizing optional arrays to empty arrays and scalar fields to `null`. ([3c382bf](https://github.com/slsfi/digital-edition-frontend-ng/commit/3c382bfdd4b50cfa882788f38e3ea29061539f4f))
+
+
+
+## [2.6.6] – 2026-04-20
+
+### Fixed
+
+- Translations. ([8ec4de1](https://github.com/slsfi/digital-edition-frontend-ng/commit/8ec4de13ccb6cad6a35605512a4d911bc802c0d0), [31cc600](https://github.com/slsfi/digital-edition-frontend-ng/commit/31cc6007ddb8e28d8274c8c6181a0e952fb2b7a1))
+- Auth: protect the `content` route with `authGuard` and derive sitemap auth-protected route exclusions from the canonical route definitions. ([82589c5](https://github.com/slsfi/digital-edition-frontend-ng/commit/82589c5ea2794be134dea10f17b3ca152e1a2b17))
+
 
 
 ## [2.6.5-production.1] – 2026-04-20
@@ -1515,7 +1556,9 @@ siteLogoDimensions: {
 
 
 
-[unreleased]: https://github.com/slsfi/digital-edition-frontend-ng/compare/2.6.5...HEAD
+[unreleased]: https://github.com/slsfi/digital-edition-frontend-ng/compare/2.7.0...HEAD
+[2.7.0]: https://github.com/slsfi/digital-edition-frontend-ng/compare/2.6.6...2.7.0
+[2.6.6]: https://github.com/slsfi/digital-edition-frontend-ng/compare/2.6.5...2.6.6
 [2.6.5]: https://github.com/slsfi/digital-edition-frontend-ng/compare/2.6.4...2.6.5
 [2.6.4]: https://github.com/slsfi/digital-edition-frontend-ng/compare/2.6.3...2.6.4
 [2.6.3]: https://github.com/slsfi/digital-edition-frontend-ng/compare/2.6.2...2.6.3

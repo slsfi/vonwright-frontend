@@ -118,18 +118,11 @@
   @if (showTermsLink || showPrivacyPolicyLink) {
     <footer class="legal-consent-footer">
       @if (showTermsLink && showPrivacyPolicyLink) {
-        <p class="legal-consent" i18n="@@Login.ConsentTermsAndPrivacy">
-          Genom att logga in godkänner du <a [routerLink]="['/terms']">användarvillkoren</a> och
-          <a [routerLink]="['/privacy-policy']">dataskyddsbeskrivningen</a>.
-        </p>
+        <p class="legal-consent" i18n="@@Login.ConsentTermsAndPrivacy">Genom att logga in godkänner du <a [routerLink]="['/terms']">användarvillkoren</a> och <a [routerLink]="['/privacy-policy']">dataskyddsbeskrivningen</a>.</p>
       } @else if (showTermsLink) {
-        <p class="legal-consent" i18n="@@Login.ConsentTermsOnly">
-          Genom att logga in godkänner du <a [routerLink]="['/terms']">användarvillkoren</a>.
-        </p>
+        <p class="legal-consent" i18n="@@Login.ConsentTermsOnly">Genom att logga in godkänner du <a [routerLink]="['/terms']">användarvillkoren</a>.</p>
       } @else if (showPrivacyPolicyLink) {
-        <p class="legal-consent" i18n="@@Login.ConsentPrivacyOnly">
-          Genom att logga in godkänner du <a [routerLink]="['/privacy-policy']">dataskyddsbeskrivningen</a>.
-        </p>
+        <p class="legal-consent" i18n="@@Login.ConsentPrivacyOnly">Genom att logga in godkänner du <a [routerLink]="['/privacy-policy']">dataskyddsbeskrivningen</a>.</p>
       }
     </footer>
   }

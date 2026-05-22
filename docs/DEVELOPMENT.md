@@ -198,6 +198,14 @@ Angular testing frameworks, not in use.
 
 
 
+## Publication metadata
+
+The supported field contract for the collection text metadata panel is documented in [`docs/PUBLICATION-METADATA.md`](PUBLICATION-METADATA.md).
+
+Update that document when changing `PublicationMetadata`, nested manuscript, variant, or facsimile metadata, or the metadata component template.
+
+
+
 ## Router preloading strategy
 
 The app uses a platform-specific router preloading strategy:
@@ -277,7 +285,7 @@ Authentication support is optional and controlled by config. This is intended so
 1. Set `app.auth.enabled` to `true` in [`src/assets/config/config.ts`](../src/assets/config/config.ts).
 2. Configure auth API base URL by setting `app.auth.backendAuthBaseURL`.
 3. If `app.auth.backendAuthBaseURL` is missing, auth service falls back to the origin of `app.backendBaseURL` (for example `https://api.example.org/digitaledition` becomes `https://api.example.org/`).
-4. Ensure backend exposes auth endpoints expected by frontend: `POST <backendAuthBaseURL>/auth/login` and `POST <backendAuthBaseURL>/auth/refresh`.
+4. Ensure backend exposes auth endpoints expected by frontend: `POST <backendAuthBaseURL>/auth/login`, `POST <backendAuthBaseURL>/auth/refresh`, and `GET <backendAuthBaseURL>/session/validate`.
 5. Protect routes by adding `canActivate: [authGuard]` in [`src/app/app.routes.ts`](../src/app/app.routes.ts) for the pages that require authentication.
 6. For protected routes that do not normally fetch backend data (for example `/account`), add `data: { requiresSessionValidation: true }` so the guard can validate current session state through `GET <backendAuthBaseURL>/session/validate`.
 7. Optional: configure `app.auth.sessionValidationTTLms` in [`src/assets/config/config.ts`](../src/assets/config/config.ts) to control how long a successful session validation is cached in the browser (default: `120000` ms).
@@ -299,6 +307,18 @@ In feature-based route mode, the `login` route is included only when `app.auth.e
 - If marker storage is unavailable (for example SSR), fallback uses legacy `returnUrl` query param.
 - Redirect target validation requires all of the following: starts with `/`, does not start with `//`, does not target `/login`, is parseable by Angular router, and is at most 2000 characters.
 
+### Startup session validation
+
+- On app startup, `AuthService` checks persisted token state before trusting it.
+- If either `access_token` or `refresh_token` is missing, auth state is cleared. This removes partial token state and leaves the user unauthenticated.
+- If both tokens exist, `AuthService` creates one one-time bootstrap validation request to `GET <backendAuthBaseURL>/session/validate` using the stored access token as the bearer token.
+- The in-memory authenticated state remains false until that startup validation succeeds.
+- The route guard waits for pending startup validation before allowing a protected route or redirecting to `/login`. This is a bootstrap check, not route-guard polling on every navigation.
+- If startup validation succeeds, the session is accepted, authenticated email is restored from storage, and protected routes can activate.
+- If the stored access token is stale and startup validation returns a terminal auth failure (`401` or `422`), the app may refresh the access token once with `POST <backendAuthBaseURL>/auth/refresh`.
+- The refreshed access token must also pass `GET <backendAuthBaseURL>/session/validate` before the startup session is accepted.
+- If startup validation or the one refresh attempt fails, auth state is cleared and the user remains unauthenticated.
+
 ### Interceptor and refresh hardening
 
 - Bearer token is attached only to requests targeting configured backend URLs (`backendBaseURL` / `backendAuthBaseURL`).
@@ -306,12 +326,12 @@ In feature-based route mode, the `login` route is included only when `app.auth.e
 - Refresh attempt is only made for backend 401 responses outside `/auth/*`.
 - When a backend 401 occurs for a request that used a stored access token but no refresh token is available, the user is logged out and redirected to `/login`.
 - `AuthService.refreshToken()` has defense-in-depth: if refresh token is missing, it fails fast, logs out, and skips network request.
+- Refreshed access tokens are validated with `GET <backendAuthBaseURL>/session/validate` before they are stored, emitted to concurrent refresh callers, or used for request retry.
 - Routes with `data.requiresSessionValidation: true` trigger a guard-level call to `GET <backendAuthBaseURL>/session/validate`.
 - Session validation is throttled and deduplicated in `AuthService.validateSessionIfStale()`:
   - successful validations are cached for `app.auth.sessionValidationTTLms` (default `120000` ms)
   - concurrent validations share one in-flight request
-- Session validation `401` is treated as unauthenticated and redirects to `/login`; non-401 validation failures are fail-open.
-- On app startup, `AuthService` treats a stored session as authenticated only when both `access_token` and `refresh_token` exist; partial token state is cleared.
+- Session validation `401` and `422` responses are treated as unauthenticated and redirect to `/login`; other guard-level validation probe failures are fail-open.
 
 ### Manual auth regression checklist (JWT expiry/invalidation)
 
@@ -323,10 +343,13 @@ Use this checklist after auth/interceptor/guard changes.
 1. Logged-out baseline: clear all three keys and open `/account`. Expected result: redirect to `/login`.
 2. Happy-path login: log in and open `/account`. Expected result: account page is accessible and protected content routes load normally.
 3. Partial stale state: keep only `access_token` in local storage (remove `refresh_token` and `auth_email`), then reload and open `/account`. Expected result: app clears stale state and redirects to `/login`.
-4. Backend-invalidated session with both tokens present: keep both tokens in local storage, invalidate them in backend, then open a protected route that performs backend requests (for example `/collection/:collectionID/text`). Expected result: first backend 401 triggers logout and redirect to `/login`.
-5. Expired access token but valid refresh token: force backend to return 401 for access token while refresh still works, then open protected content. Expected result: one refresh attempt is made, request is retried, and user remains logged in.
-6. Invalid refresh token: force backend to return 401 for refresh, then open protected content. Expected result: user is logged out and redirected to `/login`.
-7. Backend-invalidated session on a protected route that does not fetch backend data: keep both tokens in local storage, invalidate session in backend, then open a route with `data.requiresSessionValidation: true` (for example `/account`). Expected result: guard session validation returns 401 and redirects to `/login`.
+4. Startup validation with existing tokens: log in, open DevTools with network preservation enabled, then hard refresh on a protected route. Expected result: app calls `/session/validate` before treating the user as authenticated, then allows the route after validation succeeds.
+5. Startup validation with stale access token: keep both tokens in local storage, make the stored access token stale while refresh still works, then hard refresh on a protected route. Expected result: first `/session/validate` fails, one refresh attempt is made, the refreshed access token is validated with `/session/validate`, and the route activates only after validation succeeds.
+6. Backend-invalidated session with both tokens present: keep both tokens in local storage, invalidate them in backend, then open a protected route that performs backend requests (for example `/collection/:collectionID/text`). Expected result: startup validation or the first backend 401 clears auth state and redirects to `/login`.
+7. Expired access token but valid refresh token during normal API use: force backend to return 401 for access token while refresh still works, then open protected content. Expected result: one refresh attempt is made, the refreshed access token is validated, the request is retried, and user remains logged in.
+8. Refresh returns an access token that fails `/session/validate`: force the validation endpoint to reject the refreshed token. Expected result: refreshed token is not stored, user is logged out, and browser redirects to `/login`.
+9. Invalid refresh token: force backend to return 401 for refresh, then open protected content. Expected result: user is logged out and redirected to `/login`.
+10. Backend-invalidated session on a protected route that does not fetch backend data: keep both tokens in local storage, invalidate session in backend, then open a route with `data.requiresSessionValidation: true` (for example `/account`). Expected result: guard session validation returns 401 and redirects to `/login`.
 
 ### SSR note
 

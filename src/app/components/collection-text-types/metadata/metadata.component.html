@@ -6,8 +6,10 @@
   } @else if (metadata === null) {
     <ion-spinner class="loading" name="crescent"></ion-spinner>
   } @else {
-    <h2 i18n="@@Metadata.Metadata">Metadata</h2>
-    <dl>
+    @if (metadata.facsimiles.length || metadata.manuscripts.length || metadata.variants.length) {
+      <h3 i18n="@@Metadata.Overview">Översikt</h3>
+    }
+    <dl [class.padded]="metadata.facsimiles.length || metadata.manuscripts.length || metadata.variants.length">
       @if (metadata.publication_title) {
         <div>
           <dt i18n="@@Metadata.PublicationTitle">Dokumentets titel</dt>
@@ -24,24 +26,6 @@
         <div>
           <dt i18n="@@Metadata.PublishedBy">Publicerat i</dt>
           <dd [innerHTML]="metadata.published_by"></dd>
-        </div>
-      }
-      @if (metadata.document_type) {
-        <div>
-          <dt i18n="@@Metadata.DocumentType">Dokumenttyp</dt>
-          <dd>{{metadata.document_type}}</dd>
-        </div>
-      }
-      @if (metadata.original_language) {
-        <div>
-          <dt i18n="@@Metadata.OriginalLanguage">Originalspråk</dt>
-          <dd>{{metadata.original_language}}</dd>
-        </div>
-      }
-      @if (metadata.publication_date) {
-        <div>
-          <dt i18n="@@Metadata.PublicationDate">Datering</dt>
-          <dd>{{metadata.publication_date}}</dd>
         </div>
       }
       @if (metadata.author.length) {
@@ -104,6 +88,42 @@
           </dd>
         </div>
       }
+      @if (metadata.publication_date) {
+        <div>
+          <dt i18n="@@Metadata.PublicationDate">Datering</dt>
+          <dd>{{metadata.publication_date}}</dd>
+        </div>
+      }
+      @if (metadata.document_type) {
+        <div>
+          <dt i18n="@@Metadata.DocumentType">Dokumenttyp</dt>
+          <dd>{{metadata.document_type}}</dd>
+        </div>
+      }
+      @if (metadata.publication_genre) {
+        <div>
+          <dt i18n="@@Metadata.PublicationGenre">Genre</dt>
+          <dd>{{metadata.publication_genre}}</dd>
+        </div>
+      }
+      @if (metadata.keywords && !isKeywordMetadataList(metadata.keywords)) {
+        <div>
+          <dt i18n="@@Metadata.Keywords">Ämnesord</dt>
+          <dd>{{metadata.keywords}}</dd>
+        </div>
+      }
+      @if (metadata.original_language) {
+        <div>
+          <dt i18n="@@Metadata.OriginalLanguage">Originalspråk</dt>
+          <dd>{{metadata.original_language}}</dd>
+        </div>
+      }
+      @if (metadata.publication_language) {
+        <div>
+          <dt i18n="@@Metadata.PublicationLanguage">Språk</dt>
+          <dd>{{metadata.publication_language}}</dd>
+        </div>
+      }
       @if (metadata.translations.length) {
         <div>
           <dt>
@@ -130,50 +150,416 @@
           </dd>
         </div>
       }
+      @if (metadata.phys_description) {
+        <div>
+          <dt i18n="@@Metadata.PhysDescription">Fysisk beskrivning</dt>
+          <dd [innerHTML]="metadata.phys_description"></dd>
+        </div>
+      }
+      @if (metadata.phys_dimensions) {
+        <div>
+          <dt i18n="@@Metadata.PhysDimensions">Fysiska mått</dt>
+          <dd>{{metadata.phys_dimensions}}</dd>
+        </div>
+      }
+      @if (metadata.source_archive) {
+        <div>
+          <dt i18n="@@Metadata.SourceArchive">Arkivkälla</dt>
+          <dd [innerHTML]="metadata.source_archive"></dd>
+        </div>
+      }
+      @if (metadata.source_bibl) {
+        <div>
+          <dt i18n="@@Metadata.SourceBibl">Bibliografisk källa</dt>
+          <dd [innerHTML]="metadata.source_bibl"></dd>
+        </div>
+      }
+      @if (metadata.facsimile_summary) {
+        <div>
+          <dt i18n="@@Metadata.FacsimileSummary">Faksimilinfo</dt>
+          <dd [innerHTML]="metadata.facsimile_summary"></dd>
+        </div>
+      }
+      @if (metadata.rights) {
+        <div>
+          <dt i18n="@@Metadata.Rights">Rättigheter</dt>
+          <dd [innerHTML]="metadata.rights"></dd>
+        </div>
+      }
+      @if (metadata.licence) {
+        <div>
+          <dt i18n="@@Metadata.Licence">Licens</dt>
+          <dd [innerHTML]="metadata.licence"></dd>
+        </div>
+      }
+      @if (metadata.licence_encoding) {
+        <div>
+          <dt i18n="@@Metadata.LicenceEncoding">Licens för TEI-filen</dt>
+          <dd [innerHTML]="metadata.licence_encoding"></dd>
+        </div>
+      }
+      @if (metadata.licence_work) {
+        <div>
+          <dt i18n="@@Metadata.LicenceWork">Licens för verket</dt>
+          <dd [innerHTML]="metadata.licence_work"></dd>
+        </div>
+      }
+      @if (metadata.responsibility.length) {
+        <ng-container
+              [ngTemplateOutlet]="responsibilityTemplate"
+              [ngTemplateOutletContext]="{ $implicit: metadata.responsibility }"
+        ></ng-container>
+      }
+      @if (metadata.persons) {
+        <div>
+          <dt><ng-container i18n="@@Metadata.Persons">Personer</ng-container>&ngsp;<span class="entity-count">({{metadata.persons.length}})</span></dt>
+          <dd>
+            @for (person of metadata.persons; track person.id; let isLast = $last) {
+              <a
+                    class="person-link"
+                    aria-haspopup="dialog"
+                    rel="nofollow"
+                    [routerLink]="['/index', 'persons']"
+                    [queryParams]="{ id: person.id }"
+              >{{person.name}}</a>@if (!isLast) {<br>}
+            }
+          </dd>
+        </div>
+      }
+      @if (metadata.places) {
+        <div>
+          <dt><ng-container i18n="@@Metadata.Places">Orter</ng-container>&ngsp;<span class="entity-count">({{metadata.places.length}})</span></dt>
+          <dd>
+            @for (place of metadata.places; track place.id; let isLast = $last) {
+              <a
+                    class="place-link"
+                    aria-haspopup="dialog"
+                    rel="nofollow"
+                    [routerLink]="['/index', 'places']"
+                    [queryParams]="{ id: place.id }"
+              >{{place.name}}</a>@if (!isLast) {<br>}
+            }
+          </dd>
+        </div>
+      }
+      @if (metadata.keywords && isKeywordMetadataList(metadata.keywords)) {
+        <div>
+          <dt><ng-container i18n="@@Metadata.Keywords">Ämnesord</ng-container>&ngsp;<span class="entity-count">({{metadata.keywords.length}})</span></dt>
+          <dd>
+            @for (keyword of metadata.keywords; track keyword.id; let isLast = $last) {
+              <a
+                    class="keyword-link"
+                    aria-haspopup="dialog"
+                    rel="nofollow"
+                    [routerLink]="['/index', 'keywords']"
+                    [queryParams]="{ id: keyword.id }"
+              >{{keyword.name}}</a>@if (!isLast) {<br>}
+            }
+          </dd>
+        </div>
+      }
     </dl>
-    @if (metadata.facsimiles.length) {
+
+    @if (metadata.manuscripts.length) {
       <h3>
-        @if (metadata.facsimiles.length < 2) {
-          <ng-container i18n="@@Metadata.Facsimile">Faksimil</ng-container>
-        }
-        @if (metadata.facsimiles.length > 1) {
-          <ng-container i18n="@@Metadata.Facsimiles">Faksimil</ng-container>
+        @if (metadata.manuscripts.length == 1) {
+          <ng-container i18n="@@Metadata.Manuscript">Manuskript</ng-container>
+        } @else {
+          <ng-container i18n="@@Metadata.Manuscripts">Manuskript</ng-container>
+          &ngsp;<span class="group-count">({{metadata.manuscripts.length}})</span>
         }
       </h3>
-      @for (f of metadata.facsimiles; track $index) {
-        <dl class="dl-group">
-          @if (f.facsimile_title && (f.facsimile_title !== metadata.publication_title || metadata.facsimiles.length > 1)) {
-            <div>
-              <dt i18n="@@Metadata.FacsimileTitle">Faksimilets titel</dt>
-              <dd [innerHTML]="f.facsimile_title"></dd>
+      <ul>
+        @for (m of metadata.manuscripts; track $index) {
+          <li>
+            @if (m.title) {
+              <div class="linked-text-title" [innerHTML]="m.title"></div>
+            } @else {
+              <div class="linked-text-title" i18n="@@Metadata.Untitled">[saknar titel]</div>
+            }
+            <dl>
+              @if (m.author.length) {
+                <div>
+                  <dt>
+                    @if (m.author.length < 2) {
+                      <ng-container i18n="@@Metadata.Author">Författare</ng-container>
+                    }
+                    @if (m.author.length > 1) {
+                      <ng-container i18n="@@Metadata.Authors">Författare</ng-container>
+                    }
+                  </dt>
+                  <dd>
+                    @for (a of m.author; track $index; let isLast = $last) {
+                      {{a}}
+                      @if (!isLast) {
+                        <br>
+                      }
+                    }
+                  </dd>
+                </div>
+              }
+              @if (m.orig_date) {
+                <div>
+                  <dt i18n="@@Metadata.OrigDate">Datering</dt>
+                  <dd>{{m.orig_date}}</dd>
+                </div>
+              }
+              @if (m.language) {
+                <div>
+                  <dt i18n="@@Metadata.Language">Språk</dt>
+                  <dd>{{m.language}}</dd>
+                </div>
+              }
+              @if (m.phys_description) {
+                <div>
+                  <dt i18n="@@Metadata.PhysDescription">Fysisk beskrivning</dt>
+                  <dd [innerHTML]="m.phys_description"></dd>
+                </div>
+              }
+              @if (m.phys_dimensions) {
+                <div>
+                  <dt i18n="@@Metadata.PhysDimensions">Fysiska mått</dt>
+                  <dd>{{m.phys_dimensions}}</dd>
+                </div>
+              }
+              @if (m.source_archive) {
+                <div>
+                  <dt i18n="@@Metadata.SourceArchive">Arkivkälla</dt>
+                  <dd [innerHTML]="m.source_archive"></dd>
+                </div>
+              }
+              @if (m.source_bibl) {
+                <div>
+                  <dt i18n="@@Metadata.SourceBibl">Bibliografisk källa</dt>
+                  <dd [innerHTML]="m.source_bibl"></dd>
+                </div>
+              }
+              @if (m.facsimile_summary) {
+                <div>
+                  <dt i18n="@@Metadata.FacsimileSummary">Faksimilinfo</dt>
+                  <dd [innerHTML]="m.facsimile_summary"></dd>
+                </div>
+              }
+              @if (m.rights) {
+                <div>
+                  <dt i18n="@@Metadata.Rights">Rättigheter</dt>
+                  <dd [innerHTML]="m.rights"></dd>
+                </div>
+              }
+              @if (m.licence) {
+                <div>
+                  <dt i18n="@@Metadata.Licence">Licens</dt>
+                  <dd [innerHTML]="m.licence"></dd>
+                </div>
+              }
+              @if (m.licence_encoding) {
+                <div>
+                  <dt i18n="@@Metadata.LicenceEncoding">Licens för TEI-filen</dt>
+                  <dd [innerHTML]="m.licence_encoding"></dd>
+                </div>
+              }
+              @if (m.licence_work) {
+                <div>
+                  <dt i18n="@@Metadata.LicenceWork">Licens för verket</dt>
+                  <dd [innerHTML]="m.licence_work"></dd>
+                </div>
+              }
+              @if (m.responsibility.length) {
+                <ng-container
+                      [ngTemplateOutlet]="responsibilityTemplate"
+                      [ngTemplateOutletContext]="{ $implicit: m.responsibility }"
+                ></ng-container>
+              }
+            </dl>
+          </li>
+        }
+      </ul>
+    }
+
+    @if (metadata.variants.length) {
+      <h3>
+        @if (metadata.variants.length == 1) {
+          <ng-container i18n="@@Metadata.Variant">Tryckt variant</ng-container>
+        } @else {
+          <ng-container i18n="@@Metadata.Variants">Tryckta varianter</ng-container>
+          &ngsp;<span class="group-count">({{metadata.variants.length}})</span>
+        }
+      </h3>
+      <ul>
+        @for (v of metadata.variants; track $index) {
+          <li>
+            <div class="linked-text-title">
+              <span class="variant-type">@if (v.type === 0) {<ng-container i18n="@@Metadata.VariantBaseText">Grundtext</ng-container>} @else {<ng-container i18n="@@Metadata.VariantText">Variant</ng-container>}</span>:&ngsp;@if (v.title) {<span class="variant-title" [innerHTML]="v.title"></span>} @else {<span class="variant-title" i18n="@@Metadata.Untitled">[saknar titel]</span>}
             </div>
-          }
-          @if (f.archive_info) {
-            <div>
-              <dt i18n="@@Metadata.ArchiveInfo">Arkivkälla för faksimilet</dt>
-              <dd>{{f.archive_info}}</dd>
-            </div>
-          }
-          @if (f.number_of_images) {
-            <div>
-              <dt i18n="@@Metadata.NumberOfImages">Antal bilder</dt>
-              <dd>{{f.number_of_images}}</dd>
-            </div>
-          }
-          @if (f.image_number_info) {
-            <div>
-              <dt i18n="@@Metadata.ImageNumberInfo">Bildernas nummer i digitalarkivet</dt>
-              <dd>{{f.image_number_info}}</dd>
-            </div>
-          }
-          @if (f.external_url) {
-            <div>
-              <dt i18n="@@Metadata.ExternalUrl">Extern länk för faksimilet</dt>
-              <dd><a [href]="f.external_url">{{f.external_url}}</a></dd>
-            </div>
-          }
-        </dl>
-      }
+            <dl>
+              @if (v.author.length) {
+                <div>
+                  <dt>
+                    @if (v.author.length < 2) {
+                      <ng-container i18n="@@Metadata.Author">Författare</ng-container>
+                    }
+                    @if (v.author.length > 1) {
+                      <ng-container i18n="@@Metadata.Authors">Författare</ng-container>
+                    }
+                  </dt>
+                  <dd>
+                    @for (a of v.author; track $index; let isLast = $last) {
+                      {{a}}
+                      @if (!isLast) {
+                        <br>
+                      }
+                    }
+                  </dd>
+                </div>
+              }
+              @if (v.orig_date) {
+                <div>
+                  <dt i18n="@@Metadata.OrigDate">Datering</dt>
+                  <dd>{{v.orig_date}}</dd>
+                </div>
+              }
+              @if (v.language) {
+                <div>
+                  <dt i18n="@@Metadata.Language">Språk</dt>
+                  <dd>{{v.language}}</dd>
+                </div>
+              }
+              @if (v.phys_description) {
+                <div>
+                  <dt i18n="@@Metadata.PhysDescription">Fysisk beskrivning</dt>
+                  <dd [innerHTML]="v.phys_description"></dd>
+                </div>
+              }
+              @if (v.phys_dimensions) {
+                <div>
+                  <dt i18n="@@Metadata.PhysDimensions">Fysiska mått</dt>
+                  <dd>{{v.phys_dimensions}}</dd>
+                </div>
+              }
+              @if (v.source_archive) {
+                <div>
+                  <dt i18n="@@Metadata.SourceArchive">Arkivkälla</dt>
+                  <dd [innerHTML]="v.source_archive"></dd>
+                </div>
+              }
+              @if (v.source_bibl) {
+                <div>
+                  <dt i18n="@@Metadata.SourceBibl">Bibliografisk källa</dt>
+                  <dd [innerHTML]="v.source_bibl"></dd>
+                </div>
+              }
+              @if (v.facsimile_summary) {
+                <div>
+                  <dt i18n="@@Metadata.FacsimileSummary">Faksimilinfo</dt>
+                  <dd [innerHTML]="v.facsimile_summary"></dd>
+                </div>
+              }
+              @if (v.rights) {
+                <div>
+                  <dt i18n="@@Metadata.Rights">Rättigheter</dt>
+                  <dd [innerHTML]="v.rights"></dd>
+                </div>
+              }
+              @if (v.licence) {
+                <div>
+                  <dt i18n="@@Metadata.Licence">Licens</dt>
+                  <dd [innerHTML]="v.licence"></dd>
+                </div>
+              }
+              @if (v.licence_encoding) {
+                <div>
+                  <dt i18n="@@Metadata.LicenceEncoding">Licens för TEI-filen</dt>
+                  <dd [innerHTML]="v.licence_encoding"></dd>
+                </div>
+              }
+              @if (v.licence_work) {
+                <div>
+                  <dt i18n="@@Metadata.LicenceWork">Licens för verket</dt>
+                  <dd [innerHTML]="v.licence_work"></dd>
+                </div>
+              }
+              @if (v.responsibility.length) {
+                <ng-container
+                      [ngTemplateOutlet]="responsibilityTemplate"
+                      [ngTemplateOutletContext]="{ $implicit: v.responsibility }"
+                ></ng-container>
+              }
+            </dl>
+          </li>
+        }
+      </ul>
+    }
+
+    @if (metadata.facsimiles.length) {
+      <h3>
+        @if (metadata.facsimiles.length == 1) {
+          <ng-container i18n="@@Metadata.Facsimile">Faksimil</ng-container>
+        } @else {
+          <ng-container i18n="@@Metadata.Facsimiles">Faksimil</ng-container>
+          &ngsp;<span class="group-count">({{metadata.facsimiles.length}})</span>
+        }
+      </h3>
+      <ul>
+        @for (f of metadata.facsimiles; track $index) {
+          @let showFacsTitle = f.facsimile_title && (f.facsimile_title !== metadata.publication_title || metadata.facsimiles.length > 1);
+          <li>
+            @if (showFacsTitle) {
+              <div class="linked-text-title" [innerHTML]="f.facsimile_title"></div>
+            }
+            <dl [class.no-indent]="metadata.facsimiles.length === 1 || !showFacsTitle">
+              @if (f.archive_info) {
+                <div>
+                  <dt i18n="@@Metadata.ArchiveInfo">Arkivkälla</dt>
+                  <dd>{{f.archive_info}}</dd>
+                </div>
+              }
+              @if (f.number_of_images) {
+                <div>
+                  <dt i18n="@@Metadata.NumberOfImages">Antal bilder</dt>
+                  <dd>{{f.number_of_images}}</dd>
+                </div>
+              }
+              @if (f.image_number_info) {
+                <div>
+                  <dt i18n="@@Metadata.ImageNumberInfo">Bildernas nummer <br>i digitalarkivet</dt>
+                  <dd>{{f.image_number_info}}</dd>
+                </div>
+              }
+              @if (f.external_url) {
+                <div>
+                  <dt i18n="@@Metadata.ExternalUrl">Extern länk</dt>
+                  <dd><a [href]="f.external_url">{{f.external_url}}</a></dd>
+                </div>
+              }
+            </dl>
+          </li>
+        }
+      </ul>
     }
   }
 </div>
+
+
+<ng-template #responsibilityTemplate let-responsibilities>
+  <div>
+    <dt i18n="@@Metadata.Responsibility">Bearbetning</dt>
+    <dd>
+      <ul class="responsibility-list">
+        @for (responsibility of responsibilities; track $index) {
+          <li>
+            @if (responsibility.resp) {
+              <span class="responsibility-label">{{responsibility.resp}}</span>:
+            }
+            @if (responsibility.names.length) {
+              <ul class="responsibility-names">
+                @for (name of responsibility.names; track $index) {
+                  <li [innerHTML]="name"></li>
+                }
+              </ul>
+            }
+          </li>
+        }
+      </ul>
+    </dd>
+  </div>
+</ng-template>

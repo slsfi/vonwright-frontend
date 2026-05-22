@@ -1,9 +1,11 @@
+import { NgTemplateOutlet } from '@angular/common';
 import { ChangeDetectionStrategy, Component, DestroyRef, LOCALE_ID, inject, input, signal } from '@angular/core';
 import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
+import { RouterLink } from '@angular/router';
 import { IonicModule } from '@ionic/angular';
 import { catchError, of, switchMap, tap } from 'rxjs';
 
-import { PublicationMetadata } from '@models/metadata.models';
+import { MetadataIndexEntry, PublicationMetadata } from '@models/metadata.models';
 import { CollectionContentService } from '@services/collection-content.service';
 
 
@@ -14,7 +16,7 @@ import { CollectionContentService } from '@services/collection-content.service';
   selector: 'text-metadata',
   templateUrl: './metadata.component.html',
   styleUrls: ['./metadata.component.scss'],
-  imports: [IonicModule],
+  imports: [IonicModule, NgTemplateOutlet, RouterLink],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class MetadataComponent {
@@ -57,6 +59,12 @@ export class MetadataComponent {
         this.publicationMetadata.set(meta);
       }
     });
+  }
+
+  isKeywordMetadataList(
+    keywords: PublicationMetadata['keywords']
+  ): keywords is MetadataIndexEntry[] {
+    return Array.isArray(keywords);
   }
 
 }
