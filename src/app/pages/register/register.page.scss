@@ -32,6 +32,10 @@ form {
   display: block;
 }
 
+.form-section ion-checkbox::part(label) {
+  white-space: normal;
+}
+
 form .password-requirements {
   font-size: 1rem;
   margin: -0.3rem 0 0 1rem;

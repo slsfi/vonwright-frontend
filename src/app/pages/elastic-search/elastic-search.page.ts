@@ -30,6 +30,9 @@ export class ElasticSearchPage implements OnDestroy, OnInit {
   private urlService = inject(UrlService);
   private activeLocale = inject(LOCALE_ID);
 
+  private queryParamsInitialized = false;
+  private lastHandledQueryParams: string | null = null;
+
   readonly content = viewChild(IonContent);
 
   readonly enableFilters: boolean = config.page?.elasticSearch?.enableFilters ?? true;
@@ -44,6 +47,7 @@ export class ElasticSearchPage implements OnDestroy, OnInit {
   dateHistogramData: any = undefined;
   disableFilterCheckboxes: boolean = true;
   elasticError: boolean = false;
+  filterLoadingError: boolean = false;
   filterGroups: any[] = [];
   filtersVisible: boolean = true;
   from: number = 0;
@@ -99,8 +103,8 @@ export class ElasticSearchPage implements OnDestroy, OnInit {
     this.subscribeToSearchDataStreams();
 
     // Get initial aggregations
-    this.getInitialAggregations().subscribe(
-      (filters: any) => {
+    this.getInitialAggregations().subscribe({
+      next: (filters: any) => {
         // Populate initial filters with initial aggregations data
         this.filterGroups = filters;
 
@@ -113,12 +117,17 @@ export class ElasticSearchPage implements OnDestroy, OnInit {
 
         this.disableFilterCheckboxes = false;
         this.loading = false;
-        this.cf.detectChanges();
+        this.initializing = false;
+        this.filterLoadingError = false;
 
         // Set up URL query params subscriptions in order to trigger new searches
         this.subscribeToQueryParams();
+        this.cf.detectChanges();
+      },
+      error: (e: any) => {
+        this.handleInitialAggregationsError(e);
       }
-    );
+    });
   }
 
   ngOnDestroy() {
@@ -233,127 +242,139 @@ export class ElasticSearchPage implements OnDestroy, OnInit {
    */
   private subscribeToQueryParams() {
     this.routeQueryParamsSubscription = this.route.queryParams.subscribe(
-      (queryParams: any) => {
-        let triggerSearch = false;
-        let directSearch = false;
-
-        // Text query
-        if (queryParams['query']) {
-          if (queryParams['query'] !== this.submittedQuery) {
-            this.query = queryParams['query'];
-            triggerSearch = true;
-          }
-        }
-
-        // Filters
-        if (queryParams['filters']) {
-          const parsedActiveFilters = this.urlService.parse(queryParams['filters'], true);
-          if (this.activeFiltersChanged(parsedActiveFilters)) {
-            this.selectFiltersFromActiveFilters(parsedActiveFilters);
-            this.activeFilters = parsedActiveFilters;
-            triggerSearch = true;
-          }
-        } else if (this.activeFilters.length) {
-          // Active filters should be cleared
-          this.clearAllActiveFilters();
-          triggerSearch = true;
-        }
-
-        // Time range
-        if (queryParams['from'] && queryParams['to']) {
-          const range = {
-            from: queryParams['from'],
-            to: queryParams['to']
-          };
-
-          if (
-            range.from !== this.rangeYears?.from ||
-            range.to !== this.rangeYears?.to
-          ) {
-            this.rangeYears = range;
-
-            const fromYear = Number(range.from);
-            const toYear = Number(range.to);
-
-            // Here we store *date strings* used by the ES query
-            this.range = {
-              from: `${fromYear}-01-01`,
-              // exclusive upper bound: start of (toYear + 1)
-              to: `${toYear + 1}-01-01`
-            };
-
-            triggerSearch = true;
-          }
-        } else if (this.range?.from && this.range?.to) {
-          this.range = null;
-          this.rangeYears = null;
-          triggerSearch = true;
-        }
-
-        // Sort order
-        if (queryParams['sort']) {
-          let compareOrder = queryParams['sort'];
-          if (queryParams['sort'] === 'relevance') {
-            compareOrder = '';
-          }
-          if (compareOrder !== this.sort) {
-            this.sort = compareOrder;
-            triggerSearch = true;
-          }
-        }
-
-        // Number of pages with hits
-        if (queryParams['pages']) {
-          if (Number(queryParams['pages']) !== this.pages) {
-            if (this.from < 1) {
-              this.hits = [];
-              this.from = 0;
-              this.total = -1;
-            } else {
-              this.loadingMoreHits = true;
-            }
-            this.pages = Number(queryParams['pages']) || 1;
-            directSearch = true;
-            triggerSearch = true;
-          }
-        }
-
-        // Trigger new search if the search input field has been cleared, i.e. no "query" parameter
-        if (
-          !triggerSearch &&
-          !queryParams['query'] &&
-          this.submittedQuery &&
-          !this.initializing
-        ) {
-          triggerSearch = true;
-        }
-
-        // Clear all search parameters and trigger new search if no
-        // query params and not initializing page
-        if (
-          isEmptyObject(queryParams) &&
-          !this.initializing
-        ) {
-          this.query = '';
-          this.activeFilters = [];
-          this.range = null;
-          this.rangeYears = null;
-          this.sort = '';
-          triggerSearch = true;
-        }
-
-        this.initializing = false;
-
-        // Execute new search if trigger criteria have been met
-        if (triggerSearch) {
-          if (directSearch) {
-            this.search();
-          } else {
-            this.resetAndSearch();
-          }
-        }
-      }
+      (queryParams: any) => this.handleQueryParams(queryParams)
     );
+
+    this.handleQueryParams(this.route.snapshot.queryParams);
+  }
+
+  private handleQueryParams(queryParams: any) {
+    queryParams = queryParams ?? {};
+    const queryParamsKey = JSON.stringify(queryParams);
+    if (queryParamsKey === this.lastHandledQueryParams) {
+      return;
+    }
+    this.lastHandledQueryParams = queryParamsKey;
+
+    const isInitialQueryParams = !this.queryParamsInitialized;
+    let triggerSearch = false;
+    let directSearch = false;
+
+    // Text query
+    if (queryParams['query']) {
+      if (queryParams['query'] !== this.submittedQuery) {
+        this.query = queryParams['query'];
+        triggerSearch = true;
+      }
+    }
+
+    // Filters
+    if (queryParams['filters']) {
+      const parsedActiveFilters = this.urlService.parse(queryParams['filters'], true);
+      if (this.activeFiltersChanged(parsedActiveFilters)) {
+        this.selectFiltersFromActiveFilters(parsedActiveFilters);
+        this.activeFilters = parsedActiveFilters;
+        triggerSearch = true;
+      }
+    } else if (this.activeFilters.length) {
+      // Active filters should be cleared
+      this.clearAllActiveFilters();
+      triggerSearch = true;
+    }
+
+    // Time range
+    if (queryParams['from'] && queryParams['to']) {
+      const range = {
+        from: queryParams['from'],
+        to: queryParams['to']
+      };
+
+      if (
+        range.from !== this.rangeYears?.from ||
+        range.to !== this.rangeYears?.to
+      ) {
+        this.rangeYears = range;
+
+        const fromYear = Number(range.from);
+        const toYear = Number(range.to);
+
+        // Here we store *date strings* used by the ES query
+        this.range = {
+          from: `${fromYear}-01-01`,
+          // exclusive upper bound: start of (toYear + 1)
+          to: `${toYear + 1}-01-01`
+        };
+
+        triggerSearch = true;
+      }
+    } else if (this.range?.from && this.range?.to) {
+      this.range = null;
+      this.rangeYears = null;
+      triggerSearch = true;
+    }
+
+    // Sort order
+    if (queryParams['sort']) {
+      let compareOrder = queryParams['sort'];
+      if (queryParams['sort'] === 'relevance') {
+        compareOrder = '';
+      }
+      if (compareOrder !== this.sort) {
+        this.sort = compareOrder;
+        triggerSearch = true;
+      }
+    }
+
+    // Number of pages with hits
+    if (queryParams['pages']) {
+      if (Number(queryParams['pages']) !== this.pages) {
+        if (this.from < 1) {
+          this.hits = [];
+          this.from = 0;
+          this.total = -1;
+        } else {
+          this.loadingMoreHits = true;
+        }
+        this.pages = Number(queryParams['pages']) || 1;
+        directSearch = true;
+        triggerSearch = true;
+      }
+    }
+
+    // Trigger new search if the search input field has been cleared, i.e. no "query" parameter
+    if (
+      !triggerSearch &&
+      !queryParams['query'] &&
+      this.submittedQuery &&
+      !isInitialQueryParams
+    ) {
+      triggerSearch = true;
+    }
+
+    // Clear all search parameters and trigger new search if no
+    // query params and not on the first query-parameter pass.
+    if (
+      isEmptyObject(queryParams) &&
+      !isInitialQueryParams
+    ) {
+      this.query = '';
+      this.activeFilters = [];
+      this.range = null;
+      this.rangeYears = null;
+      this.sort = '';
+      triggerSearch = true;
+    }
+
+    this.queryParamsInitialized = true;
+
+    // Execute new search if trigger criteria have been met
+    if (triggerSearch) {
+      if (directSearch) {
+        this.search();
+      } else {
+        this.resetAndSearch();
+      }
+    }
   }
 
   /**
@@ -466,9 +487,28 @@ export class ElasticSearchPage implements OnDestroy, OnInit {
       range: undefined,
     }).pipe(
       map((data: any) => {
-        return this.getInitialFilters(data.aggregations);
+        const aggregations = data?.aggregations;
+        if (!aggregations || typeof aggregations !== 'object' || Array.isArray(aggregations)) {
+          console.error('Elastic search aggregation error, no aggregations: ', data);
+          throw new Error('Elastic search aggregation response did not include aggregations.');
+        }
+
+        return this.getInitialFilters(aggregations);
       })
     );
+  }
+
+  private handleInitialAggregationsError(e: any) {
+    console.error('Elastic search filter loading error: ', e);
+    this.filterLoadingError = true;
+    this.initializing = false;
+    this.loading = false;
+    this.loadingMoreHits = false;
+    this.disableFilterCheckboxes = true;
+    this.from = 0;
+    this.pages = 1;
+    this.total = 0;
+    this.cf.detectChanges();
   }
 
   private parseSortForQuery() {
@@ -743,7 +783,7 @@ export class ElasticSearchPage implements OnDestroy, OnInit {
   private convertAggregationsToFilters(aggregation: AggregationData): Facets {
     const filters = {} as any;
     // Get buckets from either unfiltered or filtered aggregation.
-    const buckets = aggregation.buckets || aggregation?.filtered?.buckets;
+    const buckets = aggregation?.buckets || aggregation?.filtered?.buckets;
 
     buckets?.forEach((filter: Facet) => {
       filters[filter.key] = filter;

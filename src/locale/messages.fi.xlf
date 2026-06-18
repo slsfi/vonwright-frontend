@@ -541,6 +541,12 @@
         <target>Kommentaari tekstiin</target>
       </segment>
     </unit>
+    <unit id="ElasticSearch.FilterLoadingError">
+      <segment state="initial">
+        <source>Ett fel har uppstått när sökavgränsningarna skulle laddas.</source>
+        <target>Hakurajausten lataamisessa tapahtui virhe.</target>
+      </segment>
+    </unit>
     <unit id="ElasticSearch.FilterResults">
       <segment state="initial">
         <source>Avgränsa sökningen</source>
@@ -707,6 +713,12 @@
       <segment state="initial">
         <source>Börja söka genom att skriva in sökord eller välja avgränsningar.</source>
         <target>Aloita haku kirjoittamalla hakusana tai valitsemalla rajauksia.</target>
+      </segment>
+    </unit>
+    <unit id="ElasticSearch.StartSearchInstructionNoFilters">
+      <segment state="initial">
+        <source>Börja söka genom att skriva in sökord.</source>
+        <target>Aloita haku kirjoittamalla hakusana.</target>
       </segment>
     </unit>
     <unit id="ElasticSearch.TimeRange">
@@ -1497,7 +1509,7 @@
     </unit>
     <unit id="Metadata.None">
       <segment state="initial">
-        <source>Ingen metadata tillgänglig.</source>
+        <source>Inga metadata tillgängliga.</source>
         <target>Dokumentin metadata ei ole saatavilla.</target>
       </segment>
     </unit>

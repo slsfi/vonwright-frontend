@@ -1,5 +1,6 @@
 @let languageMenuOpenValue = languageMenuOpen();
 @let showSideNavValue = showSideNav();
+@let languageHrefByCodeValue = languageHrefByCode();
 
 <h2 id="top-menu-label" class="screen-reader-only" i18n="@@TopMenu.AriaLabel">Primär meny</h2>
 <ul role="menubar">
@@ -90,7 +91,7 @@
         @for (lang of languages; track lang.code) {
           @if (lang.code !== activeLocale) {
             <li [attr.lang]="lang.code" role="menuitem">
-              <a [href]="`/${lang.code}${currentRouterUrl()}`">{{lang.label}} ({{lang.code}})</a>
+              <a [href]="languageHrefByCodeValue[lang.code]">{{lang.label}} ({{lang.code}})</a>
             </li>
           }
         }

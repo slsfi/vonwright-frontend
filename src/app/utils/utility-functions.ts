@@ -149,6 +149,18 @@ export function isBrowser(): boolean {
 
 
 /**
+ * Parses an app-relative URL against a dummy origin.
+ */
+export function parseRelativeUrl(url: string): URL | null {
+  try {
+    return new URL(url, 'http://localhost');
+  } catch {
+    return null;
+  }
+}
+
+
+/**
  * Returns true if the given object is empty, i.e. has no properties, else false.
  */
 export function isEmptyObject(obj: any) {

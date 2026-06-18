@@ -8,6 +8,79 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ## Unreleased
 
+### Changed
+
+- Update to base version [`2.7.5`](https://github.com/slsfi/digital-edition-frontend-ng/releases/tag/2.7.5) from upstream, original repository.
+
+
+
+## [2.7.5] – 2026-06-18
+
+### Changed
+
+- Update `nginx` to 1.30.3. ([11bd22c](https://github.com/slsfi/digital-edition-frontend-ng/commit/11bd22cb9cf03a6443385d12ae9cc5b8e210190a))
+- Deps: update `@angular/core` to 20.3.25 and `@angular/cli` to 20.3.29. ([224aff2](https://github.com/slsfi/digital-edition-frontend-ng/commit/224aff27ab5480d4889461c3424eac47df0572cc))
+- Deps: update `marked` to 18.0.5. ([59fef9e](https://github.com/slsfi/digital-edition-frontend-ng/commit/59fef9e0804cce73f47f9b1d381327e7347fd9ad))
+- Deps (dev): update `@types/node` to 22.19.21. ([ddeada7](https://github.com/slsfi/digital-edition-frontend-ng/commit/ddeada796c1a0875e7fe9ad55d4f617a3d0172fc))
+- Deps (dev): update `ng-extract-i18n-merge` to 3.4.0. ([7eed2df](https://github.com/slsfi/digital-edition-frontend-ng/commit/7eed2df982b3d87b3bd0c4244cb0d1b7d86cabfb))
+- Deps: update transitive dependencies. ([982ef53](https://github.com/slsfi/digital-edition-frontend-ng/commit/982ef539f50cbc96784d3e492217723096e46d34))
+
+### Fixed
+
+- Set document title for verify-email page. ([bc85b0e](https://github.com/slsfi/digital-edition-frontend-ng/commit/bc85b0e655be1eee7be09ae950f167a9df07059a))
+- Article: redirect to the active locale's configured route when switching languages from an article URL with a locale-specific route name. ([c641b76](https://github.com/slsfi/digital-edition-frontend-ng/commit/c641b76d42335e4d65c94f3d4d84964a57027ccd))
+- Top menu: use configured localized article route names in language links. ([f70990a](https://github.com/slsfi/digital-edition-frontend-ng/commit/f70990a41c0ab8361a7638e481149590cbee0faf))
+
+
+
+## [2.7.4] – 2026-06-03
+
+### Changed
+
+- Deps: update `@angular/core` to 20.3.24 and `@angular/cli` to 20.3.27. ([66c58a0](https://github.com/slsfi/digital-edition-frontend-ng/commit/66c58a04d4910a2e663bd33efc7d93017d168567))
+- Deps: update transitive dependencies. ([456a12f](https://github.com/slsfi/digital-edition-frontend-ng/commit/456a12fcfd00a01b6e8cc3ee9c6205a82375973c))
+
+
+
+## [2.7.3] – 2026-06-01
+
+### Changed
+
+- "Permanent URL" translation in English. ([b4724fe](https://github.com/slsfi/digital-edition-frontend-ng/commit/b4724fe633ffe11ac4128bded0c87b7dff273d51))
+- Deps: update `@angular/core` to 20.3.23. ([601ac40](https://github.com/slsfi/digital-edition-frontend-ng/commit/601ac405f00735d6e021f1f598fb5f6191522778))
+- Deps: update transitive dependencies. ([583effa](https://github.com/slsfi/digital-edition-frontend-ng/commit/583effa35a02d46a5c1cc73ff5b23ce4a21c1424))
+
+### Fixed
+
+- Search: start search instruction when filters disabled. ([6be38b4](https://github.com/slsfi/digital-edition-frontend-ng/commit/6be38b4523baf60a8f2597c5ffb2a6cc8501d041))
+- Search: increase contrast of text type labels. ([6545cb0](https://github.com/slsfi/digital-edition-frontend-ng/commit/6545cb0a02bdbfa1defcb24320af48262ff94fdb))
+- Register: wrap long checkbox labels. ([6e1da1c](https://github.com/slsfi/digital-edition-frontend-ng/commit/6e1da1c9410836993a2cc12bacf07a9a860c818e))
+
+
+
+## [2.7.2] – 2026-05-28
+
+### Fixed
+
+- Search: enable search controls after initial filters load on fresh page loads. ([7a89a0f](https://github.com/slsfi/digital-edition-frontend-ng/commit/7a89a0f2f944135df721d871b7311831fc985bf3))
+
+
+
+## [2.7.1] – 2026-05-28
+
+### Changed
+
+- Update `nginx` to 1.30.2. ([456131c](https://github.com/slsfi/digital-edition-frontend-ng/commit/456131ca00593648560c48d2f97a468994597c48))
+- Deps: update `@angular/core` to 20.3.22. ([05fdeff](https://github.com/slsfi/digital-edition-frontend-ng/commit/05fdeff3cfdc50f9b57ab4910a5b9bc205ae2700))
+- Deps: update transitive dependencies. ([e4fc9d8](https://github.com/slsfi/digital-edition-frontend-ng/commit/e4fc9d870e7d74819662568f2126912950e83f8c))
+
+### Fixed
+
+- Metadata: left-align headings. ([395d7ef](https://github.com/slsfi/digital-edition-frontend-ng/commit/395d7ef44be02db56f97bbac9f161cbf51022afd))
+- Metadata: no metadata message in Swedish. ([376ca80](https://github.com/slsfi/digital-edition-frontend-ng/commit/376ca80283a7e26fce1218dad5c178201d32643f))
+- Auth: preserve query params in top menu language links after router redirects. ([c276417](https://github.com/slsfi/digital-edition-frontend-ng/commit/c27641712b63995c564cb0fc8c9c85bcd3775574))
+- Search: show an error if initial filter aggregations cannot be loaded. ([86e2ab5](https://github.com/slsfi/digital-edition-frontend-ng/commit/86e2ab57ac0ffd5a3b0a0311f292754d7003fb8b))
+
 
 
 ## [2.7.0-production.1] – 2026-05-22
@@ -1560,7 +1633,12 @@ siteLogoDimensions: {
 
 
 
-[unreleased]: https://github.com/slsfi/digital-edition-frontend-ng/compare/2.7.0...HEAD
+[unreleased]: https://github.com/slsfi/digital-edition-frontend-ng/compare/2.7.5...HEAD
+[2.7.5]: https://github.com/slsfi/digital-edition-frontend-ng/compare/2.7.4...2.7.5
+[2.7.4]: https://github.com/slsfi/digital-edition-frontend-ng/compare/2.7.3...2.7.4
+[2.7.3]: https://github.com/slsfi/digital-edition-frontend-ng/compare/2.7.2...2.7.3
+[2.7.2]: https://github.com/slsfi/digital-edition-frontend-ng/compare/2.7.1...2.7.2
+[2.7.1]: https://github.com/slsfi/digital-edition-frontend-ng/compare/2.7.0...2.7.1
 [2.7.0]: https://github.com/slsfi/digital-edition-frontend-ng/compare/2.6.6...2.7.0
 [2.6.6]: https://github.com/slsfi/digital-edition-frontend-ng/compare/2.6.5...2.6.6
 [2.6.5]: https://github.com/slsfi/digital-edition-frontend-ng/compare/2.6.4...2.6.5

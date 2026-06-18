@@ -1,7 +1,7 @@
 import { Component, ElementRef, LOCALE_ID, NgZone, OnDestroy, OnInit, Renderer2, inject } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ModalController, PopoverController } from '@ionic/angular';
-import { Observable, Subscription, switchMap, tap } from 'rxjs';
+import { Observable, Subscription, map, of, switchMap, tap } from 'rxjs';
 
 import { config } from '@config';
 import { Article } from '@models/article.models';
@@ -58,19 +58,25 @@ export class ArticlePage implements OnInit, OnDestroy {
     }
 
     this.markdownText$ = this.route.params.pipe(
-      tap(({name}) => {
-        this.article = config.articles?.find(
-          (article: Article) => (article.routeName === name) && article.language === this.activeLocale
-        ) ?? null;
-
+      map(({name}) => ({
+        name,
+        article: this.resolveArticle(name)
+      })),
+      tap(({article}) => {
+        this.article = article;
         this.enableTOC = this.article?.enableTOC ?? true;
 
         if (this.article && !this.mobileMode && !this.tocMenuOpen) {
           this.tocMenuOpen = true;
         }
       }),
-      switchMap(({name}) => {
-        const id = this.article?.id ?? name;
+      switchMap(({name, article}) => {
+        if (article && article.routeName !== name) {
+          this.redirectToArticleRoute(article.routeName);
+          return of(null);
+        }
+
+        const id = article?.id ?? name;
 
         return this.mdService.getParsedMdContent(
           this.activeLocale + '-' + id,
@@ -83,6 +89,42 @@ export class ArticlePage implements OnInit, OnDestroy {
   ngOnDestroy() {
     this.unlistenClickEvents?.();
     this.fragmentSubscription?.unsubscribe();
+  }
+
+  /**
+   * Article route names can be locale-specific. If the route does not match
+   * the active locale, resolve it through the stable article id.
+   */
+  private resolveArticle(routeName: string): Article | null {
+    const articles: Article[] = config.articles ?? [];
+    const activeLocaleArticle = articles.find(
+      (article: Article) => article.routeName === routeName && article.language === this.activeLocale
+    );
+
+    if (activeLocaleArticle) {
+      return activeLocaleArticle;
+    }
+
+    const sourceArticle = articles.find(
+      (article: Article) => article.routeName === routeName
+    );
+
+    if (!sourceArticle) {
+      return null;
+    }
+
+    return articles.find(
+      (article: Article) => article.id === sourceArticle.id && article.language === this.activeLocale
+    ) ?? null;
+  }
+
+  private redirectToArticleRoute(routeName: string) {
+    void this.router.navigate(['..', routeName], {
+      relativeTo: this.route,
+      queryParamsHandling: 'preserve',
+      preserveFragment: true,
+      replaceUrl: true
+    });
   }
 
   async showViewOptionsPopover(event: any) {

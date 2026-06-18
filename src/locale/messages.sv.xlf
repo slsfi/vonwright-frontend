@@ -541,6 +541,12 @@
         <target>Kommentar till</target>
       </segment>
     </unit>
+    <unit id="ElasticSearch.FilterLoadingError">
+      <segment state="initial">
+        <source>Ett fel har uppstått när sökavgränsningarna skulle laddas.</source>
+        <target>Ett fel har uppstått när sökavgränsningarna skulle laddas.</target>
+      </segment>
+    </unit>
     <unit id="ElasticSearch.FilterResults">
       <segment state="initial">
         <source>Avgränsa sökningen</source>
@@ -707,6 +713,12 @@
       <segment state="initial">
         <source>Börja söka genom att skriva in sökord eller välja avgränsningar.</source>
         <target>Börja söka genom att skriva in sökord eller välja avgränsningar.</target>
+      </segment>
+    </unit>
+    <unit id="ElasticSearch.StartSearchInstructionNoFilters">
+      <segment state="initial">
+        <source>Börja söka genom att skriva in sökord.</source>
+        <target>Börja söka genom att skriva in sökord.</target>
       </segment>
     </unit>
     <unit id="ElasticSearch.TimeRange">
@@ -1497,8 +1509,8 @@
     </unit>
     <unit id="Metadata.None">
       <segment state="initial">
-        <source>Ingen metadata tillgänglig.</source>
-        <target>Ingen metadata tillgänglig.</target>
+        <source>Inga metadata tillgängliga.</source>
+        <target>Inga metadata tillgängliga.</target>
       </segment>
     </unit>
     <unit id="Metadata.NumberOfImages">

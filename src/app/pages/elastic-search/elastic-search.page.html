@@ -19,12 +19,12 @@
             enterkeyhint="search"
             inputmode="search"
             [searchIcon]="undefined"
-            [disabled]="initializing"
+            [disabled]="initializing || filterLoadingError"
             [(ngModel)]="query"
             (ionClear)="clearSearchQuery()"
             (keyup.enter)="submitSearchQuery()"
       ></ion-searchbar>
-      <ion-button (click)="submitSearchQuery()" [disabled]="initializing">
+      <ion-button (click)="submitSearchQuery()" [disabled]="initializing || filterLoadingError">
         <ion-icon slot="icon-only" name="search" aria-label="Sök" i18n-aria-label="@@BasicActions.Search"></ion-icon>
       </ion-button>
 
@@ -34,7 +34,7 @@
               fill="outline"
               class="custom-outline-button show-filters-button"
               (click)="toggleFiltersColumn()"
-              [disabled]="initializing"
+              [disabled]="initializing || filterLoadingError"
         >
           <ion-icon name="filter-outline" slot="start"></ion-icon>
           @if (!filtersVisible) {
@@ -211,13 +211,20 @@
         <div class="hits-column">
           <!-- Search status row -->
           <div class="search-status">
-            @if (initializing) {
+            @if (filterLoadingError) {
+              <p i18n="@@ElasticSearch.FilterLoadingError">Ett fel har uppstått när sökavgränsningarna skulle laddas.</p>
+            }
+            @if (initializing && !filterLoadingError) {
               <p i18n="@@ElasticSearch.LoadingFilters">Ett ögonblick, laddar sökavgränsningar ...</p>
             }
-            @if (total < 0 && !initializing && !loading) {
-              <p i18n="@@ElasticSearch.StartSearchInstruction">Börja söka genom att skriva in sökord eller välja avgränsningar.</p>
+            @if (total < 0 && !initializing && !loading && !filterLoadingError) {
+              @if (enableFilters) {
+                <p i18n="@@ElasticSearch.StartSearchInstruction">Börja söka genom att skriva in sökord eller välja avgränsningar.</p>
+              } @else {
+                <p i18n="@@ElasticSearch.StartSearchInstructionNoFilters">Börja söka genom att skriva in sökord.</p>
+              }
             }
-            @if (loading && total < 1) {
+            @if (loading && total < 1 && !filterLoadingError) {
               <ion-spinner class="loading" name="crescent"></ion-spinner>
             }
           </div>
@@ -341,7 +348,7 @@
       <!-- Filters column -->
       @if (enableFilters) {
         <div class="filter-column" [class.hide-filter-column]="!filtersVisible">
-          <h2 [class.greyed-out]="initializing" i18n="@@ElasticSearch.FilterResults">Avgränsa sökningen</h2>
+          <h2 [class.greyed-out]="initializing || filterLoadingError" i18n="@@ElasticSearch.FilterResults">Avgränsa sökningen</h2>
           @for (filterGroup of filterGroups; track filterGroup.name) {
             <div class="fg-wrapper">
               <button (click)="toggleFilterGroupOpenState(filterGroup)">

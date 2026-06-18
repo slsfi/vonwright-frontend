@@ -4,7 +4,7 @@ import { BehaviorSubject, Observable } from 'rxjs';
 import { Request } from 'express';
 
 import { config } from '@config';
-import { Article } from '@models/article.models';
+import { RouteLocalizationService } from '@services/route-localization.service';
 import { REQUEST } from 'src/express.tokens';
 
 
@@ -17,11 +17,11 @@ export class DocumentHeadService implements OnDestroy {
   private title = inject(Title);
   private document = inject<Document>(DOCUMENT);
   private activeLocale = inject(LOCALE_ID);
+  private routeLocalizationService = inject(RouteLocalizationService);
   private request = inject<Request>(REQUEST, { optional: true });
 
   private readonly languages: any[] = config.app?.i18n?.languages ?? [];
   private readonly openGraphTags: any = config.app?.openGraphMetaTags ?? undefined;
-  private readonly articles: Article[] = config.articles ?? [];
 
   private addedHeadElements: HTMLElement[] = [];
   private currentPageTitle$: BehaviorSubject<string> = new BehaviorSubject('');
@@ -214,29 +214,11 @@ export class DocumentHeadService implements OnDestroy {
     const tag: HTMLLinkElement = this.renderer.createElement('link');
     this.renderer.setAttribute(tag, 'rel', relType);
 
-    let targetURL = routerURL;
+    const targetURL = this.routeLocalizationService.localizeRouterUrl(routerURL, locale);
 
     if (hreflang) {
       const attrValue = x_default ? 'x-default' : locale;
       this.renderer.setAttribute(tag, 'hreflang', attrValue);
-    }
-
-    if (routerURL.startsWith('/article/')) {
-      // Article URLs need to be constructed from config for the routeName
-      // to be correctly mapped.
-      const currentRouteName = routerURL.split('/').at(-1);
-      // Find the article matching the current routeName and locale
-      const currentArticle = this.articles.find(
-        a => a.language === this.activeLocale && a.routeName === currentRouteName
-      );
-
-      if (currentArticle) {
-        // Find the article in the target locale
-        const targetArticle = this.articles.find(
-          a => a.language === locale && a.id === currentArticle.id
-        );
-        targetURL = targetArticle ? `/article/${targetArticle.routeName}` : targetURL;
-      }
     }
 
     const absoluteURL = this.getAbsoluteURL(locale + targetURL);

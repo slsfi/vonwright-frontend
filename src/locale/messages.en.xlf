@@ -541,6 +541,12 @@
         <target>Commentary to</target>
       </segment>
     </unit>
+    <unit id="ElasticSearch.FilterLoadingError">
+      <segment state="initial">
+        <source>Ett fel har uppstått när sökavgränsningarna skulle laddas.</source>
+        <target>An error occurred while loading filters.</target>
+      </segment>
+    </unit>
     <unit id="ElasticSearch.FilterResults">
       <segment state="initial">
         <source>Avgränsa sökningen</source>
@@ -707,6 +713,12 @@
       <segment state="initial">
         <source>Börja söka genom att skriva in sökord eller välja avgränsningar.</source>
         <target>Start by entering search terms or applying filters.</target>
+      </segment>
+    </unit>
+    <unit id="ElasticSearch.StartSearchInstructionNoFilters">
+      <segment state="initial">
+        <source>Börja söka genom att skriva in sökord.</source>
+        <target>Start by entering search terms.</target>
       </segment>
     </unit>
     <unit id="ElasticSearch.TimeRange">
@@ -1497,7 +1509,7 @@
     </unit>
     <unit id="Metadata.None">
       <segment state="initial">
-        <source>Ingen metadata tillgänglig.</source>
+        <source>Inga metadata tillgängliga.</source>
         <target>No metadata available.</target>
       </segment>
     </unit>
@@ -1930,7 +1942,7 @@
     <unit id="Reference.Permalink">
       <segment state="initial">
         <source>Beständig webbadress</source>
-        <target>Permalink</target>
+        <target>Permanent URL</target>
       </segment>
     </unit>
     <unit id="Reference.Refer">

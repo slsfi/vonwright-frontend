@@ -31,7 +31,9 @@ export class BrowserRouterNavigationSourceService
   get(router: Router): Observable<string> {
     return router.events.pipe(
       filter((event): event is NavigationEnd => event instanceof NavigationEnd),
-      map((event: NavigationEnd) => event.url)
+      // Use the final post-redirect URL, not event.url. Auth guards can add
+      // query params during redirects, and language links must preserve them.
+      map((event: NavigationEnd) => event.urlAfterRedirects)
     );
   }
 }

@@ -181,6 +181,9 @@ export class AppComponent implements OnInit {
       case 'reset-password':
         this.headService.setTitle([$localize`:@@ResetPassword.Title:Nytt lösenord`]);
         return;
+      case 'verify-email':
+        this.headService.setTitle([$localize`:@@VerifyEmail.Title:Verifiera e-postadress`]);
+        return;
       default:
         !routeBasePath && this.headService.setTitle();
         return;

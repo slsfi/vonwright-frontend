@@ -5,7 +5,9 @@ import { IonicModule } from '@ionic/angular';
 import { config } from '@config';
 import { Language } from '@models/config.models';
 import { AuthService } from '@services/auth.service';
+import { RouteLocalizationService } from '@services/route-localization.service';
 import { AUTH_ENABLED } from '@tokens/auth.tokens';
+import { parseRelativeUrl } from '@utility-functions';
 
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -28,6 +30,7 @@ export class TopMenuComponent {
   private readonly ngZone = inject(NgZone);
   private readonly renderer = inject(Renderer2);
   private readonly router = inject(Router);
+  private readonly routeLocalizationService = inject(RouteLocalizationService);
   private readonly authEnabled = inject(AUTH_ENABLED);
   private authService: AuthService | null = null;
   private readonly authMenuLoginLabel = $localize`:@@TopMenu.Login:Logga in`;
@@ -46,6 +49,16 @@ export class TopMenuComponent {
   private readonly currentLanguage?: Language = this.languages.find(
     (l: Language) => l.code === this.activeLocale
   );
+  protected readonly languageHrefByCode = computed<Record<string, string>>(() => {
+    const currentUrl = this.resolveCurrentRouterUrl();
+
+    return this.languages.reduce<Record<string, string>>((hrefByCode, language) => {
+      hrefByCode[language.code] = `/${language.code}${
+        this.routeLocalizationService.localizeRouterUrl(currentUrl, language.code)
+      }`;
+      return hrefByCode;
+    }, {});
+  });
   protected readonly currentLanguageLabel = this.currentLanguage?.label ?? '';
   protected readonly showLanguageButton = config.component?.topMenu?.showLanguageButton ?? true;
   protected readonly showTopAboutButton = config.component?.topMenu?.showAboutButton ?? true;
@@ -152,6 +165,34 @@ export class TopMenuComponent {
     event.preventDefault();
     this.getAuthService().logout();
     this.router.navigateByUrl('/login');
+  }
+
+  /**
+   * Returns the route URL used for language links, preserving query params
+   * from the live router URL if the input URL is a same-path stale snapshot.
+   */
+  private resolveCurrentRouterUrl(): string {
+    const currentUrl = this.currentRouterUrl();
+    const routerUrl = this.router.url;
+
+    if (!currentUrl) {
+      return routerUrl || '/';
+    }
+
+    const currentParsedUrl = parseRelativeUrl(currentUrl);
+    const routerParsedUrl = parseRelativeUrl(routerUrl);
+
+    if (
+      currentParsedUrl &&
+      routerParsedUrl &&
+      currentParsedUrl.pathname === routerParsedUrl.pathname &&
+      !currentParsedUrl.search &&
+      !!routerParsedUrl.search
+    ) {
+      return routerUrl;
+    }
+
+    return currentUrl;
   }
 
 }
