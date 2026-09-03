@@ -8,6 +8,63 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ## Unreleased
 
+### Changed
+
+- Update to base version [`2.7.9`](https://github.com/slsfi/digital-edition-frontend-ng/releases/tag/2.7.9) from upstream, original repository.
+
+
+
+## [2.7.9] – 2026-09-03
+
+### Changed
+
+- Deps: update `@angular/core` to 20.3.30 and `@angular/cli` to 20.3.36. ([2b3cc66](https://github.com/slsfi/digital-edition-frontend-ng/commit/2b3cc667f3097892f7434ea2fb5702efb976c96c), [26d7eab](https://github.com/slsfi/digital-edition-frontend-ng/commit/26d7eabc6b4c1164ef7746f49ce2d2c929542f59))
+- Deps: update `@ionic/angular` and `@ionic/angular-server` to 8.8.19. ([b5608bd](https://github.com/slsfi/digital-edition-frontend-ng/commit/b5608bdcdc4e7c3753985f17ce846e1591f7f451))
+- Deps: update `express-rate-limit` to 8.7.0. ([2166f65](https://github.com/slsfi/digital-edition-frontend-ng/commit/2166f653240a53d0d4bdca75ef9e35219e6b9113))
+- Deps: update `marked` to 18.0.11. ([77ff7dc](https://github.com/slsfi/digital-edition-frontend-ng/commit/77ff7dc408f327697700ae88acc86a900f5a2dfd))
+- Deps: update transitive dependencies. ([6535a41](https://github.com/slsfi/digital-edition-frontend-ng/commit/6535a41250ff5e2520387c46bdfe282ca82f1e37))
+
+
+
+## [2.7.8] – 2026-08-18
+
+### Changed
+
+- Deps: update `@angular/core` to 20.3.28 and `@angular/cli` to 20.3.34. ([594e037](https://github.com/slsfi/digital-edition-frontend-ng/commit/594e0375b779079246fc2c5b542fc4c113e0b03b))
+- Deps: update `@ionic/angular` and `@ionic/angular-server` to 8.8.18 and `ionicons` to 8.1.0. ([0dc0e88](https://github.com/slsfi/digital-edition-frontend-ng/commit/0dc0e88d32e0567f0080d5013d64b4a4eafcc08d), [d06be91](https://github.com/slsfi/digital-edition-frontend-ng/commit/d06be9129776d57fcd2a6c91655864837f59dfc2))
+- Deps: update `marked` to 18.0.10. ([781b10d](https://github.com/slsfi/digital-edition-frontend-ng/commit/781b10db8896c1355e24de925b3a8af4fcc7fb8e))
+- Deps: update transitive dependencies. ([803de54](https://github.com/slsfi/digital-edition-frontend-ng/commit/803de544b76d7d00e070d92bdd41386aebd958f3))
+
+
+
+## [2.7.7] – 2026-08-11
+
+### Changed
+
+- Update `nginx` to 1.30.4. ([92a325b](https://github.com/slsfi/digital-edition-frontend-ng/commit/92a325bf865898345701c5a4f127fb155b7f80fc))
+- Deps: update `@angular/core` to 20.3.27 and `@angular/cli` to 20.3.33. ([c4a9ce6](https://github.com/slsfi/digital-edition-frontend-ng/commit/c4a9ce648d21d083c48e0a22594417a2faa4db6c), [67d43b1](https://github.com/slsfi/digital-edition-frontend-ng/commit/67d43b165e3cf56c3d018e398deb1bd3aa691575))
+- Deps: update `express-rate-limit` to 8.6.2. ([07701ce](https://github.com/slsfi/digital-edition-frontend-ng/commit/07701ceab348960aa317222082275623d09a2cf7), [57aa7f5](https://github.com/slsfi/digital-edition-frontend-ng/commit/57aa7f5c93342dba2237a989367b1ca18243d3cc))
+- Deps: update `marked` to 18.0.9. ([68de792](https://github.com/slsfi/digital-edition-frontend-ng/commit/68de792cdb70ac9143a8e6ddc831a91b1e258c09), [c7c100a](https://github.com/slsfi/digital-edition-frontend-ng/commit/c7c100af8b53497b6b709158aabb5784fd2a4bae))
+- Deps (dev): update `@types/node` to 22.20.1. ([f140102](https://github.com/slsfi/digital-edition-frontend-ng/commit/f1401028989dfa72aa105fba1b0c8a8535fd1ead))
+- Deps: update transitive dependencies. ([7c2ab32](https://github.com/slsfi/digital-edition-frontend-ng/commit/7c2ab32126b496a6778d778bfa6d4854d6a5f107), [a40ed77](https://github.com/slsfi/digital-edition-frontend-ng/commit/a40ed773641cdb308b1804617b657eeb7f714345))
+
+### Removed
+
+- Deps: remove deprecated `@angular/animations`. ([50f4ad6](https://github.com/slsfi/digital-edition-frontend-ng/commit/50f4ad6d45d7cd3779ec87e8dba1ca5f47d03f48))
+
+
+
+## [2.7.6] – 2026-06-23
+
+### Changed
+
+- Deps (dev): update `@types/node` to 22.20.0. ([b251b78](https://github.com/slsfi/digital-edition-frontend-ng/commit/b251b789258a3170f88e9be0224ed45ed2f730b8))
+- Deps (dev): pin `gzipper` to patch versions of 8.2.x since >= 8.3.0 requires Node 24. ([ddb4b04](https://github.com/slsfi/digital-edition-frontend-ng/commit/ddb4b0478ec79b51b608d5c534f37e7719213a85))
+
+### Fixed
+
+- SSR: keep canonical and Open Graph URLs on the configured HTTPS origin when the app is deployed behind an internal HTTP proxy hop. ([f6c01de](https://github.com/slsfi/digital-edition-frontend-ng/commit/f6c01dec3e07a79cd97ceff14e9e6442331fefd4))
+
 
 
 ## [2.7.5-production.1] – 2026-06-18
@@ -1637,7 +1694,11 @@ siteLogoDimensions: {
 
 
 
-[unreleased]: https://github.com/slsfi/digital-edition-frontend-ng/compare/2.7.5...HEAD
+[unreleased]: https://github.com/slsfi/digital-edition-frontend-ng/compare/2.7.9...HEAD
+[2.7.9]: https://github.com/slsfi/digital-edition-frontend-ng/compare/2.7.8...2.7.9
+[2.7.8]: https://github.com/slsfi/digital-edition-frontend-ng/compare/2.7.7...2.7.8
+[2.7.7]: https://github.com/slsfi/digital-edition-frontend-ng/compare/2.7.6...2.7.7
+[2.7.6]: https://github.com/slsfi/digital-edition-frontend-ng/compare/2.7.5...2.7.6
 [2.7.5]: https://github.com/slsfi/digital-edition-frontend-ng/compare/2.7.4...2.7.5
 [2.7.4]: https://github.com/slsfi/digital-edition-frontend-ng/compare/2.7.3...2.7.4
 [2.7.3]: https://github.com/slsfi/digital-edition-frontend-ng/compare/2.7.2...2.7.3

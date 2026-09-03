@@ -1,11 +1,12 @@
 import { Injectable, LOCALE_ID, OnDestroy, Renderer2, RendererFactory2, DOCUMENT, inject } from '@angular/core';
 import { Meta, Title } from '@angular/platform-browser';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { Request } from 'express';
+import type { Request } from 'express';
 
 import { config } from '@config';
 import { RouteLocalizationService } from '@services/route-localization.service';
 import { REQUEST } from 'src/express.tokens';
+import { getConfiguredSiteOrigin, getRequestOrigin } from '../utils/request-origin';
 
 
 @Injectable({
@@ -299,50 +300,11 @@ export class DocumentHeadService implements OnDestroy {
    * @returns Origin string (`scheme://host`).
    */
   private getOrigin(): string {
-    const requestOrigin = this.getRequestOrigin();
+    const requestOrigin = getRequestOrigin(this.request);
     if (requestOrigin) {
       return requestOrigin;
     }
-    return String(this.document.defaultView?.location.origin ?? config.app?.siteURLOrigin ?? '');
-  }
-
-  /**
-   * Builds an origin from SSR request headers when available.
-   * @returns Origin derived from request metadata.
-   */
-  private getRequestOrigin(): string | undefined {
-    if (!this.request) {
-      return undefined;
-    }
-
-    const host = this.getRequestHeaderValue('x-forwarded-host')
-      || this.getRequestHeaderValue('host');
-
-    if (!host) {
-      return undefined;
-    }
-
-    const protocol = this.getRequestHeaderValue('x-forwarded-proto')
-      || (!this.isLocalHost(host) ? this.getConfiguredOriginProtocol() : undefined)
-      || this.request.protocol
-      || 'http';
-
-    return protocol + '://' + host;
-  }
-
-  /**
-   * Returns the first normalized value of a request header.
-   * @param headerName Request header name.
-   * @returns Header value if present.
-   */
-  private getRequestHeaderValue(headerName: string): string | undefined {
-    const header = this.request?.headers?.[headerName];
-    if (!header) {
-      return undefined;
-    }
-    const firstValue = Array.isArray(header) ? header[0] : header;
-    const normalizedValue = String(firstValue).split(',')[0]?.trim();
-    return normalizedValue || undefined;
+    return String(this.document.defaultView?.location.origin ?? getConfiguredSiteOrigin() ?? '');
   }
 
   /**
@@ -372,37 +334,6 @@ export class DocumentHeadService implements OnDestroy {
     }
 
     return normalizedPath;
-  }
-
-  /**
-   * Extracts protocol from `config.app.siteURLOrigin`.
-   * @returns Protocol name without trailing colon.
-   */
-  private getConfiguredOriginProtocol(): string | undefined {
-    const configuredOrigin = config.app?.siteURLOrigin;
-    if (!configuredOrigin) {
-      return undefined;
-    }
-
-    try {
-      return new URL(configuredOrigin).protocol.replace(':', '');
-    } catch {
-      return undefined;
-    }
-  }
-
-  /**
-   * Checks whether a host points to localhost.
-   * @param host Host string, optionally including port.
-   * @returns True for localhost and loopback addresses.
-   */
-  private isLocalHost(host: string): boolean {
-    const hostname = host.split(':')[0].toLowerCase();
-    return (
-      hostname === 'localhost' ||
-      hostname === '127.0.0.1' ||
-      hostname === '::1'
-    );
   }
 
   /**

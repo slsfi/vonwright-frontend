@@ -49,6 +49,8 @@ The request IP used by the limiter depends on Express proxy trust settings. Conf
 
 - `app.ssr.trustProxyHops` (default: `2`): number of trusted proxy hops when resolving `req.ip` for SSR rate limiting. Value `2` is correct when the app runs behind one upstream reverse proxy (for example HAProxy) in front of nginx (`reverse proxy -> nginx -> Node/Express SSR app`). If the app is reached directly through nginx (no extra reverse proxy), set this to `1`. If the app is reached directly by Node/Express (no proxy), set this to `0`. If the proxy chain is longer, increase the value accordingly.
 
+The nginx config preserves an incoming `X-Forwarded-Proto` header when the app runs behind an upstream TLS-terminating proxy, and falls back to nginx's own `$scheme` when that header is absent. SSR URL generation also treats `app.siteURLOrigin` as authoritative when the request host matches the configured public host, so canonical and Open Graph URLs keep the configured HTTPS origin even if an internal proxy hop uses HTTP.
+
 **Important!** nginx gets access to the static files through a [Docker volume][docker_volume_reference], which is defined in [`compose.yml`][docker_compose_file]. Since volumes persist even if the container itself is deleted, and the content of a volume is not updated when the image is updated, you need to run
 
 ```

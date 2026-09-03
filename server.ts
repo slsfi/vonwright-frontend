@@ -16,6 +16,7 @@ import { environment } from './src/environments/environment';
 import { REQUEST } from './src/express.tokens';
 import { config } from './src/assets/config/config';
 import { authProtectedRoutePaths } from './src/app/auth-protected-route-paths.generated';
+import { getConfiguredSiteHostname, getRequestRenderUrl } from './src/app/utils/request-origin';
 
 const LOOPBACK_ALLOWED_HOSTS = ['localhost', '127.0.0.1', '[::1]'] as const;
 
@@ -28,29 +29,9 @@ const SSR_TRUST_PROXY_HOPS = getNonNegativeInt(config?.app?.ssr?.trustProxyHops,
 const authEnabled = config?.app?.auth?.enabled === true;
 const authProtectedRouteSegmentPatterns = authProtectedRoutePaths.map((routePath) => toRouteSegments(routePath));
 
-/**
- * Resolves a hostname from `config.app.siteURLOrigin` for SSR host validation.
- */
-function getConfiguredAllowedHost(): string | undefined {
-  const siteURLOrigin = config?.app?.siteURLOrigin;
-  if (typeof siteURLOrigin !== 'string' || siteURLOrigin.trim().length === 0) {
-    return undefined;
-  }
-
-  const normalizedOrigin = /^[a-zA-Z][a-zA-Z\d+\-.]*:\/\//.test(siteURLOrigin)
-    ? siteURLOrigin
-    : `https://${siteURLOrigin}`;
-
-  try {
-    return new URL(normalizedOrigin).hostname.toLowerCase();
-  } catch {
-    return undefined;
-  }
-}
-
 function getAllowedHosts(): string[] {
   const allowedHosts = new Set<string>(LOOPBACK_ALLOWED_HOSTS);
-  const configuredHost = getConfiguredAllowedHost();
+  const configuredHost = getConfiguredSiteHostname();
   if (configuredHost) {
     allowedHosts.add(configuredHost);
   }
@@ -209,7 +190,7 @@ export function app(lang: string): express.Express {
   // Catch-all route: render Angular app for non-static paths (SSR or client-side routes, including 404 pages)
   server.use(renderRequestRateLimiter, (req, res, next) => {
     // console.log(`[SSR] Rendering URL: ${req.url}`);
-    const { protocol, originalUrl, baseUrl, headers } = req;
+    const { baseUrl } = req;
     // Temporary request debug snippet (keep commented unless troubleshooting):
     // const forwardedForHeader = req.headers['x-forwarded-for'];
     // const forwardedFor = Array.isArray(forwardedForHeader)
@@ -232,7 +213,7 @@ export function app(lang: string): express.Express {
       .render({
         bootstrap: AppServerModule,
         documentFilePath: indexHtml,
-        url: `${protocol}://${headers.host}${originalUrl}`,
+        url: getRequestRenderUrl(req),
         inlineCriticalCss: false,
         publicPath: browserDistFolder,
         providers: [
