@@ -18,10 +18,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
   - The text content column is centred with a maximum width of `750px` (previously its main sections had a maximum width of `1000px`).
   - The site title, subtitle and footer are centred in portrait mode (previously start-aligned).
   - The search bar is centred in wide portrait mode (previously start-aligned).
+- Scoped CSS variable defaults for info overlays, elastic search, indices, text variants, semantic highlighting, the text changer and the top menu now use inline fallbacks where the variables are consumed. The corresponding files in `src/theme/scoped-variables` have been removed without changing the defaults or supported override selectors.
+  - Existing overrides in [`custom.scss`](src/assets/custom_css/custom.scss) remain compatible. Forks that edited or imported the removed partials must migrate those customisations to `custom.scss` or to the inline fallbacks.
+  - The unused `--top-menu-logo-height` variable has been removed.
 
 ### Added
 
-- Home: CSS variables for easier styling customisation, with inline defaults in [home.page.scss](src/app/pages/home/home.page.scss) and an override reference in [custom.scss](src/assets/custom_css/custom.scss).
+- Home: CSS variables for easier styling customisation, with inline defaults in [`home.page.scss`](src/app/pages/home/home.page.scss) and an override reference in [`custom.scss`](src/assets/custom_css/custom.scss).
 - TEI styling: alternate (v2) CSS styles for TEI text. To use, change the included SCSS file in [`global.scss`](src/global.scss) from [`_inc-global-tei.scss`](src/theme/_inc-global-tei.scss) to [`_inc-global-tei-v2.scss`](src/theme/_inc-global-tei-v2.scss). Note that the new styles require a different HTML structure.
 
 ### Changed
@@ -41,6 +44,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 - SSR smoke test: honor non-default `--base-url` values in URL assertions while preserving forwarded-host and configured-origin proxy coverage.
 - Restore Dependabot dependency updates by removing the incompatible `devEngines.packageManager` range and treating npm 11.16.0 as a minimum version.
 - Use Ionic 9.0.2's routed-page change-detection fix and remove the now-redundant manual change-detection workarounds from collection introduction and index pages.
+
+### Removed
+
+- Unused `ion-datetime` and `ion-datetime-button` styles; the application no longer contains either component.
 
 
 

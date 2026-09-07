@@ -10,25 +10,6 @@
     margin: 0 0.5rem;
   }
 
-  ion-datetime-button::part(native) {
-    background-color: #fff;
-    border-radius: 3px;
-    border: 1px solid #b5b5b5;
-    transition: border-color 0.4s;
-  }
-
-  ion-datetime-button::part(native):hover {
-    border-color: var(--outline-button-color);
-  }
-
-  ion-datetime-button.date-active::part(native) {
-    color: var(--outline-button-color) !important;
-  }
-
-  ion-datetime-button.blank::part(native) {
-    color: #fff;
-  }
-
   ion-button {
     --color: #000;
     --padding-end: 0.25rem;
@@ -96,7 +77,7 @@
 }
 
 .yearBar {
-  background-color: var(--date-histogram-year-bar-color);
+  background-color: var(--date-histogram-year-bar-color, var(--primary-color));
   height: 100%;
   position: relative;
   width: 0;
@@ -114,11 +95,11 @@
 }
 
 .year:hover {
-  background-color: var(--date-histogram-year-hover-color);
+  background-color: var(--date-histogram-year-hover-color, var(--secondary-color));
 }
 
 .year:hover > .yearBar, .yearBarInRange {
-  background-color: var(--date-histogram-year-in-range-color);
+  background-color: var(--date-histogram-year-in-range-color, #751e22);
 }
 
 .year:hover .yearDetails {

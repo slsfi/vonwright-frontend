@@ -9,8 +9,8 @@
 }
 
 :host(.text-changer-mobile-mode) {
-  background-color: var(--text-changer-mobile-color);
-  color: var(--text-changer-mobile-color-contrast);
+  background-color: var(--text-changer-mobile-color, var(--secondary-toolbar-color));
+  color: var(--text-changer-mobile-color-contrast, var(--secondary-toolbar-color-contrast));
   height: 46px;
   padding: 0;
 }

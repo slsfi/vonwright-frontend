@@ -1,8 +1,8 @@
 page-elastic-search {
   .hit-item {
     em {
-      background-color: var(--search-match-highlight-background-color);
-      color: var(--search-match-highlight-text-color);
+      background-color: var(--search-match-highlight-background-color, var(--search-match-background-color));
+      color: var(--search-match-highlight-text-color, #000);
       font-style: normal;
     }
   }
