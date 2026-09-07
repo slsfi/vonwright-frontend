@@ -47,7 +47,7 @@ to run the image. If you built the image with a different name and tag in step 3
 
 ### nginx in front of app image
 
-In production, nginx is run in a Docker container in front of the app container so nginx, which is more performant than Node.js, can server static files. To run the app in this setup locally:
+In production, nginx is run in a Docker container in front of the app container so nginx, which is more performant than Node.js, can serve static files. To run the app in this setup locally:
 
 1. Start [Docker Desktop][docker_desktop] and log in with your credentials.
 2. In PowerShell, `cd` into the app repository folder.
@@ -97,7 +97,7 @@ The app is built on Angular and uses many web components from Ionic. It also has
 
 The Angular documentation is available on <https://angular.dev/>.
 
-At it’s root, the Angular app uses NgModules, even though all components except `pages` use the standalone API. This is because currently, another dependency, `Ionic`, doesn’t support the Angular standalone API for SSR apps.
+At its root, the Angular app still uses NgModules, even though all components except `pages` use the standalone API. This is no longer an Ionic limitation: Ionic 9 supports standalone components and provides `provideIonicAngular()` for standalone application bootstrap. The migration plan is to first replace the root, server and page NgModules with standalone bootstrap and components, and enable zoneless change detection, while retaining the existing webpack-based build and SSR setup. These two migrations are not intended to introduce breaking changes. The later migration from Angular's separate `browser` and `server` builders to the [`application` builder](https://angular.dev/tools/cli/build-system-migration) is expected to introduce breaking changes.
 
 #### Updating Angular
 
@@ -416,7 +416,7 @@ Current status:
 - Auth-protected routes are currently forced to client rendering in Express middleware in [`server.ts`](../server.ts), based on generated route-path metadata from [`src/app/auth-protected-route-paths.generated.ts`](../src/app/auth-protected-route-paths.generated.ts).
 - This is an implementation workaround for the current webpack-based SSR build setup.
 
-When migrating to Angular's `application` builder (`@angular-devkit/build-angular:application`):
+The standalone and zoneless migrations are planned first while the legacy builders remain in use. The subsequent migration to Angular's `application` builder (`@angular-devkit/build-angular:application`) is expected to introduce breaking changes. During that builder migration:
 
 - Investigate replacing the current middleware-based implementation with Angular server-routes configuration (`withRoutes` / `RenderMode.Client`) for auth-protected routes.
 - Validate compatibility with feature-based route generation before removing the current workaround.

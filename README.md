@@ -35,13 +35,13 @@ The app is built on [Angular][angular] and uses [Ionic][ionic] web components.
 
 3. Create a new branch in the forked repository and name it `production`, `prod` or something similar.
 
-4. Configure your project app by editing `/src/assets/config/config.ts`. Documentation on the configuration options is forthcoming.
+4. Configure your project app by editing [`src/assets/config/config.ts`](src/assets/config/config.ts). The [development notes](docs/DEVELOPMENT.md) document selected configuration-dependent features, but a complete reference for all configuration options is not yet available.
 
 The `base` branch of the forked repository must **never** be manually modified. It must be kept as a clone of the original ”upstream” `main` branch in [`digital-edition-frontend-ng`][digital-edition-frontend-ng]. When the upstream `main` branch is updated, you can sync the updates to the `base` branch in your forked repository. You can then merge the `base` branch into your `production` branch.
 
 This workflow enables updates to the app in the original, upstream repository to be easily distributed to forked project repositories.
 
-By default, the app has Swedish and Finnish language versions enabled. See the documentation (forthcoming) on how to configure internationalization, customize your app, build it for production and deploy it.
+By default, the app has Swedish and Finnish language versions enabled. See [Updating, building and deployment](docs/DEPLOYMENT.md) and the [development notes](docs/DEVELOPMENT.md) for the currently available guidance. Complete documentation for internationalization and app customization is not yet available.
 
 
 ## Documentation
@@ -61,15 +61,15 @@ node --version
 npm --version
 ```
 
-2. Install project dependencies:
+2. [Clone][clone_repository] the repository locally and `cd` into the folder. On Windows you can use [GitHub Desktop][github_desktop] or [Git Bash][git_bash] (see [tutorial on Git Bash][gith_bash_tutorial]).
+
+3. Install project dependencies:
 
 ```
 npm install
 ```
 
 The local Angular CLI from `node_modules` is used by the npm scripts.
-
-3. [Clone][clone_repository] the repository locally and `cd` into the folder. On Windows you can use [GitHub Desktop][github_desktop] or [Git Bash][git_bash] (see [tutorial on Git Bash][gith_bash_tutorial]).
 
 ### Running locally
 

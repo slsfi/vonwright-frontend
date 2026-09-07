@@ -38,6 +38,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 - Deps: update `marked` to 18.0.11.
 - Deps: pin `zone.js` to 0.15.1.
 - Deps: update transitive dependencies.
+- Update documentation.
 
 ### Fixed
 
