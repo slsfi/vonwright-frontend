@@ -8,6 +8,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ## [Unreleased]
 
+
+
+## [3.0.0] – 2026-09-07
+
 ### BREAKING CHANGES
 
 - Node.js `^24.15.0` and npm `>=11.16.0` required.
@@ -24,31 +28,32 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ### Added
 
-- Home: CSS variables for easier styling customisation, with inline defaults in [`home.page.scss`](src/app/pages/home/home.page.scss) and an override reference in [`custom.scss`](src/assets/custom_css/custom.scss).
-- TEI styling: alternate (v2) CSS styles for TEI text. To use, change the included SCSS file in [`global.scss`](src/global.scss) from [`_inc-global-tei.scss`](src/theme/_inc-global-tei.scss) to [`_inc-global-tei-v2.scss`](src/theme/_inc-global-tei-v2.scss). Note that the new styles require a different HTML structure.
+- Home: CSS variables for easier styling customisation, with inline defaults in [`home.page.scss`](src/app/pages/home/home.page.scss) and an override reference in [`custom.scss`](src/assets/custom_css/custom.scss). ([bae21a8](https://github.com/slsfi/digital-edition-frontend-ng/commit/bae21a8eed208addbc625ba3e0aaa6b3f8e7adad), [93c508c](https://github.com/slsfi/digital-edition-frontend-ng/commit/93c508c9535afb14134fcd91fd86b72cc8e6af2c))
+- TEI styling: alternate (v2) CSS styles for TEI text. To use, change the included SCSS file in [`global.scss`](src/global.scss) from [`_inc-global-tei.scss`](src/theme/_inc-global-tei.scss) to [`_inc-global-tei-v2.scss`](src/theme/_inc-global-tei-v2.scss). Note that the new styles require a different HTML structure. ([138530d](https://github.com/slsfi/digital-edition-frontend-ng/commit/138530d5a80a89a251a54397621aaa4e7a895dcb))
 
 ### Changed
 
-- Upgrade the required Node.js runtime and Docker build image to Node 24 with npm 11, update `@types/node` to version 24, and update `gzipper` to 8.3.0.
-- Upgrade `actions/checkout` in Docker build action workflow to v7.
-- Add version-pinned npm install-script approvals and document the transitive dependency update workflow.
-- Deps: update `@angular/core` to 22.1.5 and `@angular/cli` to 22.1.7.
-- Deps: update `@ionic/angular` and `@ionic/angular-server` to 9.0.2.
-- Deps: update `express-rate-limit` to 8.7.0.
-- Deps: update `marked` to 18.0.11.
-- Deps: pin `zone.js` to 0.15.1.
-- Deps: update transitive dependencies.
-- Update documentation.
+- Upgrade the required Node.js runtime and Docker build image to Node 24 with npm 11, update `@types/node` to version 24, and update `gzipper` to 8.3.0. ([ac44eb7](https://github.com/slsfi/digital-edition-frontend-ng/commit/ac44eb748f5c4d174f8f8d83ce07c5c693ff98c8))
+- Upgrade `actions/checkout` in Docker build action workflow to v7. ([4eef553](https://github.com/slsfi/digital-edition-frontend-ng/commit/4eef5533a9388e89b3b74626cebe9ccb82a1da13))
+- Add version-pinned npm install-script approvals and document the transitive dependency update workflow. ([1f76867](https://github.com/slsfi/digital-edition-frontend-ng/commit/1f76867ff05f60856042ca67b2d2a15c9d0fb411))
+- Inline scoped CSS variable defaults. ([96e058c](https://github.com/slsfi/digital-edition-frontend-ng/commit/96e058c8ba7e981e63bb2cada9ddac47753bbdbf))
+- Deps: update `@angular/core` to 22.1.5 and `@angular/cli` to 22.1.7. ([e06a4c5](https://github.com/slsfi/digital-edition-frontend-ng/commit/e06a4c54d48ea4df4d48456aacdbb4f8bc0296f2), [b5879d3](https://github.com/slsfi/digital-edition-frontend-ng/commit/b5879d35ae0b7c7ad617a67d35d4450d709df67a), [b234581](https://github.com/slsfi/digital-edition-frontend-ng/commit/b2345818b0195e698607c5fc3d97a1aac5b87643), [06d27cf](https://github.com/slsfi/digital-edition-frontend-ng/commit/06d27cf110901f47ca1ca34ad4e720bfbfd2bc95))
+- Deps: update `@ionic/angular` and `@ionic/angular-server` to 9.0.2. ([599a52a](https://github.com/slsfi/digital-edition-frontend-ng/commit/599a52aa85e87bfd4d5759823ab63d7aaa047742), [821a4e2](https://github.com/slsfi/digital-edition-frontend-ng/commit/821a4e2b5827beb20a2ab5be648b9c5a5db3d539), [f2b1d5c](https://github.com/slsfi/digital-edition-frontend-ng/commit/f2b1d5cfcc6b161c16e8c94ddcbe579e3ec65e35))
+- Deps: update `express-rate-limit` to 8.7.0. ([8b61181](https://github.com/slsfi/digital-edition-frontend-ng/commit/8b61181a8dded7c0cc1800bc6d0be2e580ab4df5))
+- Deps: update `marked` to 18.0.11. ([c52869b](https://github.com/slsfi/digital-edition-frontend-ng/commit/c52869b200547a75b4d3c9fd411e1ec8f7fb7cc2))
+- Deps: pin `zone.js` to 0.15.1. ([e41cdf7](https://github.com/slsfi/digital-edition-frontend-ng/commit/e41cdf7860d3c4595f7b6b822ba631a7e9f3335c))
+- Deps: update transitive dependencies. ([e44df10](https://github.com/slsfi/digital-edition-frontend-ng/commit/e44df100ae15b694b025b3f4d06105e39e70935c), [c7e7dfd](https://github.com/slsfi/digital-edition-frontend-ng/commit/c7e7dfd05afd63e8b366c37ffd9bd8374c4acf02))
+- Update documentation. ([770669d](https://github.com/slsfi/digital-edition-frontend-ng/commit/770669dd88041b221192932e49c79b9355f1dd1e))
 
 ### Fixed
 
-- SSR smoke test: honor non-default `--base-url` values in URL assertions while preserving forwarded-host and configured-origin proxy coverage.
-- Restore Dependabot dependency updates by removing the incompatible `devEngines.packageManager` range and treating npm 11.16.0 as a minimum version.
-- Use Ionic 9.0.2's routed-page change-detection fix and remove the now-redundant manual change-detection workarounds from collection introduction and index pages.
+- SSR smoke test: honor non-default `--base-url` values in URL assertions while preserving forwarded-host and configured-origin proxy coverage. ([45201bb](https://github.com/slsfi/digital-edition-frontend-ng/commit/45201bb9256d3d90f40be7554159818318ac2de6))
+- Restore Dependabot dependency updates by removing the incompatible `devEngines.packageManager` range and treating npm 11.16.0 as a minimum version. ([604d3b8](https://github.com/slsfi/digital-edition-frontend-ng/commit/604d3b8ad56ea1a7815d67bc4811d9440134e18c))
+- Use Ionic 9.0.2's routed-page change-detection fix and remove the now-redundant manual change-detection workarounds from collection introduction and index pages. ([0ca00ee](https://github.com/slsfi/digital-edition-frontend-ng/commit/0ca00ee9a87bd6a9f17e3076327480b5a25e8e56))
 
 ### Removed
 
-- Unused `ion-datetime` and `ion-datetime-button` styles; the application no longer contains either component.
+- Unused `ion-datetime` and `ion-datetime-button` styles; the application no longer contains either component. ([96e058c](https://github.com/slsfi/digital-edition-frontend-ng/commit/96e058c8ba7e981e63bb2cada9ddac47753bbdbf))
 
 
 
@@ -1532,7 +1537,8 @@ siteLogoDimensions: {
 
 
 
-[unreleased]: https://github.com/slsfi/digital-edition-frontend-ng/compare/2.7.8...HEAD
+[unreleased]: https://github.com/slsfi/digital-edition-frontend-ng/compare/3.0.0...HEAD
+[3.0.0]: https://github.com/slsfi/digital-edition-frontend-ng/compare/2.7.8...3.0.0
 [2.7.8]: https://github.com/slsfi/digital-edition-frontend-ng/compare/2.7.7...2.7.8
 [2.7.7]: https://github.com/slsfi/digital-edition-frontend-ng/compare/2.7.6...2.7.7
 [2.7.6]: https://github.com/slsfi/digital-edition-frontend-ng/compare/2.7.5...2.7.6
