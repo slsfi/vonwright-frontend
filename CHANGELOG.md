@@ -8,6 +8,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ## [Unreleased]
 
+### Changed
+
+- Deps: update `marked` to 18.0.12.
+
 ### Fixed
 
 - Sass variables import path for TEI v2 styling.
