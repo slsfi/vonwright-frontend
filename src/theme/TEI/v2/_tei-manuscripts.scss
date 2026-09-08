@@ -3,7 +3,7 @@
  * Styles for manuscripts.
  */
 @use "sass:math";
-@use "../sass_variables" as vars;
+@use "../../sass_variables" as vars;
 
 /* Size of the esh-symbol in manuscripts. */
 div.tei.teiManuscript .immediate_symbol img {

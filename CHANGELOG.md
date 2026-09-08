@@ -8,6 +8,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ## [Unreleased]
 
+### Fixed
+
+- Sass variables import path for TEI v2 styling.
+
 
 
 ## [3.0.0] – 2026-09-07

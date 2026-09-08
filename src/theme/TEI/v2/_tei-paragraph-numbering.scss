@@ -2,7 +2,7 @@
  * TEI PARAGRAPH NUMBERING - v2
  * Styles for paragraph and line numberings.
  */
- @use "../sass_variables" as vars;
+ @use "../../sass_variables" as vars;
 
 .tei span {
   &.lNumber,
