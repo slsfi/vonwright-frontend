@@ -11,6 +11,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 ### Changed
 
 - Deps: update `marked` to 18.0.12.
+- Deps: update transitive dependencies.
 
 ### Fixed
 
