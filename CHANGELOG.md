@@ -8,14 +8,18 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ## [Unreleased]
 
+
+
+## [3.0.1] – 2026-09-08
+
 ### Changed
 
-- Deps: update `marked` to 18.0.12.
-- Deps: update transitive dependencies.
+- Deps: update `marked` to 18.0.12. ([c6ed093](https://github.com/slsfi/digital-edition-frontend-ng/commit/c6ed0937cc54b1796523edbcb25c9106083a73c0))
+- Deps: update transitive dependencies. ([4792e04](https://github.com/slsfi/digital-edition-frontend-ng/commit/4792e04254e785594760c9a67e762ef4966e77e9))
 
 ### Fixed
 
-- Sass variables import path for TEI v2 styling.
+- Sass variables import path for TEI v2 styling. ([c0f82a6](https://github.com/slsfi/digital-edition-frontend-ng/commit/c0f82a6fd48a4a73c730cfb3d34703771f4afe18))
 
 
 
@@ -1546,7 +1550,8 @@ siteLogoDimensions: {
 
 
 
-[unreleased]: https://github.com/slsfi/digital-edition-frontend-ng/compare/3.0.0...HEAD
+[unreleased]: https://github.com/slsfi/digital-edition-frontend-ng/compare/3.0.1...HEAD
+[3.0.1]: https://github.com/slsfi/digital-edition-frontend-ng/compare/3.0.0...3.0.1
 [3.0.0]: https://github.com/slsfi/digital-edition-frontend-ng/compare/2.7.8...3.0.0
 [2.7.8]: https://github.com/slsfi/digital-edition-frontend-ng/compare/2.7.7...2.7.8
 [2.7.7]: https://github.com/slsfi/digital-edition-frontend-ng/compare/2.7.6...2.7.7
