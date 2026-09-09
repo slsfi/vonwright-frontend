@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 
+const http = require('node:http');
+const https = require('node:https');
 const { performance } = require('node:perf_hooks');
 
 /**
@@ -166,6 +168,70 @@ const TEST_CASES = [
     ],
   },
   {
+    name: 'Collection introduction',
+    route: '/sv/collection/203/introduction',
+    checks: [
+      {
+        description: 'Contains collection introduction snippet',
+        type: 'includes',
+        value: 'Topelius mest kända och till konceptionen mest ambitiösa verk',
+      },
+    ],
+  },
+  {
+    name: 'Persons index',
+    route: '/sv/index/persons',
+    checks: [
+      {
+        description: 'Contains person index entry',
+        type: 'includes',
+        value: 'Abbas I av Egypten',
+      },
+    ],
+  },
+  {
+    name: 'Ionic SSR variant select plain-text label',
+    // The variants component is deferred during SSR, so provide a deterministic
+    // title in the serialized view state to test the parent select template.
+    route: '/sv/collection/203/text/20217/ch1?views=(type:variants,uid:v1,id:6872,sortOrder:1,title:SSR+variant+title)',
+    headers: {
+      'User-Agent': 'Mobi',
+    },
+    checks: [
+      {
+        description: 'Contains the selected variant and title as one plain-text label',
+        type: 'regex',
+        value: /<div aria-hidden="true" class="select-text sc-ion-select-md" part="text"[^>]*><!--[^>]*-->Tryckt variant – SSR variant title<\/div>/,
+      },
+    ],
+  },
+  {
+    name: 'Ionic SSR ion-button structure',
+    route: '/sv/collection/200/text/19870',
+    checks: [
+      {
+        description: 'Contains hydrated ion-button host element',
+        type: 'regex',
+        value: /<ion-button\b[^>]*\bclass=["'][^"']*\bion-button\b[^"']*\bhydrated\b[^"']*["'][^>]*>/i,
+      },
+      {
+        description: 'Contains native button inside ion-button',
+        type: 'regex',
+        value: /<ion-button\b[\s\S]*?<button\b[^>]*\bclass=["'][^"']*\bbutton-native\b[^"']*["'][^>]*\bpart=["']native["'][^>]*>/i,
+      },
+      {
+        description: 'Contains expected ion-icon inside ion-button',
+        type: 'regex',
+        value: /<ion-button\b[\s\S]*?<ion-icon\b[^>]*\bname=["']arrow-redo-sharp["'][^>]*\bhydrated\b[^>]*>/i,
+      },
+      {
+        description: 'Contains expected button label text',
+        type: 'regex',
+        value: /<ion-button\b[\s\S]*?<span\b[^>]*\bside-title\b[^>]*>\s*Hänvisa\s*<\/span>/i,
+      },
+    ],
+  },
+  {
     name: 'SEO tags collection text sv',
     route: '/sv/collection/216/text/20280',
     checks: [
@@ -193,32 +259,6 @@ const TEST_CASES = [
         description: 'og:url points to Swedish collection text route',
         type: 'includes',
         value: '<meta property="og:url" content="http://localhost:4201/sv/collection/216/text/20280">',
-      },
-    ],
-  },
-  {
-    name: 'Ionic SSR ion-button structure',
-    route: '/sv/collection/200/text/19870',
-    checks: [
-      {
-        description: 'Contains hydrated ion-button host element',
-        type: 'regex',
-        value: /<ion-button\b[^>]*\bclass=["'][^"']*\bion-button\b[^"']*\bhydrated\b[^"']*["'][^>]*>/i,
-      },
-      {
-        description: 'Contains native button inside ion-button',
-        type: 'regex',
-        value: /<ion-button\b[\s\S]*?<button\b[^>]*\bclass=["'][^"']*\bbutton-native\b[^"']*["'][^>]*\bpart=["']native["'][^>]*>/i,
-      },
-      {
-        description: 'Contains expected ion-icon inside ion-button',
-        type: 'regex',
-        value: /<ion-button\b[\s\S]*?<ion-icon\b[^>]*\bname=["']arrow-redo-sharp["'][^>]*\bhydrated\b[^>]*>/i,
-      },
-      {
-        description: 'Contains expected button label text',
-        type: 'regex',
-        value: /<ion-button\b[\s\S]*?<span\b[^>]*\bside-title\b[^>]*>\s*Hänvisa\s*<\/span>/i,
       },
     ],
   },
@@ -379,6 +419,10 @@ function getUrl(baseUrl, route) {
 }
 
 async function fetchHtml(url, timeoutMs, headers) {
+  if (hasExplicitHostHeader(headers)) {
+    return fetchHtmlWithExplicitHost(url, timeoutMs, headers);
+  }
+
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), timeoutMs);
   const started = performance.now();
@@ -412,24 +456,100 @@ async function fetchHtml(url, timeoutMs, headers) {
   }
 }
 
-function runCheck(body, check) {
+function hasExplicitHostHeader(headers) {
+  return Object.keys(headers || {}).some((name) => name.toLowerCase() === 'host');
+}
+
+/**
+ * Node's Fetch implementation does not send an explicitly supplied Host header.
+ * Use the low-level HTTP client for proxy tests that need the connection target
+ * and public request host to differ.
+ */
+function fetchHtmlWithExplicitHost(url, timeoutMs, headers) {
+  const started = performance.now();
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), timeoutMs);
+
+  return new Promise((resolve) => {
+    let settled = false;
+
+    const finish = (result) => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timeout);
+      resolve({
+        ...result,
+        ms: performance.now() - started,
+      });
+    };
+
+    const fail = (error) => {
+      finish({
+        ok: false,
+        status: 0,
+        contentType: '',
+        body: '',
+        error: error instanceof Error ? error.message : String(error),
+      });
+    };
+
+    let targetUrl;
+    try {
+      targetUrl = new URL(url);
+    } catch (error) {
+      fail(error);
+      return;
+    }
+
+    const client = targetUrl.protocol === 'https:' ? https : http;
+    const request = client.get(targetUrl, { headers, signal: controller.signal }, (response) => {
+      const chunks = [];
+      response.setEncoding('utf8');
+      response.on('data', (chunk) => chunks.push(chunk));
+      response.on('end', () => {
+        const contentType = response.headers['content-type'];
+        finish({
+          ok: true,
+          status: response.statusCode || 0,
+          contentType: Array.isArray(contentType) ? contentType[0] || '' : contentType || '',
+          body: chunks.join(''),
+        });
+      });
+      response.on('error', fail);
+    });
+
+    request.on('error', fail);
+  });
+}
+
+function resolveCheckValue(value, baseUrl) {
+  if (typeof value !== 'string') {
+    return value;
+  }
+
+  return value.replace(DEFAULT_BASE_URL, baseUrl.replace(/\/+$/, ''));
+}
+
+function runCheck(body, check, baseUrl) {
+  const value = resolveCheckValue(check.value, baseUrl);
+
   if (check.type === 'includes') {
-    const matched = body.includes(check.value);
+    const matched = body.includes(value);
     return {
       passed: matched,
       reason: matched
         ? ''
-        : `Missing expected HTML snippet: ${JSON.stringify(check.value)}`,
+        : `Missing expected HTML snippet: ${JSON.stringify(value)}`,
     };
   }
 
   if (check.type === 'regex') {
-    const matched = check.value.test(body);
+    const matched = value.test(body);
     return {
       passed: matched,
       reason: matched
         ? ''
-        : `Missing expected HTML pattern: ${check.value.toString()}`,
+        : `Missing expected HTML pattern: ${value.toString()}`,
     };
   }
 
@@ -466,7 +586,7 @@ async function runTest(baseUrl, timeoutMs, testCase) {
   }
 
   for (const check of testCase.checks) {
-    const result = runCheck(response.body, check);
+    const result = runCheck(response.body, check, baseUrl);
     if (!result.passed) {
       errors.push(`${check.description}: ${result.reason}`);
     }

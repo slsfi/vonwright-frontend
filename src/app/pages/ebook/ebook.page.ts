@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, inject } from '@angular/core';
+import { Component, OnDestroy, OnInit, inject, ChangeDetectionStrategy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 
@@ -11,6 +11,7 @@ import { splitFilename } from '@utility-functions';
   selector: 'page-ebook',
   templateUrl: './ebook.page.html',
   styleUrls: ['./ebook.page.scss'],
+  changeDetection: ChangeDetectionStrategy.Eager,
   standalone: false
 })
 export class EbookPage implements OnDestroy, OnInit {

@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, DestroyRef, ElementRef, Injector, LOCALE_ID, NgZone, OnInit, Renderer2, afterNextRender, inject, signal, viewChild, viewChildren } from '@angular/core';
 import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 import { ActivatedRoute } from '@angular/router';
-import { IonFabButton, IonFabList, IonPopover, ModalController, PopoverController } from '@ionic/angular';
+import { IonFabButton, IonFabList, IonPopover, ModalController, PopoverController } from '@ionic/angular/lazy';
 import { distinctUntilChanged, Observable } from 'rxjs';
 
 import { config } from '@config';

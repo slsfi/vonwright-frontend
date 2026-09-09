@@ -1,0 +1,38 @@
+/**
+ * IMPORT FILE FOR GLOBAL TEI STYLES - v2
+ *
+ * ! This file maps to the v2 TEI styles in TEI/v2/
+ * These are alternate TEI styles which require a different HTML
+ * structure to work.
+ *
+ * TEI global styles, applied to the content of collection pages.
+ * If your project doesn't have collections you can safely comment
+ * all of these out. You can also selectively comment out styles
+ * for components/features that you don't have, or comment out some
+ * of them and define your own styles from scratch in custom.scss.
+ */
+
+// TEI core styles. If you only have facsimiles you can comment it out.
+@use "TEI/v2/tei-core";
+// TEI styles for semantic elements and icons.
+@use "TEI/v2/tei-semantic-extras";
+// TEI styles for showing page breaks.
+@use "TEI/v2/tei-page-breaks";
+// TEI styles for showing paragraph/line numberings.
+@use "TEI/v2/tei-paragraph-numbering";
+// TEI common styles, used by multiple collection components.
+@use "TEI/v2/tei-common";
+// TEI styles for the collection title page.
+@use "TEI/v2/tei-title";
+// TEI styles for the collection foreword page.
+@use "TEI/v2/tei-foreword";
+// TEI styles for the collection introduction page.
+@use "TEI/v2/tei-introduction";
+// TEI styles for the collection reading text component.
+@use "TEI/v2/tei-readingtext";
+// TEI styles for the collection comments component.
+@use "TEI/v2/tei-comments";
+// TEI styles for the collection manuscripts component.
+@use "TEI/v2/tei-manuscripts";
+// TEI styles for the collection variants component.
+@use "TEI/v2/tei-variants";

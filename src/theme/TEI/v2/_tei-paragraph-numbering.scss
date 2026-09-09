@@ -1,0 +1,115 @@
+/**
+ * TEI PARAGRAPH NUMBERING - v2
+ * Styles for paragraph and line numberings.
+ */
+ @use "../../sass_variables" as vars;
+
+.tei span {
+  &.lNumber,
+  &.pNumber {
+    display: none;
+  }
+}
+
+.tei.show_paragraphNumbering span {
+  &.lNumber,
+  &.pNumber {
+    display: block;
+    position: absolute;
+    margin-left: -35px;
+    text-align: left;
+    width: 30px;
+    font-family: var(--font-stack-app-base);
+    font-size: 0.6875rem;
+    text-indent: 0;
+    font-style: normal !important;
+    font-weight: normal !important;
+  }
+}
+
+.miniFontSize .tei.show_paragraphNumbering p.lg span {
+  &.lNumber,
+  &.pNumber {
+    margin-left: calc(-2.5 * vars.$text-fontsize-mini - 35px);
+  }
+}
+.tinyFontSize .tei.show_paragraphNumbering p.lg span {
+  &.lNumber,
+  &.pNumber {
+    margin-left: calc(-2.5 * vars.$text-fontsize-tiny - 35px);
+  }
+}
+.xxxsmallFontSize .tei.show_paragraphNumbering p.lg span {
+  &.lNumber,
+  &.pNumber {
+    margin-left: calc(-2.5 * vars.$text-fontsize-xxxsmall - 35px);
+  }
+}
+.xxsmallFontSize .tei.show_paragraphNumbering p.lg span {
+  &.lNumber,
+  &.pNumber {
+    margin-left: calc(-2.5 * vars.$text-fontsize-xxsmall - 35px);
+  }
+}
+.xsmallFontSize .tei.show_paragraphNumbering p.lg span {
+  &.lNumber,
+  &.pNumber {
+    margin-left: calc(-2.5 * vars.$text-fontsize-xsmall - 35px);
+  }
+}
+.smallFontSize .tei.show_paragraphNumbering p.lg span {
+  &.lNumber,
+  &.pNumber {
+    margin-left: calc(-2.5 * vars.$text-fontsize-small - 35px);
+  }
+}
+.mediumFontSize .tei.show_paragraphNumbering p.lg span {
+  &.lNumber,
+  &.pNumber {
+    margin-left: calc(-2.5 * vars.$text-fontsize-medium - 35px);
+  }
+}
+.largeFontSize .tei.show_paragraphNumbering p.lg span {
+  &.lNumber,
+  &.pNumber {
+    margin-left: calc(-2.5 * vars.$text-fontsize-large - 35px);
+  }
+}
+.xlargeFontSize .tei.show_paragraphNumbering p.lg span {
+  &.lNumber,
+  &.pNumber {
+    margin-left: calc(-2.5 * vars.$text-fontsize-xlarge - 35px);
+  }
+}
+
+.tei.tei.show_paragraphNumbering {
+  blockquote {
+    p span {
+      &.pNumber {
+        margin-left: -65px;
+      }
+    }
+  }
+}
+
+/*
+Left padding for reading-texts and introductions when the
+paragraph numbering is displayed.
+*/
+reading-text .tei.show_paragraphNumbering,
+page-introduction .tei.show_paragraphNumbering {
+  padding-left: 20px;
+}
+
+@media screen and (max-width: 820px) {
+  /* Margin on small screens when showing paragraph numbering. */
+  reading-text .tei.show_paragraphNumbering,
+  page-introduction .tei.show_paragraphNumbering {
+    margin-left: 8px;
+  }
+}
+
+/* Left padding if showing paragraph numbering in mobile view. */
+page-text .mobile-mode-readingtext .tei.show_paragraphNumbering {
+  padding-left: 28px;
+}

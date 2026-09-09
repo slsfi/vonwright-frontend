@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, DestroyRef, ElementRef, Injector, afterRenderEffect, computed, effect, inject, input, output, signal, untracked } from '@angular/core';
 import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
-import { AlertButton, AlertController, AlertInput, IonicModule } from '@ionic/angular';
+import { AlertButton, AlertController, AlertInput, IonicModule } from '@ionic/angular/lazy';
 import { catchError, of, switchMap, tap } from 'rxjs';
 
 import { config } from '@config';

@@ -8,7 +8,8 @@ import { routes } from './app.routes';
   imports: [
     RouterModule.forRoot(routes, {
       preloadingStrategy: RouterPreloadingStrategyService,
-      initialNavigation: 'enabledBlocking'
+      initialNavigation: 'enabledBlocking',
+      paramsInheritanceStrategy: 'emptyOnly'
     })
   ],
   exports: [RouterModule]

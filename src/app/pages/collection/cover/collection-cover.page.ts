@@ -1,4 +1,4 @@
-import { Component, LOCALE_ID, OnInit, inject } from '@angular/core';
+import { Component, LOCALE_ID, OnInit, inject, ChangeDetectionStrategy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { catchError, map, Observable, of, switchMap, tap } from 'rxjs';
 
@@ -10,6 +10,7 @@ import { PlatformService } from '@services/platform.service';
   selector: 'page-cover',
   templateUrl: './collection-cover.page.html',
   styleUrls: ['./collection-cover.page.scss'],
+  changeDetection: ChangeDetectionStrategy.Eager,
   standalone: false
 })
 export class CollectionCoverPage implements OnInit {

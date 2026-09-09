@@ -63,7 +63,7 @@
                 [value]="activePersonFilters"
           >
             @for (filterOption of filterOptionsPersons; track filterOption.id) {
-              <ion-select-option [value]="filterOption.id" [innerHTML]="filterOption.name"></ion-select-option>
+              <ion-select-option [value]="filterOption.id">{{ filterOption.name }}</ion-select-option>
             }
           </ion-select>
         }
@@ -83,7 +83,7 @@
                 [value]="activePlaceFilters"
           >
             @for (filterOption of filterOptionsPlaces; track filterOption.id) {
-              <ion-select-option [value]="filterOption.id" [innerHTML]="filterOption.name"></ion-select-option>
+              <ion-select-option [value]="filterOption.id">{{ filterOption.name }}</ion-select-option>
             }
           </ion-select>
         }
@@ -103,7 +103,7 @@
                 [value]="activeKeywordFilters"
           >
             @for (filterOption of filterOptionsKeywords; track filterOption.id) {
-              <ion-select-option [value]="filterOption.id" [innerHTML]="filterOption.name"></ion-select-option>
+              <ion-select-option [value]="filterOption.id">{{ filterOption.name }}</ion-select-option>
             }
           </ion-select>
         }

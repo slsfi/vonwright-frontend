@@ -6,7 +6,7 @@
 # 3) Secure runtime image (non-root user + production dependencies only).
 
 # Pin the Node base image by tag (set from CI workflow build arg).
-ARG NODE_IMAGE_TAG=22-alpine
+ARG NODE_IMAGE_TAG=24-alpine
 
 
 # 1) Shared base image used by all stages.

@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { IonicModule } from '@ionic/angular';
+import { IonicModule } from '@ionic/angular/lazy';
 
 import { TrustHtmlPipe } from '@pipes/trust-html.pipe';
 import { AboutPage } from './about.page';

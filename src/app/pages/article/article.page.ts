@@ -1,6 +1,6 @@
-import { Component, ElementRef, LOCALE_ID, NgZone, OnDestroy, OnInit, Renderer2, inject } from '@angular/core';
+import { Component, ElementRef, LOCALE_ID, NgZone, OnDestroy, OnInit, Renderer2, inject, ChangeDetectionStrategy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ModalController, PopoverController } from '@ionic/angular';
+import { ModalController, PopoverController } from '@ionic/angular/lazy';
 import { Observable, Subscription, map, of, switchMap, tap } from 'rxjs';
 
 import { config } from '@config';
@@ -16,6 +16,7 @@ import { isBrowser } from '@utility-functions';
   selector: 'page-article',
   templateUrl: './article.page.html',
   styleUrls: ['./article.page.scss'],
+  changeDetection: ChangeDetectionStrategy.Eager,
   standalone: false
 })
 export class ArticlePage implements OnInit, OnDestroy {

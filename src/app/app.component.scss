@@ -1,10 +1,6 @@
 // Import scoped CSS variables
-@use "../theme/scoped-variables/info-overlay-variables.scss";
 @use "../theme/scoped-variables/secondary-toolbar-variables.scss";
-@use "../theme/scoped-variables/semantic-code-variables.scss";
 @use "../theme/scoped-variables/side-menu-variables.scss";
-@use "../theme/scoped-variables/text-changer-variables.scss";
-@use "../theme/scoped-variables/top-menu-variables.scss";
 
 header {
   box-shadow: 0 4px 4px -4px rgba(0, 0, 0, 0.6);

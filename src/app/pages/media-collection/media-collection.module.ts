@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonicModule } from '@ionic/angular';
+import { IonicModule } from '@ionic/angular/lazy';
 
 import { GalleryThumbImageComponent } from '@components/gallery-thumb-image/gallery-thumb-image.component';
 import { TrustHtmlPipe } from '@pipes/trust-html.pipe';

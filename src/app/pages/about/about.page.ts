@@ -1,4 +1,4 @@
-import { Component, ElementRef, LOCALE_ID, NgZone, OnDestroy, OnInit, Renderer2, inject } from '@angular/core';
+import { Component, ElementRef, LOCALE_ID, NgZone, OnDestroy, OnInit, Renderer2, inject, ChangeDetectionStrategy } from '@angular/core';
 import { ActivatedRoute, Data, Router } from '@angular/router';
 import { combineLatest, distinctUntilChanged, map, Observable, of, Subscription, switchMap } from 'rxjs';
 
@@ -11,6 +11,7 @@ import { isBrowser } from '@utility-functions';
   selector: 'page-about',
   templateUrl: './about.page.html',
   styleUrls: ['./about.page.scss'],
+  changeDetection: ChangeDetectionStrategy.Eager,
   standalone: false
 })
 export class AboutPage implements OnInit, OnDestroy {

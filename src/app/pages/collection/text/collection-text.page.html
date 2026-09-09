@@ -66,16 +66,6 @@
             <!-- Column type title -->
             <h2>
               <ng-container *ngTemplateOutlet="columnHeadingTemplate; context: {$implicit: view}"/>
-              @if ((
-                view.type === 'variants' ||
-                view.type === 'manuscripts' ||
-                view.type === 'facsimiles'
-                ) && view.title) {
-                <span
-                      class="column-text-title"
-                      [innerHTML]="view.title"
-                ></span>
-              }
             </h2>
             <!-- Column options -->
             @if (currentViews.length > 1) {
@@ -191,14 +181,7 @@
         >
           @for (view of currentViews; track view.uid; let i = $index) {
             <ion-select-option [value]="i">
-              <ng-container *ngTemplateOutlet="columnHeadingTemplate; context: {$implicit: view}"/>
-              @if ((
-                view.type === 'variants' ||
-                view.type === 'manuscripts' ||
-                view.type === 'facsimiles'
-                ) && view.title) {
-                – <span [innerHTML]="view.title"></span>
-              }
+              <ng-container *ngTemplateOutlet="columnHeadingTemplate; context: {$implicit: view, appendTitleAsText: true}"/>
             </ion-select-option>
           }
         </ion-select>
@@ -248,16 +231,6 @@
         <!-- Column type title in mobile mode, for screen readers only -->
         <h2 class="screen-reader-only">
           <ng-container *ngTemplateOutlet="columnHeadingTemplate; context: {$implicit: view}"/>
-          @if ((
-            view.type === 'variants' ||
-            view.type === 'manuscripts' ||
-            view.type === 'facsimiles'
-            ) && view.title) {
-            <span
-                  class="column-text-title"
-                  [innerHTML]="view.title"
-            ></span>
-          }
         </h2>
         <!-- Column content -->
         <ng-container *ngTemplateOutlet="columnTypesTemplate; context: {view, i}"/>
@@ -282,7 +255,7 @@
 <!-- TEMPLATES -->
 
 <!-- Column headings template -->
-<ng-template #columnHeadingTemplate let-view>
+<ng-template #columnHeadingTemplate let-view let-appendTitleAsText="appendTitleAsText">
   @if (view.type === 'readingtext') {
     <ng-container i18n="@@ReadingText.ReadingText">Lästext</ng-container>
   } @else if (view.type === 'readingtext_sv') {
@@ -303,6 +276,19 @@
     <ng-container i18n="@@Legend.Legend">Teckenförklaringar</ng-container>
   } @else if (view.type === 'metadata') {
     <ng-container i18n="@@Metadata.Metadata">Metadata</ng-container>
+  }
+  @if ((
+    view.type === 'variants' ||
+    view.type === 'manuscripts' ||
+    view.type === 'facsimiles'
+    ) && view.title) {
+    @if (appendTitleAsText) {
+      @for (title of [view.title]; track title) {
+        – {{ title }}
+      }
+    } @else {
+      <span class="column-text-title">{{ view.title }}</span>
+    }
   }
 </ng-template>
 

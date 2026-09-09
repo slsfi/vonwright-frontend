@@ -1,6 +1,6 @@
-import { Component, LOCALE_ID, OnInit, inject, viewChild } from '@angular/core';
+import { Component, LOCALE_ID, OnInit, inject, viewChild, ChangeDetectionStrategy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { IonContent, ModalController } from '@ionic/angular';
+import { IonContent, ModalController } from '@ionic/angular/lazy';
 import { Observable, Subscription } from 'rxjs';
 
 import { config } from '@config';
@@ -19,6 +19,7 @@ import { isBrowser, sortArrayOfObjectsAlphabetically } from '@utility-functions'
   selector: 'page-index',
   templateUrl: './index.page.html',
   styleUrls: ['./index.page.scss'],
+  changeDetection: ChangeDetectionStrategy.Eager,
   standalone: false
 })
 export class IndexPage implements OnInit {

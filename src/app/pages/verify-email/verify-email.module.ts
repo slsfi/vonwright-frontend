@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
-import { IonicModule } from '@ionic/angular';
+import { IonicModule } from '@ionic/angular/lazy';
 
 import { AuthStatusMessageComponent } from '../../components/auth-status-message/auth-status-message.component';
 import { VerifyEmailPageRoutingModule } from './verify-email-routing.module';

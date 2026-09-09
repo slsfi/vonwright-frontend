@@ -47,7 +47,7 @@ to run the image. If you built the image with a different name and tag in step 3
 
 ### nginx in front of app image
 
-In production, nginx is run in a Docker container in front of the app container so nginx, which is more performant than Node.js, can server static files. To run the app in this setup locally:
+In production, nginx is run in a Docker container in front of the app container so nginx, which is more performant than Node.js, can serve static files. To run the app in this setup locally:
 
 1. Start [Docker Desktop][docker_desktop] and log in with your credentials.
 2. In PowerShell, `cd` into the app repository folder.
@@ -97,7 +97,7 @@ The app is built on Angular and uses many web components from Ionic. It also has
 
 The Angular documentation is available on <https://angular.dev/>.
 
-At it’s root, the Angular app uses NgModules, even though all components except `pages` use the standalone API. This is because currently, another dependency, `Ionic`, doesn’t support the Angular standalone API for SSR apps.
+At its root, the Angular app still uses NgModules, even though all components except `pages` use the standalone API. This is no longer an Ionic limitation: Ionic 9 supports standalone components and provides `provideIonicAngular()` for standalone application bootstrap. The migration plan is to first replace the root, server and page NgModules with standalone bootstrap and components, and enable zoneless change detection, while retaining the existing webpack-based build and SSR setup. These two migrations are not intended to introduce breaking changes. The later migration from Angular's separate `browser` and `server` builders to the [`application` builder](https://angular.dev/tools/cli/build-system-migration) is expected to introduce breaking changes.
 
 #### Updating Angular
 
@@ -195,6 +195,41 @@ Library for extracting and merging i18n xliff translation files for Angular proj
 ### `jasmine` and `karma`
 
 Angular testing frameworks, not in use.
+
+
+### Updating transitive dependencies
+
+Keep `package-lock.json` when updating transitive dependencies so that the changes remain reproducible and reviewable. Update all dependencies to the newest versions permitted by their existing semver ranges with:
+
+```bash
+npm update
+```
+
+Some dependencies run lifecycle scripts during installation. The approved package versions are pinned in the `allowScripts` section of `package.json`. After updating, list packages whose scripts are not covered by an existing approval:
+
+```bash
+npm approve-scripts --allow-scripts-pending
+```
+
+Review each reported package and its changes before approving it. Approve packages individually, or list several package names in the same command:
+
+```bash
+npm approve-scripts <package> [<package> ...]
+```
+
+This updates the package's version-pinned entry in `allowScripts`. Do not replace it with an unversioned approval unless future versions of that package should be allowed to run install scripts without another review.
+
+Finally, perform a clean installation from the updated lockfile and verify the app:
+
+```bash
+npm ci
+npm run test:source-encoding
+npm run test:routes-parser
+npm run build:ssr
+npm run test:ssr:smoke
+```
+
+`npm ci` removes the existing `node_modules` directory automatically. Commit the reviewed `package-lock.json` changes and, when approvals changed, the corresponding `package.json` changes. Deleting and regenerating the lockfile should only be necessary when repairing a broken dependency tree.
 
 
 
@@ -381,7 +416,7 @@ Current status:
 - Auth-protected routes are currently forced to client rendering in Express middleware in [`server.ts`](../server.ts), based on generated route-path metadata from [`src/app/auth-protected-route-paths.generated.ts`](../src/app/auth-protected-route-paths.generated.ts).
 - This is an implementation workaround for the current webpack-based SSR build setup.
 
-When migrating to Angular's `application` builder (`@angular-devkit/build-angular:application`):
+The standalone and zoneless migrations are planned first while the legacy builders remain in use. The subsequent migration to Angular's `application` builder (`@angular-devkit/build-angular:application`) is expected to introduce breaking changes. During that builder migration:
 
 - Investigate replacing the current middleware-based implementation with Angular server-routes configuration (`withRoutes` / `RenderMode.Client`) for auth-protected routes.
 - Validate compatibility with feature-based route generation before removing the current workaround.

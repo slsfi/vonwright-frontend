@@ -1,5 +1,5 @@
 import { NgModule } from '@angular/core';
-import { provideHttpClient, withFetch, withInterceptors } from '@angular/common/http';
+import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { ServerModule } from '@angular/platform-server';
 import { IonicServerModule } from '@ionic/angular-server';
 
@@ -47,7 +47,6 @@ const authEnabled = config?.app?.auth?.enabled === true;
   ],
   providers: [
     provideHttpClient(
-      withFetch(),
       ...(authEnabled ? [withInterceptors([authInterceptor])] : [])
     ),
     {

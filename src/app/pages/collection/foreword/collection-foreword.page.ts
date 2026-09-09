@@ -1,6 +1,6 @@
-import { Component, ElementRef, LOCALE_ID, OnInit, inject } from '@angular/core';
+import { Component, ElementRef, LOCALE_ID, OnInit, inject, ChangeDetectionStrategy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { ModalController, PopoverController } from '@ionic/angular';
+import { ModalController, PopoverController } from '@ionic/angular/lazy';
 import { catchError, combineLatest, map, Observable, of, switchMap, tap } from 'rxjs';
 
 import { config } from '@config';
@@ -15,6 +15,7 @@ import { ViewOptionsService } from '@services/view-options.service';
   selector: 'page-foreword',
   templateUrl: './collection-foreword.page.html',
   styleUrls: ['./collection-foreword.page.scss'],
+  changeDetection: ChangeDetectionStrategy.Eager,
   standalone: false
 })
 export class CollectionForewordPage implements OnInit {

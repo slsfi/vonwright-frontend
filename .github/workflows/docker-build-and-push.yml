@@ -24,12 +24,12 @@ jobs:
     env:
       # Node image tag used by Dockerfile base image.
       # https://hub.docker.com/_/node/
-      NODE_IMAGE_TAG: 22-alpine
+      NODE_IMAGE_TAG: 24-alpine
 
     steps:
       # 1) Check out source code used for docker build context.
       - name: Check out repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       # 2) Create a Buildx builder. Buildx uses BuildKit under the hood.
       - name: Set up Docker Buildx

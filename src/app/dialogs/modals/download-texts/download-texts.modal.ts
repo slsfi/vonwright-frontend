@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, DestroyRef, Input, LOCALE_ID, DOCUM
 import { NgClass, NgStyle } from '@angular/common';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { PRIMARY_OUTLET, Router, UrlSegment, UrlTree } from '@angular/router';
-import { IonicModule, ModalController } from '@ionic/angular';
+import { IonicModule, ModalController } from '@ionic/angular/lazy';
 import { catchError, forkJoin, map, Observable, of, Subscription, tap } from 'rxjs';
 
 import { config } from '@config';

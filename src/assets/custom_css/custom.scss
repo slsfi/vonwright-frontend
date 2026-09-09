@@ -22,39 +22,47 @@
   * OVERRIDE SCOPED CSS VARIABLES
 
   To override scoped CSS variables, wrap them in the appropriate
-  page/component element selectors. The required selectors are listed
-  in the files in /src/theme/scoped-variables. You must also either
-  add the !important property to the variable values, or increase the
-  specificity of the selector by adding the [class][class] attribute
-  selectors directly after the element selector. Otherwise these variables
-  won’t take precedence. Examples of overriding scoped CSS variables:
+  page/component element selectors. The required selectors and default
+  values are listed in the reference below. Scoped variables use one of
+  two kinds of defaults: declarations in /src/theme/scoped-variables, or
+  fallback values defined inline where the variables are used.
 
-  page-elastic-search[class][class] {
+  Variables with inline defaults can normally be overridden using the
+  element selector without increasing its specificity. For example:
+
+  page-elastic-search {
     --inl-color: #000;
   }
 
-  or (less preferred):
+  Variables declared in /src/theme/scoped-variables may require a selector
+  with higher specificity so that the custom value takes precedence. Add
+  [class][class] directly after the element selector:
 
-  page-elastic-search {
-    --inl-color: #000 !important;
+  page-introduction[class][class] {
+    --intro-toc-background-color: #000;
   }
 
-  * ALTERNATIVE TO OVERRIDING CSS VARIABLES
+  Alternatively, and less preferably, add !important to the custom value:
 
-  Instead of using custom.scss to override CSS variables you can also
-  directly edit the variable values in /src/theme/_variables.scss
-  and in the various files in /src/theme/scoped-variables.
+  page-introduction {
+    --intro-toc-background-color: #000 !important;
+  }
+
+  * EDITING DEFAULT VALUES DIRECTLY
+
+  Instead of overriding variables in custom.scss, you can edit their default
+  values directly. Global defaults are in /src/theme/_variables.scss. The
+  centrally declared scoped defaults are in /src/theme/scoped-variables,
+  while inline defaults are fallback arguments in the var() expressions
+  where the variables are used.
   
-  The pros of this approach are that the size of the CSS bundle of the
-  website becomes slightly smaller, since CSS variables with the same
-  property names are not defined twice. This speeds up page loading a bit.
-  The cons are that the risk for merge conflicts between the base app
-  and the project app increases if the CSS variables are modified in the
-  base app.
+  Direct editing can make the CSS bundle marginally smaller, but it increases
+  the risk of merge conflicts with the base app. An inline default may also
+  occur in more than one stylesheet and must then be changed consistently.
+  Overriding variables in custom.scss is therefore recommended for forks.
 
-  If you directly edit /src/theme/_variables.scss or the files in
-  /src/theme/scoped-variables it’s recommended that you leave the default
-  values of the variables as comments at the end of edited lines.
+  If you edit a default directly, it’s recommended that you leave the
+  original value as a comment at the end of the edited line.
 
   * REFERENCE FOR OVERRIDING CSS VARIABLES
 
@@ -141,7 +149,61 @@
     --top-menu-height:                         62px;
     --top-menu-toolbar-button-icons-font-size: 1.875rem;
     --top-menu-button-filter:                  drop-shadow(0 1px 3px rgba(35, 35, 35, .3));
-    --top-menu-logo-height:                    56px;
+  }
+
+  page-home {
+    /// Banner image and site title, mainly in landscape mode
+    --banner-border-bottom: 0;
+    --banner-height: 50%;
+    --banner-height-narrow: 40%;
+    --banner-title-background-color: transparent;
+    --banner-title-color: #000;
+    --banner-title-font-family: var(--font-stack-home-banner);
+    --banner-title-font-size: calc(1.375rem + 2.15vw);
+    --banner-title-font-weight: 400;
+    --banner-title-letter-spacing: normal;
+    --banner-title-opacity: 1;
+    --banner-title-text-shadow: none;
+    --banner-title-text-transform: none;
+    --banner-title-white-space: normal;
+    --banner-title-wrapper-top: 50%;
+    --banner-subtitle-font-size: calc(1.25rem + 0.7vw);
+    --banner-subtitle-font-style: italic;
+    --landscape-pic-img-obj-position: 50% 50%;  /// set to `left top` to fix top left corner always into view
+
+    /// Banner image and site title in portrait mode
+    --portrait-banner-background-color: transparent;
+    --portrait-site-title-color: #000;
+    --portrait-site-title-font-family: var(--font-stack-home-banner);
+    --portrait-site-title-font-size: 3.25rem;
+    --portrait-site-title-font-weight: 400;
+    --portrait-site-title-letter-spacing: normal;
+    --portrait-site-title-text-align: center;
+    --portrait-site-title-text-transform: none;
+    --portrait-site-subtitle-font-size: 2.25rem;
+    --portrait-site-subtitle-font-style: italic;
+
+    /// The following apply in portrait mode when the content is shown in a single column,
+    /// i.e. the banner image is full width and text content is below
+    --portrait-narrow-site-title-font-size: 2.25rem;
+    --portrait-narrow-site-title-text-align: center;
+    --portrait-narrow-site-subtitle-font-size: 1.625rem;
+
+    /// Search bar alignment: change the left margin to 0 to left-align the search bar
+    /// instead of center-align it
+    --search-bar-margin-left: auto;
+    --portrait-narrow-search-bar-margin-left: auto;
+
+    /// Max-width of divisions
+    --text-content-max-width: 750px;
+    --site-presentation-max-width: var(--text-content-max-width);
+    --content-grid-max-width: var(--text-content-max-width);
+    --search-bar-max-width: 520px;
+    --footer-max-width: var(--text-content-max-width);
+
+    /// Footer
+    --footer-color: #353535;
+    --footer-text-align: center;
   }
 
   page-elastic-search[class][class] {
@@ -165,7 +227,7 @@
     --date-histogram-year-in-range-color: #751e22;
   }
 
-  page-index[class][class] {
+  page-index {
     --list-item-background-color:       transparent;
     --list-item-border-color:           var(--main-background-accent-color);
     --list-item-hover-background-color: #f5f5f5;
@@ -178,7 +240,7 @@
     --intro-toc-text-color:       var(--secondary-toolbar-color-contrast);
   }
 
-  page-text[class][class] {
+  page-text {
     --error-variant-background-color:           #f3c598;
     --interpunction-variant-background-color:   #dbf0ec;
     --lemma-identical-variant-background-color: #fff1b9;

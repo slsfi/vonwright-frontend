@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonicModule } from '@ionic/angular';
+import { IonicModule } from '@ionic/angular/lazy';
 
 import { MathJaxDirective } from '@directives/math-jax.directive';
 import { CommentsComponent } from '@components/collection-text-types/comments/comments.component';

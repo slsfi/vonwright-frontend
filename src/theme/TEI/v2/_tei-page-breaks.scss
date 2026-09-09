@@ -1,0 +1,113 @@
+/**
+ * TEI PAGE BREAKS - v2
+ * Styles for page breaks, both original and edition.
+ */
+@use "sass:math";
+@use "../../sass_variables" as vars;
+
+.pb {
+  &.edition,
+  &.orig {
+    display: none;
+  }
+}
+
+.pb + .pb {
+  padding-left: 0.2353em;
+}
+
+div.tei.show_pageBreakEdition .pb.edition,
+div.tei.show_pageBreakOriginal .pb.orig {
+  font-family: var(--font-stack-app-base);
+  display: revert;
+}
+
+div.tei.show_pageBreakEdition div.pb.edition,
+div.tei.show_pageBreakOriginal div.pb.orig {
+  display: inline-block;
+}
+
+div.tei.show_pageBreakEdition .pb.edition {
+  color: var(--pageBreakEdition-color, #8f6b28);
+}
+
+div.tei.show_pageBreakOriginal .pb.orig {
+  color: var(--pageBreakOriginal-color, #b32fa0);
+
+  &.facs {
+    color: #0000ff;
+  }
+}
+
+/* Size of page numberings at different font sizes. */
+.miniFontSize div.tei.show_pageBreakOriginal,
+.miniFontSize div.tei.show_pageBreakEdition {
+  .pb_orig,
+  .pb_edition {
+    font-size: math.ceil(0.875 * vars.$text-fontsize-mini);
+  }
+}
+
+.tinyFontSize div.tei.show_pageBreakOriginal,
+.tinyFontSize div.tei.show_pageBreakEdition {
+  .pb_orig,
+  .pb_edition {
+    font-size: math.ceil(0.875 * vars.$text-fontsize-tiny);
+  }
+}
+
+.xxxsmallFontSize div.tei.show_pageBreakOriginal,
+.xxxsmallFontSize div.tei.show_pageBreakEdition {
+  .pb_orig,
+  .pb_edition {
+    font-size: math.ceil(0.875 * vars.$text-fontsize-xxxsmall);
+  }
+}
+
+.xxsmallFontSize div.tei.show_pageBreakOriginal,
+.xxsmallFontSize div.tei.show_pageBreakEdition {
+  .pb_orig,
+  .pb_edition {
+    font-size: math.ceil(0.875 * vars.$text-fontsize-xxsmall);
+  }
+}
+
+.xsmallFontSize div.tei.show_pageBreakOriginal,
+.xsmallFontSize div.tei.show_pageBreakEdition {
+  .pb_orig,
+  .pb_edition {
+    font-size: math.ceil(0.875 * vars.$text-fontsize-xsmall);
+  }
+}
+
+.smallFontSize div.tei.show_pageBreakOriginal,
+.smallFontSize div.tei.show_pageBreakEdition {
+  .pb_orig,
+  .pb_edition {
+    font-size: math.ceil(0.875 * vars.$text-fontsize-small);
+  }
+}
+
+.mediumFontSize div.tei.show_pageBreakOriginal,
+.mediumFontSize div.tei.show_pageBreakEdition {
+  .pb_orig,
+  .pb_edition {
+    font-size: math.ceil(0.875 * vars.$text-fontsize-medium);
+  }
+}
+
+.largeFontSize div.tei.show_pageBreakOriginal,
+.largeFontSize div.tei.show_pageBreakEdition {
+  .pb_orig,
+  .pb_edition {
+    font-size: math.ceil(0.875 * vars.$text-fontsize-large);
+  }
+}
+
+.xlargeFontSize div.tei.show_pageBreakOriginal,
+.xlargeFontSize div.tei.show_pageBreakEdition {
+  .pb_orig,
+  .pb_edition {
+    font-size: math.ceil(0.875 * vars.$text-fontsize-xlarge);
+  }
+}

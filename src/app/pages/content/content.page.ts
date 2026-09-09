@@ -1,4 +1,4 @@
-import { Component, LOCALE_ID, OnInit, inject } from '@angular/core';
+import { Component, LOCALE_ID, OnInit, inject, ChangeDetectionStrategy } from '@angular/core';
 import { Observable } from 'rxjs';
 
 import { MarkdownService } from '@services/markdown.service';
@@ -8,6 +8,7 @@ import { MarkdownService } from '@services/markdown.service';
   selector: 'page-content',
   templateUrl: './content.page.html',
   styleUrls: ['./content.page.scss'],
+  changeDetection: ChangeDetectionStrategy.Eager,
   standalone: false
 })
 export class ContentPage implements OnInit {

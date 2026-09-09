@@ -1,4 +1,4 @@
-import { Component, computed, inject, OnDestroy, signal } from '@angular/core';
+import { Component, computed, inject, OnDestroy, signal, ChangeDetectionStrategy } from '@angular/core';
 import { PRIMARY_OUTLET, Router } from '@angular/router';
 import { FormBuilder, Validators } from '@angular/forms';
 
@@ -10,6 +10,7 @@ type PasswordFlowMode = 'forgot' | 'change';
   selector: 'page-forgot-password',
   templateUrl: './forgot-password.page.html',
   styleUrls: ['./forgot-password.page.scss'],
+  changeDetection: ChangeDetectionStrategy.Eager,
   standalone: false
 })
 export class ForgotPasswordPage implements OnDestroy {

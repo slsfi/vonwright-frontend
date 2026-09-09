@@ -1,4 +1,5 @@
 import { TestBed } from '@angular/core/testing';
+import type { PartialMatchRouteSnapshot } from '@angular/router';
 
 import { AUTH_ENABLED } from '@tokens/auth.tokens';
 import { authFeatureEnabledMatchGuard } from './auth-feature-enabled-match.guard';
@@ -12,7 +13,7 @@ describe('authFeatureEnabledMatchGuard', () => {
     });
 
     const result = TestBed.runInInjectionContext(() =>
-      authFeatureEnabledMatchGuard({} as any, [] as any)
+      authFeatureEnabledMatchGuard({} as any, [] as any, {} as PartialMatchRouteSnapshot)
     );
 
     expect(result).toBe(false);
@@ -26,7 +27,7 @@ describe('authFeatureEnabledMatchGuard', () => {
     });
 
     const result = TestBed.runInInjectionContext(() =>
-      authFeatureEnabledMatchGuard({} as any, [] as any)
+      authFeatureEnabledMatchGuard({} as any, [] as any, {} as PartialMatchRouteSnapshot)
     );
 
     expect(result).toBe(true);

@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { Router } from '@angular/router';
 
 import { AuthService } from '@services/auth.service';
@@ -7,6 +7,7 @@ import { AuthService } from '@services/auth.service';
   selector: 'page-account',
   templateUrl: './account.page.html',
   styleUrls: ['./account.page.scss'],
+  changeDetection: ChangeDetectionStrategy.Eager,
   standalone: false
 })
 export class AccountPage {

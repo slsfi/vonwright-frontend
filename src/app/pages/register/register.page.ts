@@ -1,4 +1,4 @@
-import { Component, inject, LOCALE_ID, OnDestroy } from '@angular/core';
+import { Component, inject, LOCALE_ID, OnDestroy, ChangeDetectionStrategy } from '@angular/core';
 import { Router } from '@angular/router';
 import { AbstractControl, FormBuilder, ValidationErrors, Validators } from '@angular/forms';
 
@@ -62,6 +62,7 @@ function createCountryOptions(localeId: string): ReadonlyArray<SelectOption> {
   templateUrl: './register.page.html',
   styleUrls: ['./register.page.scss'],
   host: { ngSkipHydration: 'true' },
+  changeDetection: ChangeDetectionStrategy.Eager,
   standalone: false
 })
 export class RegisterPage implements OnDestroy {

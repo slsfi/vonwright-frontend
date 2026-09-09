@@ -12,13 +12,13 @@
 
 
 /* Core CSS required for Ionic components to work properly. */
-@import "~@ionic/angular/css/core.css";
+@import "@ionic/angular/css/core.css";
 
 
 /* Basic CSS for apps built with Ionic. */
-@import "~@ionic/angular/css/normalize.css";
-@import "~@ionic/angular/css/structure.css";
-@import "~@ionic/angular/css/typography.css";
+@import "@ionic/angular/css/normalize.css";
+@import "@ionic/angular/css/structure.css";
+@import "@ionic/angular/css/typography.css";
 
 
 /**
@@ -47,7 +47,6 @@
 @include meta.load-css("theme/ionic/ion-alert");
 @include meta.load-css("theme/ionic/ion-button");
 @include meta.load-css("theme/ionic/ion-content");
-@include meta.load-css("theme/ionic/ion-datetime");
 @include meta.load-css("theme/ionic/ion-header");
 @include meta.load-css("theme/ionic/ion-input");
 @include meta.load-css("theme/ionic/ion-modal");
@@ -63,11 +62,18 @@
 @include meta.load-css("theme/inc-global-misc");
 
 
-/* TEI global styles, that can be commented out if not needed in your project
-   to reduce the size of the global CSS file. */
+/** TEI global styles, that can be commented out if not needed in your project
+ *  to reduce the size of the global CSS file.
+ */
 @include meta.load-css("theme/inc-global-tei");
+/** Alternate TEI global styles. Comment the TEI style inclusion line above and
+ *  uncomment the one below to use the newer styles. Note that they require
+ *  a different HTML structure.
+ */
+// @include meta.load-css("theme/inc-global-tei-v2");
 
 
-/* Optional global styles, that can be commented out if not needed in your
-   project to reduce the size of the global CSS file. */
+/** Optional global styles, that can be commented out if not needed in your
+ *  project to reduce the size of the global CSS file.
+ */
 @include meta.load-css("theme/inc-global-optional");

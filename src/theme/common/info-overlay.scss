@@ -2,11 +2,11 @@
   Style for infoOverlay boxes. They also inherit styles from div.tei
 */
 .tei.infoOverlay {
-  background: var(--info-overlay-background-color);
+  background: var(--info-overlay-background-color, #333);
   border-radius: 3px 3px 0 0;
   box-shadow: 0 0 10px 2px rgba(0, 0, 0, 0.4);
   clip-path: inset(-12px -12px 0px -12px);
-  color: var(--info-overlay-text-color);
+  color: var(--info-overlay-text-color, #e3e3e3);
   display: inline-block;
   font-family: var(--font-stack-app-base);
   font-size: 1em;
@@ -21,7 +21,7 @@
   z-index: 1000;
 
   .infoOverlayHeader {
-    background: var(--info-overlay-background-color);
+    background: var(--info-overlay-background-color, #333);
     display: inline-block;
     padding: 12px 16px 8px 16px;
     position: sticky;
@@ -30,7 +30,7 @@
     z-index: 10;
 
     .infoOverlayTitle {
-      color: var(--info-overlay-text-color);
+      color: var(--info-overlay-text-color, #e3e3e3);
       display: inline;
       font-size: 0.7em;
       font-weight: 600;
@@ -39,7 +39,7 @@
     }
 
     ion-button {
-      --color: var(--info-overlay-text-color);
+      --color: var(--info-overlay-text-color, #e3e3e3);
       --padding-end: 0;
       --padding-start: 0;
       float: right;
@@ -67,7 +67,7 @@
     padding: 0 24px 24px 16px;
 
     a {
-      color: var(--info-overlay-link-color);
+      color: var(--info-overlay-link-color, #84cce3);
     }
 
     .footnoteWrapper {
@@ -82,7 +82,7 @@
 
     p.footnoteText,
     p.infoOverlayText {
-      color: var(--info-overlay-text-color);
+      color: var(--info-overlay-text-color, #e3e3e3);
       display: inline-block;
       font-weight: 300;
       line-height: 1.4em;

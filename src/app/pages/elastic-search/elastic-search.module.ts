@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonicModule } from '@ionic/angular';
+import { IonicModule } from '@ionic/angular/lazy';
 
 import { DateHistogramComponent } from '@components/date-histogram/date-histogram.component';
 import { CollectionTitlePipe } from '@pipes/collection-title.pipe';

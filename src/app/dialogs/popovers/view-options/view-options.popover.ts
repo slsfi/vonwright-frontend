@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, Input, OnInit, computed, inject } from '@angular/core';
-import { IonicModule, PopoverController } from '@ionic/angular';
+import { IonicModule, PopoverController } from '@ionic/angular/lazy';
 
 import { config } from '@config';
 import { Textsize, ViewFlags } from '@models/view-options.models';

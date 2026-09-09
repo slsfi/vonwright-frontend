@@ -8,6 +8,70 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ## Unreleased
 
+### Changed
+
+- Update to base version [`3.0.1`](https://github.com/slsfi/digital-edition-frontend-ng/releases/tag/3.0.1) from upstream, original repository.
+
+
+
+## [3.0.1] – 2026-09-08
+
+### Changed
+
+- Deps: update `marked` to 18.0.12. ([c6ed093](https://github.com/slsfi/digital-edition-frontend-ng/commit/c6ed0937cc54b1796523edbcb25c9106083a73c0))
+- Deps: update transitive dependencies. ([4792e04](https://github.com/slsfi/digital-edition-frontend-ng/commit/4792e04254e785594760c9a67e762ef4966e77e9))
+
+### Fixed
+
+- Sass variables import path for TEI v2 styling. ([c0f82a6](https://github.com/slsfi/digital-edition-frontend-ng/commit/c0f82a6fd48a4a73c730cfb3d34703771f4afe18))
+
+
+
+## [3.0.0] – 2026-09-07
+
+### BREAKING CHANGES
+
+- Node.js `^24.15.0` and npm `>=11.16.0` required.
+- Supported browsers aligned with Angular major version browser support.
+- Home page styling defaults have changed:
+  - The site presentation text block is start-aligned in landscape mode (previously centered).
+  - The banner title and subtitle have a transparent background with full opacity (previously the main background colour with `0.8` opacity).
+  - The text content column is centred with a maximum width of `750px` (previously its main sections had a maximum width of `1000px`).
+  - The site title, subtitle and footer are centred in portrait mode (previously start-aligned).
+  - The search bar is centred in wide portrait mode (previously start-aligned).
+- Scoped CSS variable defaults for info overlays, elastic search, indices, text variants, semantic highlighting, the text changer and the top menu now use inline fallbacks where the variables are consumed. The corresponding files in `src/theme/scoped-variables` have been removed without changing the defaults or supported override selectors.
+  - Existing overrides in [`custom.scss`](src/assets/custom_css/custom.scss) remain compatible. Forks that edited or imported the removed partials must migrate those customisations to `custom.scss` or to the inline fallbacks.
+  - The unused `--top-menu-logo-height` variable has been removed.
+
+### Added
+
+- Home: CSS variables for easier styling customisation, with inline defaults in [`home.page.scss`](src/app/pages/home/home.page.scss) and an override reference in [`custom.scss`](src/assets/custom_css/custom.scss). ([bae21a8](https://github.com/slsfi/digital-edition-frontend-ng/commit/bae21a8eed208addbc625ba3e0aaa6b3f8e7adad), [93c508c](https://github.com/slsfi/digital-edition-frontend-ng/commit/93c508c9535afb14134fcd91fd86b72cc8e6af2c))
+- TEI styling: alternate (v2) CSS styles for TEI text. To use, change the included SCSS file in [`global.scss`](src/global.scss) from [`_inc-global-tei.scss`](src/theme/_inc-global-tei.scss) to [`_inc-global-tei-v2.scss`](src/theme/_inc-global-tei-v2.scss). Note that the new styles require a different HTML structure. ([138530d](https://github.com/slsfi/digital-edition-frontend-ng/commit/138530d5a80a89a251a54397621aaa4e7a895dcb))
+
+### Changed
+
+- Upgrade the required Node.js runtime and Docker build image to Node 24 with npm 11, update `@types/node` to version 24, and update `gzipper` to 8.3.0. ([ac44eb7](https://github.com/slsfi/digital-edition-frontend-ng/commit/ac44eb748f5c4d174f8f8d83ce07c5c693ff98c8))
+- Upgrade `actions/checkout` in Docker build action workflow to v7. ([4eef553](https://github.com/slsfi/digital-edition-frontend-ng/commit/4eef5533a9388e89b3b74626cebe9ccb82a1da13))
+- Add version-pinned npm install-script approvals and document the transitive dependency update workflow. ([1f76867](https://github.com/slsfi/digital-edition-frontend-ng/commit/1f76867ff05f60856042ca67b2d2a15c9d0fb411))
+- Inline scoped CSS variable defaults. ([96e058c](https://github.com/slsfi/digital-edition-frontend-ng/commit/96e058c8ba7e981e63bb2cada9ddac47753bbdbf))
+- Deps: update `@angular/core` to 22.1.5 and `@angular/cli` to 22.1.7. ([e06a4c5](https://github.com/slsfi/digital-edition-frontend-ng/commit/e06a4c54d48ea4df4d48456aacdbb4f8bc0296f2), [b5879d3](https://github.com/slsfi/digital-edition-frontend-ng/commit/b5879d35ae0b7c7ad617a67d35d4450d709df67a), [b234581](https://github.com/slsfi/digital-edition-frontend-ng/commit/b2345818b0195e698607c5fc3d97a1aac5b87643), [06d27cf](https://github.com/slsfi/digital-edition-frontend-ng/commit/06d27cf110901f47ca1ca34ad4e720bfbfd2bc95))
+- Deps: update `@ionic/angular` and `@ionic/angular-server` to 9.0.2. ([599a52a](https://github.com/slsfi/digital-edition-frontend-ng/commit/599a52aa85e87bfd4d5759823ab63d7aaa047742), [821a4e2](https://github.com/slsfi/digital-edition-frontend-ng/commit/821a4e2b5827beb20a2ab5be648b9c5a5db3d539), [f2b1d5c](https://github.com/slsfi/digital-edition-frontend-ng/commit/f2b1d5cfcc6b161c16e8c94ddcbe579e3ec65e35))
+- Deps: update `express-rate-limit` to 8.7.0. ([8b61181](https://github.com/slsfi/digital-edition-frontend-ng/commit/8b61181a8dded7c0cc1800bc6d0be2e580ab4df5))
+- Deps: update `marked` to 18.0.11. ([c52869b](https://github.com/slsfi/digital-edition-frontend-ng/commit/c52869b200547a75b4d3c9fd411e1ec8f7fb7cc2))
+- Deps: pin `zone.js` to 0.15.1. ([e41cdf7](https://github.com/slsfi/digital-edition-frontend-ng/commit/e41cdf7860d3c4595f7b6b822ba631a7e9f3335c))
+- Deps: update transitive dependencies. ([e44df10](https://github.com/slsfi/digital-edition-frontend-ng/commit/e44df100ae15b694b025b3f4d06105e39e70935c), [c7e7dfd](https://github.com/slsfi/digital-edition-frontend-ng/commit/c7e7dfd05afd63e8b366c37ffd9bd8374c4acf02))
+- Update documentation. ([770669d](https://github.com/slsfi/digital-edition-frontend-ng/commit/770669dd88041b221192932e49c79b9355f1dd1e))
+
+### Fixed
+
+- SSR smoke test: honor non-default `--base-url` values in URL assertions while preserving forwarded-host and configured-origin proxy coverage. ([45201bb](https://github.com/slsfi/digital-edition-frontend-ng/commit/45201bb9256d3d90f40be7554159818318ac2de6))
+- Restore Dependabot dependency updates by removing the incompatible `devEngines.packageManager` range and treating npm 11.16.0 as a minimum version. ([604d3b8](https://github.com/slsfi/digital-edition-frontend-ng/commit/604d3b8ad56ea1a7815d67bc4811d9440134e18c))
+- Use Ionic 9.0.2's routed-page change-detection fix and remove the now-redundant manual change-detection workarounds from collection introduction and index pages. ([0ca00ee](https://github.com/slsfi/digital-edition-frontend-ng/commit/0ca00ee9a87bd6a9f17e3076327480b5a25e8e56))
+
+### Removed
+
+- Unused `ion-datetime` and `ion-datetime-button` styles; the application no longer contains either component. ([96e058c](https://github.com/slsfi/digital-edition-frontend-ng/commit/96e058c8ba7e981e63bb2cada9ddac47753bbdbf))
+
 
 
 ## [2.7.9-production.1] – 2026-09-03
@@ -1698,7 +1762,9 @@ siteLogoDimensions: {
 
 
 
-[unreleased]: https://github.com/slsfi/digital-edition-frontend-ng/compare/2.7.9...HEAD
+[unreleased]: https://github.com/slsfi/digital-edition-frontend-ng/compare/3.0.1...HEAD
+[3.0.1]: https://github.com/slsfi/digital-edition-frontend-ng/compare/3.0.0...3.0.1
+[3.0.0]: https://github.com/slsfi/digital-edition-frontend-ng/compare/2.7.8...3.0.0
 [2.7.9]: https://github.com/slsfi/digital-edition-frontend-ng/compare/2.7.8...2.7.9
 [2.7.8]: https://github.com/slsfi/digital-edition-frontend-ng/compare/2.7.7...2.7.8
 [2.7.7]: https://github.com/slsfi/digital-edition-frontend-ng/compare/2.7.6...2.7.7

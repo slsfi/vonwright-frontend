@@ -1,0 +1,650 @@
+/**
+ * TEI COMMON - v2
+ * Common styles for TEI-texts. These are base styles for
+ * paragraphs, headings etc.
+ */
+
+div.tei {
+  /* DIVISIONS OF TEXT */
+  hgroup {
+    margin: 2.5em 0 1.5em 0;
+  }
+  
+  section[role="doc-endnotes"] {
+    margin-top: 2em;
+  }
+
+  .opener {
+    margin: 0 0 1em 0;
+  }
+
+  .closer {
+    margin: 1em 1.25em;
+  }
+
+  /* HEADINGS */
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-size: 1em;
+    font-weight: 400;
+    line-height: 1.35;
+    margin: 1.375em 0 1em 0;
+    text-align: center;
+
+    &.title {
+      font-size: 1.3530em;  /* 23px when 1em = 17px */
+      font-variant: small-caps;
+    }
+
+    &.part {
+      font-size: 1.2353em; /* 21px when 1em = 17px */
+      font-variant: small-caps;
+    }
+
+    &.section {
+      font-size: 1.2353em; /* 21px when 1em = 17px */
+    }
+
+    &.suite {
+      font-size: 1.2353em; /* 21px when 1em = 17px */
+      font-style: italic;
+    }
+
+    &.chapter {
+      font-size: 1.1765em;  /* 20px when 1em = 17px */
+      font-style: italic;
+    }
+
+    &.sub {
+      font-size: 1.0589em;  /* 18px when 1em = 17px */
+      font-weight: 600;
+    }
+
+    &.sub2 {
+      font-size: 1.0589em;  /* 18px when 1em = 17px */
+      font-style: italic;
+    }
+
+    &.sub3 {
+      font-size: 1em;
+      font-weight: 600;
+    }
+  }
+
+  /* PARAGRAPHS AND PARAGRAPH-LIKE TEXT */
+  p {
+    font-size: 1em;
+    line-height: 1.6em;
+    margin: 0;
+    text-indent: 1.25em;
+
+    &[role="doc-subtitle"] {
+      font-size: 1.1176em;
+      font-style: italic;
+      margin: 0 0 2.25em 0;
+      text-align: center;
+      text-indent: 0;
+    }
+
+    &.part-title { /* Matches style of heading with .part classname */
+      font-size: 1.2353em; /* 21px when 1em = 17px */
+      font-variant: small-caps;
+      line-height: 1.35;
+      margin: 1.375em 0 1em 0;
+      text-align: center;
+      text-indent: 0;
+    }
+  }
+
+  .noIndent,
+  .argument,
+  .byline,
+  .dateline,
+  .note,
+  .salute,
+  .signed,
+  .lg {
+    text-indent: 0;
+  }
+
+  .argument {
+    font-size: 0.9412em;
+    margin: 1em 1.25em;
+  }
+
+  .signed {
+    text-align: right;
+  }
+
+  .lg  {
+    margin: 1em 0;
+  }
+  .prose .lg,
+  .poem.incorp .lg {
+    margin-left: 2.5em;
+    margin-right: 2.5em;
+  }
+
+  blockquote {
+    font-style: normal;
+    font-size: 1em;
+    line-height: 1.6em;
+    margin: 1em 30px;
+  }
+
+  .byline {
+    text-align: center;
+  }
+
+  .lg {
+    .l {
+      &.indent {
+        margin-left: 2.5em;
+      }
+
+      &.center {
+        display: inline-block;
+        width: 100%;
+      }
+    }
+  }
+
+  .opener {
+    .epigraph {
+      &.quote,
+      &.bibl {
+        align-items: last baseline;
+        display: flex;
+        flex-direction: column;
+        font-size: 0.9412em;
+        margin-right: 2.5em;
+        text-indent: 0;
+      }
+    }
+  }
+
+
+  /* TEXT GENRE OVERRIDES */
+  .letter {
+    .letterpart + .letterpart {
+      margin-top: 2em;
+    }
+
+    .opener {
+      margin: 0 1.25em 1em 0;
+      text-align: right;
+
+      .salute,
+      .note {
+        margin-top: 1em;
+        text-align: left;
+      }
+    }
+
+    .signed {
+      text-align: left;
+    }
+  }
+
+
+  /* MILESTONES, DIVIDERS, HORIZONTAL RULES */
+  .milestone.milestonePart {
+    background-color: #ececec;
+    color: #4e4e4e;
+    font-family: var(--font-stack-app-base);
+    font-size: 0.8824em;
+    line-height: 1.5em;
+    margin: 0.8em 0;
+    padding: 0 0.8em;
+    text-align: center;
+  }
+
+  hr.milestone.blank {
+    height: 0;
+    border: none;
+    background-color: transparent;
+    margin: 1.5em 0 0 0;
+  }
+
+  hr.milestone.bar {
+    height: 1px;
+    border: 0;
+    background-color: #404040;
+    padding: 0;
+    margin: 1.5em auto;
+    width: 5.625em;
+  }
+
+  hr.milestone {
+    &.asterisk,
+    &.dashedLine {
+      color: #222;
+      height: auto;
+      border: none;
+      background-color: transparent;
+      text-align: center;
+      margin: 1.75em auto 1.25em auto;
+    }
+
+    &.dashedLine {
+      margin: 1.5em auto;
+    }
+  }
+
+  hr.milestone.asterisk::after {
+    color: inherit;
+    content: "*";
+  }
+
+  hr.milestone.dashedLine::after {
+    color: inherit;
+    content: "—   —   —   —   —   —   —   —";
+  }
+
+
+  /* FIGURES */
+  figure {
+    display: block;
+    margin-block: 1em;
+    margin-inline: 0;
+    max-inline-size: 100%;
+
+    &.fig-full {
+      clear: both;
+      inline-size: 100%;
+    }
+
+    &.fig-left,
+    &.fig-center,
+    &.fig-right {
+      inline-size: fit-content;
+    }
+
+    &.fig-left {
+      margin-inline-start: 0;
+      margin-inline-end: auto;
+    }
+
+    &.fig-center {
+      margin-inline-start: auto;
+      margin-inline-end: auto;
+      text-align: center;
+    }
+
+    &.fig-right {
+      margin-inline-start: auto;
+      margin-inline-end: 0;
+    }
+
+    &.fig-float-left {
+      float: left;
+      margin-inline-end: 1em;
+      margin-block: 0.25em 0.75em;
+      max-inline-size: 40%;
+    }
+
+    &.fig-float-right {
+      float: right;
+      margin-inline-start: 1em;
+      margin-block: 0.25em 0.75em;
+      max-inline-size: 40%;
+    }
+  }
+
+  .inline-figure {
+    display: inline-block;
+    margin-inline: 0.25em;
+    text-align: center;
+    vertical-align: baseline;
+    max-inline-size: 100%;
+
+    &.fig-full,
+    &.fig-left,
+    &.fig-center,
+    &.fig-right {
+      display: block;
+      margin-block: 1em;
+    }
+
+    &.fig-full {
+      clear: both;
+      inline-size: 100%;
+      margin-inline: 0;
+    }
+
+    &.fig-left,
+    &.fig-center,
+    &.fig-right {
+      inline-size: fit-content;
+    }
+
+    &.fig-left {
+      margin-inline-start: 0;
+      margin-inline-end: auto;
+      text-align: left;
+    }
+
+    &.fig-center {
+      margin-inline-start: auto;
+      margin-inline-end: auto;
+    }
+
+    &.fig-right {
+      margin-inline-start: auto;
+      margin-inline-end: 0;
+      text-align: left;
+    }
+
+    &.fig-float-left,
+    &.fig-float-right {
+      margin-block: 0.25em;
+      max-inline-size: 40%;
+      text-align: left;
+    }
+
+    &.fig-float-left {
+      float: left;
+      margin-inline-end: 1em;
+      margin-inline-start: 0;
+    }
+
+    &.fig-float-right {
+      float: right;
+      margin-inline-start: 1em;
+      margin-inline-end: 0;
+    }
+  }
+
+  figcaption,
+  .inline-caption {
+    display: block;
+    font-size: 0.9412em;
+    margin: 0.5em;
+    text-align: left;
+    text-indent: 0;
+  }
+
+  figure.fig-center figcaption,
+  figure.fig-full figcaption,
+  .inline-figure.fig-center .inline-caption,
+  .inline-figure.fig-full .inline-caption {
+    text-align: center;
+  }
+
+  figure > img,
+  .inline-figure > img {
+    display: block;
+    max-inline-size: 100%;
+    block-size: auto;
+  }
+
+  figure.fig-full > img,
+  .inline-figure.fig-full > img {
+    inline-size: 100%;
+  }
+
+  figure.fig-center > img,
+  .inline-figure.fig-center > img {
+    margin-inline-start: auto;
+    margin-inline-end: auto;
+  }
+
+  figure.fig-right > img,
+  .inline-figure.fig-right > img {
+    margin-inline-start: auto;
+    margin-inline-end: 0;
+  }
+
+
+  /* FOOTNOTES */
+  /* List of notes at the end of the text: */
+  ol.footnotesList {
+    display: table;
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+
+    li.footnoteItem {
+      display: table-row;
+
+      a.footnoteReference {
+        display: table-cell;
+        padding: 0 0.7em 0 0;
+        text-align: right;
+        text-decoration: none;
+
+        &:hover:not(.disable-hover) {
+          text-decoration: underline;
+        }
+      }
+
+      span.footnoteText {
+        display: table-cell;
+        padding: 0;
+        overflow-wrap: anywhere;
+      }
+    }
+
+    /*
+    Zero-width space needed for some screen readers
+    since list-style-type is none.
+    */
+    li.footnoteItem::before {
+      content: "\200B";
+    }
+  }
+
+  /* The footnote indicator in the text: */
+  span.footnoteindicator {
+    color: var(--default-link-color);
+    cursor: pointer;
+    font-size: 0.9412em;
+    line-height: 0.5em;
+    vertical-align: 60%;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+
+  /* COMMON REND VALUES */
+  .bold {
+    font-weight: bold;
+  }
+  .encircled {
+    border: 1px solid #808080;
+    border-radius: 0.75em;
+    padding: 0 0.25em;
+  }
+  .expanded {
+    letter-spacing: 0.1177em;
+  }
+  .italics {
+    font-style: italic;
+  }
+  .larger {
+    font-size: 1.0589em;
+  }
+  .raised {
+    font-size: 0.8235em;
+    line-height: 0.5em;
+    vertical-align: 60%;
+  }
+  .smallCaps {
+    font-variant: small-caps;
+  }
+  .smaller {
+    font-size: 0.9412em;
+  }
+  .strikethrough,
+  .deletion {
+    text-decoration: line-through;
+  }
+  .underline {
+    text-decoration: underline;
+  }
+  .underlineDashed {
+    text-decoration: underline dashed;
+  }
+  .underlineDouble {
+    text-decoration: underline double;
+  }
+  .uppercase {
+    text-transform: uppercase;
+  }
+
+  .left {
+    text-align: left !important;
+    text-indent: 0;
+  }
+  .center {
+    text-align: center !important;
+    text-indent: 0;
+  }
+  .right {
+    text-align: right !important;
+    text-indent: 0;
+  }
+
+
+  /* MISC */
+  .anchor_lemma {
+    display: none;
+  }
+
+  .editorial-hi,
+  .gap,
+  .space {
+    color: #990202;
+  }
+
+  .unclear {
+    color: #737373;
+  }
+
+  .form-shift {
+    font-family: var(--font-stack-tei-formshift, var(--font-stack-app-base));
+  }
+
+
+  /* TABLES */
+  .table-wrapper {
+    overflow-x: auto;
+  }
+
+  table {
+    table-layout: fixed;
+
+    caption {
+      text-align: left;
+      margin: 0 0 1em 0;
+      width: 100%;
+      overflow-wrap: normal;
+    }
+  }
+
+  td,
+  th {
+    padding: 0.25em 1em 0.25em 0;
+    vertical-align: top;
+  }
+
+  td:last-child,
+  th:last-child {
+    padding-right: 0;
+  }
+
+  /* Style for centering a table */
+  table.centeredTable {
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  /* Style for adding borders to all cells in a table */
+  table.borderedCellTable th,
+  table.borderedCellTable td {
+    border: 1px solid #000;
+    padding: 0.25em;
+  }
+
+  /* Style for adding bottom borders to all rows in a table */
+  table.bottomBorderedRowsTable {
+    th,
+    td {
+      border-bottom: 1px solid #d0d0d0;
+      padding: 0.25em;
+    }
+
+    th {
+      border-bottom-color: #000;
+    }
+
+    tr:last-child > td {
+      border-bottom: 0;
+    }
+  }
+
+  /* Styles for tables with 2, 3 and 4 columns of equal width */
+  table.equalWidthTable2 th,
+  table.equalWidthTable2 td {
+    width: 50%;
+  }
+
+  table.equalWidthTable3 th,
+  table.equalWidthTable3 td {
+    width: 33.33%;
+  }
+
+  table.equalWidthTable4 th,
+  table.equalWidthTable4 td {
+    width: 25%;
+  }
+
+  /* Style for table which is padded to the right and left */
+  table.paddedTable {
+    margin-left: 1.5em !important;
+    margin-right: 1.5em !important;
+  }
+
+  /* Style for table which has condensed vertical spacing between cells */
+  table.condensedTableCells th,
+  table.condensedTableCells td {
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+
+  /* Style for adding a bottom border to table cells */
+  .botBorder {
+    border-bottom: 1px solid #000;
+  }
+
+  /* Style for adding a right border to table cells */
+  .rightBorder {
+    border-right: 1px solid #000;
+  }
+
+  .rightBorder + td {
+    padding-left: 1em;
+  }
+
+  /* LISTS */
+  ul {
+    margin: 1em 0;
+
+    &.hangingIndent {
+      list-style-type: none;
+      padding: 0;
+
+      li {
+        margin-inline-start: 1.5em;
+        text-indent: -1.5em;
+      }
+    }
+  }
+
+}

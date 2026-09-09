@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, DestroyRef, Injector, effect, inject, input, output, signal } from '@angular/core';
 import { NgStyle } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { AlertButton, AlertController, AlertInput, IonicModule, ModalController } from '@ionic/angular';
+import { AlertButton, AlertController, AlertInput, IonicModule, ModalController } from '@ionic/angular/lazy';
 import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 import { catchError, of, switchMap, tap } from 'rxjs';
 

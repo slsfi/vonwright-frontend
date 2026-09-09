@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, DestroyRef, DOCUMENT, Input, OnInit, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { PRIMARY_OUTLET, Router, RouterModule, UrlSegment, UrlTree } from '@angular/router';
-import { IonicModule, ModalController } from '@ionic/angular';
+import { IonicModule, ModalController } from '@ionic/angular/lazy';
 
 import { ReferenceData } from '@models/metadata.models';
 import { ReferenceDataService } from '@services/reference-data.service';

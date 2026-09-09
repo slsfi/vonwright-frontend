@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, Injector, NgZone, afterRenderEffect
 import { toSignal } from '@angular/core/rxjs-interop';
 import { NgTemplateOutlet } from '@angular/common';
 import { Params, RouterLink, UrlSegment } from '@angular/router';
-import { IonicModule } from '@ionic/angular';
+import { IonicModule } from '@ionic/angular/lazy';
 import { distinctUntilChanged, filter } from 'rxjs';
 
 import { config } from '@config';

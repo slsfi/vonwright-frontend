@@ -2,7 +2,6 @@
 {
   "compileOnSave": false,
   "compilerOptions": {
-    "baseUrl": "./",
     "outDir": "./dist/out-tsc",
     "forceConsistentCasingInFileNames": true,
     "strict": true,
@@ -12,55 +11,53 @@
     "noFallthroughCasesInSwitch": true,
     "sourceMap": true,
     "declaration": false,
-    "downlevelIteration": true,
     "experimentalDecorators": true,
     "moduleResolution": "bundler",
     "importHelpers": true,
     "target": "ES2022",
     "module": "ES2022",
     "useDefineForClassFields": false,
-    "lib": [
-      "ES2022",
-      "dom"
-    ],
     "allowSyntheticDefaultImports": true,
     "strictPropertyInitialization": false,
     "paths": {
       "@components/*": [
-        "src/app/components/*"
+        "./src/app/components/*"
       ],
       "@config": [
-        "src/assets/config/config"
+        "./src/assets/config/config"
       ],
       "@directives/*": [
-        "src/app/directives/*"
+        "./src/app/directives/*"
       ],
       "@guards/*": [
-        "src/app/guards/*"
+        "./src/app/guards/*"
       ],
       "@interceptors/*": [
-        "src/app/interceptors/*"
+        "./src/app/interceptors/*"
       ],
       "@modals/*": [
-        "src/app/dialogs/modals/*"
+        "./src/app/dialogs/modals/*"
       ],
       "@models/*": [
-        "src/app/models/*"
+        "./src/app/models/*"
       ],
       "@popovers/*": [
-        "src/app/dialogs/popovers/*"
+        "./src/app/dialogs/popovers/*"
       ],
       "@pipes/*": [
-        "src/app/pipes/*"
+        "./src/app/pipes/*"
       ],
       "@services/*": [
-        "src/app/services/*"
+        "./src/app/services/*"
       ],
       "@tokens/*": [
-        "src/app/tokens/*"
+        "./src/app/tokens/*"
       ],
       "@utility-functions": [
-        "src/app/utils/utility-functions"
+        "./src/app/utils/utility-functions"
+      ],
+      "src/*": [
+        "./src/*"
       ]
     }
   },

@@ -5,6 +5,17 @@
   "homepage": "https://github.com/slsfi/vonwright-frontend#readme",
   "license": "MIT",
   "private": true,
+  "engines": {
+    "node": "^24.15.0",
+    "npm": ">=11.16.0"
+  },
+  "devEngines": {
+    "runtime": {
+      "name": "node",
+      "version": "^24.15.0",
+      "onFail": "error"
+    }
+  },
   "scripts": {
     "ng": "ng",
     "start": "ng serve --configuration=development,sv",
@@ -25,39 +36,40 @@
     "compress": "gzipper compress ./dist/app/browser --include html,htm,xml,txt,css,js,svg,ico,json,ttf,otf --threshold 1300 --gzip-level 9 --remove-larger"
   },
   "dependencies": {
-    "@angular/common": "^20.3.30",
-    "@angular/compiler": "^20.3.30",
-    "@angular/core": "^20.3.30",
-    "@angular/forms": "^20.3.30",
-    "@angular/platform-browser": "^20.3.30",
-    "@angular/platform-server": "^20.3.30",
-    "@angular/router": "^20.3.30",
-    "@angular/ssr": "^20.3.36",
-    "@ionic/angular": "^8.8.19",
-    "@ionic/angular-server": "^8.8.19",
+    "@angular/common": "^22.1.5",
+    "@angular/compiler": "^22.1.5",
+    "@angular/core": "^22.1.5",
+    "@angular/forms": "^22.1.5",
+    "@angular/platform-browser": "^22.1.5",
+    "@angular/platform-server": "^22.1.5",
+    "@angular/router": "^22.1.5",
+    "@angular/ssr": "^22.1.7",
+    "@ionic/angular": "^9.0.2",
+    "@ionic/angular-server": "^9.0.2",
     "express": "^5.2.1",
     "express-rate-limit": "^8.7.0",
     "htmlparser2": "^12.0.0",
     "ionicons": "^8.1.0",
-    "marked": "^18.0.11",
+    "marked": "^18.0.12",
     "marked-custom-heading-id": "^2.0.17",
     "marked-footnote": "^1.4.0",
     "rxjs": "~7.8.2",
     "tslib": "^2.8.1",
-    "zone.js": "~0.15.1"
+    "zone.js": "0.15.1"
   },
   "devDependencies": {
-    "@angular-devkit/build-angular": "^20.3.36",
-    "@angular/build": "^20.3.36",
-    "@angular/cli": "^20.3.36",
-    "@angular/compiler-cli": "^20.3.30",
-    "@angular/language-service": "^20.3.30",
-    "@angular/localize": "^20.3.30",
+    "@angular-devkit/build-angular": "^22.1.7",
+    "@angular/build": "^22.1.7",
+    "@angular/cli": "^22.1.7",
+    "@angular/compiler-cli": "^22.1.5",
+    "@angular/language-service": "^22.1.5",
+    "@angular/localize": "^22.1.5",
     "@types/express": "^5.0.6",
     "@types/jasmine": "~5.1.15",
-    "@types/node": "^22.20.1",
+    "@types/node": "^24.13.3",
     "browser-sync": "^3.0.4",
-    "gzipper": "~8.2.1",
+    "gzipper": "^8.3.0",
+    "istanbul-lib-instrument": "^6.0.3",
     "jasmine-core": "~5.13.0",
     "karma": "~6.4.4",
     "karma-chrome-launcher": "~3.2.0",
@@ -65,6 +77,13 @@
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.2.0",
     "ng-extract-i18n-merge": "^3.4.0",
-    "typescript": "~5.8.3"
+    "typescript": "~6.0.3"
+  },
+  "allowScripts": {
+    "@parcel/watcher@2.6.0": true,
+    "esbuild@0.28.2": true,
+    "fsevents@2.3.3": true,
+    "lmdb@3.5.6": true,
+    "msgpackr-extract@3.0.4": true
   }
 }
