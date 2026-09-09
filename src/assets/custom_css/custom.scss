@@ -292,9 +292,7 @@ page-introduction[class][class] {
 /* Custom, project specific styles */
 
 page-home {
-  .title-wrapper .banner-title {
-    background-color: transparent;
-  }
+  --text-content-max-width: 1600px;
 
   .frontpage-editions-list {
     column-gap: 4em;
@@ -331,12 +329,11 @@ page-home {
   .frontpage-editions-list-col {
     margin-bottom: 2.5em;
     max-width: 440px;
+    text-align: center;
     width: 100%;
   }
 
   .text-content div.site-presentation.markdown.markdown {
-    max-width: 1600px;
-
     .intro-paragraph {
       margin-left: auto;
       margin-right: auto;
