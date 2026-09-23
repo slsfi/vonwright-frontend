@@ -8,6 +8,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ## Unreleased
 
+### Changed
+
+- Rollback image version in `compose.yml` to `2.7.5-production.1` because of an unresolved memory leak in later releases.
+
 
 
 ## [3.0.1-production.1] – 2026-09-09
