@@ -13,6 +13,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 - Prebuild: optimise static collection-menu generation by fetching and flattening shared non-multilingual collection data only once, and give failed TOC requests three retries with incremental cooldowns.
 - Disable Dependabot's default cooldown period for version updates.
 
+### Fixed
+
+- html-parser: declare DOM dependencies and import isTag from domhandler.
+
 
 
 ## [3.1.0] – 2026-09-21

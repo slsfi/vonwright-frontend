@@ -148,6 +148,21 @@ npm install @ionic/angular @ionic/angular-server
 ```
 
 
+### [`dom-serializer`][npm_dom-serializer]
+
+Serializes the DOM produced by `htmlparser2` back to HTML after the app updates image paths and class names.
+
+
+### [`domhandler`][npm_domhandler]
+
+Builds a DOM tree from `htmlparser2` parser events. Provides the `DomHandler` class and node type guards such as `isTag`. Import the type guards directly from `domhandler`; their deprecated re-exports were removed from `domutils` in version 4.
+
+
+### [`domutils`][npm_domutils]
+
+Utilities for querying and traversing the DOM produced by `domhandler`, used to find headings and illustrations and inspect their attributes.
+
+
 ### [`express`][npm_express]
 
 Framework for running a web server in Node.js. This library is required by Angular to enable server-side rendering.
@@ -160,6 +175,8 @@ Middleware used for app-level request limiting of dynamic SSR/CSR shell response
 ### [`htmlparser2`][npm_htmlparser2]
 
 SSR-compatible HTML/XML parser, used in a few places in the app to parse HTML from the backend.
+
+[`HtmlParserService`](../src/app/services/html-parser.service.ts) uses `domhandler`, `domutils`, and `dom-serializer` alongside `htmlparser2`. All four packages are declared as direct runtime dependencies in `package.json` because application code imports them. Keep their versions compatible with `htmlparser2` when updating so that application imports do not depend on which versions npm installs transitively through Angular's build tooling.
 
 
 ### [`ionicons`][npm_ionicons]
@@ -506,6 +523,9 @@ Cross-cutting future work that should stay visible outside local code comments i
 [docker_compose_file]: ../compose.yml
 [docker_desktop]: https://www.docker.com/products/docker-desktop/
 [dockerfile]: ../Dockerfile
+[npm_dom-serializer]: https://www.npmjs.com/package/dom-serializer
+[npm_domhandler]: https://www.npmjs.com/package/domhandler
+[npm_domutils]: https://www.npmjs.com/package/domutils
 [npm_express]: https://www.npmjs.com/package/express
 [npm_express-rate-limit]: https://www.npmjs.com/package/express-rate-limit
 [npm_htmlparser2]: https://www.npmjs.com/package/htmlparser2
