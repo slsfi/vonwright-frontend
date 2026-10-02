@@ -8,19 +8,26 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ## [Unreleased]
 
+
+
+## [3.1.1] – 2026-10-02
+
+> [!NOTE]
+> This patch release fixes an SSR memory leak in Ionic, present since v2.7.8.
+
 ### Changed
 
-- Prebuild: optimise static collection-menu generation by fetching and flattening shared non-multilingual collection data only once, and give failed TOC requests three retries with incremental cooldowns.
-- Disable Dependabot's default cooldown period for version updates.
-- Deps: update `@angular/core` and `@angular/cli` to 22.2.1.
-- Deps: update `@ionic/angular` and `@ionic/angular-server` to 9.0.6.
-- Deps: update `marked` to 18.0.14.
-- Deps (dev): update `@types/node` to 24.19.1.
-- Deps: update transitive dependencies.
+- Prebuild: optimise static collection-menu generation by fetching and flattening shared non-multilingual collection data only once, and give failed TOC requests three retries with incremental cooldowns. ([61ff9fb](https://github.com/slsfi/digital-edition-frontend-ng/commit/61ff9fb5d5f091a13362981fad48339f8c9fdec9))
+- Disable Dependabot's default cooldown period for version updates. ([5bc6070](https://github.com/slsfi/digital-edition-frontend-ng/commit/5bc6070e41b29273a31d1697718c2e27e6fe3a7c))
+- Deps: update `@angular/core` and `@angular/cli` to 22.2.1. ([8ae1728](https://github.com/slsfi/digital-edition-frontend-ng/commit/8ae17287d5d10ad84b6e2c1060a79b9c82680d53))
+- Deps: update `@ionic/angular` and `@ionic/angular-server` to 9.0.6. ([298619f](https://github.com/slsfi/digital-edition-frontend-ng/commit/298619f56bc1fb9e6b0583a506df7f42b713a1e2))
+- Deps: update `marked` to 18.0.14. ([3613d00](https://github.com/slsfi/digital-edition-frontend-ng/commit/3613d002eb0ea828e1d08bc59c6561f6d2dbaef6))
+- Deps (dev): update `@types/node` to 24.19.1. ([406dbb0](https://github.com/slsfi/digital-edition-frontend-ng/commit/406dbb007f911505f7577e5c4b2624bb1a592b80))
+- Deps: update transitive dependencies. ([46f4194](https://github.com/slsfi/digital-edition-frontend-ng/commit/46f41946ab69fcee34864181429b3bdeac5a92f3))
 
 ### Fixed
 
-- html-parser: declare DOM dependencies and import isTag from domhandler.
+- html-parser: declare DOM dependencies and import `isTag` from `domhandler`. ([9ce0ec2](https://github.com/slsfi/digital-edition-frontend-ng/commit/9ce0ec2dc6844583d723b7ca673f174c751fe26a))
 
 
 
@@ -64,6 +71,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 - Zone.js from the browser and server runtimes. ([2483ec1](https://github.com/slsfi/digital-edition-frontend-ng/commit/2483ec108779047728c69452515ccd1fd1463d28))
 - Redundant `NgZone.run()` and `NgZone.runOutsideAngular()` wrappers from the zoneless application. ([13c5a92](https://github.com/slsfi/digital-edition-frontend-ng/commit/13c5a92cde00172f2133a491a44f3655999c43d3))
+
 
 
 ## [3.0.1] – 2026-09-08
@@ -1606,7 +1614,8 @@ siteLogoDimensions: {
 
 
 
-[unreleased]: https://github.com/slsfi/digital-edition-frontend-ng/compare/3.1.0...HEAD
+[unreleased]: https://github.com/slsfi/digital-edition-frontend-ng/compare/3.1.1...HEAD
+[3.1.1]: https://github.com/slsfi/digital-edition-frontend-ng/compare/3.1.0...3.1.1
 [3.1.0]: https://github.com/slsfi/digital-edition-frontend-ng/compare/3.0.1...3.1.0
 [3.0.1]: https://github.com/slsfi/digital-edition-frontend-ng/compare/3.0.0...3.0.1
 [3.0.0]: https://github.com/slsfi/digital-edition-frontend-ng/compare/2.7.8...3.0.0
