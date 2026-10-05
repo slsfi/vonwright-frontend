@@ -15,109 +15,109 @@ import { verifyEmailJwtGuard } from '@guards/verify-email-jwt.guard';
 export const routes: Routes = [
   {
     path: '',
-    loadChildren: () => import('./pages/home/home.module').then(m => m.HomePageModule)
+    loadComponent: () => import('./pages/home/home.page').then(m => m.HomePage)
   },
   {
     path: 'about',
-    loadChildren: () => import('./pages/about/about.module').then(m => m.AboutPageModule)
+    loadChildren: () => import('./pages/about/about.routes').then(m => m.aboutRoutes)
   },
   {
     path: 'cookie-policy',
     data: { backendPageId: '05-01' },
-    loadChildren: () => import('./pages/about/about.module').then(m => m.AboutPageModule)
+    loadChildren: () => import('./pages/about/about.routes').then(m => m.aboutRoutes)
   },
   {
     path: 'privacy-policy',
     data: { backendPageId: '05-02' },
-    loadChildren: () => import('./pages/about/about.module').then(m => m.AboutPageModule)
+    loadChildren: () => import('./pages/about/about.routes').then(m => m.aboutRoutes)
   },
   {
     path: 'terms',
     data: { backendPageId: '05-03' },
-    loadChildren: () => import('./pages/about/about.module').then(m => m.AboutPageModule)
+    loadChildren: () => import('./pages/about/about.routes').then(m => m.aboutRoutes)
   },
   {
     path: 'accessibility-statement',
     data: { backendPageId: '05-04' },
-    loadChildren: () => import('./pages/about/about.module').then(m => m.AboutPageModule)
+    loadChildren: () => import('./pages/about/about.routes').then(m => m.aboutRoutes)
   },
   {
     path: 'article',
-    loadChildren: () => import('./pages/article/article.module').then(m => m.ArticlePageModule)
+    loadChildren: () => import('./pages/article/article.routes').then(m => m.articleRoutes)
   },
   {
     path: 'content',
-    loadChildren: () => import('./pages/content/content.module').then(m => m.ContentPageModule),
+    loadComponent: () => import('./pages/content/content.page').then(m => m.ContentPage),
     canActivate: [authGuard]
   },
   {
     path: 'collection/:collectionID/cover',
-    loadChildren: () => import('./pages/collection/cover/collection-cover.module').then(m => m.CollectionCoverPageModule),
+    loadComponent: () => import('./pages/collection/cover/collection-cover.page').then(m => m.CollectionCoverPage),
     canActivate: [authGuard]
   },
   {
     path: 'collection/:collectionID/title',
-    loadChildren: () => import('./pages/collection/title/collection-title.module').then(m => m.CollectionTitlePageModule),
+    loadComponent: () => import('./pages/collection/title/collection-title.page').then(m => m.CollectionTitlePage),
     canActivate: [authGuard]
   },
   {
     path: 'collection/:collectionID/foreword',
-    loadChildren: () => import('./pages/collection/foreword/collection-foreword.module').then(m => m.CollectionForewordPageModule),
+    loadComponent: () => import('./pages/collection/foreword/collection-foreword.page').then(m => m.CollectionForewordPage),
     canActivate: [authGuard]
   },
   {
     path: 'collection/:collectionID/introduction',
-    loadChildren: () => import('./pages/collection/introduction/collection-introduction.module').then(m => m.CollectionIntroductionPageModule),
+    loadComponent: () => import('./pages/collection/introduction/collection-introduction.page').then(m => m.CollectionIntroductionPage),
     canActivate: [authGuard]
   },
   {
     path: 'collection/:collectionID/text',
-    loadChildren: () => import('./pages/collection/text/collection-text.module').then(m => m.CollectionTextPageModule),
+    loadChildren: () => import('./pages/collection/text/collection-text.routes').then(m => m.collectionTextRoutes),
     canActivate: [authGuard]
   },
   {
     path: 'ebook',
-    loadChildren: () => import('./pages/ebook/ebook.module').then(m => m.EbookPageModule)
+    loadChildren: () => import('./pages/ebook/ebook.routes').then(m => m.ebookRoutes)
   },
   {
     path: 'login',
-    loadChildren: () => import('./pages/login/login.module').then(m => m.LoginPageModule),
+    loadComponent: () => import('./pages/login/login.page').then(m => m.LoginPage),
     canMatch: [authFeatureEnabledMatchGuard],
     canActivate: [authGuard]
   },
   {
     path: 'register',
-    loadChildren: () => import('./pages/register/register.module').then(m => m.RegisterPageModule),
+    loadComponent: () => import('./pages/register/register.page').then(m => m.RegisterPage),
     canMatch: [authFeatureEnabledMatchGuard],
     canActivate: [authGuard]
   },
   {
     path: 'forgot-password',
-    loadChildren: () => import('./pages/forgot-password/forgot-password.module').then(m => m.ForgotPasswordPageModule),
+    loadComponent: () => import('./pages/forgot-password/forgot-password.page').then(m => m.ForgotPasswordPage),
     canMatch: [authFeatureEnabledMatchGuard]
   },
   {
     path: 'change-password',
-    loadChildren: () => import('./pages/forgot-password/forgot-password.module').then(m => m.ForgotPasswordPageModule),
+    loadComponent: () => import('./pages/forgot-password/forgot-password.page').then(m => m.ForgotPasswordPage),
     canMatch: [authFeatureEnabledMatchGuard],
     canActivate: [authGuard]
   },
   {
     path: 'reset-password',
-    loadChildren: () => import('./pages/reset-password/reset-password.module').then(m => m.ResetPasswordPageModule),
+    loadComponent: () => import('./pages/reset-password/reset-password.page').then(m => m.ResetPasswordPage),
     canMatch: [authFeatureEnabledMatchGuard],
     canActivate: [resetPasswordJwtGuard]
   },
   {
     path: 'verify-email',
-    loadChildren: () => import('./pages/verify-email/verify-email.module').then(m => m.VerifyEmailPageModule),
+    loadComponent: () => import('./pages/verify-email/verify-email.page').then(m => m.VerifyEmailPage),
     canMatch: [authFeatureEnabledMatchGuard],
     canActivate: [verifyEmailJwtGuard]
   },
   {
     path: 'account',
     data: { requiresSessionValidation: true },
-    loadChildren: () => import('./pages/account/account.module').then(m => m.AccountPageModule),
+    loadComponent: () => import('./pages/account/account.page').then(m => m.AccountPage),
     canMatch: [authFeatureEnabledMatchGuard],
     canActivate: [authGuard]
   },
@@ -128,21 +128,21 @@ export const routes: Routes = [
   },
   {
     path: 'index/:type',
-    loadChildren: () => import('./pages/index/index.module').then(m => m.IndexPageModule),
+    loadComponent: () => import('./pages/index/index.page').then(m => m.IndexPage),
     canActivate: [authGuard]
   },
   {
     path: 'media-collection',
-    loadChildren: () => import('./pages/media-collection/media-collection.module').then(m => m.MediaCollectionPageModule),
+    loadChildren: () => import('./pages/media-collection/media-collection.routes').then(m => m.mediaCollectionRoutes),
     canActivate: [authGuard]
   },
   {
     path: 'search',
-    loadChildren: () => import('./pages/elastic-search/elastic-search.module').then(m => m.ElasticSearchPageModule),
+    loadComponent: () => import('./pages/elastic-search/elastic-search.page').then(m => m.ElasticSearchPage),
     canActivate: [authGuard]
   },
   {
     path: '**',
-    loadChildren: () => import('./pages/page-not-found/page-not-found.module').then(m => m.PageNotFoundPageModule)
+    loadComponent: () => import('./pages/page-not-found/page-not-found.page').then(m => m.PageNotFoundPage)
   }
 ];

@@ -3,7 +3,7 @@
 This document contains notes and tips on the development of the app.
 
 
-## Run locally on Windows
+## Run Docker images locally on Windows
 
 ### Remote Docker image of app
 
@@ -84,7 +84,29 @@ By default the app is built using GitHub Actions according to the workflow defin
 
 The workflow also runs `docker pull node:${NODE_IMAGE_TAG}` before the build. This is intentional for explicitness and log visibility.
 
-When updating which Node.js image is used for the build, remember to update both `docker-build-and-push.yml` and `Dockerfile`.
+When updating the supported Node.js version, keep all version declarations and developer-facing guidance aligned:
+
+- update `NODE_IMAGE_TAG` in [`.github/workflows/docker-build-and-push.yml`](../.github/workflows/docker-build-and-push.yml),
+- update the default `NODE_IMAGE_TAG` in [`Dockerfile`](../Dockerfile),
+- update both `engines.node` and `devEngines.runtime.version` in [`package.json`](../package.json),
+- update the Node.js prerequisite in [`README.md`](../README.md),
+- regenerate or update `package-lock.json` as needed so its metadata remains consistent.
+
+
+
+## Application architecture
+
+The app is a standalone, zoneless Angular application with server-side rendering and Ionic UI components.
+
+- **Standalone Angular application:** [`src/main.ts`](../src/main.ts) and [`src/main.server.ts`](../src/main.server.ts) both bootstrap `AppComponent` with `bootstrapApplication()`. There are no application, server, page, or routing NgModules owned by this repository; page templates and reusable components import their Angular and Ionic dependencies directly.
+- **Browser/server bootstrap and shared provider configuration:** The browser bootstrap uses [`src/app/app.config.ts`](../src/app/app.config.ts), while the server bootstrap uses [`src/app/app.config.server.ts`](../src/app/app.config.server.ts). The browser configuration owns shared router, HTTP, Ionic, and application providers and selects browser implementations of platform-specific services. The server configuration uses `mergeApplicationConfig()` so server-only providers are applied after the shared browser configuration and override the platform-specific browser implementations.
+- **Ionic standalone components and the `IonicServerModule` bridge:** Application components import the standalone Ionic components they use rather than `IonicModule`, and application-level Ionic providers are registered with `provideIonicAngular()`. On the server, `importProvidersFrom(IonicServerModule)` is the sole intentional application-level NgModule bridge because Ionic does not expose an equivalent standalone server-provider function.
+- **Zoneless change detection:** The application uses Angular's zoneless change detection and does not register `provideZoneChangeDetection()` or another change-detection compatibility provider. Components expose asynchronous template state through signals, inputs, the `async` pipe, or other Angular notification mechanisms. Zone.js is absent from browser, server, and test polyfills and from the dependency tree.
+- **SSR via `CommonEngine`:** [`server.ts`](../server.ts) passes the server bootstrap function to `CommonEngine`, which remains the app's SSR integration.
+- **Retained Webpack `browser`/`server` builders and `dist/app` contract:** The application intentionally retains Angular's separate Webpack-based `browser` and `server` builders in `angular.json` and the existing `dist/app` output contract. Migration to the [`application` builder](https://angular.dev/tools/cli/build-system-migration) is deferred as a separate breaking change.
+- **Hydration intentionally not enabled:** Client hydration is deliberately not configured because Ionic's underlying Stencil components do not currently support SSR hydration with Angular ([ionic-team/ionic-framework#30490](https://github.com/ionic-team/ionic-framework/issues/30490)). The application therefore retains the non-hydrated `CommonEngine` SSR lifecycle; enabling hydration must be handled and tested as a dedicated SSR/deployment migration rather than folded into ordinary component work.
+
+The current architecture resulted from the completed standalone and zoneless phase of a [two-stage Angular modernization](migrations/README.md). The migration overview also links to the planned application-builder and Vitest phase.
 
 
 
@@ -96,8 +118,6 @@ The app is built on Angular and uses many web components from Ionic. It also has
 ### `@angular`
 
 The Angular documentation is available on <https://angular.dev/>.
-
-At its root, the Angular app still uses NgModules, even though all components except `pages` use the standalone API. This is no longer an Ionic limitation: Ionic 9 supports standalone components and provides `provideIonicAngular()` for standalone application bootstrap. The migration plan is to first replace the root, server and page NgModules with standalone bootstrap and components, and enable zoneless change detection, while retaining the existing webpack-based build and SSR setup. These two migrations are not intended to introduce breaking changes. The later migration from Angular's separate `browser` and `server` builders to the [`application` builder](https://angular.dev/tools/cli/build-system-migration) is expected to introduce breaking changes.
 
 #### Updating Angular
 
@@ -128,6 +148,21 @@ npm install @ionic/angular @ionic/angular-server
 ```
 
 
+### [`dom-serializer`][npm_dom-serializer]
+
+Serializes the DOM produced by `htmlparser2` back to HTML after the app updates image paths and class names.
+
+
+### [`domhandler`][npm_domhandler]
+
+Builds a DOM tree from `htmlparser2` parser events. Provides the `DomHandler` class and node type guards such as `isTag`. Import the type guards directly from `domhandler`; their deprecated re-exports were removed from `domutils` in version 4.
+
+
+### [`domutils`][npm_domutils]
+
+Utilities for querying and traversing the DOM produced by `domhandler`, used to find headings and illustrations and inspect their attributes.
+
+
 ### [`express`][npm_express]
 
 Framework for running a web server in Node.js. This library is required by Angular to enable server-side rendering.
@@ -141,10 +176,12 @@ Middleware used for app-level request limiting of dynamic SSR/CSR shell response
 
 SSR-compatible HTML/XML parser, used in a few places in the app to parse HTML from the backend.
 
+[`HtmlParserService`](../src/app/services/html-parser.service.ts) uses `domhandler`, `domutils`, and `dom-serializer` alongside `htmlparser2`. All four packages are declared as direct runtime dependencies in `package.json` because application code imports them. Keep their versions compatible with `htmlparser2` when updating so that application imports do not depend on which versions npm installs transitively through Angular's build tooling.
+
 
 ### [`ionicons`][npm_ionicons]
 
-Iconset especially intended to be used with Ionic.
+Iconset especially intended to be used with Ionic. See the [instruction on how to register icons below](#registering-icons).
 
 
 ### [`marked`][npm_marked]
@@ -172,11 +209,6 @@ Reactive extensions library. Used internally by Angular and heavily in the app f
 Runtime library for TypeScript containing all of the TypeScript helper functions. Required by Angular.
 
 
-### [`zone.js`][npm_zone.js]
-
-Library for execution contexts (”zones”) that persist across async tasks. Required by Angular.
-
-
 ### [`browser-sync`][npm_browser-sync] (devDependency)
 
 Required by the Angular builders.
@@ -194,7 +226,10 @@ Library for extracting and merging i18n xliff translation files for Angular proj
 
 ### `jasmine` and `karma`
 
-Angular testing frameworks, not in use.
+Unit-testing framework and test runner. Use `npm test` for watch mode or
+`npm run test:ci` for a single run. Karma uses a headless Chrome launcher with
+GPU acceleration disabled by default because the regular Chrome launcher is
+not reliable in the supported development environment.
 
 
 ### Updating transitive dependencies
@@ -219,17 +254,62 @@ npm approve-scripts <package> [<package> ...]
 
 This updates the package's version-pinned entry in `allowScripts`. Do not replace it with an unversioned approval unless future versions of that package should be allowed to run install scripts without another review.
 
-Finally, perform a clean installation from the updated lockfile and verify the app:
+Finally, perform a clean installation from the updated lockfile and run the standard verification checks:
 
 ```bash
 npm ci
+npm run test:ci
 npm run test:source-encoding
 npm run test:routes-parser
+npm run test:static-collection-menus
 npm run build:ssr
+```
+
+Then start the built SSR app:
+
+```bash
+npm run serve:ssr
+```
+
+While it is running, use another terminal to run the SSR smoke test:
+
+```bash
 npm run test:ssr:smoke
 ```
 
 `npm ci` removes the existing `node_modules` directory automatically. Commit the reviewed `package-lock.json` changes and, when approvals changed, the corresponding `package.json` changes. Deleting and regenerating the lockfile should only be necessary when repairing a broken dependency tree.
+
+
+
+## Testing
+
+Use the Angular/Jasmine unit suite as the primary automated check, with the script-based checks for the areas they specifically cover:
+
+- `npm test`: run Angular/Jasmine unit tests in Karma watch mode while developing.
+- `npm run test:ci`: run the full Angular/Jasmine unit suite once in headless Chrome; use this for pre-PR verification.
+- `npm run test:source-encoding`: validate source-file encoding and BOM usage.
+- `npm run test:routes-parser`: verify route parser/generator behavior; run it after changes to `prebuild-generate-routes.js` or generator-facing route syntax in `src/app/app.routes.ts`.
+- `npm run test:static-collection-menus`: verify that shared non-multilingual TOCs are fetched once, per-locale menu files are generated, and fetch retries back off as expected; run it after changes to `prebuild-generate-static-collection-menus.js` or shared fetch retry behavior in `prebuild-common-fns.js`.
+- `npm run test:ssr:smoke`: verify selected server-rendered responses against a running SSR app; build and start the app first, or pass `--base-url` to target another running environment.
+
+When changing `app.routes.ts` or a lazy `*.routes.ts` file, also update and run the Angular route-recognition specs. For SSR-specific changes, run `npm run build:ssr`, start the built app with `npm run serve:ssr`, and then run `npm run test:ssr:smoke` in another terminal. The detailed route-parser and SSR smoke-test sections below describe those workflows further.
+
+
+
+## Registering icons
+
+Application icons referenced by name are registered centrally in [`src/ionicons-polyfill.ts`](../src/ionicons-polyfill.ts). The browser build loads this file as a polyfill before `main.ts`, and the Karma bootstrap imports the same registry from [`src/test.ts`](../src/test.ts).
+
+The early browser registration is required for SSR. When the client starts, the `ion-icon` custom element upgrades the icon elements already present in the server-rendered HTML before Angular creates the page components. Registering icons only in component constructors is therefore too late and produces Ionicons `Invalid base URL` warnings during client bootstrap.
+
+When adding an icon:
+
+1. Import its SVG data by name from `ionicons/icons` in [`src/ionicons-polyfill.ts`](../src/ionicons-polyfill.ts).
+2. Add it to the object passed to `addIcons()` in the same file.
+3. Import the standalone `IonIcon` component in the Angular component that uses it, then reference the registered icon with its kebab-case name, for example `<ion-icon name="information-circle-sharp"></ion-icon>`.
+4. For a dynamic `[name]` binding, register every icon name the binding can produce.
+
+Do not add component-local `addIcons()` calls. The central registry is the single source of truth for application-owned icons.
 
 
 
@@ -251,13 +331,18 @@ The app uses a platform-specific router preloading strategy:
 Implementation files:
 
 - [`src/app/services/router-preloading-strategy.service.ts`](../src/app/services/router-preloading-strategy.service.ts)
-- [`src/app/app-routing.module.ts`](../src/app/app-routing.module.ts)
+- [`src/app/app.config.ts`](../src/app/app.config.ts)
+- [`src/app/app.config.server.ts`](../src/app/app.config.server.ts)
 - [`src/app/app.routes.ts`](../src/app/app.routes.ts)
 - [`src/app/app.routes.generated.ts`](../src/app/app.routes.generated.ts)
-- [`src/app/app.module.ts`](../src/app/app.module.ts)
-- [`src/app/app.server.module.ts`](../src/app/app.server.module.ts)
+- Lazy standalone route arrays under `src/app/pages/`, currently:
+  - [`about.routes.ts`](../src/app/pages/about/about.routes.ts)
+  - [`article.routes.ts`](../src/app/pages/article/article.routes.ts)
+  - [`collection-text.routes.ts`](../src/app/pages/collection/text/collection-text.routes.ts)
+  - [`ebook.routes.ts`](../src/app/pages/ebook/ebook.routes.ts)
+  - [`media-collection.routes.ts`](../src/app/pages/media-collection/media-collection.routes.ts)
 
-Route-level preload behavior is set with route `data.preload` in `app.routes.ts`:
+The preloading strategy applies to both `loadComponent` and `loadChildren`. Route-level behavior is set with `data.preload` on the route declaration that owns the lazy load. Developers set it in `app.routes.ts` or one of the lazy `*.routes.ts` files. Do not edit `app.routes.generated.ts`; route generation copies the top-level metadata from `app.routes.ts`:
 
 - `'eager'`: preload as soon as router preloading runs.
 - `'idle'`: preload when browser is idle.
@@ -273,27 +358,32 @@ Route-level preload behavior is set with route `data.preload` in `app.routes.ts`
 
 Current route policy:
 
-- default for lazy routes: `idle-if-fast`
-- optional per-route overrides: `eager`, `idle`, or `off`
+- All current lazy routes use the default `idle-if-fast` behavior.
+- A route can override the default with `eager`, `idle`, or `off`.
+- For a `loadChildren` route, the parent route array must first be loaded before the router can discover and apply preloading rules to its child routes. Setting the parent to `off` therefore also prevents its not-yet-loaded children from being considered for preloading.
 
 
 
 ## Feature-based route generation
 
-The app can generate routes at build time based on values in [`src/assets/config/config.ts`](../src/assets/config/config.ts).
+The app can generate its top-level production routes at build time based on values in [`src/assets/config/config.ts`](../src/assets/config/config.ts).
 
-- Canonical routes source (edited by developers): [`src/app/app.routes.ts`](../src/app/app.routes.ts)
+- Canonical top-level routes source (edited by developers): [`src/app/app.routes.ts`](../src/app/app.routes.ts)
 - Generated file: [`src/app/app.routes.generated.ts`](../src/app/app.routes.generated.ts)
 - Generated auth-guarded route paths: [`src/app/auth-protected-route-paths.generated.ts`](../src/app/auth-protected-route-paths.generated.ts)
 - Generator script: [`prebuild-generate-routes.js`](../prebuild-generate-routes.js)
 - npm command: `npm run generate-routes`
 
+Simple routes use `loadComponent` directly in `app.routes.ts`. Routes with multiple URL shapes, child paths, or observable parent-route behavior use a top-level `loadChildren` entry that loads a standalone `Routes` array from the corresponding `*.routes.ts` file under `src/app/pages/`.
+
+The generator parses and filters only the top-level route blocks in `app.routes.ts`. It copies their references to lazy route arrays unchanged; it does not parse, duplicate, or independently feature-filter the child routes in those files. A child route is available in production whenever its top-level parent route is included.
+
 Feature toggle in config:
 
 - `app.prebuild.featureBasedRoutes` (default: `false`)
 - when `false`, the generated routes include all default lazy routes
-- when `true`, the generated routes include only feature-enabled lazy routes
-- filtering is path-based in `prebuild-generate-routes.js`; any new route not listed in the filter map remains included by default
+- when `true`, the generated routes include only feature-enabled top-level routes
+- filtering is path-based in `prebuild-generate-routes.js`; any new top-level route not listed in the filter map remains included by default
 
 Build behavior:
 
@@ -307,168 +397,19 @@ Parser smoke tests:
 
 - Test script: [`scripts/test-prebuild-generate-routes.js`](../scripts/test-prebuild-generate-routes.js)
 - npm command: `npm run test:routes-parser`
-- run these tests after changes to `prebuild-generate-routes.js` and after route syntax refactors in `src/app/app.routes.ts`
+- run these tests after changes to `prebuild-generate-routes.js` and after generator-facing route syntax changes in `src/app/app.routes.ts`
+- run the Angular route-recognition tests after changes to either `app.routes.ts` or a lazy `*.routes.ts` file
 
 
 
 ## Authentication-guarded routing and token-based authentication flow
 
-Authentication support is optional and controlled by config. This is intended so the base app can stay auth-disabled by default, while selected forks can enable auth.
+Authentication support is optional and config-driven, allowing forks to protect selected routes while the base app remains auth-disabled by default.
 
-### Enable in a fork
-
-1. Set `app.auth.enabled` to `true` in [`src/assets/config/config.ts`](../src/assets/config/config.ts).
-2. Configure auth API base URL by setting `app.auth.backendAuthBaseURL`.
-3. If `app.auth.backendAuthBaseURL` is missing, auth service falls back to the origin of `app.backendBaseURL` (for example `https://api.example.org/digitaledition` becomes `https://api.example.org/`).
-4. Ensure backend exposes auth endpoints expected by frontend: `POST <backendAuthBaseURL>/auth/login`, `POST <backendAuthBaseURL>/auth/refresh`, and `GET <backendAuthBaseURL>/session/validate`.
-5. Protect routes by adding `canActivate: [authGuard]` in [`src/app/app.routes.ts`](../src/app/app.routes.ts) for the pages that require authentication.
-6. For protected routes that do not normally fetch backend data (for example `/account`), add `data: { requiresSessionValidation: true }` so the guard can validate current session state through `GET <backendAuthBaseURL>/session/validate`.
-7. Optional: configure `app.auth.sessionValidationTTLms` in [`src/assets/config/config.ts`](../src/assets/config/config.ts) to control how long a successful session validation is cached in the browser (default: `120000` ms).
-8. Keep login route enabled with `canMatch: [authFeatureEnabledMatchGuard]` so `/login` is only matchable when auth feature is enabled.
-9. If using production build with feature-based routes, run `npm run generate-routes` after route/config changes (or use `npm run build:ssr`, which runs it automatically).
-In feature-based route mode, the `login` route is included only when `app.auth.enabled` is `true`.
-
-### Behavior when disabled
-
-- `AUTH_ENABLED` resolves to `false` from config.
-- Auth guard is effectively a no-op.
-- Auth interceptor is not registered in browser/server modules.
-- `/login` is not matchable because `authFeatureEnabledMatchGuard` returns `false`.
-
-### Redirect behavior and privacy hardening
-
-- Unauthenticated access to protected routes redirects to `/login?rt=1`.
-- Intended target URL is stored in session-scoped redirect storage (browser `sessionStorage`) and consumed once after successful login.
-- If marker storage is unavailable (for example SSR), fallback uses legacy `returnUrl` query param.
-- Redirect target validation requires all of the following: starts with `/`, does not start with `//`, does not target `/login`, is parseable by Angular router, and is at most 2000 characters.
-
-### Startup session validation
-
-- On app startup, `AuthService` checks persisted token state before trusting it.
-- If either `access_token` or `refresh_token` is missing, auth state is cleared. This removes partial token state and leaves the user unauthenticated.
-- If both tokens exist, `AuthService` creates one one-time bootstrap validation request to `GET <backendAuthBaseURL>/session/validate` using the stored access token as the bearer token.
-- The in-memory authenticated state remains false until that startup validation succeeds.
-- The route guard waits for pending startup validation before allowing a protected route or redirecting to `/login`. This is a bootstrap check, not route-guard polling on every navigation.
-- If startup validation succeeds, the session is accepted, authenticated email is restored from storage, and protected routes can activate.
-- If the stored access token is stale and startup validation returns a terminal auth failure (`401` or `422`), the app may refresh the access token once with `POST <backendAuthBaseURL>/auth/refresh`.
-- The refreshed access token must also pass `GET <backendAuthBaseURL>/session/validate` before the startup session is accepted.
-- If startup validation or the one refresh attempt fails, auth state is cleared and the user remains unauthenticated.
-
-### Interceptor and refresh hardening
-
-- Bearer token is attached only to requests targeting configured backend URLs (`backendBaseURL` / `backendAuthBaseURL`).
-- Bearer token is never attached to `/auth/*` endpoints.
-- Refresh attempt is only made for backend 401 responses outside `/auth/*`.
-- When a backend 401 occurs for a request that used a stored access token but no refresh token is available, the user is logged out and redirected to `/login`.
-- `AuthService.refreshToken()` has defense-in-depth: if refresh token is missing, it fails fast, logs out, and skips network request.
-- Refreshed access tokens are validated with `GET <backendAuthBaseURL>/session/validate` before they are stored, emitted to concurrent refresh callers, or used for request retry.
-- Routes with `data.requiresSessionValidation: true` trigger a guard-level call to `GET <backendAuthBaseURL>/session/validate`.
-- Session validation is throttled and deduplicated in `AuthService.validateSessionIfStale()`:
-  - successful validations are cached for `app.auth.sessionValidationTTLms` (default `120000` ms)
-  - concurrent validations share one in-flight request
-- Session validation `401` and `422` responses are treated as unauthenticated and redirect to `/login`; other guard-level validation probe failures are fail-open.
-
-### Manual auth regression checklist (JWT expiry/invalidation)
-
-Use this checklist after auth/interceptor/guard changes.
-
-- Preconditions: `app.auth.enabled = true`, backend auth endpoints enabled, and at least one protected content route available (for example `/collection/:collectionID/text`).
-- Use browser DevTools to inspect/edit local storage keys: `access_token`, `refresh_token`, `auth_email`.
-
-1. Logged-out baseline: clear all three keys and open `/account`. Expected result: redirect to `/login`.
-2. Happy-path login: log in and open `/account`. Expected result: account page is accessible and protected content routes load normally.
-3. Partial stale state: keep only `access_token` in local storage (remove `refresh_token` and `auth_email`), then reload and open `/account`. Expected result: app clears stale state and redirects to `/login`.
-4. Startup validation with existing tokens: log in, open DevTools with network preservation enabled, then hard refresh on a protected route. Expected result: app calls `/session/validate` before treating the user as authenticated, then allows the route after validation succeeds.
-5. Startup validation with stale access token: keep both tokens in local storage, make the stored access token stale while refresh still works, then hard refresh on a protected route. Expected result: first `/session/validate` fails, one refresh attempt is made, the refreshed access token is validated with `/session/validate`, and the route activates only after validation succeeds.
-6. Backend-invalidated session with both tokens present: keep both tokens in local storage, invalidate them in backend, then open a protected route that performs backend requests (for example `/collection/:collectionID/text`). Expected result: startup validation or the first backend 401 clears auth state and redirects to `/login`.
-7. Expired access token but valid refresh token during normal API use: force backend to return 401 for access token while refresh still works, then open protected content. Expected result: one refresh attempt is made, the refreshed access token is validated, the request is retried, and user remains logged in.
-8. Refresh returns an access token that fails `/session/validate`: force the validation endpoint to reject the refreshed token. Expected result: refreshed token is not stored, user is logged out, and browser redirects to `/login`.
-9. Invalid refresh token: force backend to return 401 for refresh, then open protected content. Expected result: user is logged out and redirected to `/login`.
-10. Backend-invalidated session on a protected route that does not fetch backend data: keep both tokens in local storage, invalidate session in backend, then open a route with `data.requiresSessionValidation: true` (for example `/account`). Expected result: guard session validation returns 401 and redirects to `/login`.
-
-### SSR note
-
-With current token storage strategy (no auth cookies), SSR cannot identify authenticated browser users on initial request.
-
-To avoid SSR/client mismatches on auth-guarded routes, the Express SSR server serves the client-rendered index HTML (CSR shell) for route paths generated in [`src/app/auth-protected-route-paths.generated.ts`](../src/app/auth-protected-route-paths.generated.ts) when `app.auth.enabled` is `true`. Non-protected routes continue to use SSR.
-
-### Sitemap behavior in auth mode
-
-- Auth-related routes are always excluded from sitemap generation.
-  - In current generator rules this includes `/login`, `/account`, `/forgot-password`, `/reset-password`, `/change-password`, `/register`, and `/verify-email`.
-- When `app.auth.enabled` is `true`, auth-protected routes are also excluded from sitemap generation.
-  - In current generator rules this includes collection routes, `index/:type`, `media-collection`, and `search`.
-
-### Static collection menus in auth mode
-
-- When `app.auth.enabled` is `true`, `prebuild-generate-static-collection-menus.js` skips generating static collection TOC HTML fragments.
-- `StaticHtmlComponent` also forces prebuilt collection menus off in auth mode, even if `app.prebuild.staticCollectionMenus` is `true` or missing.
-
-
-## TODOs
-
-Use this section for cross-cutting TODOs that should stay visible outside local code comments.
-
-### SSR route mode migration
-
-Current status:
-
-- Auth-protected routes are currently forced to client rendering in Express middleware in [`server.ts`](../server.ts), based on generated route-path metadata from [`src/app/auth-protected-route-paths.generated.ts`](../src/app/auth-protected-route-paths.generated.ts).
-- This is an implementation workaround for the current webpack-based SSR build setup.
-
-The standalone and zoneless migrations are planned first while the legacy builders remain in use. The subsequent migration to Angular's `application` builder (`@angular-devkit/build-angular:application`) is expected to introduce breaking changes. During that builder migration:
-
-- Investigate replacing the current middleware-based implementation with Angular server-routes configuration (`withRoutes` / `RenderMode.Client`) for auth-protected routes.
-- Validate compatibility with feature-based route generation before removing the current workaround.
-
-### nginx rate limiting for SSR backend
-
-- nginx rate limiting is currently not enabled; app-level limiting is handled in `server.ts` (`express-rate-limit`).
-- Consider re-enabling nginx edge rate limiting later for defense in depth.
-- Why postponed: correct per-user limiting in nginx depends on verified real client IP forwarding/trust configuration across proxy chain(s) (for example LB/HAProxy/nginx). A wrong config can collapse many users into one bucket or trust spoofable headers.
-
-### Main side menu articles wrapper label
-
-- Current behavior: when `config.component.mainSideMenu.ungroupArticles` is `false`, the wrapper item for article children gets its title from the root markdown menu node for articles.
-- In the same menu branch, individual article item titles are mapped from `config.articles`, so the wrapper-title source is inconsistent with the child item-title source.
-- Future breaking change to consider: make the wrapper title app-owned and localized through the Angular XLF files (like other menu wrapper labels), instead of reading it from the markdown node.
-- Reasoning: forks already customize localized XLF strings, so this keeps the menu label source consistent and avoids coupling the wrapper label to markdown menu metadata.
-
-### Hydration migration
-
-Current status:
-
-- Client hydration is not enabled in this app right now (Ionic SSR limitation).
-- `ngSkipHydration` is used only on Angular component hosts, never on plain HTML elements.
-- Facsimile image viewers are explicitly marked with `ngSkipHydration` as a temporary safeguard.
-- Media-collection thumbnails are also resolved through `FacsimileImageService`; in auth-enabled mode, browser `src` can become a blob URL after bootstrap.
-
-Current temporary markers:
-
-- [`src/app/components/collection-text-types/facsimiles/facsimiles.component.ts`](../src/app/components/collection-text-types/facsimiles/facsimiles.component.ts)
-- [`src/app/dialogs/modals/fullscreen-image-viewer/fullscreen-image-viewer.modal.ts`](../src/app/dialogs/modals/fullscreen-image-viewer/fullscreen-image-viewer.modal.ts)
-- [`src/app/components/gallery-thumb-image/gallery-thumb-image.component.ts`](../src/app/components/gallery-thumb-image/gallery-thumb-image.component.ts)
-- [`src/app/app.component.html`](../src/app/app.component.html) (auth-enabled mode: `top-menu` and `main-side-menu` are marked with `ngSkipHydration`)
-
-Related implementation notes:
-
-- [`src/app/components/collection-text-types/facsimiles/facsimiles.component.ts`](../src/app/components/collection-text-types/facsimiles/facsimiles.component.ts)
-- [`src/app/dialogs/modals/fullscreen-image-viewer/fullscreen-image-viewer.modal.ts`](../src/app/dialogs/modals/fullscreen-image-viewer/fullscreen-image-viewer.modal.ts)
-- [`src/app/components/gallery-thumb-image/gallery-thumb-image.component.ts`](../src/app/components/gallery-thumb-image/gallery-thumb-image.component.ts)
-- [`src/app/pages/media-collection/media-collection.page.ts`](../src/app/pages/media-collection/media-collection.page.ts)
-
-Why:
-
-- In auth-enabled mode, browser rendering may replace URL-based image `src` values with blob URLs after bootstrap.
-- If hydration is enabled later, this can cause SSR/client DOM differences unless initial `src` is deterministic.
-- This also applies to media-collection thumbnail images resolved via `FacsimileImageService`.
-
-Exit criteria:
-
-1. Hydration is enabled in the app.
-2. Facsimile and media-collection image `src` initialization is made hydration-safe (deterministic SSR/client initial value).
-3. Remove `ngSkipHydration` markers and remove/update the local TODO comments above.
-
+- Enable it with `app.auth.enabled` in [`src/assets/config/config.ts`](../src/assets/config/config.ts).
+- Protect route declarations with `authGuard`; auth-related production route metadata is generated by `npm run generate-routes`.
+- Because tokens are stored in browser storage rather than cookies, auth-protected routes receive a client-rendered shell instead of SSR when authentication is enabled.
+- Session startup validation, token refresh, redirects, sitemap behavior, static collection menus, and the manual regression checklist are documented in the [authentication guide](AUTHENTICATION.md).
 
 
 ## SSR smoke test (local or remote)
@@ -573,11 +514,18 @@ What the benchmark reports:
 
 
 
+## TODOs
+
+Cross-cutting future work that should stay visible outside local code comments is tracked in [`docs/TODO.md`](TODO.md).
+
+
 [angular_update_guide]: https://update.angular.io/
 [docker_compose_file]: ../compose.yml
 [docker_desktop]: https://www.docker.com/products/docker-desktop/
 [dockerfile]: ../Dockerfile
-[npm_epubjs]: https://www.npmjs.com/package/epubjs
+[npm_dom-serializer]: https://www.npmjs.com/package/dom-serializer
+[npm_domhandler]: https://www.npmjs.com/package/domhandler
+[npm_domutils]: https://www.npmjs.com/package/domutils
 [npm_express]: https://www.npmjs.com/package/express
 [npm_express-rate-limit]: https://www.npmjs.com/package/express-rate-limit
 [npm_htmlparser2]: https://www.npmjs.com/package/htmlparser2
@@ -587,7 +535,6 @@ What the benchmark reports:
 [npm_marked-footnote]: https://www.npmjs.com/package/marked-footnote
 [npm_rxjs]: https://www.npmjs.com/package/rxjs
 [npm_tslib]: https://www.npmjs.com/package/tslib
-[npm_zone.js]: https://www.npmjs.com/package/zone.js
 [npm_browser-sync]: https://www.npmjs.com/package/browser-sync
 [npm_gzipper]: https://www.npmjs.com/package/gzipper
 [npm_ng-extract-i18n-merge]: https://www.npmjs.com/package/ng-extract-i18n-merge

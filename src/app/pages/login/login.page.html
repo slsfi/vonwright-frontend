@@ -1,5 +1,5 @@
-@let loginErrorValue = loginError();
-@let loginInProgressValue = loginInProgress();
+@let loginError = this.loginError();
+@let loginInProgress = this.loginInProgress();
 
 <ion-content>
   <article>
@@ -15,7 +15,7 @@
         labelPlacement="stacked"
         autocomplete="email"
         inputmode="email"
-        [readonly]="loginInProgressValue"
+        [readonly]="loginInProgress"
         (ionInput)="clearAuthError()"
         i18n-label="@@Login.EmailLabel"
         label="E-postadress"
@@ -43,7 +43,7 @@
         fill="outline"
         labelPlacement="stacked"
         autocomplete="current-password"
-        [readonly]="loginInProgressValue"
+        [readonly]="loginInProgress"
         (ionInput)="clearAuthError()"
         i18n-label="@@Login.PasswordLabel"
         label="Lösenord"
@@ -53,20 +53,20 @@
       
       <p class="forgot-password"><a [routerLink]="['/forgot-password']" i18n="@@Login.ForgotPassword">Glömt lösenordet?</a></p>
 
-      @if (loginErrorValue) {
-        @if (loginErrorValue === 'invalid_credentials') {
+      @if (loginError) {
+        @if (loginError === 'invalid_credentials') {
           <auth-status-message
             type="error"
             i18n-message="@@Login.InvalidCredentials"
             message="Fel e-postadress eller lösenord."
           ></auth-status-message>
-        } @else if (loginErrorValue === 'email_not_verified') {
+        } @else if (loginError === 'email_not_verified') {
           <auth-status-message
             type="error"
             i18n-message="@@Login.EmailNotVerified"
             message="Du måste verifiera din e-postadress innan du kan logga in. Kontrollera din inkorg för ett e-postmeddelande med en verifieringslänk. Om länken har gått ut eller om du inte har fått något e-postmeddelande måste du registrera dig igen."
           ></auth-status-message>
-        } @else if (loginErrorValue === 'no_credentials') {
+        } @else if (loginError === 'no_credentials') {
           <auth-status-message
             type="error"
             i18n-message="@@Login.NoCredentials"
@@ -85,16 +85,16 @@
         class="custom-button"
         type="submit"
         expand="block"
-        [disabled]="form.invalid || loginInProgressValue"
+        [disabled]="form.invalid || loginInProgress"
       >
         <span class="button-content">
           <ion-spinner
             class="button-spinner"
-            [class.hide-spinner]="!loginInProgressValue"
+            [class.hide-spinner]="!loginInProgress"
             name="crescent"
             aria-hidden="true"
           ></ion-spinner>
-          @if (loginInProgressValue) {
+          @if (loginInProgress) {
             <ng-container i18n="@@Login.InProgress">Loggar in ...</ng-container>
           } @else {
             <ng-container i18n="@@Login.SubmitButton">Logga in</ng-container>

@@ -1,4 +1,7 @@
+@let article = this.article();
+@let enableTOC = this.enableTOC();
 @let renderedHtml = markdownText$ | async;
+@let tocMenuOpen = this.tocMenuOpen();
 
 <ion-header class="ion-no-border">
   <ion-toolbar class="secondary">

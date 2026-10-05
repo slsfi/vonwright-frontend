@@ -1,8 +1,10 @@
-@if (flattenedToc().length) {
-  @let nav = navItems();
-  @let prev = nav.prev;
-  @let current = nav.current;
-  @let next = nav.next;
+@let flattenedToc = this.flattenedToc();
+
+@if (flattenedToc.length) {
+  @let navItems = this.navItems();
+  @let prev = navItems.prev;
+  @let current = navItems.current;
+  @let next = navItems.next;
 
   <div class="text-changer-wrapper"
         [class.mobile-mode]="mobileMode"

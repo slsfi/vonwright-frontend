@@ -21,8 +21,9 @@ import { isBrowser } from '@utility-functions';
  * on MacBooks with MacOS.
  * 
  * Since the app mode must be set to the same both on the server and in the
- * browser, we can only use the user agent string to set the mode. If the SSR
- * app runs in one mode, and the browser app in another, hydration fails.
+ * browser, we can only use the user agent string to set the mode. A mismatch
+ * changes the rendered layout during client bootstrap and would also make a
+ * future client-hydration setup unsafe.
  * 
  * Preferrably we wouldn't need to do browser sniffing and instead rely
  * solely on a responsive design. However, with the current layout

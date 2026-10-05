@@ -20,6 +20,8 @@ The app is built on [Angular][angular] and uses [Ionic][ionic] web components.
 
 ## Documentation
 
+- [Authentication](docs/AUTHENTICATION.md).
+- [Theming](docs/THEMING.md).
 - [Updating, building and deployment](docs/DEPLOYMENT.md).
 - [Development notes](docs/DEVELOPMENT.md).
 

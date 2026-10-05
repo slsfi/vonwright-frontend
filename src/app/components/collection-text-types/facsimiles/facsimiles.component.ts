@@ -1,7 +1,7 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, Injector, effect, inject, input, output, signal } from '@angular/core';
+import { Component, DestroyRef, Injector, effect, inject, input, output, signal } from '@angular/core';
 import { NgStyle } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { AlertButton, AlertController, AlertInput, IonicModule, ModalController } from '@ionic/angular/lazy';
+import { AlertButton, AlertController, AlertInput, IonButton, IonFab, IonFabButton, IonIcon, IonInput, IonSpinner, ModalController } from '@ionic/angular';
 import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 import { catchError, of, switchMap, tap } from 'rxjs';
 
@@ -24,8 +24,7 @@ import { sortArrayOfObjectsNumerically } from '@utility-functions';
   selector: 'facsimiles',
   templateUrl: './facsimiles.component.html',
   styleUrls: ['./facsimiles.component.scss'],
-  imports: [NgStyle, FormsModule, IonicModule, DraggableImageDirective, TrustHtmlPipe],
-  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [NgStyle, FormsModule, IonButton, IonFab, IonFabButton, IonIcon, IonInput, IonSpinner, DraggableImageDirective, TrustHtmlPipe],
   host: { ngSkipHydration: 'true' }
 })
 export class FacsimilesComponent {

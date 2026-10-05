@@ -1,18 +1,19 @@
-@let pdfDataValue = pdfData();
-@let pdfDownloadOptions = pdfDataValue?.downloadOptions ?? [];
-@let pageNumberValue = pageNumber();
-@let pdfURLValue = pdfURL();
-@let downloadPopoverOpen = downloadPopoverIsOpen();
+@let downloadPopoverIsOpen = this.downloadPopoverIsOpen();
+@let pageNumber = this.pageNumber();
+@let pdfData = this.pdfData();
+@let pdfDownloadOptions = pdfData?.downloadOptions ?? [];
+@let pdfFileName = this.pdfFileName();
+@let pdfURL = this.pdfURL();
 
 <ion-header class="ion-no-border">
   <ion-toolbar class="secondary">
 
-    @if (pdfDataValue) {
-      @if (pdfDataValue.title) {
+    @if (pdfData) {
+      @if (pdfData.title) {
         <div class="pdf-title-wrapper">
-          <h1>{{ pdfDataValue.title }}</h1>
-          @if (pageNumberValue) {
-            <p><ng-container i18n="@@PdfViewer.Page">sida</ng-container> {{pageNumberValue}}</p>
+          <h1>{{ pdfData.title }}</h1>
+          @if (pageNumber) {
+            <p><ng-container i18n="@@PdfViewer.Page">sida</ng-container> {{pageNumber}}</p>
           }
         </div>
       }
@@ -40,7 +41,7 @@
                 alignment="end"
                 [showBackdrop]="true"
                 [backdropDismiss]="true"
-                [isOpen]="downloadPopoverOpen"
+                [isOpen]="downloadPopoverIsOpen"
                 (didDismiss)="closeDownloadPopover()"
           >
             <ng-template>
@@ -104,10 +105,10 @@
 </ion-header>
 
 <ion-content class="no-padding" [scrollX]="false" [scrollY]="false">
-  @if (pdfURLValue) {
-    <object [data]="pdfURLValue" type="application/pdf">
+  @if (pdfURL) {
+    <object [data]="pdfURL" type="application/pdf">
       <p class="no-support">
-        <ng-container i18n="@@PdfViewer.NoBrowserSupport">Din webbläsare stöder inte PDF-filer. Ladda ner PDF:en för att läsa den:</ng-container>&nbsp;<a [href]="pdfURLValue" i18n="@@PdfViewer.DownloadPdf" [download]="pdfFileName()">ladda ner PDF</a>.
+        <ng-container i18n="@@PdfViewer.NoBrowserSupport">Din webbläsare stöder inte PDF-filer. Ladda ner PDF:en för att läsa den:</ng-container>&nbsp;<a [href]="pdfURL" i18n="@@PdfViewer.DownloadPdf" [download]="pdfFileName">ladda ner PDF</a>.
       </p>
     </object>
   }

@@ -7,7 +7,8 @@ import { Injectable } from '@angular/core';
  * - Browser code can persist auth tokens in web storage.
  * - Server-side rendering must not touch browser globals such as localStorage.
  *
- * Platform-specific implementations are provided in AppModule/AppServerModule.
+ * Platform-specific implementations are selected by the browser/server
+ * application configurations.
  */
 export abstract class AuthTokenStorageService {
   /**

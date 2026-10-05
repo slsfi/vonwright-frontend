@@ -1,5 +1,22 @@
+@let activeComponent = this.activeComponent();
 @let viewOptions = viewOptionsService.show();
 @let textsize = viewOptionsService.textsize();
+@let showSeparateIntroToc = this.showSeparateIntroToc();
+@let infoOverlayPosition = this.infoOverlayPosition();
+@let infoOverlayPosType = this.infoOverlayPosType();
+@let infoOverlayText = this.infoOverlayText();
+@let infoOverlayTitle = this.infoOverlayTitle();
+@let infoOverlayTriggerElem = this.infoOverlayTriggerElem();
+@let infoOverlayWidth = this.infoOverlayWidth();
+@let text = this.text();
+@let textLoading = this.textLoading();
+@let textMenu = this.textMenu();
+@let tocMenuOpen = this.tocMenuOpen();
+@let toolTipMaxWidth = this.toolTipMaxWidth();
+@let toolTipPosition = this.toolTipPosition();
+@let toolTipPosType = this.toolTipPosType();
+@let toolTipScaleValue = this.toolTipScaleValue();
+@let toolTipText = this.toolTipText();
 
 <ion-header class="ion-no-border">
   <ion-toolbar class="secondary">
@@ -7,7 +24,7 @@
     @if (!mobileMode) {
       <text-changer slot="start"
             [parentPageType]="'introduction'"
-            [ionViewActive]="_activeComponent"
+            [ionViewActive]="activeComponent"
             class="text-changer-desktop-mode"
       ></text-changer>
     }
@@ -31,7 +48,7 @@
           <span class="side-title" i18n="@@ViewOptions.Settings">Inställningar</span>
         </ion-button>
       }
-      @if (hasSeparateIntroToc) {
+      @if (showSeparateIntroToc) {
         <ion-button [ngClass]="tocMenuOpen ? 'menuOpenTOC' : 'menuClosedTOC'" (click)="toggleTocMenu()">
           @if (!tocMenuOpen) {
             <ion-icon slot="start" name="list"></ion-icon>
@@ -71,7 +88,7 @@
           [class.show_workInfo]="viewOptions.workInfo && viewOptionsTogglesIntro.workInfo"
           [class.show_paragraphNumbering]="viewOptions.paragraphNumbering && viewOptionsTogglesIntro.paragraphNumbering"
           [class.show_pageBreakEdition]="viewOptions.pageBreakEdition && viewOptionsTogglesIntro.pageBreakEdition"
-          [class.hideIntro]="hasSeparateIntroToc"
+          [class.hideIntro]="showSeparateIntroToc"
           [innerHTML]="text | trustHtml"
     ></div>
 
@@ -121,7 +138,7 @@
   </article>
 
   <!-- Introduction table of contents -->
-  @if (hasSeparateIntroToc && tocMenuOpen) {
+  @if (showSeparateIntroToc && tocMenuOpen) {
     <nav id="TOC">
       @if (!mobileMode) {
         <div id="toc-close-button" (click)="toggleTocMenu()">
@@ -144,7 +161,7 @@
 @if (mobileMode) {
   <text-changer
         [parentPageType]="'introduction'"
-        [ionViewActive]="_activeComponent"
+        [ionViewActive]="activeComponent"
         class="text-changer-mobile-mode"
   ></text-changer>
 }

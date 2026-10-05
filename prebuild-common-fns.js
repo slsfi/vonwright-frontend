@@ -62,16 +62,27 @@ async function fetchFromAPI(endpoint) {
   }
 }
 
-async function fetchWithRetry(url, attempts = 3, delay = 2000) {
+/**
+ * Fetch JSON from an API, retrying failed requests with an optional linear cooldown.
+ * @param {string} url
+ * @param {number} retries Number of retries after the initial request.
+ * @param {number} delay Delay before the first retry in milliseconds.
+ * @param {number} delayIncrement Milliseconds added before each subsequent retry.
+ */
+async function fetchWithRetry(url, retries = 2, delay = 2000, delayIncrement = 0) {
+  const attempts = retries + 1;
+
   for (let attempt = 1; attempt <= attempts; attempt++) {
     const result = await fetchFromAPI(url);
     if (result) return result;
     if (attempt < attempts) {
-      console.warn(`Fetch failed (${attempt}/${attempts}) for ${url}. Retrying in ${delay}ms...`);
-      await sleep(delay);
+      const retry = attempt;
+      const retryDelay = delay + ((retry - 1) * delayIncrement);
+      console.warn(`Fetch failed for ${url}. Retrying (${retry}/${retries}) in ${retryDelay}ms...`);
+      await sleep(retryDelay);
     }
   }
-  console.error(`Fetch failed (${attempts}/${attempts}) for ${url}.`);
+  console.error(`Fetch failed for ${url} after ${attempts} attempts (${retries} retries).`);
   return null;
 }
 

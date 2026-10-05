@@ -23,7 +23,7 @@ For example, if the base app is on version `1.0.2`, the release targets the `pro
 
 The Docker images built this way are pushed to and stored in the [GitHub Container Registry][ghcr_docs].
 
-The production build command `npm run build:ssr` runs route generation before compiling Angular. Feature-based route/module exclusion is disabled by default and can be enabled in [`src/assets/config/config.ts`][config_ts] by setting `app.prebuild.featureBasedRoutes` to `true`.
+The production build command `npm run build:ssr` runs route generation before compiling Angular. Feature-based route exclusion is disabled by default and can be enabled in [`src/assets/config/config.ts`][config_ts] by setting `app.prebuild.featureBasedRoutes` to `true`.
 
 **Important!** Before creating a new release, push a commit that updates:
 

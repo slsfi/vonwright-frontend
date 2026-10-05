@@ -1,7 +1,9 @@
-import { Component, OnDestroy, OnInit, inject, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnDestroy, OnInit, inject, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { IonContent } from '@ionic/angular';
 import { Subscription } from 'rxjs';
 
+import { PdfViewerComponent } from '@components/pdf-viewer/pdf-viewer.component';
 import { config } from '@config';
 import { Ebook } from '@models/ebook.models';
 import { splitFilename } from '@utility-functions';
@@ -11,15 +13,14 @@ import { splitFilename } from '@utility-functions';
   selector: 'page-ebook',
   templateUrl: './ebook.page.html',
   styleUrls: ['./ebook.page.scss'],
-  changeDetection: ChangeDetectionStrategy.Eager,
-  standalone: false
+  imports: [IonContent, PdfViewerComponent]
 })
 export class EbookPage implements OnDestroy, OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
 
-  ebookType: string = '';
-  filename: string = '';
+  readonly ebookType = signal('');
+  readonly filename = signal('');
   routeParamsSubscr: Subscription | null = null;
   title: string = '';
 
@@ -39,9 +40,9 @@ export class EbookPage implements OnDestroy, OnInit {
       } else {
         const requestedFilename = `${params.name}.${params.type}`;
         const reqEbook = availableEbooks.find(ebook => ebook.filename === requestedFilename);
-        this.filename = reqEbook?.filename ?? '';
+        this.filename.set(reqEbook?.filename ?? '');
         this.title = reqEbook?.title ?? '';
-        this.ebookType = params.type;
+        this.ebookType.set(params.type);
       }
     });
   }

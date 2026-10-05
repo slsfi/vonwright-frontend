@@ -1,5 +1,5 @@
-import { ChangeDetectionStrategy, Component, Input, OnInit, computed, inject } from '@angular/core';
-import { IonicModule, PopoverController } from '@ionic/angular/lazy';
+import { Component, Input, OnInit, computed, inject } from '@angular/core';
+import { IonButton, IonIcon, IonItem, IonLabel, IonList, IonListHeader, IonRadio, IonRadioGroup, IonToggle, PopoverController } from '@ionic/angular';
 
 import { config } from '@config';
 import { Textsize, ViewFlags } from '@models/view-options.models';
@@ -28,10 +28,12 @@ function isFlagKey(k: string): k is FlagKey {
   selector: 'popover-view-options',
   templateUrl: './view-options.popover.html',
   styleUrls: ['./view-options.popover.scss'],
-  imports: [IonicModule],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  imports: [IonButton, IonIcon, IonItem, IonLabel, IonList, IonListHeader, IonRadio, IonRadioGroup, IonToggle]
 })
 export class ViewOptionsPopover implements OnInit {
+  // ─────────────────────────────────────────────────────────────────────────────
+  // Dependency injection, @Input properties, local state
+  // ─────────────────────────────────────────────────────────────────────────────
   private popoverCtrl = inject(PopoverController);
   protected viewOptionsService = inject(ViewOptionsService);
 
@@ -60,6 +62,9 @@ export class ViewOptionsPopover implements OnInit {
     return n;
   });
 
+  // ─────────────────────────────────────────────────────────────────────────────
+  // Lifecycle wiring
+  // ─────────────────────────────────────────────────────────────────────────────
   ngOnInit() {
     // If the parent provided explicit visibility, use that; otherwise fall back to config.
     if (this.toggles && Object.keys(this.toggles).length > 0) {
@@ -82,6 +87,9 @@ export class ViewOptionsPopover implements OnInit {
     }
   }
 
+  // ─────────────────────────────────────────────────────────────────────────────
+  // Public UI actions (called from template)
+  // ─────────────────────────────────────────────────────────────────────────────
   close() {
     this.popoverCtrl.dismiss();
   }

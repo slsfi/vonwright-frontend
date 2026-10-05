@@ -1,12 +1,40 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, ElementRef, Injector, LOCALE_ID, NgZone, OnInit, Renderer2, afterNextRender, inject, signal, viewChild, viewChildren } from '@angular/core';
+import { AsyncPipe, NgStyle, NgTemplateOutlet } from '@angular/common';
+import { Component, DestroyRef, ElementRef, Injector, LOCALE_ID, OnInit, Renderer2, afterNextRender, inject, signal, viewChild, viewChildren } from '@angular/core';
 import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 import { ActivatedRoute } from '@angular/router';
-import { IonFabButton, IonFabList, IonPopover, ModalController, PopoverController } from '@ionic/angular/lazy';
-import { distinctUntilChanged, Observable } from 'rxjs';
+import {
+  IonButton,
+  IonButtons,
+  IonContent,
+  IonFab,
+  IonFabButton,
+  IonFabList,
+  IonHeader,
+  IonIcon,
+  IonPopover,
+  IonSelect,
+  IonSelectOption,
+  IonSpinner,
+  IonToolbar,
+  ModalController,
+  PopoverController
+} from '@ionic/angular';
+import { Observable } from 'rxjs';
 
+import { CommentsComponent } from '@components/collection-text-types/comments/comments.component';
+import { FacsimilesComponent } from '@components/collection-text-types/facsimiles/facsimiles.component';
+import { IllustrationsComponent } from '@components/collection-text-types/illustrations/illustrations.component';
+import { LegendComponent } from '@components/collection-text-types/legend/legend.component';
+import { ManuscriptsComponent } from '@components/collection-text-types/manuscripts/manuscripts.component';
+import { MetadataComponent } from '@components/collection-text-types/metadata/metadata.component';
+import { ReadingTextComponent } from '@components/collection-text-types/reading-text/reading-text.component';
+import { VariantsComponent } from '@components/collection-text-types/variants/variants.component';
+import { TextChangerComponent } from '@components/text-changer/text-changer.component';
 import { config } from '@config';
+import { MathJaxDirective } from '@directives/math-jax.directive';
 import { TextKey, ViewState, ViewType, ViewUid } from '@models/collection.models';
 import { Illustration } from '@models/illustration.models';
+import { TrustHtmlPipe } from '@pipes/trust-html.pipe';
 import { CollectionContentService } from '@services/collection-content.service';
 import { CollectionsService } from '@services/collections.service';
 import { DocumentHeadService } from '@services/document-head.service';
@@ -28,8 +56,35 @@ import { enableFrontMatterPageOrTextViewType, isBrowser, moveArrayItem } from '@
   selector: 'page-text',
   templateUrl: './collection-text.page.html',
   styleUrls: ['./collection-text.page.scss'],
-  standalone: false,
-  changeDetection: ChangeDetectionStrategy.OnPush
+  imports: [
+    AsyncPipe,
+    CommentsComponent,
+    FacsimilesComponent,
+    IllustrationsComponent,
+    IonButton,
+    IonButtons,
+    IonContent,
+    IonFab,
+    IonFabButton,
+    IonFabList,
+    IonHeader,
+    IonIcon,
+    IonPopover,
+    IonSelect,
+    IonSelectOption,
+    IonSpinner,
+    IonToolbar,
+    LegendComponent,
+    ManuscriptsComponent,
+    MathJaxDirective,
+    MetadataComponent,
+    NgStyle,
+    NgTemplateOutlet,
+    ReadingTextComponent,
+    TextChangerComponent,
+    TrustHtmlPipe,
+    VariantsComponent
+  ]
 })
 export class CollectionTextPage implements OnInit {
   // ─────────────────────────────────────────────────────────────────────────────
@@ -42,7 +97,6 @@ export class CollectionTextPage implements OnInit {
   private headService = inject(DocumentHeadService);
   private injector = inject(Injector);
   private modalCtrl = inject(ModalController);
-  private ngZone = inject(NgZone);
   private parserService = inject(HtmlParserService);
   private platformService = inject(PlatformService);
   private popoverCtrl = inject(PopoverController);
@@ -60,13 +114,13 @@ export class CollectionTextPage implements OnInit {
   readonly fabColumnOptions = viewChildren<IonFabList>('fabColumnOptions');
   readonly fabColumnOptionsButton = viewChildren<IonFabButton>('fabColumnOptionsButton');
 
-  defaultViews: string[] = config.page?.text?.defaultViews ?? ['readingtext'];
-  readonly enableLegacyIDs: boolean = config.collections?.enableLegacyIDs;
+  private defaultViews: string[] = config.page?.text?.defaultViews ?? ['readingtext'];
+  private readonly legacyIDsEnabled: boolean = config.collections?.enableLegacyIDs ?? false;
   readonly multilingualReadingTextLanguages: string[] = config.app?.i18n?.multilingualReadingTextLanguages ?? [];
   readonly showTextDownloadButton: boolean = config.page?.text?.showTextDownloadButton ?? false;
   readonly showURNButton: boolean = config.page?.text?.showURNButton ?? true;
   readonly showViewOptionsButton: boolean = config.page?.text?.showViewOptionsButton ?? true;
-  readonly viewTypes: any = config.page?.text?.viewTypes ?? {};
+  private readonly viewTypes: any = config.page?.text?.viewTypes ?? {};
 
   private collectionAndPublicationLegacyId: string = '';
   private tooltipVisible: boolean = false;
@@ -80,38 +134,36 @@ export class CollectionTextPage implements OnInit {
   private unlistenMouseoutEvents?: () => void;
 
   protected currentPageTitle$: Observable<string> = this.headService.getCurrentPageTitle();
-  protected mobileMode = this.platformService.isMobile();
+  protected readonly mobileMode = this.platformService.isMobile();
 
-  activeComponent = signal<boolean>(true);
-  activeMobileModeViewIndex = signal<number>(0);
-  addViewPopoverisOpen = signal<boolean>(false);
-  enabledViewTypes = signal<string[]>([]);
-  illustrationsViewShown = signal<boolean>(false);
-  infoOverlayPosition = signal<{ bottom: string; left: string }>({
+  readonly activeComponent = signal(true);
+  readonly activeMobileModeViewIndex = signal(0);
+  readonly addViewPopoverisOpen = signal(false);
+  readonly enabledViewTypes = signal<string[]>([]);
+  readonly illustrationsViewShown = signal(false);
+  readonly infoOverlayPosition = signal<{ bottom: string; left: string }>({
     bottom: '0px',
     left: '-1500px',
   });
-  infoOverlayPosType = signal<'fixed' | 'absolute'>('fixed');
-  infoOverlayText = signal<string>('');
-  infoOverlayTitle = signal<string>('');
-  infoOverlayTriggerElem = signal<HTMLElement | null>(null);
-  infoOverlayWidth = signal<string | null>(null);
-  searchMatches = signal<string[]>([]);
-  textKey = signal<TextKey>({ collectionID: '', publicationID: '', textItemID: '' });
-  textPosition = signal<string>('');
-  toolTipMaxWidth = signal<string | null>(null);
-  toolTipPosition = signal<{ top: string; left: string }>({
+  readonly infoOverlayPosType = signal<'fixed' | 'absolute'>('fixed');
+  readonly infoOverlayText = signal('');
+  readonly infoOverlayTitle = signal('');
+  readonly infoOverlayTriggerElem = signal<HTMLElement | null>(null);
+  readonly infoOverlayWidth = signal<string | null>(null);
+  readonly searchMatches = signal<string[]>([]);
+  readonly textKey = signal<TextKey>({ collectionID: '', publicationID: '', textItemID: '' });
+  readonly textPosition = signal('');
+  readonly toolTipMaxWidth = signal<string | null>(null);
+  readonly toolTipPosition = signal<{ top: string; left: string }>({
     top: '0px',
     left: '-1500px'
   });
-  toolTipPosType = signal<'fixed' | 'absolute'>('fixed');
-  toolTipScaleValue = signal<number | null>(null);
-  toolTipText = signal<string>('');
-  views = signal<ViewState[]>([]);
+  readonly toolTipPosType = signal<'fixed' | 'absolute'>('fixed');
+  readonly toolTipScaleValue = signal<number | null>(null);
+  readonly toolTipText = signal('');
+  readonly views = signal<ViewState[]>([]);
 
-  private readonly active$ = toObservable(this.activeComponent).pipe(
-    distinctUntilChanged()
-  );
+  private readonly active$ = toObservable(this.activeComponent);
 
 
   // ─────────────────────────────────────────────────────────────────────────────
@@ -198,7 +250,7 @@ export class CollectionTextPage implements OnInit {
       this.collectionContentService.previousReadViewTextId = this.collectionContentService.readViewTextId;
       this.collectionContentService.readViewTextId = routeTextItemID;
 
-      if (this.enableLegacyIDs && isBrowser()) {
+      if (this.legacyIDsEnabled && isBrowser()) {
         this.setCollectionAndPublicationLegacyId(publicationID);
       }
 
@@ -833,458 +885,448 @@ export class CollectionTextPage implements OnInit {
   private setUpTextListeners() {
     const nElement: HTMLElement = this.elementRef.nativeElement;
 
-    this.ngZone.runOutsideAngular(() => {
+    /* CHECK ONCE IF THE USER IF TOUCHING THE SCREEN */
+    this.unlistenFirstTouchStartEvent = this.renderer2.listen(nElement, 'touchstart', (event) => {
+      this.userIsTouching = true;
+      // Don't listen for keyup enter, mouseover and mouseout
+      // events since they should have no effect on touch devices
+      this.unlistenKeyUpEnterEvents?.();
+      this.unlistenMouseoverEvents?.();
+      this.unlistenMouseoutEvents?.();
+      this.unlistenFirstTouchStartEvent?.();
+    });
 
-      /* CHECK ONCE IF THE USER IF TOUCHING THE SCREEN */
-      this.unlistenFirstTouchStartEvent = this.renderer2.listen(nElement, 'touchstart', (event) => {
-        this.userIsTouching = true;
-        // Don't listen for keyup enter, mouseover and mouseout
-        // events since they should have no effect on touch devices
-        this.unlistenKeyUpEnterEvents?.();
-        this.unlistenMouseoverEvents?.();
-        this.unlistenMouseoutEvents?.();
-        this.unlistenFirstTouchStartEvent?.();
-      });
+    /* KEY UP ENTER EVENTS */
+    // For keyboard navigation to work on semantic information in
+    // dynamically loaded content we need to convert keyup events
+    // on the Enter key to click events, since spans are used for
+    // them and they won't natively trigger click events on Enter
+    // key hits.
+    this.unlistenKeyUpEnterEvents = this.renderer2.listen(nElement, 'keyup.enter', (event) => {
+      const keyTarget = event.target as HTMLElement;
+      if (
+        keyTarget?.tagName !== 'A' &&
+        keyTarget?.tagName !== 'BUTTON' &&
+        (
+          keyTarget?.classList.contains('tooltiptrigger') ||
+          keyTarget?.classList.contains('figureP')
+        )
+      ) {
+        keyTarget.click();
+      }
+    });
 
-      /* KEY UP ENTER EVENTS */
-      // For keyboard navigation to work on semantic information in
-      // dynamically loaded content we need to convert keyup events
-      // on the Enter key to click events, since spans are used for
-      // them and they won't natively trigger click events on Enter
-      // key hits.
-      this.unlistenKeyUpEnterEvents = this.renderer2.listen(nElement, 'keyup.enter', (event) => {
-        const keyTarget = event.target as HTMLElement;
-        if (
-          keyTarget?.tagName !== 'A' &&
-          keyTarget?.tagName !== 'BUTTON' &&
-          (
-            keyTarget?.classList.contains('tooltiptrigger') ||
-            keyTarget?.classList.contains('figureP')
-          )
-        ) {
-          keyTarget.click();
-        }
-      });
+    /* CLICK EVENTS */
+    this.unlistenClickEvents = this.renderer2.listen(nElement, 'click', (event) => {
+      if (!this.userIsTouching) {
+        this.hideToolTip();
+      }
 
-      /* CLICK EVENTS */
-      this.unlistenClickEvents = this.renderer2.listen(nElement, 'click', (event) => {
-        if (!this.userIsTouching) {
-          this.ngZone.run(() => this.hideToolTip());
-        }
+      if (event?.target?.classList.contains('close-info-overlay')) {
+        this.hideInfoOverlay();
+        return;
+      }
 
-        if (event?.target?.classList.contains('close-info-overlay')) {
-          this.ngZone.run(() => this.hideInfoOverlay());
-          return;
-        }
+      let eventTarget = this.getEventTarget(event);
+      let modalShown = false;
+      const viewOptions = this.viewOptionsService.show();
 
-        let eventTarget = this.getEventTarget(event);
-        let modalShown = false;
-        const viewOptions = this.viewOptionsService.show();
-
-        // Modal trigger for person-, place- or workinfo and info overlay trigger for footnote and comment.
-        // Loop needed for finding correct tooltip trigger when there are nested triggers.
-        while (!modalShown && eventTarget['classList'].contains('tooltiptrigger')) {
-          if (eventTarget.hasAttribute('data-id')) {
-            if (
-              eventTarget['classList'].contains('person') &&
-              viewOptions.personInfo
-            ) {
-              this.ngZone.run(() => {
-                this.showSemanticDataObjectModal(eventTarget.getAttribute('data-id'), 'subject');
-              });
-              modalShown = true;
-            } else if (
-              eventTarget['classList'].contains('placeName') &&
-              viewOptions.placeInfo
-            ) {
-              this.ngZone.run(() => {
-                this.showSemanticDataObjectModal(eventTarget.getAttribute('data-id'), 'location');
-              });
-              modalShown = true;
-            } else if (
-              eventTarget['classList'].contains('title') &&
-              viewOptions.workInfo
-            ) {
-              this.ngZone.run(() => {
-                this.showSemanticDataObjectModal(eventTarget.getAttribute('data-id'), 'work');
-              });
-              modalShown = true;
-            } else if (
-              eventTarget['classList'].contains('comment') &&
-              viewOptions.comments
-            ) {
-              // The user has clicked a comment lemma ("asterisk") in the reading-text.
-              // Check if comments view is shown.
-              const viewTypesShown = this.getViewTypesShown();
-              const commentsViewIsShown = viewTypesShown.includes('comments');
-              if (commentsViewIsShown && !this.mobileMode) {
-                // Scroll to comment in comments view and scroll lemma in reading-text view.
-                const numId = eventTarget.getAttribute('data-id').replace( /^\D+/g, '');
-                const targetId = 'start' + numId;
-                const lemmaStart = this.scrollService.findElementInColumnByAttribute(
-                  'data-id', targetId, 'reading-text'
-                );
-
-                if (lemmaStart) {
-                  // Scroll to start of lemma in reading text and temporarily prepend arrow.
-                  this.scrollService.scrollToCommentLemma(lemmaStart);
-                  // Scroll to comment in the comments-column.
-                  this.scrollService.scrollToComment(numId);
-                }
-              } else {
-                // If a comments view isn't shown or viewmode is mobile,
-                // show comment in infoOverlay.
-                this.ngZone.run(() => {
-                  this.showCommentInfoOverlay(eventTarget.getAttribute('data-id'), eventTarget);
-                });
-              }
-              modalShown = true;
-            } else if (
-              eventTarget['classList'].contains('ttFoot') &&
-              eventTarget['classList'].contains('teiManuscript')
-            ) {
-              // Footnote reference clicked in manuscript column
-              this.ngZone.run(() => {
-                this.showFootnoteInfoOverlay(
-                  eventTarget.getAttribute('data-id'), 'manuscript', eventTarget
-                );
-              });
-              modalShown = true;
-            } else if (eventTarget['classList'].contains('ttFoot')) {
-              // Footnote reference clicked in reading text
-              this.ngZone.run(() => {
-                this.showFootnoteInfoOverlay(
-                  eventTarget.getAttribute('data-id'), 'reading-text', eventTarget
-                );
-              });
-              modalShown = true;
-            }
-          } else if (
-            (
-              (
-                eventTarget['classList'].contains('ttChanges') ||
-                eventTarget['classList'].contains('ttEmendations')
-               ) &&
-              viewOptions.emendations
-            ) ||
-            (
-              eventTarget['classList'].contains('ttNormalisations') &&
-              viewOptions.normalisations
-            ) ||
-            (
-              eventTarget['classList'].contains('ttAbbreviations') &&
-              viewOptions.abbreviations
-            )
+      // Modal trigger for person-, place- or workinfo and info overlay trigger for footnote and comment.
+      // Loop needed for finding correct tooltip trigger when there are nested triggers.
+      while (!modalShown && eventTarget['classList'].contains('tooltiptrigger')) {
+        if (eventTarget.hasAttribute('data-id')) {
+          if (
+            eventTarget['classList'].contains('person') &&
+            viewOptions.personInfo
           ) {
-            this.ngZone.run(() => {
-              this.showInfoOverlayFromInlineHtml(eventTarget);
-            });
+            this.showSemanticDataObjectModal(eventTarget.getAttribute('data-id'), 'subject');
             modalShown = true;
           } else if (
-            eventTarget['classList'].contains('ttMs') ||
-            eventTarget['classList'].contains('tooltipMs')
+            eventTarget['classList'].contains('placeName') &&
+            viewOptions.placeInfo
           ) {
-            if (
-              eventTarget['classList'].contains('unclear') ||
-              eventTarget['classList'].contains('gap') ||
-              eventTarget['classList'].contains('marginalia')
-            ) {
-              // Editorial note about unclear text or text in margin,
-              // should be clickable only in the reading text column.
-              let parentElem: any = eventTarget;
+            this.showSemanticDataObjectModal(eventTarget.getAttribute('data-id'), 'location');
+            modalShown = true;
+          } else if (
+            eventTarget['classList'].contains('title') &&
+            viewOptions.workInfo
+          ) {
+            this.showSemanticDataObjectModal(eventTarget.getAttribute('data-id'), 'work');
+            modalShown = true;
+          } else if (
+            eventTarget['classList'].contains('comment') &&
+            viewOptions.comments
+          ) {
+            // The user has clicked a comment lemma ("asterisk") in the reading-text.
+            // Check if comments view is shown.
+            const viewTypesShown = this.getViewTypesShown();
+            const commentsViewIsShown = viewTypesShown.includes('comments');
+            if (commentsViewIsShown && !this.mobileMode) {
+              // Scroll to comment in comments view and scroll lemma in reading-text view.
+              const numId = eventTarget.getAttribute('data-id').replace( /^\D+/g, '');
+              const targetId = 'start' + numId;
+              const lemmaStart = this.scrollService.findElementInColumnByAttribute(
+                'data-id', targetId, 'reading-text'
+              );
+
+              if (lemmaStart) {
+                // Scroll to start of lemma in reading text and temporarily prepend arrow.
+                this.scrollService.scrollToCommentLemma(lemmaStart);
+                // Scroll to comment in the comments-column.
+                this.scrollService.scrollToComment(numId);
+              }
+            } else {
+              // If a comments view isn't shown or viewmode is mobile,
+              // show comment in infoOverlay.
+              this.showCommentInfoOverlay(eventTarget.getAttribute('data-id'), eventTarget);
+            }
+            modalShown = true;
+          } else if (
+            eventTarget['classList'].contains('ttFoot') &&
+            eventTarget['classList'].contains('teiManuscript')
+          ) {
+            // Footnote reference clicked in manuscript column
+            this.showFootnoteInfoOverlay(
+              eventTarget.getAttribute('data-id'), 'manuscript', eventTarget
+            );
+            modalShown = true;
+          } else if (eventTarget['classList'].contains('ttFoot')) {
+            // Footnote reference clicked in reading text
+            this.showFootnoteInfoOverlay(
+              eventTarget.getAttribute('data-id'), 'reading-text', eventTarget
+            );
+            modalShown = true;
+          }
+        } else if (
+          (
+            (
+              eventTarget['classList'].contains('ttChanges') ||
+              eventTarget['classList'].contains('ttEmendations')
+              ) &&
+            viewOptions.emendations
+          ) ||
+          (
+            eventTarget['classList'].contains('ttNormalisations') &&
+            viewOptions.normalisations
+          ) ||
+          (
+            eventTarget['classList'].contains('ttAbbreviations') &&
+            viewOptions.abbreviations
+          )
+        ) {
+          this.showInfoOverlayFromInlineHtml(eventTarget);
+          modalShown = true;
+        } else if (
+          eventTarget['classList'].contains('ttMs') ||
+          eventTarget['classList'].contains('tooltipMs')
+        ) {
+          if (
+            eventTarget['classList'].contains('unclear') ||
+            eventTarget['classList'].contains('gap') ||
+            eventTarget['classList'].contains('marginalia')
+          ) {
+            // Editorial note about unclear text or text in margin,
+            // should be clickable only in the reading text column.
+            let parentElem: any = eventTarget;
+            parentElem = parentElem.parentElement;
+            while (parentElem !== null && parentElem.tagName !== 'READ-TEXT') {
               parentElem = parentElem.parentElement;
-              while (parentElem !== null && parentElem.tagName !== 'READ-TEXT') {
-                parentElem = parentElem.parentElement;
-              }
-              if (parentElem !== null) {
-                this.ngZone.run(() => {
-                  this.showInfoOverlayFromInlineHtml(eventTarget);
-                });
-                modalShown = true;
-              }
             }
-          } else if (
-            eventTarget.hasAttribute('id') &&
-            eventTarget['classList'].contains('ttFoot') &&
-            eventTarget['classList'].contains('teiVariant')
-          ) {
-            // Footnote reference clicked in variant.
-            this.ngZone.run(() => {
-              this.showFootnoteInfoOverlay(
-                eventTarget.getAttribute('id'), 'variant', eventTarget
-              );
-            });
-            modalShown = true;
-          } else if (
-            eventTarget['classList'].contains('ttFoot') &&
-            !eventTarget.hasAttribute('id') &&
-            !eventTarget.hasAttribute('data-id')
-          ) {
-            this.ngZone.run(() => {
+            if (parentElem !== null) {
               this.showInfoOverlayFromInlineHtml(eventTarget);
-            });
-            modalShown = true;
-          } else if (eventTarget['classList'].contains('ttComment')) {
-            this.ngZone.run(() => {
-              this.showInfoOverlayFromInlineHtml(eventTarget);
-            });
-            modalShown = true;
-          }
-
-          // Get the parent node of the event target for the next iteration
-          // if a modal or infoOverlay hasn't been shown already. This is
-          // for finding nested tooltiptriggers, i.e. a person can be a
-          // child of a change.
-          if (!modalShown) {
-            eventTarget = eventTarget['parentNode'];
-            if (
-              !eventTarget['classList'].contains('tooltiptrigger') &&
-              eventTarget['parentNode'] &&
-              eventTarget['parentNode']['classList'].contains('tooltiptrigger')
-            ) {
-              // The parent isn't a tooltiptrigger, but the parent of the parent
-              // is, use it for the next iteration.
-              eventTarget = eventTarget['parentNode'];
+              modalShown = true;
             }
           }
+        } else if (
+          eventTarget.hasAttribute('id') &&
+          eventTarget['classList'].contains('ttFoot') &&
+          eventTarget['classList'].contains('teiVariant')
+        ) {
+          // Footnote reference clicked in variant.
+          this.showFootnoteInfoOverlay(
+            eventTarget.getAttribute('id'), 'variant', eventTarget
+          );
+          modalShown = true;
+        } else if (
+          eventTarget['classList'].contains('ttFoot') &&
+          !eventTarget.hasAttribute('id') &&
+          !eventTarget.hasAttribute('data-id')
+        ) {
+          this.showInfoOverlayFromInlineHtml(eventTarget);
+          modalShown = true;
+        } else if (eventTarget['classList'].contains('ttComment')) {
+          this.showInfoOverlayFromInlineHtml(eventTarget);
+          modalShown = true;
         }
 
-        eventTarget = this.getEventTarget(event);
-        if (
+        // Get the parent node of the event target for the next iteration
+        // if a modal or infoOverlay hasn't been shown already. This is
+        // for finding nested tooltiptriggers, i.e. a person can be a
+        // child of a change.
+        if (!modalShown) {
+          eventTarget = eventTarget['parentNode'];
+          if (
+            !eventTarget['classList'].contains('tooltiptrigger') &&
+            eventTarget['parentNode'] &&
+            eventTarget['parentNode']['classList'].contains('tooltiptrigger')
+          ) {
+            // The parent isn't a tooltiptrigger, but the parent of the parent
+            // is, use it for the next iteration.
+            eventTarget = eventTarget['parentNode'];
+          }
+        }
+      }
+
+      eventTarget = this.getEventTarget(event);
+      if (
+        (
+          eventTarget.classList.contains('variantScrollTarget') ||
+          eventTarget.classList.contains('anchorScrollTarget')
+        ) &&
+        (
+          this.viewOptionsService.selectedVariationType() === 'all' ||
           (
-            eventTarget.classList.contains('variantScrollTarget') ||
-            eventTarget.classList.contains('anchorScrollTarget')
-          ) &&
-          (
-            this.viewOptionsService.selectedVariationType() === 'all' ||
+            this.viewOptionsService.selectedVariationType() === 'sub' &&
             (
-              this.viewOptionsService.selectedVariationType() === 'sub' &&
-              (
-                eventTarget.classList.contains('substantial') ||
-                eventTarget.classList.contains('lemma')
-              )
+              eventTarget.classList.contains('substantial') ||
+              eventTarget.classList.contains('lemma')
             )
           )
-        ) {
-          // Click on variant lemma --> highlight and scroll all variant columns
-          // in desktop mode; display variant info in infoOverlay in mobile mode.
-          if (!this.mobileMode) {
-            eventTarget.classList.add('highlight');
-            this.ngZone.run(() => {
-              this.hideToolTip();
-              this.scrollService.scrollToVariant(
-                eventTarget, this.elementRef.nativeElement
-              );
-            });
+        )
+      ) {
+        // Click on variant lemma --> highlight and scroll all variant columns
+        // in desktop mode; display variant info in infoOverlay in mobile mode.
+        if (!this.mobileMode) {
+          eventTarget.classList.add('highlight');
+          this.hideToolTip();
+          this.scrollService.scrollToVariant(
+            eventTarget, this.elementRef.nativeElement
+          );
+          window.setTimeout(function(elem: any) {
+            elem.classList.remove('highlight');
+          }.bind(null, eventTarget), 5000);
+        } else if (eventTarget.classList.contains('tooltiptrigger')) {
+          this.showInfoOverlayFromInlineHtml(eventTarget);
+        }
+      } else if (eventTarget['classList'].contains('extVariantsTrigger')) {
+        // Click on trigger for showing links to external variants
+        if (eventTarget.nextElementSibling) {
+          if (
+            eventTarget.nextElementSibling.classList.contains('extVariants') &&
+            !eventTarget.nextElementSibling.classList.contains('show-extVariants')
+          ) {
+            eventTarget.nextElementSibling.classList.add('show-extVariants');
+          } else if (
+            eventTarget.nextElementSibling.classList.contains('extVariants') &&
+            eventTarget.nextElementSibling.classList.contains('show-extVariants')
+          ) {
+            eventTarget.nextElementSibling.classList.remove('show-extVariants');
+          }
+        }
+      }
+
+      // Possibly click on link.
+      eventTarget = event.target as HTMLElement;
+      if (!eventTarget?.classList.contains('xreference')) {
+        eventTarget = eventTarget.parentElement;
+        if (eventTarget) {
+          if (!eventTarget.classList.contains('xreference')) {
+            eventTarget = eventTarget.parentElement;
+          }
+        }
+      }
+
+      if (eventTarget?.classList.contains('xreference')) {
+        event.preventDefault();
+        const anchorElem: HTMLAnchorElement = eventTarget as HTMLAnchorElement;
+
+        if (eventTarget.classList.contains('footnoteReference')) {
+          // Link to (foot)note reference in the same text.
+          let targetId = '';
+          if (anchorElem.hasAttribute('href')) {
+            targetId = anchorElem.getAttribute('href') || '';
+          } else if (anchorElem.parentElement?.hasAttribute('href')) {
+            targetId = anchorElem.parentElement.getAttribute('href') || '';
+          }
+
+          if (targetId) {
+            let targetColumnId = '';
+            if (anchorElem.className.includes('targetColumnId_')) {
+              for (let i = 0; i < anchorElem.classList.length; i++) {
+                if (anchorElem.classList[i].startsWith('targetColumnId_')) {
+                  targetColumnId = anchorElem.classList[i].replace('targetColumnId_', '');
+                }
+              }
+            }
+
+            // Find the containing scrollable element.
+            let containerElem: HTMLElement | null = null;
+            if (targetColumnId) {
+              containerElem = nElement.querySelector<HTMLElement>('#' + targetColumnId);
+            } else {
+              containerElem = anchorElem.parentElement;
+              while (
+                containerElem?.parentElement &&
+                !containerElem.classList.contains('scroll-content-container')
+              ) {
+                containerElem = containerElem.parentElement;
+              }
+              if (!containerElem?.parentElement) {
+                containerElem = null;
+              }
+              if (!containerElem) {
+                // Check if a footnotereference link in infoOverlay.
+                // This method is used to find the container element if in mobile mode.
+                if (
+                  anchorElem.parentElement?.parentElement?.hasAttribute('class') &&
+                  anchorElem.parentElement?.parentElement?.classList.contains('infoOverlayContent')
+                ) {
+                  containerElem = nElement.querySelector<HTMLElement>(
+                    'ion-content.collection-ion-content.mobile-mode-content .scroll-content-container:not(.visuallyhidden)'
+                  );
+                }
+              }
+            }
+
+            if (containerElem) {
+              let dataIdSelector = '[data-id="' + String(targetId).replace('#', '') + '"]';
+              if (anchorElem.classList.contains('teiVariant')) {
+                // Link to (foot)note reference in variant, uses id-attribute instead of data-id.
+                dataIdSelector = '[id="' + String(targetId).replace('#', '') + '"]';
+              }
+              const target = containerElem.querySelector<HTMLElement>(dataIdSelector);
+              if (target) {
+                this.scrollService.scrollToHTMLElement(target, 'top');
+              }
+            }
+          }
+        } else if (anchorElem.classList.contains('ref_variant')) {
+          // Click on link to another variant text
+          const sid = 'sid-' + anchorElem.href.split(';sid-')[1];
+          const varTargets = Array.from(document.querySelectorAll('#' + sid));
+
+          if (varTargets.length > 0) {
+            this.scrollService.scrollElementIntoView(anchorElem);
+            anchorElem.classList.add('highlight');
             window.setTimeout(function(elem: any) {
               elem.classList.remove('highlight');
-            }.bind(null, eventTarget), 5000);
-          } else if (eventTarget.classList.contains('tooltiptrigger')) {
-            this.ngZone.run(() => this.showInfoOverlayFromInlineHtml(eventTarget));
+            }.bind(null, anchorElem), 5000);
+
+            varTargets.forEach((varTarget: any) => {
+              this.scrollService.scrollElementIntoView(varTarget);
+              if (varTarget.firstElementChild?.classList.contains('var_margin')) {
+                const marginElem = varTarget.firstElementChild;
+
+                // Highlight all children of the margin element that have the ref_variant class
+                const refVariants = Array.from(marginElem.querySelectorAll('.ref_variant'));
+                refVariants.forEach((refVariant: any) => {
+                  refVariant.classList.add('highlight');
+                  window.setTimeout(function(elem: any) {
+                    elem.classList.remove('highlight');
+                  }.bind(null, refVariant), 5000);
+                });
+
+                if (marginElem.firstElementChild?.classList.contains('extVariantsTrigger')) {
+                  marginElem.firstElementChild.classList.add('highlight');
+                  window.setTimeout(function(elem: any) {
+                    elem.classList.remove('highlight');
+                  }.bind(null, marginElem.firstElementChild), 5000);
+                }
+              }
+            });
           }
-        } else if (eventTarget['classList'].contains('extVariantsTrigger')) {
-          // Click on trigger for showing links to external variants
-          if (eventTarget.nextElementSibling) {
+
+        } else if (anchorElem.classList.contains('ref_external')) {
+          // Link to external web page, open in new window/tab.
+          if (anchorElem.hasAttribute('href')) {
+            window.open(anchorElem.href, '_blank');
+          }
+
+        } else {
+          // Link to a reading text, comment or introduction.
+          // Get the href parts for the targeted text.
+          const hrefLink = anchorElem.href.replace('_', ' ');
+          const hrefTargetItems: string[] = decodeURIComponent(
+            String(hrefLink).split('/').pop() || ''
+          ).trim().split(' ');
+          let targetCollId = '';
+          let targetPubId = '';
+          let targetChapterId = '';
+          let targetPositionId = '';
+          const textKey = this.textKey();
+
+          if (
+            anchorElem.classList.contains('ref_readingtext') ||
+            anchorElem.classList.contains('ref_comment')
+          ) {
+            // Link to reading text or comment.
+
+            let comparePageId = '';
+
+            if (hrefTargetItems.length === 1 && hrefTargetItems[0].startsWith('#')) {
+              // If only a position starting with a hash, assume it's
+              // in the same collection, text and chapter.
+              comparePageId = textKey.textItemID;
+            } else if (hrefTargetItems.length > 1) {
+              targetCollId = hrefTargetItems[0];
+              targetPubId = hrefTargetItems[1];
+              comparePageId = targetCollId + '_' + targetPubId;
+              if (hrefTargetItems.length > 2 && !hrefTargetItems[2].startsWith('#')) {
+                targetChapterId = hrefTargetItems[2];
+                comparePageId += '_' + targetChapterId;
+              }
+            }
+
+            let legacyPageId = this.collectionAndPublicationLegacyId;
+            if (legacyPageId && textKey?.chapterID) {
+              legacyPageId += '_' + textKey.chapterID;
+            }
+
+            // Check if we are already on the same page.
             if (
-              eventTarget.nextElementSibling.classList.contains('extVariants') &&
-              !eventTarget.nextElementSibling.classList.contains('show-extVariants')
+              (comparePageId === textKey.textItemID || comparePageId === legacyPageId) &&
+              hrefTargetItems[hrefTargetItems.length - 1].startsWith('#')
             ) {
-              eventTarget.nextElementSibling.classList.add('show-extVariants');
-            } else if (
-              eventTarget.nextElementSibling.classList.contains('extVariants') &&
-              eventTarget.nextElementSibling.classList.contains('show-extVariants')
-            ) {
-              eventTarget.nextElementSibling.classList.remove('show-extVariants');
-            }
-          }
-        }
+              // We are on the same page and the last item in the target href is a textposition.
+              targetPositionId = hrefTargetItems[hrefTargetItems.length - 1].replace('#', '');
 
-        // Possibly click on link.
-        eventTarget = event.target as HTMLElement;
-        if (!eventTarget?.classList.contains('xreference')) {
-          eventTarget = eventTarget.parentElement;
-          if (eventTarget) {
-            if (!eventTarget.classList.contains('xreference')) {
-              eventTarget = eventTarget.parentElement;
-            }
-          }
-        }
-
-        if (eventTarget?.classList.contains('xreference')) {
-          event.preventDefault();
-          const anchorElem: HTMLAnchorElement = eventTarget as HTMLAnchorElement;
-
-          if (eventTarget.classList.contains('footnoteReference')) {
-            // Link to (foot)note reference in the same text.
-            let targetId = '';
-            if (anchorElem.hasAttribute('href')) {
-              targetId = anchorElem.getAttribute('href') || '';
-            } else if (anchorElem.parentElement?.hasAttribute('href')) {
-              targetId = anchorElem.parentElement.getAttribute('href') || '';
-            }
-
-            if (targetId) {
-              let targetColumnId = '';
-              if (anchorElem.className.includes('targetColumnId_')) {
-                for (let i = 0; i < anchorElem.classList.length; i++) {
-                  if (anchorElem.classList[i].startsWith('targetColumnId_')) {
-                    targetColumnId = anchorElem.classList[i].replace('targetColumnId_', '');
-                  }
-                }
+              // Find element in the correct column (reading-text or comments) based on ref type.
+              let refType = 'reading-text';
+              if (anchorElem.classList.contains('ref_comment')) {
+                refType = 'comments';
               }
+              const addViewType = (refType === 'reading-text') ? 'readingtext' : refType;
 
-              // Find the containing scrollable element.
-              let containerElem: HTMLElement | null = null;
-              if (targetColumnId) {
-                containerElem = nElement.querySelector<HTMLElement>('#' + targetColumnId);
-              } else {
-                containerElem = anchorElem.parentElement;
-                while (
-                  containerElem?.parentElement &&
-                  !containerElem.classList.contains('scroll-content-container')
-                ) {
-                  containerElem = containerElem.parentElement;
-                }
-                if (!containerElem?.parentElement) {
-                  containerElem = null;
-                }
-                if (!containerElem) {
-                  // Check if a footnotereference link in infoOverlay.
-                  // This method is used to find the container element if in mobile mode.
-                  if (
-                    anchorElem.parentElement?.parentElement?.hasAttribute('class') &&
-                    anchorElem.parentElement?.parentElement?.classList.contains('infoOverlayContent')
-                  ) {
-                    containerElem = nElement.querySelector<HTMLElement>(
-                      'ion-content.collection-ion-content.mobile-mode-content .scroll-content-container:not(.visuallyhidden)'
-                    );
-                  }
-                }
-              }
-
-              if (containerElem) {
-                let dataIdSelector = '[data-id="' + String(targetId).replace('#', '') + '"]';
-                if (anchorElem.classList.contains('teiVariant')) {
-                  // Link to (foot)note reference in variant, uses id-attribute instead of data-id.
-                  dataIdSelector = '[id="' + String(targetId).replace('#', '') + '"]';
-                }
-                const target = containerElem.querySelector<HTMLElement>(dataIdSelector);
-                if (target) {
-                  this.scrollService.scrollToHTMLElement(target, 'top');
-                }
-              }
-            }
-          } else if (anchorElem.classList.contains('ref_variant')) {
-            // Click on link to another variant text
-            const sid = 'sid-' + anchorElem.href.split(';sid-')[1];
-            const varTargets = Array.from(document.querySelectorAll('#' + sid));
-
-            if (varTargets.length > 0) {
-              this.scrollService.scrollElementIntoView(anchorElem);
-              anchorElem.classList.add('highlight');
-              window.setTimeout(function(elem: any) {
-                elem.classList.remove('highlight');
-              }.bind(null, anchorElem), 5000);
-
-              varTargets.forEach((varTarget: any) => {
-                this.scrollService.scrollElementIntoView(varTarget);
-                if (varTarget.firstElementChild?.classList.contains('var_margin')) {
-                  const marginElem = varTarget.firstElementChild;
-
-                  // Highlight all children of the margin element that have the ref_variant class
-                  const refVariants = Array.from(marginElem.querySelectorAll('.ref_variant'));
-                  refVariants.forEach((refVariant: any) => {
-                    refVariant.classList.add('highlight');
-                    window.setTimeout(function(elem: any) {
-                      elem.classList.remove('highlight');
-                    }.bind(null, refVariant), 5000);
-                  });
-
-                  if (marginElem.firstElementChild?.classList.contains('extVariantsTrigger')) {
-                    marginElem.firstElementChild.classList.add('highlight');
-                    window.setTimeout(function(elem: any) {
-                      elem.classList.remove('highlight');
-                    }.bind(null, marginElem.firstElementChild), 5000);
-                  }
-                }
-              });
-            }
-
-          } else if (anchorElem.classList.contains('ref_external')) {
-            // Link to external web page, open in new window/tab.
-            if (anchorElem.hasAttribute('href')) {
-              window.open(anchorElem.href, '_blank');
-            }
-
-          } else {
-            // Link to a reading text, comment or introduction.
-            // Get the href parts for the targeted text.
-            const hrefLink = anchorElem.href.replace('_', ' ');
-            const hrefTargetItems: string[] = decodeURIComponent(
-              String(hrefLink).split('/').pop() || ''
-            ).trim().split(' ');
-            let targetCollId = '';
-            let targetPubId = '';
-            let targetChapterId = '';
-            let targetPositionId = '';
-            const textKey = this.textKey();
-
-            if (
-              anchorElem.classList.contains('ref_readingtext') ||
-              anchorElem.classList.contains('ref_comment')
-            ) {
-              // Link to reading text or comment.
-
-              let comparePageId = '';
-
-              if (hrefTargetItems.length === 1 && hrefTargetItems[0].startsWith('#')) {
-                // If only a position starting with a hash, assume it's
-                // in the same collection, text and chapter.
-                comparePageId = textKey.textItemID;
-              } else if (hrefTargetItems.length > 1) {
-                targetCollId = hrefTargetItems[0];
-                targetPubId = hrefTargetItems[1];
-                comparePageId = targetCollId + '_' + targetPubId;
-                if (hrefTargetItems.length > 2 && !hrefTargetItems[2].startsWith('#')) {
-                  targetChapterId = hrefTargetItems[2];
-                  comparePageId += '_' + targetChapterId;
-                }
-              }
-
-              let legacyPageId = this.collectionAndPublicationLegacyId;
-              if (legacyPageId && textKey?.chapterID) {
-                legacyPageId += '_' + textKey.chapterID;
-              }
-
-              // Check if we are already on the same page.
               if (
-                (comparePageId === textKey.textItemID || comparePageId === legacyPageId) &&
-                hrefTargetItems[hrefTargetItems.length - 1].startsWith('#')
+                !nElement.querySelector(
+                  'page-text:not([ion-page-hidden]):not(.ion-page-hidden) ' + refType
+                )
               ) {
-                // We are on the same page and the last item in the target href is a textposition.
-                targetPositionId = hrefTargetItems[hrefTargetItems.length - 1].replace('#', '');
+                // The target column type needs to be opened first
+                this.addView(addViewType, undefined, undefined, true);
+                this.setActiveMobileModeViewType(undefined, addViewType);
 
-                // Find element in the correct column (reading-text or comments) based on ref type.
-                let refType = 'reading-text';
-                if (anchorElem.classList.contains('ref_comment')) {
-                  refType = 'comments';
-                }
-                const addViewType = (refType === 'reading-text') ? 'readingtext' : refType;
-
-                if (
-                  !nElement.querySelector(
-                    'page-text:not([ion-page-hidden]):not(.ion-page-hidden) ' + refType
-                  )
-                ) {
-                  // The target column type needs to be opened first
-                  this.ngZone.run(() => {
-                    this.addView(addViewType, undefined, undefined, true);
-                    this.setActiveMobileModeViewType(undefined, addViewType);
-                  });
-
-                  // The added view needs to be rendered before looking for
-                  // matching elements again -> timeout.
-                  // TODO: ideally get rid of setTimeout for this functionality
+                // The added view needs to be rendered before looking for
+                // matching elements again -> timeout.
+                // TODO: ideally get rid of setTimeout for this functionality
+                setTimeout(() => {
+                  let targetElement = this.scrollService.findElementInColumnByAttribute(
+                    'name', targetPositionId, refType
+                  );
+                  if (targetElement?.classList.contains('anchor')) {
+                    this.scrollService.scrollToHTMLElement(targetElement);
+                  }
+                }, 700);
+              } else {
+                if (!this.mobileMode) {
+                  let targetElement = this.scrollService.findElementInColumnByAttribute(
+                    'name', targetPositionId, refType
+                  );
+                  if (targetElement?.classList.contains('anchor')) {
+                    this.scrollService.scrollToHTMLElement(targetElement);
+                  }
+                } else {
+                  this.setActiveMobileModeViewType(undefined, addViewType);
                   setTimeout(() => {
                     let targetElement = this.scrollService.findElementInColumnByAttribute(
                       'name', targetPositionId, refType
@@ -1293,247 +1335,203 @@ export class CollectionTextPage implements OnInit {
                       this.scrollService.scrollToHTMLElement(targetElement);
                     }
                   }, 700);
-                } else {
-                  if (!this.mobileMode) {
-                    let targetElement = this.scrollService.findElementInColumnByAttribute(
-                      'name', targetPositionId, refType
-                    );
-                    if (targetElement?.classList.contains('anchor')) {
-                      this.scrollService.scrollToHTMLElement(targetElement);
-                    }
-                  } else {
-                    this.ngZone.run(() => {
-                      this.setActiveMobileModeViewType(undefined, addViewType);
-                    });
-                    setTimeout(() => {
-                      let targetElement = this.scrollService.findElementInColumnByAttribute(
-                        'name', targetPositionId, refType
-                      );
-                      if (targetElement?.classList.contains('anchor')) {
-                        this.scrollService.scrollToHTMLElement(targetElement);
-                      }
-                    }, 700);
-                  }
                 }
-              } else {
-                // We are not on the same page, open in new window.
-                // (Safari on iOS doesn't allow window.open() inside async calls so
-                // we have to open the new window first and set its location later.)
-                const newWindowRef = window.open();
-
-                this.collectionsService.getCollectionAndPublicationByLegacyId(
-                  targetCollId + '_' + targetPubId
-                ).subscribe(
-                  (data: any) => {
-                    if (data?.length && data[0]['coll_id'] && data[0]['pub_id']) {
-                      targetCollId = data[0]['coll_id'];
-                      targetPubId = data[0]['pub_id'];
-                    }
-
-                    let hrefString = '/collection/' + targetCollId + '/text/' + targetPubId;
-                    if (targetChapterId) {
-                      hrefString += '/' + targetChapterId;
-                      if (hrefTargetItems.length > 3 && hrefTargetItems[3].startsWith('#')) {
-                        targetPositionId = hrefTargetItems[3].replace('#', '');
-                        hrefString += '?position=' + targetPositionId;
-                      }
-                    } else if (hrefTargetItems.length > 2 && hrefTargetItems[2].startsWith('#')) {
-                      targetPositionId = hrefTargetItems[2].replace('#', '');
-                      hrefString += '?position=' + targetPositionId;
-                    }
-                    if (newWindowRef) {
-                      newWindowRef.location.href = '/' + this.activeLocale + hrefString;
-                    }
-                  }
-                );
               }
-
-            } else if (anchorElem.classList.contains('ref_introduction')) {
-              // Link to introduction, open in new window/tab.
-              targetCollId = hrefTargetItems[0];
-
+            } else {
+              // We are not on the same page, open in new window.
+              // (Safari on iOS doesn't allow window.open() inside async calls so
+              // we have to open the new window first and set its location later.)
               const newWindowRef = window.open();
 
               this.collectionsService.getCollectionAndPublicationByLegacyId(
-                targetCollId
+                targetCollId + '_' + targetPubId
               ).subscribe(
                 (data: any) => {
-                  if (data?.length && data[0]['coll_id']) {
+                  if (data?.length && data[0]['coll_id'] && data[0]['pub_id']) {
                     targetCollId = data[0]['coll_id'];
+                    targetPubId = data[0]['pub_id'];
                   }
-                  let hrefString = '/collection/' + targetCollId + '/introduction';
-                  if (hrefTargetItems.length > 1 && hrefTargetItems[1].startsWith('#')) {
-                    targetPositionId = hrefTargetItems[1].replace('#', '');
+
+                  let hrefString = '/collection/' + targetCollId + '/text/' + targetPubId;
+                  if (targetChapterId) {
+                    hrefString += '/' + targetChapterId;
+                    if (hrefTargetItems.length > 3 && hrefTargetItems[3].startsWith('#')) {
+                      targetPositionId = hrefTargetItems[3].replace('#', '');
+                      hrefString += '?position=' + targetPositionId;
+                    }
+                  } else if (hrefTargetItems.length > 2 && hrefTargetItems[2].startsWith('#')) {
+                    targetPositionId = hrefTargetItems[2].replace('#', '');
                     hrefString += '?position=' + targetPositionId;
                   }
-                  // Open the link in a new window/tab.
                   if (newWindowRef) {
                     newWindowRef.location.href = '/' + this.activeLocale + hrefString;
                   }
                 }
               );
             }
+
+          } else if (anchorElem.classList.contains('ref_introduction')) {
+            // Link to introduction, open in new window/tab.
+            targetCollId = hrefTargetItems[0];
+
+            const newWindowRef = window.open();
+
+            this.collectionsService.getCollectionAndPublicationByLegacyId(
+              targetCollId
+            ).subscribe(
+              (data: any) => {
+                if (data?.length && data[0]['coll_id']) {
+                  targetCollId = data[0]['coll_id'];
+                }
+                let hrefString = '/collection/' + targetCollId + '/introduction';
+                if (hrefTargetItems.length > 1 && hrefTargetItems[1].startsWith('#')) {
+                  targetPositionId = hrefTargetItems[1].replace('#', '');
+                  hrefString += '?position=' + targetPositionId;
+                }
+                // Open the link in a new window/tab.
+                if (newWindowRef) {
+                  newWindowRef.location.href = '/' + this.activeLocale + hrefString;
+                }
+              }
+            );
           }
         }
-      });
+      }
+    });
 
-      /* MOUSE OVER EVENTS */
-      this.unlistenMouseoverEvents = this.renderer2.listen(nElement, 'mouseover', (event) => {
-        // Mouseover effects only if using a cursor, not if the user is touching the screen
-        if (this.userIsTouching) {
-          return;
-        }
+    /* MOUSE OVER EVENTS */
+    this.unlistenMouseoverEvents = this.renderer2.listen(nElement, 'mouseover', (event) => {
+      // Mouseover effects only if using a cursor, not if the user is touching the screen
+      if (this.userIsTouching) {
+        return;
+      }
 
-        let eventTarget = this.getEventTarget(event);
-        const viewOptions = this.viewOptionsService.show();
+      let eventTarget = this.getEventTarget(event);
+      const viewOptions = this.viewOptionsService.show();
 
-        // Loop needed for finding correct tooltip trigger when there are nested triggers.
-        while (!this.tooltipVisible && eventTarget['classList'].contains('tooltiptrigger')) {
-          if (eventTarget.hasAttribute('data-id')) {
-            if (
-              eventTarget['classList'].contains('person') &&
-              viewOptions.personInfo
-            ) {
-              this.ngZone.run(() => {
-                this.showSemanticDataObjectTooltip(eventTarget.getAttribute('data-id'), 'person', eventTarget);
-              });
-            } else if (
-              eventTarget['classList'].contains('placeName') &&
-              viewOptions.placeInfo
-            ) {
-              this.ngZone.run(() => {
-                this.showSemanticDataObjectTooltip(eventTarget.getAttribute('data-id'), 'place', eventTarget);
-              });
-            } else if (
-              eventTarget['classList'].contains('title') &&
-              viewOptions.workInfo
-            ) {
-              this.ngZone.run(() => {
-                this.showSemanticDataObjectTooltip(eventTarget.getAttribute('data-id'), 'work', eventTarget);
-              });
-            } else if (
-              eventTarget['classList'].contains('comment') &&
-              viewOptions.comments
-            ) {
-              this.ngZone.run(() => {
-                this.showCommentTooltip(eventTarget.getAttribute('data-id'), eventTarget);
-              });
-            } else if (
-              eventTarget['classList'].contains('teiManuscript') &&
-              eventTarget['classList'].contains('ttFoot')
-            ) {
-              this.ngZone.run(() => {
-                this.showFootnoteTooltip(eventTarget.getAttribute('data-id'), 'manuscript', eventTarget);
-              });
-            } else if (eventTarget['classList'].contains('ttFoot')) {
-              this.ngZone.run(() => {
-                this.showFootnoteTooltip(eventTarget.getAttribute('data-id'), 'reading-text', eventTarget);
-              });
-            }
-          } else if (
-            (
-              (
-                eventTarget['classList'].contains('ttChanges') ||
-                eventTarget['classList'].contains('ttEmendations')
-              ) &&
-              viewOptions.emendations
-            ) || (
-              eventTarget['classList'].contains('ttNormalisations') &&
-              viewOptions.normalisations
-            ) || (
-              eventTarget['classList'].contains('ttAbbreviations') &&
-              viewOptions.abbreviations
-            )
+      // Loop needed for finding correct tooltip trigger when there are nested triggers.
+      while (!this.tooltipVisible && eventTarget['classList'].contains('tooltiptrigger')) {
+        if (eventTarget.hasAttribute('data-id')) {
+          if (
+            eventTarget['classList'].contains('person') &&
+            viewOptions.personInfo
           ) {
-            this.ngZone.run(() => {
-              this.showTooltipFromInlineHtml(eventTarget);
-            });
+            this.showSemanticDataObjectTooltip(eventTarget.getAttribute('data-id'), 'person', eventTarget);
           } else if (
-            eventTarget['classList'].contains('ttVariant') &&
-            this.viewOptionsService.selectedVariationType() !== 'none'
+            eventTarget['classList'].contains('placeName') &&
+            viewOptions.placeInfo
           ) {
-            this.ngZone.run(() => {
-              this.showVariantTooltip(eventTarget);
-            });
-          } else if (eventTarget['classList'].contains('ttMs')) {
-            // Check if the tooltip trigger element is in a manuscripts column
-            // since ttMs should generally only be triggered there.
-            if (
-              eventTarget['classList'].contains('unclear') ||
-              eventTarget['classList'].contains('gap') ||
-              eventTarget['classList'].contains('marginalia')
-            ) {
-              // Tooltips for text with class unclear, gap or marginalia should be shown in other columns too.
-              this.ngZone.run(() => {
-                this.showTooltipFromInlineHtml(eventTarget);
-              });
-            } else {
-              let parentElem: HTMLElement | null = eventTarget as HTMLElement;
-              parentElem = parentElem.parentElement;
-              while (parentElem !== null && parentElem?.tagName !== 'MANUSCRIPTS') {
-                parentElem = parentElem.parentElement;
-              }
-              if (parentElem) {
-                this.ngZone.run(() => {
-                  this.showTooltipFromInlineHtml(eventTarget);
-                });
-              }
-            }
+            this.showSemanticDataObjectTooltip(eventTarget.getAttribute('data-id'), 'place', eventTarget);
           } else if (
-            eventTarget.hasAttribute('id') &&
-            eventTarget['classList'].contains('teiVariant') &&
+            eventTarget['classList'].contains('title') &&
+            viewOptions.workInfo
+          ) {
+            this.showSemanticDataObjectTooltip(eventTarget.getAttribute('data-id'), 'work', eventTarget);
+          } else if (
+            eventTarget['classList'].contains('comment') &&
+            viewOptions.comments
+          ) {
+            this.showCommentTooltip(eventTarget.getAttribute('data-id'), eventTarget);
+          } else if (
+            eventTarget['classList'].contains('teiManuscript') &&
             eventTarget['classList'].contains('ttFoot')
           ) {
-            this.ngZone.run(() => {
-              this.showFootnoteTooltip(
-                eventTarget.getAttribute('id'), 'variant', eventTarget
-              );
-            });
-          } else if (
-            (
-              eventTarget['classList'].contains('ttFoot') ||
-              eventTarget['classList'].contains('ttComment')
-            ) &&
-            !eventTarget.hasAttribute('id') &&
-            !eventTarget.hasAttribute('data-id')
-          ) {
-            this.ngZone.run(() => this.showTooltipFromInlineHtml(eventTarget));
+            this.showFootnoteTooltip(eventTarget.getAttribute('data-id'), 'manuscript', eventTarget);
+          } else if (eventTarget['classList'].contains('ttFoot')) {
+            this.showFootnoteTooltip(eventTarget.getAttribute('data-id'), 'reading-text', eventTarget);
           }
-
-          /* Get the parent node of the event target for the next iteration if a tooltip hasn't been shown already.
-          * This is for finding nested tooltiptriggers, i.e. a person can be a child of a change. */
-          if (!this.tooltipVisible) {
-            eventTarget = eventTarget['parentNode'];
-            if (
-              !eventTarget['classList'].contains('tooltiptrigger') &&
-              eventTarget['parentNode']['classList'].contains('tooltiptrigger')
-            ) {
-              /* The parent isn't a tooltiptrigger, but the parent of the parent is, use it for the next iteration. */
-              eventTarget = eventTarget['parentNode'];
+        } else if (
+          (
+            (
+              eventTarget['classList'].contains('ttChanges') ||
+              eventTarget['classList'].contains('ttEmendations')
+            ) &&
+            viewOptions.emendations
+          ) || (
+            eventTarget['classList'].contains('ttNormalisations') &&
+            viewOptions.normalisations
+          ) || (
+            eventTarget['classList'].contains('ttAbbreviations') &&
+            viewOptions.abbreviations
+          )
+        ) {
+          this.showTooltipFromInlineHtml(eventTarget);
+        } else if (
+          eventTarget['classList'].contains('ttVariant') &&
+          this.viewOptionsService.selectedVariationType() !== 'none'
+        ) {
+          this.showVariantTooltip(eventTarget);
+        } else if (eventTarget['classList'].contains('ttMs')) {
+          // Check if the tooltip trigger element is in a manuscripts column
+          // since ttMs should generally only be triggered there.
+          if (
+            eventTarget['classList'].contains('unclear') ||
+            eventTarget['classList'].contains('gap') ||
+            eventTarget['classList'].contains('marginalia')
+          ) {
+            // Tooltips for text with class unclear, gap or marginalia should be shown in other columns too.
+            this.showTooltipFromInlineHtml(eventTarget);
+          } else {
+            let parentElem: HTMLElement | null = eventTarget as HTMLElement;
+            parentElem = parentElem.parentElement;
+            while (parentElem !== null && parentElem?.tagName !== 'MANUSCRIPTS') {
+              parentElem = parentElem.parentElement;
+            }
+            if (parentElem) {
+              this.showTooltipFromInlineHtml(eventTarget);
             }
           }
-        }
-
-        /* Check if mouse over doodle image which has a parent tooltiptrigger */
-        if (
-          eventTarget.hasAttribute('data-id') &&
-          eventTarget['classList'].contains('doodle') &&
-          eventTarget['classList'].contains('unknown') &&
-          eventTarget['parentNode'] &&
-          eventTarget['parentNode']['classList'].contains('tooltiptrigger')
+        } else if (
+          eventTarget.hasAttribute('id') &&
+          eventTarget['classList'].contains('teiVariant') &&
+          eventTarget['classList'].contains('ttFoot')
         ) {
+          this.showFootnoteTooltip(
+            eventTarget.getAttribute('id'), 'variant', eventTarget
+          );
+        } else if (
+          (
+            eventTarget['classList'].contains('ttFoot') ||
+            eventTarget['classList'].contains('ttComment')
+          ) &&
+          !eventTarget.hasAttribute('id') &&
+          !eventTarget.hasAttribute('data-id')
+        ) {
+          this.showTooltipFromInlineHtml(eventTarget);
+        }
+
+        /* Get the parent node of the event target for the next iteration if a tooltip hasn't been shown already.
+        * This is for finding nested tooltiptriggers, i.e. a person can be a child of a change. */
+        if (!this.tooltipVisible) {
           eventTarget = eventTarget['parentNode'];
-          this.ngZone.run(() => this.showTooltipFromInlineHtml(eventTarget));
+          if (
+            !eventTarget['classList'].contains('tooltiptrigger') &&
+            eventTarget['parentNode']['classList'].contains('tooltiptrigger')
+          ) {
+            /* The parent isn't a tooltiptrigger, but the parent of the parent is, use it for the next iteration. */
+            eventTarget = eventTarget['parentNode'];
+          }
         }
-      });
+      }
 
-      /* MOUSE OUT EVENTS */
-      this.unlistenMouseoutEvents = this.renderer2.listen(nElement, 'mouseout', (event) => {
-        if (!this.userIsTouching && this.tooltipVisible) {
-          this.ngZone.run(() => this.hideToolTip());
-        }
-      });
+      /* Check if mouse over doodle image which has a parent tooltiptrigger */
+      if (
+        eventTarget.hasAttribute('data-id') &&
+        eventTarget['classList'].contains('doodle') &&
+        eventTarget['classList'].contains('unknown') &&
+        eventTarget['parentNode'] &&
+        eventTarget['parentNode']['classList'].contains('tooltiptrigger')
+      ) {
+        eventTarget = eventTarget['parentNode'];
+        this.showTooltipFromInlineHtml(eventTarget);
+      }
+    });
 
+    /* MOUSE OUT EVENTS */
+    this.unlistenMouseoutEvents = this.renderer2.listen(nElement, 'mouseout', (event) => {
+      if (!this.userIsTouching && this.tooltipVisible) {
+        this.hideToolTip();
+      }
     });
   }
 
@@ -1759,12 +1757,10 @@ export class CollectionTextPage implements OnInit {
     // Return focus to element that triggered the info overlay,
     // with timeout so the info overlay isn't triggered again
     // on keyup.enter event
-    this.ngZone.runOutsideAngular(() => {
-      setTimeout(() => {
-        this.infoOverlayTriggerElem()?.focus({ preventScroll: true });
-        this.infoOverlayTriggerElem.set(null);
-      }, 250);
-    });
+    setTimeout(() => {
+      this.infoOverlayTriggerElem()?.focus({ preventScroll: true });
+      this.infoOverlayTriggerElem.set(null);
+    }, 250);
   }
 
   private setToolTipPosition(targetElem: HTMLElement, ttText: string) {

@@ -1,7 +1,10 @@
-import { Component, ElementRef, LOCALE_ID, NgZone, OnDestroy, OnInit, Renderer2, inject, ChangeDetectionStrategy } from '@angular/core';
+import { AsyncPipe } from '@angular/common';
+import { Component, ElementRef, LOCALE_ID, OnDestroy, OnInit, Renderer2, inject } from '@angular/core';
 import { ActivatedRoute, Data, Router } from '@angular/router';
+import { IonContent } from '@ionic/angular';
 import { combineLatest, distinctUntilChanged, map, Observable, of, Subscription, switchMap } from 'rxjs';
 
+import { TrustHtmlPipe } from '@pipes/trust-html.pipe';
 import { MarkdownService } from '@services/markdown.service';
 import { ScrollService } from '@services/scroll.service';
 import { isBrowser } from '@utility-functions';
@@ -11,13 +14,11 @@ import { isBrowser } from '@utility-functions';
   selector: 'page-about',
   templateUrl: './about.page.html',
   styleUrls: ['./about.page.scss'],
-  changeDetection: ChangeDetectionStrategy.Eager,
-  standalone: false
+  imports: [AsyncPipe, IonContent, TrustHtmlPipe]
 })
 export class AboutPage implements OnInit, OnDestroy {
   private elementRef = inject(ElementRef);
   private mdService = inject(MarkdownService);
-  private ngZone = inject(NgZone);
   private renderer2 = inject(Renderer2);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
@@ -27,6 +28,7 @@ export class AboutPage implements OnInit, OnDestroy {
   markdownText$: Observable<string | null>;
 
   private fragmentSubscription?: Subscription;
+  private scrollRetryTimer?: ReturnType<typeof setTimeout>;
   private unlistenClickEvents?: () => void;
 
   ngOnInit() {
@@ -66,6 +68,7 @@ export class AboutPage implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
+    this.clearScrollRetryTimer();
     this.unlistenClickEvents?.();
     this.fragmentSubscription?.unsubscribe();
   }
@@ -77,64 +80,73 @@ export class AboutPage implements OnInit, OnDestroy {
   private setUpTextListeners() {
     const nElement: HTMLElement = this.elementRef.nativeElement;
 
-    this.ngZone.runOutsideAngular(() => {
-      /* CLICK EVENTS */
-      this.unlistenClickEvents = this.renderer2.listen(nElement, 'click', (event) => {
-        try {
-          const eventTarget = event.target as HTMLElement;
-          if (
-            eventTarget.hasAttribute('href') &&
-            eventTarget.getAttribute('href')?.startsWith('#')
-          ) {
-            // Link to a position on the same page, find the link target
-            // and scroll the position into view using the URL fragment.
-            event.preventDefault();
-            const targetElemId = eventTarget.getAttribute('href')?.slice(1);
-            if (!targetElemId) {
-              return;
-            }
-
-            this.router.navigate([], {
-              fragment: targetElemId,
-              queryParamsHandling: 'preserve',
-              relativeTo: this.route,
-              replaceUrl: false,
-            });
+    /* CLICK EVENTS */
+    this.unlistenClickEvents = this.renderer2.listen(nElement, 'click', (event) => {
+      try {
+        const eventTarget = event.target as HTMLElement;
+        if (
+          eventTarget.hasAttribute('href') &&
+          eventTarget.getAttribute('href')?.startsWith('#')
+        ) {
+          // Link to a position on the same page, find the link target
+          // and scroll the position into view using the URL fragment.
+          event.preventDefault();
+          const targetElemId = eventTarget.getAttribute('href')?.slice(1);
+          if (!targetElemId) {
+            return;
           }
-        } catch (e) {
-          console.error(e);
+
+          this.router.navigate([], {
+            fragment: targetElemId,
+            queryParamsHandling: 'preserve',
+            relativeTo: this.route,
+            replaceUrl: false,
+          });
         }
-      });
+      } catch (e) {
+        console.error(e);
+      }
     });
   }
 
   private scrollToFragment(targetElemId: string, delayMs: number = 500) {
     if (!isBrowser()) return;
 
-    this.ngZone.runOutsideAngular(() => {
-      let attemptsLeft = 10;
+    this.clearScrollRetryTimer();
 
-      const tryScroll = () => {
-        if (attemptsLeft-- < 1) return;
+    let attemptsLeft = 10;
 
-        const scrollTargetElem = document.querySelector(
-          'page-about:not([ion-page-hidden]):not(.ion-page-hidden) [id="' + targetElemId + '"]'
+    const tryScroll = () => {
+      if (attemptsLeft-- < 1) {
+        this.scrollRetryTimer = undefined;
+        return;
+      }
+
+      const scrollTargetElem = document.querySelector(
+        'page-about:not([ion-page-hidden]):not(.ion-page-hidden) [id="' + targetElemId + '"]'
+      );
+      const scrollContainerElem = document.querySelector(
+        'page-about:not([ion-page-hidden]):not(.ion-page-hidden) ion-content'
+      )?.shadowRoot?.querySelector('[part="scroll"]');
+
+      if (scrollTargetElem && scrollContainerElem) {
+        this.scrollRetryTimer = undefined;
+        this.scrollService.scrollElementIntoView(
+          scrollTargetElem as HTMLElement, 'top', 0, 'smooth', scrollContainerElem as HTMLElement
         );
-        const scrollContainerElem = document.querySelector(
-          'page-about:not([ion-page-hidden]):not(.ion-page-hidden) ion-content'
-        )?.shadowRoot?.querySelector('[part="scroll"]');
+      } else {
+        this.scrollRetryTimer = setTimeout(tryScroll, delayMs);
+      }
+    };
 
-        if (scrollTargetElem && scrollContainerElem) {
-          this.scrollService.scrollElementIntoView(
-            scrollTargetElem as HTMLElement, 'top', 0, 'smooth', scrollContainerElem as HTMLElement
-          );
-        } else {
-          setTimeout(tryScroll, delayMs);
-        }
-      };
+    tryScroll();
+  }
 
-      tryScroll();
-    });
+  private clearScrollRetryTimer(): void {
+    if (this.scrollRetryTimer !== undefined) {
+      clearTimeout(this.scrollRetryTimer);
+      this.scrollRetryTimer = undefined;
+    }
   }
 
 }

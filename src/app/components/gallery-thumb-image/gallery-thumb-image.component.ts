@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, input } from '@angular/core';
+import { Component, input } from '@angular/core';
 
 
 // This is intentionally an attribute-selector component hosted on <img>, not a
@@ -11,7 +11,6 @@ import { ChangeDetectionStrategy, Component, input } from '@angular/core';
   selector: 'img[gallery-thumb-image]',
   template: '',
   styleUrls: ['./gallery-thumb-image.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
     ngSkipHydration: 'true',
     loading: 'lazy',

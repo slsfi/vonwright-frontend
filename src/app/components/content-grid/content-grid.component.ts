@@ -1,7 +1,7 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, LOCALE_ID, inject, signal } from '@angular/core';
+import { Component, DestroyRef, LOCALE_ID, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
-import { IonicModule } from '@ionic/angular/lazy';
+import { IonCol, IonGrid, IonRow, IonSpinner } from '@ionic/angular';
 import { catchError, forkJoin, from, map, mergeMap, Observable, of, switchMap, toArray } from 'rxjs';
 
 import { config } from '@config';
@@ -21,8 +21,7 @@ import { MarkdownService } from '@services/markdown.service';
   selector: 'content-grid',
   templateUrl: './content-grid.component.html',
   styleUrls: ['./content-grid.component.scss'],
-  imports: [IonicModule, RouterLink, ParentChildPagePathPipe],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  imports: [IonCol, IonGrid, IonRow, IonSpinner, RouterLink, ParentChildPagePathPipe]
 })
 export class ContentGridComponent {
   // -----------------------------------------------------------------------------

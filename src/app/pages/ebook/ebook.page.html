@@ -1,3 +1,6 @@
+@let ebookType = this.ebookType();
+@let filename = this.filename();
+
 @if (filename && ebookType === 'pdf') {
   <pdf-viewer
         id="pdf-page-container"

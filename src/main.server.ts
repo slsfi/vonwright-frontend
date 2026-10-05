@@ -1,22 +1,9 @@
-import {
-  ApplicationRef,
-  provideZoneChangeDetection,
-} from '@angular/core';
-import type { BootstrapContext } from '@angular/platform-browser';
+import { BootstrapContext, bootstrapApplication } from '@angular/platform-browser';
 
-import { AppServerModule } from './app/app.server.module';
+import { config } from './app/app.config.server';
+import { AppComponent } from './app/app.component';
 
-const bootstrap = async (
-  context: BootstrapContext,
-): Promise<ApplicationRef> => {
-  const moduleRef = await context.platformRef.bootstrapModule(
-    AppServerModule,
-    {
-      applicationProviders: [provideZoneChangeDetection()],
-    },
-  );
-
-  return moduleRef.injector.get(ApplicationRef);
-};
+const bootstrap = (context: BootstrapContext) =>
+  bootstrapApplication(AppComponent, config, context);
 
 export default bootstrap;

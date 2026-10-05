@@ -45,9 +45,12 @@ describe('AuthRedirectStorageService', () => {
     });
 
     it('swallows errors when clearing fails', () => {
-      spyOn(Storage.prototype, 'removeItem').and.throwError('storage failure');
+      const removeItemSpy = spyOn(Storage.prototype, 'removeItem')
+        .and.throwError('storage failure');
 
       expect(() => service.clearReturnUrl()).not.toThrow();
+
+      removeItemSpy.and.callThrough();
     });
   });
 

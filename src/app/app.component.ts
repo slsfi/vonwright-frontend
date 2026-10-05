@@ -1,7 +1,12 @@
-import { Component, DestroyRef, OnInit, inject, ChangeDetectionStrategy } from '@angular/core';
+import { Component, DestroyRef, OnInit, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Params, PRIMARY_OUTLET, Router, UrlSegment, UrlTree } from '@angular/router';
+import { IonApp, IonProgressBar, IonRouterOutlet, IonSpinner } from '@ionic/angular';
 
+import { CollectionSideMenuComponent } from '@components/menus/collection-side/collection-side-menu.component';
+import { MainSideMenuComponent } from '@components/menus/main-side/main-side-menu.component';
+import { TopMenuComponent } from '@components/menus/top/top-menu.component';
+import { StaticHtmlComponent } from '@components/static-html/static-html.component';
 import { config } from '@config';
 import { CollectionTableOfContentsService } from '@services/collection-toc.service';
 import { DocumentHeadService } from '@services/document-head.service';
@@ -14,41 +19,50 @@ import { isBrowser } from '@utility-functions';
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
-  changeDetection: ChangeDetectionStrategy.Eager,
-  standalone: false
+  imports: [
+    IonApp,
+    IonProgressBar,
+    IonRouterOutlet,
+    IonSpinner,
+    CollectionSideMenuComponent,
+    MainSideMenuComponent,
+    StaticHtmlComponent,
+    TopMenuComponent
+  ]
 })
 export class AppComponent implements OnInit {
-  private destroyRef = inject(DestroyRef);
-  private headService = inject(DocumentHeadService);
-  private platformService = inject(PlatformService);
-  private router = inject(Router);
-  private routerNavigationSource = inject(RouterNavigationSourceService);
-  private tocService = inject(CollectionTableOfContentsService);
+  private readonly destroyRef = inject(DestroyRef);
+  private readonly headService = inject(DocumentHeadService);
+  private readonly platformService = inject(PlatformService);
+  private readonly router = inject(Router);
+  private readonly routerNavigationSource = inject(RouterNavigationSourceService);
+  private readonly tocService = inject(CollectionTableOfContentsService);
 
   readonly enableCollectionSideMenuSSR: boolean = config.app?.ssr?.collectionSideMenu ?? false;
   readonly prebuiltCollectionMenus: boolean = config.app?.prebuild?.staticCollectionMenus ?? true;
   readonly enableRouterLoadingBar: boolean = config.app?.enableRouterLoadingBar ?? false;
   readonly authEnabled: boolean = config?.app?.auth?.enabled === true;
 
-  appIsStarting: boolean = true;
-  collectionID: string = '';
-  collSideMenuUrlSegments: UrlSegment[];
-  collSideMenuQueryParams: Params;
-  currentRouterUrl: string = '';
-  currentUrlSegments: UrlSegment[] = [];
-  loadingBarHidden: boolean = false;
-  mobileMode: boolean = true;
-  mountMainSideMenu: boolean = false;
-  previousRouterUrl: string = '';
-  showCollectionSideMenu: boolean = false;
-  showSideNav: boolean = false;
+  readonly mobileMode = this.platformService.isMobile();
+  readonly collectionID = signal('');
+  readonly collSideMenuUrlSegments = signal<UrlSegment[]>([]);
+  readonly collSideMenuQueryParams = signal<Params>({});
+  readonly currentRouterUrl = signal('');
+  readonly currentUrlSegments = signal<UrlSegment[]>([]);
+  readonly loadingBarHidden = signal(false);
+  readonly mountMainSideMenu = signal(false);
+  readonly showCollectionSideMenu = signal(false);
+  readonly showSideNav = signal(!this.mobileMode);
+
+  private appIsStarting = true;
+  private loadingBarHideTimer: ReturnType<typeof setTimeout> | undefined;
+  private previousRouterUrl = '';
+
+  constructor() {
+    this.destroyRef.onDestroy(() => this.clearLoadingBarHideTimer());
+  }
 
   ngOnInit(): void {
-    this.mobileMode = this.platformService.isMobile();
-    // Side menu is shown by default in desktop mode but not in
-    // mobile mode.
-    this.showSideNav = !this.mobileMode;
-
     // Set Open Graph meta tags that are common for all routes.
     // og:title is set by this.headService.setTitle
     this.headService.setCommonOpenGraphTags();
@@ -56,24 +70,25 @@ export class AppComponent implements OnInit {
     this.routerNavigationSource.get(this.router).pipe(
       takeUntilDestroyed(this.destroyRef)
     ).subscribe((url: string) => {
-      this.previousRouterUrl = this.currentRouterUrl;
-      this.currentRouterUrl = url;
+      this.previousRouterUrl = this.currentRouterUrl();
+      this.currentRouterUrl.set(url);
       const currentUrlTree: UrlTree = this.router.parseUrl(url);
-      this.currentUrlSegments = currentUrlTree?.root?.children[PRIMARY_OUTLET]?.segments;
+      const currentUrlSegments = currentUrlTree?.root?.children[PRIMARY_OUTLET]?.segments ?? [];
+      this.currentUrlSegments.set(currentUrlSegments);
 
       // Check if a collection page in order to show collection side
       // menu instead of main side menu.
-      if (this.currentUrlSegments?.[0]?.path === 'collection') {
-        const newCollectionID = this.currentUrlSegments[1]?.path || '';
+      if (currentUrlSegments[0]?.path === 'collection') {
+        const newCollectionID = currentUrlSegments[1]?.path || '';
         
-        if (this.collectionID !== newCollectionID) {
-          this.collectionID = newCollectionID;
-          this.tocService.setCurrentCollectionToc(this.collectionID);
+        if (this.collectionID() !== newCollectionID) {
+          this.collectionID.set(newCollectionID);
+          this.tocService.setCurrentCollectionToc(newCollectionID);
         }
 
-        this.collSideMenuUrlSegments = this.currentUrlSegments;
-        this.collSideMenuQueryParams = currentUrlTree?.queryParams;
-        this.showCollectionSideMenu = true;
+        this.collSideMenuUrlSegments.set(currentUrlSegments);
+        this.collSideMenuQueryParams.set(currentUrlTree.queryParams);
+        this.showCollectionSideMenu.set(true);
       } else {
         // If the app is started on a collection-page the main side menu
         // is not immediately created in order to increase performance.
@@ -81,13 +96,13 @@ export class AppComponent implements OnInit {
         // created and stays mounted. It is hidden with css if the user
         // visits a collection page and the collection side menu is
         // displayed.
-        this.mountMainSideMenu = true;
-        this.showCollectionSideMenu = false;
+        this.mountMainSideMenu.set(true);
+        this.showCollectionSideMenu.set(false);
         // Clear the collection TOC loaded in the collection side menu
         // to prevent the previous TOC from flashing in view when
         // entering another collection.
-        if (this.collectionID) {
-          this.collectionID = '';
+        if (this.collectionID()) {
+          this.collectionID.set('');
           this.tocService.setCurrentCollectionToc('');
         }
       }
@@ -99,15 +114,15 @@ export class AppComponent implements OnInit {
       if (
         (
           this.mobileMode &&
-          this.currentRouterUrl.split('?')[0] !== this.previousRouterUrl.split('?')[0]
+          url.split('?')[0] !== this.previousRouterUrl.split('?')[0]
         ) ||
         (
           this.appIsStarting &&
-          !this.currentUrlSegments &&
+          currentUrlSegments.length === 0 &&
           !this.mobileMode
         )
       ) {
-        this.showSideNav = false;
+        this.showSideNav.set(false);
       }
 
       // Open side menu if:
@@ -115,21 +130,21 @@ export class AppComponent implements OnInit {
       // 2. queryParams contains menu=open
       if (
         (
-          this.currentUrlSegments?.[0]?.path === 'collection' &&
+          currentUrlSegments[0]?.path === 'collection' &&
           this.previousRouterUrl === '/content'
         ) ||
-        currentUrlTree?.queryParams?.menu === 'open'
+        currentUrlTree.queryParams?.menu === 'open'
       ) {
-        this.showSideNav = true;
+        this.showSideNav.set(true);
       }
 
       if (this.appIsStarting) {
         this.appIsStarting = false;
       }
 
-      this.setTitleForTopMenuPages(this.currentUrlSegments?.[0]?.path || '');
+      this.setTitleForTopMenuPages(currentUrlSegments[0]?.path || '');
 
-      if (this.currentRouterUrl === '/') {
+      if (url === '/') {
         this.headService.setMetaTag(
           'name',
           'description',
@@ -143,26 +158,36 @@ export class AppComponent implements OnInit {
         this.headService.setOpenGraphDescriptionProperty('');
       }
 
-      this.headService.setLinks(this.currentRouterUrl);
-      this.headService.setOpenGraphURLProperty(this.currentRouterUrl);
+      this.headService.setLinks(url);
+      this.headService.setOpenGraphURLProperty(url);
     });
   }
 
-  toggleSideNav() {
-    this.showSideNav = !this.showSideNav;
+  toggleSideNav(): void {
+    this.showSideNav.update(show => !show);
   }
 
   hideLoadingBar(hide: boolean): void {
+    this.clearLoadingBarHideTimer();
+
     if (hide && isBrowser()) {
-      setTimeout(() => {
-        this.loadingBarHidden = hide;
+      this.loadingBarHideTimer = setTimeout(() => {
+        this.loadingBarHideTimer = undefined;
+        this.loadingBarHidden.set(true);
       }, 700);
     } else {
-      this.loadingBarHidden = hide;
+      this.loadingBarHidden.set(hide);
     }
   }
 
-  private setTitleForTopMenuPages(routeBasePath?: string) {
+  private clearLoadingBarHideTimer(): void {
+    if (this.loadingBarHideTimer !== undefined) {
+      clearTimeout(this.loadingBarHideTimer);
+      this.loadingBarHideTimer = undefined;
+    }
+  }
+
+  private setTitleForTopMenuPages(routeBasePath?: string): void {
     switch (routeBasePath) {
       case 'content':
         this.headService.setTitle([$localize`:@@TopMenu.Content:Innehåll`]);

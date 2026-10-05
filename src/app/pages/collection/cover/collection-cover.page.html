@@ -1,10 +1,12 @@
+@let activeComponent = this.activeComponent();
+
 <ion-header class="ion-no-border">
   <ion-toolbar class="secondary">
 
     @if (!mobileMode) {
       <text-changer
             [parentPageType]="'cover'"
-            [ionViewActive]="_activeComponent"
+            [ionViewActive]="activeComponent"
             class="text-changer-desktop-mode"
       ></text-changer>
     }
@@ -30,7 +32,7 @@
 @if (mobileMode) {
   <text-changer
         [parentPageType]="'cover'"
-        [ionViewActive]="_activeComponent"
+        [ionViewActive]="activeComponent"
         class="text-changer-mobile-mode"
   ></text-changer>
 }

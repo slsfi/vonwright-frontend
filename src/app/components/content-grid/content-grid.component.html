@@ -1,4 +1,6 @@
-@if (contentItems(); as data) {
+@let data = this.contentItems();
+
+@if (data) {
   <ion-grid>
     <ion-row>
       @for (item of data; track item.id) {

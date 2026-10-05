@@ -1,8 +1,8 @@
-import { ChangeDetectionStrategy, Component, Injector, NgZone, afterRenderEffect, computed, effect, inject, input, signal, untracked } from '@angular/core';
+import { Component, DestroyRef, Injector, afterRenderEffect, computed, effect, inject, input, signal, untracked } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { NgTemplateOutlet } from '@angular/common';
 import { Params, RouterLink, UrlSegment } from '@angular/router';
-import { IonicModule } from '@ionic/angular/lazy';
+import { IonIcon, IonSelect, IonSelectOption } from '@ionic/angular';
 import { distinctUntilChanged, filter } from 'rxjs';
 
 import { config } from '@config';
@@ -27,20 +27,20 @@ import { addOrRemoveValueInNewArray, enableFrontMatterPageOrTextViewType, isBrow
   templateUrl: './collection-side-menu.component.html',
   styleUrls: ['./collection-side-menu.component.scss'],
   imports: [
-    NgTemplateOutlet, IonicModule, RouterLink,
+    NgTemplateOutlet, IonIcon, IonSelect, IonSelectOption, RouterLink,
     ArrayIncludesAnyPipe, ArrayIncludesPipe, CollectionPagePathPipe,
     CollectionPagePositionQueryparamPipe
-  ],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  ]
 })
 export class CollectionSideMenuComponent {
   // ─────────────────────────────────────────────────────────────────────────────
   // Dependency injection, Input/Output signals, Fields, Local state signals
   // ─────────────────────────────────────────────────────────────────────────────
+  private readonly destroyRef = inject(DestroyRef);
   private readonly injector = inject(Injector);
-  private readonly ngZone = inject(NgZone);
   private readonly scrollService = inject(ScrollService);
   private readonly tocService = inject(CollectionTableOfContentsService);
+  private scrollTimer?: ReturnType<typeof setTimeout>;
 
   readonly collectionID = input<string>('');
   readonly routeQueryParams = input<Params>();
@@ -98,6 +98,7 @@ export class CollectionSideMenuComponent {
   // ─────────────────────────────────────────────────────────────────────────────
 
   constructor() {
+    this.destroyRef.onDestroy(() => this.clearScrollTimer());
     this.registerFrontmatterPageUpdates();
     this.registerHighlightDispatcher();
     this.registerTocUpdates();
@@ -363,19 +364,26 @@ export class CollectionSideMenuComponent {
       return;
     }
 
-    this.ngZone.runOutsideAngular(() => {
-      setTimeout(() => {
-        const container = document.querySelector<HTMLElement>('.side-navigation');
-        const target = document.querySelector<HTMLElement>(
-          `collection-side-menu [data-id="toc_${itemId}"] .menu-highlight`
+    this.clearScrollTimer();
+    this.scrollTimer = setTimeout(() => {
+      this.scrollTimer = undefined;
+      const container = document.querySelector<HTMLElement>('.side-navigation');
+      const target = document.querySelector<HTMLElement>(
+        `collection-side-menu [data-id="toc_${itemId}"] .menu-highlight`
+      );
+      if (container && target) {
+        this.scrollService.scrollElementIntoView(
+          target, 'center', 0, 'smooth', container
         );
-        if (container && target) {
-          this.scrollService.scrollElementIntoView(
-            target, 'center', 0, 'smooth', container
-          );
-        }
-      }, timeout);
-    });
+      }
+    }, timeout);
+  }
+
+  private clearScrollTimer() {
+    if (this.scrollTimer !== undefined) {
+      clearTimeout(this.scrollTimer);
+      this.scrollTimer = undefined;
+    }
   }
 
   private computeSortOptions(collectionID: string) {

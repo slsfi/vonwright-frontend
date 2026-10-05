@@ -1,34 +1,34 @@
-@let emailVerificationInProgressValue = emailVerificationInProgress();
-@let emailVerificationCompletedValue = emailVerificationCompleted();
-@let verifyEmailErrorValue = verifyEmailError();
+@let emailVerificationInProgress = this.emailVerificationInProgress();
+@let emailVerificationCompleted = this.emailVerificationCompleted();
+@let verifyEmailError = this.verifyEmailError();
 
 <ion-content>
   <article>
     <div class="narrow-wrap">
       <h1 i18n="@@VerifyEmail.Title">Verifiera e-postadress</h1>
 
-      @if (emailVerificationInProgressValue) {
+      @if (emailVerificationInProgress) {
         <auth-status-message
           type="processing"
           i18n-message="@@VerifyEmail.Verifying"
           message="Verifierar din e-postadress ..."
         ></auth-status-message>
       }
-      @if (emailVerificationCompletedValue) {
+      @if (emailVerificationCompleted) {
         <auth-status-message
           type="success"
           i18n-message="@@VerifyEmail.Success"
           message="Din e-postadress har verifierats. Du kan nu logga in på ditt konto."
         ></auth-status-message>
       }
-      @if (verifyEmailErrorValue === 'invalid_link') {
+      @if (verifyEmailError === 'invalid_link') {
         <auth-status-message
           type="error"
           i18n-message="@@VerifyEmail.InvalidLink"
           message="Verifieringslänken är ogiltig eller har löpt ut."
         ></auth-status-message>
       }
-      @if (verifyEmailErrorValue === 'request_failed') {
+      @if (verifyEmailError === 'request_failed') {
         <auth-status-message
           type="error"
           i18n-message="@@VerifyEmail.RequestFailed"

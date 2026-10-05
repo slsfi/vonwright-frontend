@@ -1,5 +1,5 @@
 import { NgTemplateOutlet } from '@angular/common';
-import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
+import { Component, computed, inject, input } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
 import { HeadingNode } from '@models/article.models';
@@ -13,8 +13,7 @@ import { HtmlParserService } from '@services/html-parser.service';
   selector: 'article-toc',
   templateUrl: './article-toc.component.html',
   styleUrls: ['./article-toc.component.scss'],
-  imports: [NgTemplateOutlet, RouterLink],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  imports: [NgTemplateOutlet, RouterLink]
 })
 export class ArticleTocComponent {
   private readonly htmlParser = inject(HtmlParserService);

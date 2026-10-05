@@ -1,6 +1,9 @@
-@let languageMenuOpenValue = languageMenuOpen();
-@let showSideNavValue = showSideNav();
-@let languageHrefByCodeValue = languageHrefByCode();
+@let authMenuTitle = this.authMenuTitle();
+@let isAuthenticated = this.isAuthenticated();
+@let languageHrefByCode = this.languageHrefByCode();
+@let languageMenuOpen = this.languageMenuOpen();
+@let languageMenuWidth = this.languageMenuWidth();
+@let showSideNav = this.showSideNav();
 
 <h2 id="top-menu-label" class="screen-reader-only" i18n="@@TopMenu.AriaLabel">Primär meny</h2>
 <ul role="menubar">
@@ -8,11 +11,11 @@
     <button (click)="toggleSideMenu($event)"
           type="button"
           aria-haspopup="menu"
-          [attr.aria-expanded]="showSideNavValue"
+          [attr.aria-expanded]="showSideNav"
           aria-controls="side-navigation"
     >
-      <ion-icon [class.visuallyhidden]="showSideNavValue" name="menu-sharp"></ion-icon>
-      <ion-icon [class.visuallyhidden]="!showSideNavValue" name="close-sharp"></ion-icon>
+      <ion-icon [class.visuallyhidden]="showSideNav" name="menu-sharp"></ion-icon>
+      <ion-icon [class.visuallyhidden]="!showSideNav" name="close-sharp"></ion-icon>
       <span class="side-title" i18n="@@TopMenu.Menu">Meny</span>
     </button>
   </li>
@@ -44,15 +47,15 @@
   }
   @if (showTopAuthButton) {
     <li class="auth-button" role="menuitem">
-      @if (isAuthenticated()) {
+      @if (isAuthenticated) {
         <button (click)="logout($event)" type="button">
           <ion-icon name="log-out-sharp"></ion-icon>
-          <span class="side-title">{{authMenuTitle()}}</span>
+          <span class="side-title">{{authMenuTitle}}</span>
         </button>
       } @else {
         <a [routerLink]="['/login']">
           <ion-icon name="log-in-sharp"></ion-icon>
-          <span class="side-title">{{authMenuTitle()}}</span>
+          <span class="side-title">{{authMenuTitle}}</span>
         </a>
       }
     </li>
@@ -63,7 +66,7 @@
             (click)="toggleLanguageMenu($event)"
             type="button"
             id="language-menu-toggle-button"
-            [attr.aria-expanded]="languageMenuOpenValue"
+            [attr.aria-expanded]="languageMenuOpen"
             aria-haspopup="menu"
             aria-controls="language-menu"
             aria-label="Välj språk. Nuvarande språk:"
@@ -72,12 +75,12 @@
         <ion-icon name="language-sharp"></ion-icon>
         <span class="current-language"><span class="current-language-label">{{currentLanguageLabel}} </span>({{activeLocale}})</span>
         <ion-icon class="toggle-language-menu-icon"
-              [class.hide-icon]="languageMenuOpenValue"
+              [class.hide-icon]="languageMenuOpen"
               name="chevron-down-sharp"
               aria-hidden="true"
         ></ion-icon>
         <ion-icon class="toggle-language-menu-icon"
-              [class.hide-icon]="!languageMenuOpenValue"
+              [class.hide-icon]="!languageMenuOpen"
               name="chevron-up-sharp"
               aria-hidden="true"
         ></ion-icon>
@@ -85,13 +88,13 @@
       <ul #languageMenu
             id="language-menu"
             role="menu"
-            [class.open]="languageMenuOpenValue"
-            [style.min-width.px]="languageMenuWidth()"
+            [class.open]="languageMenuOpen"
+            [style.min-width.px]="languageMenuWidth"
       >
         @for (lang of languages; track lang.code) {
           @if (lang.code !== activeLocale) {
             <li [attr.lang]="lang.code" role="menuitem">
-              <a [href]="languageHrefByCodeValue[lang.code]">{{lang.label}} ({{lang.code}})</a>
+              <a [href]="languageHrefByCode[lang.code]">{{lang.label}} ({{lang.code}})</a>
             </li>
           }
         }

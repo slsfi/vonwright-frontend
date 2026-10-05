@@ -1,7 +1,15 @@
-import { Component, inject, OnDestroy, ChangeDetectionStrategy } from '@angular/core';
-import { Router } from '@angular/router';
-import { FormBuilder, Validators } from '@angular/forms';
+import { Component, inject, OnDestroy } from '@angular/core';
+import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Router, RouterLink } from '@angular/router';
+import {
+  IonButton,
+  IonContent,
+  IonInput,
+  IonInputPasswordToggle,
+  IonSpinner
+} from '@ionic/angular';
 
+import { AuthStatusMessageComponent } from '@components/auth-status-message/auth-status-message.component';
 import { config } from '@config';
 import { getAuthRedirectNavigationQueryParams } from '@services/auth-redirect-url.utils';
 import { AuthService } from '@services/auth.service';
@@ -10,8 +18,16 @@ import { AuthService } from '@services/auth.service';
   selector: 'page-login',
   templateUrl: './login.page.html',
   styleUrls: ['./login.page.scss'],
-  changeDetection: ChangeDetectionStrategy.Eager,
-  standalone: false
+  imports: [
+    AuthStatusMessageComponent,
+    IonButton,
+    IonContent,
+    IonInput,
+    IonInputPasswordToggle,
+    IonSpinner,
+    ReactiveFormsModule,
+    RouterLink
+  ]
 })
 export class LoginPage implements OnDestroy {
   private readonly formBuilder = inject(FormBuilder);

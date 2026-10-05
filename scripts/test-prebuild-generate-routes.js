@@ -2,6 +2,7 @@ const assert = require('assert');
 const fs = require('fs');
 const path = require('path');
 const {
+  createRouteGenerationPlan,
   extractRouteBlocks,
   extractRoutesArrayBody,
   getAuthProtectedRoutePaths,
@@ -39,35 +40,120 @@ function test(name, fn) {
   tests.push({ name, fn });
 }
 
-test('extractRouteBlocks handles comments containing braces and brackets', () => {
-  const source = `
+const standaloneRoutesSource = `
 import { Routes } from '@angular/router';
 
 export const routes: Routes = [
   {
     path: '',
-    loadChildren: () => import('./pages/home/home.module').then(m => m.HomePageModule)
+    loadComponent: () => import('./pages/home/home.page').then(m => m.HomePage)
   },
   // This comment contains } ] and should not break parsing.
   /* This block comment contains { [ ] } and should not break parsing. */
   {
-    path: "content",
+    path: "about",
+    loadChildren: () => import('./pages/about/about.routes').then(m => m.aboutRoutes)
+  },
+  {
+    path: 'content',
     data: {
       label: 'text'
     },
     // Inline comment with ] and }
-    loadChildren: () => import('./pages/content/content.module').then(m => m.ContentPageModule)
+    loadComponent: () => import('./pages/content/content.page').then(m => m.ContentPage),
+    canActivate: [authGuard]
+  },
+  {
+    path: 'article',
+    loadChildren: () => import('./pages/article/article.routes').then(m => m.articleRoutes)
+  },
+  {
+    path: 'search',
+    loadComponent: () => import('./pages/elastic-search/elastic-search.page').then(m => m.ElasticSearchPage),
+    canActivate: [authGuard]
   },
   {
     path: \`**\`,
-    loadChildren: () => import('./pages/page-not-found/page-not-found.module').then(m => m.PageNotFoundPageModule)
+    loadComponent: () => import('./pages/page-not-found/page-not-found.page').then(m => m.PageNotFoundPage)
   }
 ];
 `;
 
-  const blocks = extractRouteBlocks(source);
-  assert.strictEqual(blocks.length, 3);
-  assert.deepStrictEqual(blocks.map(getRoutePath), ['', 'content', '**']);
+function createGeneratorConfig(featureBasedRoutes, authEnabled) {
+  return {
+    app: {
+      auth: { enabled: authEnabled },
+      prebuild: { featureBasedRoutes }
+    },
+    articles: [{ name: 'example' }],
+    collections: { order: [] },
+    component: {
+      mainSideMenu: {
+        items: {
+          about: true,
+          articles: false,
+          search: false
+        }
+      },
+      topMenu: { showElasticSearchButton: false }
+    },
+    ebooks: []
+  };
+}
+
+test('extractRouteBlocks handles standalone routes and comments containing braces and brackets', () => {
+  const blocks = extractRouteBlocks(standaloneRoutesSource);
+  assert.strictEqual(blocks.length, 6);
+  assert.deepStrictEqual(
+    blocks.map(getRoutePath),
+    ['', 'about', 'content', 'article', 'search', '**']
+  );
+  assert.match(blocks[0], /loadComponent/);
+  assert.match(blocks[1], /about\.routes/);
+  assert.match(blocks[3], /article\.routes/);
+});
+
+test('feature-based mode false preserves all top-level standalone routes', () => {
+  const plan = createRouteGenerationPlan(
+    standaloneRoutesSource,
+    createGeneratorConfig(false, true)
+  );
+
+  assert.strictEqual(plan.featureBasedRoutes, false);
+  assert.strictEqual(plan.authEnabled, true);
+  assert.strictEqual(plan.routesFileContent, standaloneRoutesSource);
+  assert.strictEqual(plan.unknownRoutePaths.size, 0);
+  assert.deepStrictEqual(
+    plan.routeBlocks.map(getRoutePath),
+    ['', 'about', 'content', 'article', 'search', '**']
+  );
+  assert.deepStrictEqual(
+    getAuthProtectedRoutePaths(plan.routeBlocks, plan.authEnabled),
+    ['content', 'search']
+  );
+});
+
+test('feature-based mode true filters standalone routes by top-level path', () => {
+  const plan = createRouteGenerationPlan(
+    standaloneRoutesSource,
+    createGeneratorConfig(true, true)
+  );
+
+  assert.strictEqual(plan.featureBasedRoutes, true);
+  assert.strictEqual(plan.authEnabled, true);
+  assert.strictEqual(plan.unknownRoutePaths.size, 0);
+  assert.deepStrictEqual(
+    plan.routeBlocks.map(getRoutePath),
+    ['', 'about', 'content', '**']
+  );
+  assert.match(plan.routesFileContent, /loadComponent/);
+  assert.match(plan.routesFileContent, /about\.routes/);
+  assert.doesNotMatch(plan.routesFileContent, /article\.routes/);
+  assert.doesNotMatch(plan.routesFileContent, /ElasticSearchPage/);
+  assert.deepStrictEqual(
+    getAuthProtectedRoutePaths(plan.routeBlocks, plan.authEnabled),
+    ['content']
+  );
 });
 
 test('extractRoutesArrayBody ignores comments while finding closing bracket', () => {
@@ -166,15 +252,20 @@ const c = \`template // text\`;`;
   assert.doesNotMatch(stripped, /remove this/);
 });
 
-test('current app.routes.ts can be parsed into route blocks', () => {
+test('current app.routes.ts parses and all top-level paths have feature keys', () => {
   const routesPath = path.join(__dirname, '../src/app/app.routes.ts');
   const source = fs.readFileSync(routesPath, 'utf-8');
   const blocks = extractRouteBlocks(source);
   const paths = blocks.map(getRoutePath).filter((routePath) => routePath !== null);
+  const featureBasedPlan = createRouteGenerationPlan(
+    source,
+    createGeneratorConfig(true, false)
+  );
 
   assert.ok(blocks.length > 0);
   assert.ok(paths.includes(''));
   assert.ok(paths.includes('**'));
+  assert.strictEqual(featureBasedPlan.unknownRoutePaths.size, 0);
 });
 
 test('current app.routes.ts yields no protected paths when auth is disabled', () => {
@@ -186,13 +277,30 @@ test('current app.routes.ts yields no protected paths when auth is disabled', ()
   assert.deepStrictEqual(paths, []);
 });
 
-test('current app.routes.ts includes content in protected paths when auth is enabled', () => {
+test('current app.routes.ts preserves the complete protected path list when auth is enabled', () => {
   const routesPath = path.join(__dirname, '../src/app/app.routes.ts');
   const source = fs.readFileSync(routesPath, 'utf-8');
   const blocks = extractRouteBlocks(source);
   const paths = getAuthProtectedRoutePaths(blocks, true);
 
-  assert.ok(paths.includes('content'));
+  assert.deepStrictEqual(paths, [
+    'account',
+    'change-password',
+    'collection/:collectionID/cover',
+    'collection/:collectionID/foreword',
+    'collection/:collectionID/introduction',
+    'collection/:collectionID/text',
+    'collection/:collectionID/title',
+    'content',
+    'forgot-password',
+    'index/:type',
+    'login',
+    'media-collection',
+    'register',
+    'reset-password',
+    'search',
+    'verify-email'
+  ]);
 });
 
 let passed = 0;

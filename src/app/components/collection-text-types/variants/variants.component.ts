@@ -1,6 +1,6 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, ElementRef, Injector, afterRenderEffect, computed, effect, inject, input, output, signal, untracked } from '@angular/core';
+import { Component, DestroyRef, ElementRef, Injector, OnDestroy, afterRenderEffect, computed, effect, inject, input, output, signal, untracked } from '@angular/core';
 import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
-import { AlertButton, AlertController, AlertInput, IonicModule } from '@ionic/angular/lazy';
+import { AlertButton, AlertController, AlertInput, IonButton, IonIcon, IonSpinner } from '@ionic/angular';
 import { catchError, of, switchMap, tap } from 'rxjs';
 
 import { config } from '@config';
@@ -20,10 +20,9 @@ import { ViewOptionsService } from '@services/view-options.service';
   selector: 'variants',
   templateUrl: './variants.component.html',
   styleUrls: ['./variants.component.scss'],
-  imports: [IonicModule, TrustHtmlPipe],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  imports: [IonButton, IonIcon, IonSpinner, TrustHtmlPipe]
 })
-export class VariantsComponent {
+export class VariantsComponent implements OnDestroy {
   // ─────────────────────────────────────────────────────────────────────────────
   // Dependency injection, Input/Output signals, Fields, Local state signals
   // ─────────────────────────────────────────────────────────────────────────────
@@ -48,7 +47,7 @@ export class VariantsComponent {
 
   readonly showOpenLegendButton: boolean = config.component?.variants?.showOpenLegendButton ?? false;
 
-  intervalTimerId: number = 0;
+  private intervalTimerId?: number;
   private _lastScrollKey: string | null = null;
 
   variants = signal<Variant[] | null>(null);
@@ -124,6 +123,17 @@ export class VariantsComponent {
     this.registerAfterRenderEffects();
   }
 
+  ngOnDestroy() {
+    this.clearSearchMatchInterval();
+  }
+
+  private clearSearchMatchInterval() {
+    if (this.intervalTimerId !== undefined) {
+      clearInterval(this.intervalTimerId);
+      this.intervalTimerId = undefined;
+    }
+  }
+
   private loadVariants() {
     // Load variants when textKey changes
     toObservable(this.textKey).pipe(
@@ -192,9 +202,9 @@ export class VariantsComponent {
         if (this._lastScrollKey !== key) {
           this._lastScrollKey = key;
 
-          this.scrollService.scrollToFirstSearchMatch(
-            this.elementRef.nativeElement,
-            this.intervalTimerId
+          this.clearSearchMatchInterval();
+          this.intervalTimerId = this.scrollService.scrollToFirstSearchMatch(
+            this.elementRef.nativeElement
           );
         }
       },

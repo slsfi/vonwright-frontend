@@ -1,4 +1,4 @@
-import { Injectable, NgZone, inject } from '@angular/core';
+import { Injectable } from '@angular/core';
 
 import { ScrollPlan, ScrollYPos } from '@models/scroll.models';
 import { isBrowser } from '@utility-functions';
@@ -8,8 +8,6 @@ import { isBrowser } from '@utility-functions';
   providedIn: 'root',
 })
 export class ScrollService {
-  private ngZone = inject(NgZone);
-
   private activeComHighl: Record<string, any> = {
     commentTimeOutId: null,
     commentLemmaElement: null,
@@ -166,17 +164,15 @@ export class ScrollService {
     scrollBehavior = 'smooth'
   ) {
     try {
-      this.ngZone.runOutsideAngular(() => {
-        const tmpImage: HTMLImageElement = new Image();
-        tmpImage.src = 'assets/images/ms_arrow_right.svg';
-        tmpImage.alt = 'right arrow';
-        tmpImage.classList.add('inl_ms_arrow');
-        element.parentElement?.insertBefore(tmpImage, element);
-        this.scrollElementIntoView(tmpImage, position, 0, scrollBehavior);
-        setTimeout(() => {
-          element.parentElement?.removeChild(tmpImage);
-        }, timeOut);
-      });
+      const tmpImage: HTMLImageElement = new Image();
+      tmpImage.src = 'assets/images/ms_arrow_right.svg';
+      tmpImage.alt = 'right arrow';
+      tmpImage.classList.add('inl_ms_arrow');
+      element.parentElement?.insertBefore(tmpImage, element);
+      this.scrollElementIntoView(tmpImage, position, 0, scrollBehavior);
+      setTimeout(() => {
+        element.parentElement?.removeChild(tmpImage);
+      }, timeOut);
     } catch (e) {
       console.error(e);
     }
@@ -215,25 +211,23 @@ export class ScrollService {
    */
   scrollLastViewIntoView() {
     if (isBrowser()) {
-      this.ngZone.runOutsideAngular(() => {
-        let iterationsLeft = 10;
-        clearInterval(this.intervalTimerId);
-        const that = this;
-        this.intervalTimerId = window.setInterval(function() {
-          if (iterationsLeft < 1) {
-            clearInterval(that.intervalTimerId);
-          } else {
-            iterationsLeft -= 1;
-            const viewElements = document.querySelector(
-              'page-text:not([ion-page-hidden]):not(.ion-page-hidden)'
-            )?.getElementsByClassName('text-column');
-            if (viewElements?.[0]) {
-              const lastViewElement = viewElements[viewElements.length - 1] as HTMLElement;
-              that.scrollCollectionTextColumnIntoView(lastViewElement, 0) && clearInterval(that.intervalTimerId);
-            }
+      let iterationsLeft = 10;
+      clearInterval(this.intervalTimerId);
+      const that = this;
+      this.intervalTimerId = window.setInterval(function() {
+        if (iterationsLeft < 1) {
+          clearInterval(that.intervalTimerId);
+        } else {
+          iterationsLeft -= 1;
+          const viewElements = document.querySelector(
+            'page-text:not([ion-page-hidden]):not(.ion-page-hidden)'
+          )?.getElementsByClassName('text-column');
+          if (viewElements?.[0]) {
+            const lastViewElement = viewElements[viewElements.length - 1] as HTMLElement;
+            that.scrollCollectionTextColumnIntoView(lastViewElement, 0) && clearInterval(that.intervalTimerId);
           }
-        }.bind(this), 500);
-      });
+        }
+      }.bind(this), 500);
     }
   }
 
@@ -242,48 +236,46 @@ export class ScrollService {
    * Searches for the first <mark> element that isn't in a footnote tooltip within
    * the given containerElement and scrolls it into view.
    * @param containerElement the context element to look for <mark> within
-   * @param intervalTimerId reference to a variable where the return value of
-   * window.setInterval can be stored
+   * @returns the retry interval handle, or undefined outside the browser
    */
-  scrollToFirstSearchMatch(containerElement: HTMLElement, intervalTimerId: number) {
-    if (isBrowser()) {
-      this.ngZone.runOutsideAngular(() => {
-        let iterationsLeft = 10;
-        clearInterval(intervalTimerId);
-        const that = this;
-
-        intervalTimerId = window.setInterval(function() {
-          if (iterationsLeft < 1) {
-            clearInterval(intervalTimerId);
-          } else {
-            iterationsLeft -= 1;
-            let target: HTMLElement | null | undefined = containerElement.querySelector('mark');
-
-            if (
-              target?.parentElement?.classList.contains('ttFixed') ||
-              target?.parentElement?.parentElement?.classList.contains('ttFixed')
-            ) {
-              // The search match is in a footnote tooltip, look for next which isn't
-              const targets: NodeListOf<HTMLElement> = containerElement.querySelectorAll('mark');
-              let i = 0;
-
-              while (
-                target?.parentElement?.classList.contains('ttFixed') ||
-                target?.parentElement?.parentElement?.classList.contains('ttFixed')
-              ) {
-                i++;
-                target = targets[i];
-              }
-            }
-
-            if (target) {
-              that.scrollToHTMLElement(target);
-              clearInterval(intervalTimerId);
-            }
-          }
-        }.bind(this), 1000);
-      });
+  scrollToFirstSearchMatch(containerElement: HTMLElement): number | undefined {
+    if (!isBrowser()) {
+      return undefined;
     }
+
+    let iterationsLeft = 10;
+    const intervalTimerId = window.setInterval(() => {
+      if (iterationsLeft < 1) {
+        clearInterval(intervalTimerId);
+      } else {
+        iterationsLeft -= 1;
+        let target: HTMLElement | null | undefined = containerElement.querySelector('mark');
+
+        if (
+          target?.parentElement?.classList.contains('ttFixed') ||
+          target?.parentElement?.parentElement?.classList.contains('ttFixed')
+        ) {
+          // The search match is in a footnote tooltip, look for next which isn't
+          const targets: NodeListOf<HTMLElement> = containerElement.querySelectorAll('mark');
+          let i = 0;
+
+          while (
+            target?.parentElement?.classList.contains('ttFixed') ||
+            target?.parentElement?.parentElement?.classList.contains('ttFixed')
+          ) {
+            i++;
+            target = targets[i];
+          }
+        }
+
+        if (target) {
+          this.scrollToHTMLElement(target);
+          clearInterval(intervalTimerId);
+        }
+      }
+    }, 1000);
+
+    return intervalTimerId;
   }
 
   /**

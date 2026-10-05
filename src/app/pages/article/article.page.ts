@@ -1,10 +1,24 @@
-import { Component, ElementRef, LOCALE_ID, NgZone, OnDestroy, OnInit, Renderer2, inject, ChangeDetectionStrategy } from '@angular/core';
+import { AsyncPipe, NgClass } from '@angular/common';
+import { Component, ElementRef, LOCALE_ID, OnDestroy, OnInit, Renderer2, inject, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ModalController, PopoverController } from '@ionic/angular/lazy';
+import {
+  IonButton,
+  IonButtons,
+  IonContent,
+  IonHeader,
+  IonIcon,
+  IonSpinner,
+  IonToolbar,
+  ModalController,
+  PopoverController
+} from '@ionic/angular';
 import { Observable, Subscription, map, of, switchMap, tap } from 'rxjs';
 
+import { ArticleTocComponent } from '@components/article-toc/article-toc.component';
 import { config } from '@config';
 import { Article } from '@models/article.models';
+import { IsExternalURLPipe } from '@pipes/is-external-url.pipe';
+import { TrustHtmlPipe } from '@pipes/trust-html.pipe';
 import { MarkdownService } from '@services/markdown.service';
 import { PlatformService } from '@services/platform.service';
 import { ScrollService } from '@services/scroll.service';
@@ -16,14 +30,25 @@ import { isBrowser } from '@utility-functions';
   selector: 'page-article',
   templateUrl: './article.page.html',
   styleUrls: ['./article.page.scss'],
-  changeDetection: ChangeDetectionStrategy.Eager,
-  standalone: false
+  imports: [
+    ArticleTocComponent,
+    AsyncPipe,
+    IonButton,
+    IonButtons,
+    IonContent,
+    IonHeader,
+    IonIcon,
+    IonSpinner,
+    IonToolbar,
+    IsExternalURLPipe,
+    NgClass,
+    TrustHtmlPipe
+  ]
 })
 export class ArticlePage implements OnInit, OnDestroy {
   private elementRef = inject(ElementRef);
   private mdService = inject(MarkdownService);
   private modalController = inject(ModalController);
-  private ngZone = inject(NgZone);
   private platformService = inject(PlatformService);
   private popoverCtrl = inject(PopoverController);
   private renderer2 = inject(Renderer2);
@@ -36,18 +61,17 @@ export class ArticlePage implements OnInit, OnDestroy {
   readonly showTextDownloadButton: boolean = config.page?.article?.showTextDownloadButton ?? false;
   readonly showURNButton: boolean = config.page?.article?.showURNButton ?? false;
 
-  article: Article | null = null;
-  enableTOC: boolean = true;
+  readonly article = signal<Article | null>(null);
+  readonly enableTOC = signal(true);
   markdownText$: Observable<string | null>;
-  mobileMode: boolean = false;
-  tocMenuOpen: boolean = false;
+  readonly mobileMode = this.platformService.isMobile();
+  readonly tocMenuOpen = signal(false);
 
   private fragmentSubscription?: Subscription;
+  private scrollRetryTimer?: ReturnType<typeof setTimeout>;
   private unlistenClickEvents?: () => void;
 
   ngOnInit() {
-    this.mobileMode = this.platformService.isMobile();
-
     if (isBrowser()) {
       this.setUpTextListeners();
 
@@ -64,11 +88,11 @@ export class ArticlePage implements OnInit, OnDestroy {
         article: this.resolveArticle(name)
       })),
       tap(({article}) => {
-        this.article = article;
-        this.enableTOC = this.article?.enableTOC ?? true;
+        this.article.set(article);
+        this.enableTOC.set(article?.enableTOC ?? true);
 
-        if (this.article && !this.mobileMode && !this.tocMenuOpen) {
-          this.tocMenuOpen = true;
+        if (article && !this.mobileMode && !this.tocMenuOpen()) {
+          this.tocMenuOpen.set(true);
         }
       }),
       switchMap(({name, article}) => {
@@ -88,6 +112,7 @@ export class ArticlePage implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
+    this.clearScrollRetryTimer();
     this.unlistenClickEvents?.();
     this.fragmentSubscription?.unsubscribe();
   }
@@ -167,7 +192,7 @@ export class ArticlePage implements OnInit, OnDestroy {
   }
 
   toggleTocMenu() {
-    this.tocMenuOpen = !this.tocMenuOpen;
+    this.tocMenuOpen.update(tocMenuOpen => !tocMenuOpen);
   }
 
   /**
@@ -177,77 +202,86 @@ export class ArticlePage implements OnInit, OnDestroy {
   private setUpTextListeners() {
     const nElement: HTMLElement = this.elementRef.nativeElement;
 
-    this.ngZone.runOutsideAngular(() => {
-      /* CLICK EVENTS */
-      this.unlistenClickEvents = this.renderer2.listen(nElement, 'click', (event) => {
-        try {
-          const eventTarget = event.target as HTMLElement;
-          if (
-            eventTarget.hasAttribute('href') &&
-            eventTarget.getAttribute('href')?.startsWith('#')
-          ) {
-            // Link to a position on the same page, find the link target
-            // and scroll the position into view using the URL fragment.
-            event.preventDefault();
-            const targetElemId = eventTarget.getAttribute('href')?.slice(1);
-            if (!targetElemId) {
-              return;
-            }
-
-            this.router.navigate([], {
-              fragment: targetElemId,
-              queryParamsHandling: 'preserve',
-              relativeTo: this.route,
-              replaceUrl: false,
-            });
+    /* CLICK EVENTS */
+    this.unlistenClickEvents = this.renderer2.listen(nElement, 'click', (event) => {
+      try {
+        const eventTarget = event.target as HTMLElement;
+        if (
+          eventTarget.hasAttribute('href') &&
+          eventTarget.getAttribute('href')?.startsWith('#')
+        ) {
+          // Link to a position on the same page, find the link target
+          // and scroll the position into view using the URL fragment.
+          event.preventDefault();
+          const targetElemId = eventTarget.getAttribute('href')?.slice(1);
+          if (!targetElemId) {
+            return;
           }
-        } catch (e) {
-          console.error(e);
+
+          this.router.navigate([], {
+            fragment: targetElemId,
+            queryParamsHandling: 'preserve',
+            relativeTo: this.route,
+            replaceUrl: false,
+          });
         }
-      });
+      } catch (e) {
+        console.error(e);
+      }
     });
   }
 
   private scrollToFragment(targetElemId: string, delayMs: number = 500) {
     if (!isBrowser()) return;
+
+    this.clearScrollRetryTimer();
   
-    this.ngZone.runOutsideAngular(() => {
-      let attemptsLeft = 10;
-  
-      const tryScroll = () => {
-        if (attemptsLeft-- < 1) return;
-  
-        const scrollTargetElem = document.querySelector<HTMLElement>(
-          'page-article:not([ion-page-hidden]):not(.ion-page-hidden) [id="' + targetElemId + '"]'
+    let attemptsLeft = 10;
+
+    const tryScroll = () => {
+      if (attemptsLeft-- < 1) {
+        this.scrollRetryTimer = undefined;
+        return;
+      }
+
+      const scrollTargetElem = document.querySelector<HTMLElement>(
+        'page-article:not([ion-page-hidden]):not(.ion-page-hidden) [id="' + targetElemId + '"]'
+      );
+      const scrollContainerElem = document.querySelector<HTMLElement>(
+        'page-article:not([ion-page-hidden]):not(.ion-page-hidden) article'
+      );
+
+      if (scrollTargetElem && scrollContainerElem) {
+        this.scrollRetryTimer = undefined;
+        this.scrollService.scrollElementIntoView(
+          scrollTargetElem, 'top', 0, 'smooth', scrollContainerElem
         );
-        const scrollContainerElem = document.querySelector<HTMLElement>(
-          'page-article:not([ion-page-hidden]):not(.ion-page-hidden) article'
-        );
-  
-        if (scrollTargetElem && scrollContainerElem) {
-          this.scrollService.scrollElementIntoView(
-            scrollTargetElem, 'top', 0, 'smooth', scrollContainerElem
-          );
 
-          // If scrolling to footnote or footnote reference, move focus so navigating
-          // back and forth with keyboard works.
-          const targetElemAttr = scrollTargetElem.getAttribute('id');
-          let focusElem = null;
+        // If scrolling to footnote or footnote reference, move focus so navigating
+        // back and forth with keyboard works.
+        const targetElemAttr = scrollTargetElem.getAttribute('id');
+        let focusElem = null;
 
-          if (targetElemAttr?.startsWith('md-footnote-ref-')) {
-            focusElem = scrollTargetElem;
-          } else if (targetElemAttr?.startsWith('md-footnote-')) {
-            focusElem = scrollTargetElem.querySelector<HTMLElement>('[data-md-footnote-backref]');
-          }
-
-          focusElem?.focus({ preventScroll: true });
-        } else {
-          setTimeout(tryScroll, delayMs);
+        if (targetElemAttr?.startsWith('md-footnote-ref-')) {
+          focusElem = scrollTargetElem;
+        } else if (targetElemAttr?.startsWith('md-footnote-')) {
+          focusElem = scrollTargetElem.querySelector<HTMLElement>('[data-md-footnote-backref]');
         }
-      };
-  
-      tryScroll();
-    });
+
+        focusElem?.focus({ preventScroll: true });
+      } else {
+        this.scrollRetryTimer = setTimeout(tryScroll, delayMs);
+      }
+    };
+
+    tryScroll();
+  }
+
+  private clearScrollRetryTimer(): void {
+    if (this.scrollRetryTimer !== undefined) {
+      clearTimeout(this.scrollRetryTimer);
+      this.scrollRetryTimer = undefined;
+    }
   }
   
 }

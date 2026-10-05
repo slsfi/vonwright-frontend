@@ -1,8 +1,8 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, Input, LOCALE_ID, DOCUMENT, inject, signal } from '@angular/core';
+import { Component, DestroyRef, Input, LOCALE_ID, DOCUMENT, inject, signal } from '@angular/core';
 import { NgClass, NgStyle } from '@angular/common';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { PRIMARY_OUTLET, Router, UrlSegment, UrlTree } from '@angular/router';
-import { IonicModule, ModalController } from '@ionic/angular/lazy';
+import { IonButton, IonButtons, IonContent, IonHeader, IonIcon, IonSpinner, IonTitle, IonToolbar, ModalController } from '@ionic/angular';
 import { catchError, forkJoin, map, Observable, of, Subscription, tap } from 'rxjs';
 
 import { config } from '@config';
@@ -28,8 +28,7 @@ import { concatenateNames, isFileNotFoundHtml } from '@utility-functions';
   selector: 'modal-download-texts',
   templateUrl: './download-texts.modal.html',
   styleUrls: ['./download-texts.modal.scss'],
-  imports: [NgClass, NgStyle, IonicModule, TrustHtmlPipe],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  imports: [NgClass, NgStyle, IonButton, IonButtons, IonContent, IonHeader, IonIcon, IonSpinner, IonTitle, IonToolbar, TrustHtmlPipe]
 })
 export class DownloadTextsModal {
   // ─────────────────────────────────────────────────────────────────────────────

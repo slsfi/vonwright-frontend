@@ -1,9 +1,23 @@
-import { Component, ChangeDetectionStrategy, DestroyRef, ElementRef, LOCALE_ID, NgZone, OnDestroy, OnInit, Renderer2, inject } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { NgClass, NgStyle } from '@angular/common';
+import { Component, DestroyRef, ElementRef, LOCALE_ID, OnDestroy, OnInit, Renderer2, inject, signal } from '@angular/core';
+import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ModalController, PopoverController } from '@ionic/angular/lazy';
+import {
+  IonButton,
+  IonButtons,
+  IonContent,
+  IonHeader,
+  IonIcon,
+  IonSpinner,
+  IonToolbar,
+  ModalController,
+  PopoverController
+} from '@ionic/angular';
+import { Subscription, catchError, distinctUntilChanged, filter, map, of, switchMap, tap } from 'rxjs';
 
+import { TextChangerComponent } from '@components/text-changer/text-changer.component';
 import { config } from '@config';
+import { TrustHtmlPipe } from '@pipes/trust-html.pipe';
 import { CollectionContentService } from '@services/collection-content.service';
 import { CollectionsService } from '@services/collections.service';
 import { HtmlParserService } from '@services/html-parser.service';
@@ -19,8 +33,19 @@ import { isBrowser } from '@utility-functions';
   selector: 'page-introduction',
   templateUrl: './collection-introduction.page.html',
   styleUrls: ['./collection-introduction.page.scss'],
-  changeDetection: ChangeDetectionStrategy.Eager,
-  standalone: false
+  imports: [
+    IonButton,
+    IonButtons,
+    IonContent,
+    IonHeader,
+    IonIcon,
+    IonSpinner,
+    IonToolbar,
+    NgClass,
+    NgStyle,
+    TextChangerComponent,
+    TrustHtmlPipe
+  ]
 })
 export class CollectionIntroductionPage implements OnInit, OnDestroy {
   private collectionContentService = inject(CollectionContentService);
@@ -28,7 +53,6 @@ export class CollectionIntroductionPage implements OnInit, OnDestroy {
   private destroyRef = inject(DestroyRef);
   private elementRef = inject(ElementRef);
   private modalCtrl = inject(ModalController);
-  private ngZone = inject(NgZone);
   private parserService = inject(HtmlParserService);
   private platformService = inject(PlatformService);
   private popoverCtrl = inject(PopoverController);
@@ -41,56 +65,57 @@ export class CollectionIntroductionPage implements OnInit, OnDestroy {
   viewOptionsService = inject(ViewOptionsService);
   private activeLocale = inject(LOCALE_ID);
 
-  hasSeparateIntroToc: boolean = config.page?.introduction?.hasSeparateTOC ?? false;
+  readonly legacyIDsEnabled: boolean = config.collections?.enableLegacyIDs ?? false;
   readonly replaceImageAssetsPaths: boolean = config.collections?.replaceImageAssetsPaths ?? true;
+  readonly separateIntroTocEnabled: boolean = config.page?.introduction?.hasSeparateTOC ?? false;
   readonly showTextDownloadButton: boolean = config.page?.introduction?.showTextDownloadButton ?? false;
   readonly showURNButton: boolean = config.page?.introduction?.showURNButton ?? true;
   readonly showViewOptionsButton: boolean = config.page?.introduction?.showViewOptionsButton ?? true;
-  viewOptionsTogglesIntro: any = config.page?.introduction?.viewOptions ?? undefined;
-
-  _activeComponent: boolean = true;
-  collectionID: string = '';
-  collectionLegacyId: string = '';
-  infoOverlayPosition: any = {
+  readonly activeComponent = signal(true);
+  readonly showSeparateIntroToc = signal(false);
+  readonly infoOverlayPosition = signal({
     bottom: 0 + 'px',
     left: -1500 + 'px'
-  };
-  infoOverlayPosType: string = 'fixed';
-  infoOverlayText: string = '';
-  infoOverlayTitle: string = '';
-  infoOverlayTriggerElem: HTMLElement | null = null;
-  infoOverlayWidth: string | null = null;
-  intervalTimerId: number = 0;
-  mobileMode: boolean = false;
-  pos: string | null = null;
-  searchMatches: string[] = [];
-  text: string = '';
-  textLoading: boolean = true;
-  textMenu: string = '';
-  tocMenuOpen: boolean = false;
-  toolTipMaxWidth: string | null = null;
-  toolTipPosition: any = {
+  });
+  readonly infoOverlayPosType = signal('fixed');
+  readonly infoOverlayText = signal('');
+  readonly infoOverlayTitle = signal('');
+  readonly infoOverlayTriggerElem = signal<HTMLElement | null>(null);
+  readonly infoOverlayWidth = signal<string | null>(null);
+  readonly mobileMode = this.platformService.isMobile();
+  readonly text = signal('');
+  readonly textLoading = signal(true);
+  readonly textMenu = signal('');
+  readonly tocMenuOpen = signal(false);
+  readonly toolTipMaxWidth = signal<string | null>(null);
+  readonly toolTipPosition = signal({
     top: 0 + 'px',
     left: -1500 + 'px'
-  };
-  toolTipPosType: string = 'fixed';
-  toolTipScaleValue: number | null = null;
-  toolTipText: string = '';
-  tooltipVisible: boolean = false;
-  userIsTouching: boolean = false;
+  });
+  readonly toolTipPosType = signal('fixed');
+  readonly toolTipScaleValue = signal<number | null>(null);
+  readonly toolTipText = signal('');
+  readonly viewOptionsTogglesIntro: Record<string, boolean>;
 
+  private readonly active$ = toObservable(this.activeComponent);
+  private collectionID: string = '';
+  private collectionLegacyId: string = '';
+  private intervalTimerId?: number;
+  private legacyIdSubscription?: Subscription;
+  private pos: string | null = null;
+  private restoreInfoOverlayFocusTimer?: ReturnType<typeof setTimeout>;
+  private searchMatches: string[] = [];
+  private tooltipVisible: boolean = false;
   private unlistenClickEvents?: () => void;
   private unlistenKeyUpEnterEvents?: () => void;
   private unlistenMouseoverEvents?: () => void;
   private unlistenMouseoutEvents?: () => void;
   private unlistenFirstTouchStartEvent?: () => void;
+  private userIsTouching: boolean = false;
 
   constructor() {
-    if (
-      this.viewOptionsTogglesIntro === undefined ||
-      this.viewOptionsTogglesIntro === null ||
-      Object.keys(this.viewOptionsTogglesIntro).length === 0
-    ) {
+    const configuredToggles = config.page?.introduction?.viewOptions;
+    if (!configuredToggles || Object.keys(configuredToggles).length === 0) {
       this.viewOptionsTogglesIntro = {
         'comments': false,
         'personInfo': false,
@@ -104,51 +129,60 @@ export class CollectionIntroductionPage implements OnInit, OnDestroy {
         'pageBreakEdition': false
       };
     } else {
-      this.viewOptionsTogglesIntro.comments = false;
-      this.viewOptionsTogglesIntro.emendations = false;
-      this.viewOptionsTogglesIntro.normalisations = false;
-      this.viewOptionsTogglesIntro.abbreviations = false;
-      this.viewOptionsTogglesIntro.pageBreakOriginal = false;
+      this.viewOptionsTogglesIntro = {
+        ...configuredToggles,
+        comments: false,
+        emendations: false,
+        normalisations: false,
+        abbreviations: false,
+        pageBreakOriginal: false
+      };
     }
   }
 
+  /**
+   * Keep the introduction in sync with route and query parameters while this
+   * Ionic page is active. Position-only changes scroll the already loaded
+   * introduction; a new collection ID resets the page and starts a new content
+   * request. `switchMap` cancels an older request if route reuse changes the
+   * collection again before that request completes.
+   */
   ngOnInit() {
-    this.mobileMode = this.platformService.isMobile();
+    this.routeStateSource.get(this.route, this.active$).pipe(
+      map(({ params, queryParams }) => ({ ...params, ...queryParams })),
+      tap(routeParams => {
+        // Position and search terms come from query parameters and affect what
+        // happens after the introduction has been rendered.
+        this.pos = routeParams['position'] ?? null;
+        this.searchMatches = routeParams['q']
+          ? this.parserService.getSearchMatchesFromQueryParams(routeParams['q'])
+          : [];
 
-    this.routeStateSource.get(this.route).pipe(
-      takeUntilDestroyed(this.destroyRef)
-    ).subscribe(({ params, queryParams }) => {
-      const routeParams = { ...params, ...queryParams };
-      
-      // Check if there is a text position in the route params
-      // (comes from queryParams)
-      if (routeParams['position'] !== undefined) {
-        this.pos = routeParams['position'];
-      } else {
-        this.pos = null;
-      }
-
-      if (routeParams['q'] !== undefined) {
-        this.searchMatches = this.parserService.getSearchMatchesFromQueryParams(routeParams['q']);
-      }
-
-      // If there is a collection id in the route params and it's
-      // not the same as already stored in the component, load
-      // content. If it's the same collection id, try to scroll
-      // the text to this.pos (will only scroll if not null).
-      if (routeParams['collectionID']) {
-        if (routeParams['collectionID'] !== this.collectionID) {
-          this.collectionID = routeParams['collectionID'];
-          if (config.collections?.enableLegacyIDs) {
-            this.setCollectionLegacyId(this.collectionID);
-          }
-          this.loadIntroduction(this.collectionID, this.activeLocale);
-        } else {
-          // Try to scroll to a position in the text
+        // The collection content is already loaded, so a route update for the
+        // same collection only needs to move to the requested position.
+        if (
+          routeParams['collectionID'] &&
+          routeParams['collectionID'] === this.collectionID
+        ) {
           this.scrollToPos(100);
         }
-      }
-    });
+      }),
+      map(routeParams => routeParams['collectionID']),
+      filter((collectionID): collectionID is string => Boolean(collectionID)),
+      distinctUntilChanged(),
+      tap(collectionID => this.prepareIntroductionLoad(collectionID)),
+      switchMap(collectionID => this.collectionContentService.getIntroduction(
+        collectionID,
+        this.activeLocale
+      ).pipe(
+        map((res: any) => this.parseIntroductionResponse(res)),
+        catchError((e: any) => {
+          console.error(e);
+          return of(this.getIntroductionLoadError());
+        })
+      )),
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe(result => this.applyIntroductionResult(result));
 
     if (isBrowser()) {
       this.setUpTextListeners();
@@ -156,6 +190,11 @@ export class CollectionIntroductionPage implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
+    this.clearScrollInterval();
+    if (this.restoreInfoOverlayFocusTimer !== undefined) {
+      clearTimeout(this.restoreInfoOverlayFocusTimer);
+    }
+    this.legacyIdSubscription?.unsubscribe();
     this.unlistenClickEvents?.();
     this.unlistenKeyUpEnterEvents?.();
     this.unlistenMouseoverEvents?.();
@@ -164,65 +203,102 @@ export class CollectionIntroductionPage implements OnInit, OnDestroy {
   }
 
   ionViewWillEnter() {
-    this._activeComponent = true;
+    this.activeComponent.set(true);
   }
 
   ionViewWillLeave() {
-    this._activeComponent = false;
+    this.activeComponent.set(false);
+    this.clearScrollInterval();
   }
 
-  private loadIntroduction(id: string, lang: string) {
-    this.text = '';
-    this.textLoading = true;
-    this.collectionContentService.getIntroduction(id, lang).subscribe({
-      next: (res: any) => {
-        if (res?.content && res?.content !== 'File not found') {
-          this.textLoading = false;
-          // Fix paths for images
-          let textContent = this.replaceImageAssetsPaths
-            ? res.content.replace(/src="images\//g, 'src="assets/images/')
-            : res.content;
+  private clearScrollInterval() {
+    if (this.intervalTimerId !== undefined) {
+      clearInterval(this.intervalTimerId);
+      this.intervalTimerId = undefined;
+    }
+  }
 
-          // TODO: this manipulation of the introductions TOC should maybe be done using htmlparser2,
-          // TODO: on the other hand using regex doesn't rely on an external dependency ...
-          // Find the introduction's table of contents in the text
-          const pattern = /<div data-id="content">(.*?)<\/div>/s;
-          const matches = textContent.match(pattern);
+  /** Reset collection-specific state before loading a reused page. */
+  private prepareIntroductionLoad(collectionID: string) {
+    this.collectionID = collectionID;
+    this.collectionLegacyId = '';
+    this.text.set('');
+    this.textMenu.set('');
+    this.textLoading.set(true);
+    this.showSeparateIntroToc.set(false);
+    this.tocMenuOpen.set(false);
 
-          if (matches && matches.length > 0) {
-            // The introduction's table of contents was found,
-            // copy it to this.textMenu and remove it from this.text
-            this.textMenu = matches[1];
-            textContent = textContent.replace(pattern, '');
+    if (this.legacyIDsEnabled) {
+      this.setCollectionLegacyId(collectionID);
+    }
+  }
 
-            if (!this.mobileMode && !this.tocMenuOpen) {
-              this.tocMenuOpen = true;
-            }
-          } else {
-            this.hasSeparateIntroToc = false;
-          }
+  /**
+   * Normalize the API response and split an embedded introduction TOC from the
+   * main text. Whether the extracted TOC is displayed is controlled separately
+   * by the static `separateIntroTocEnabled` configuration flag.
+   */
+  private parseIntroductionResponse(res: any) {
+    if (!res?.content || res.content === 'File not found') {
+      return this.getIntroductionLoadError();
+    }
 
-          this.text = this.parserService.insertSearchMatchTags(textContent, this.searchMatches);
+    // Fix paths for images before inserting the response into the page.
+    let textContent = this.replaceImageAssetsPaths
+      ? res.content.replace(/src="images\//g, 'src="assets/images/')
+      : res.content;
 
-          // Try to scroll to a position in the text or first search match
-          if (this.pos) {
-            this.scrollToPos();
-          } else if (this.searchMatches.length) {
-            this.scrollService.scrollToFirstSearchMatch(this.elementRef.nativeElement, this.intervalTimerId);
-          }
-        } else {
-          this.textLoading = false;
-          this.text = $localize`:@@CollectionIntroduction.None:Inledningen kunde inte laddas.`;
-          this.hasSeparateIntroToc = false;
-        }
-      },
-      error: (e: any) =>  {
-        console.error(e);
-        this.textLoading = false;
-        this.text = $localize`:@@CollectionIntroduction.None:Inledningen kunde inte laddas.`;
-        this.hasSeparateIntroToc = false;
-      }
-    });
+    // Find the introduction's table of contents, copy it to the separate menu,
+    // and remove it from the main introduction text.
+    // TODO: This manipulation could be moved to HtmlParserService/htmlparser2.
+    const pattern = /<div data-id="content">(.*?)<\/div>/s;
+    const matches = textContent.match(pattern);
+    const textMenu = matches?.[1] ?? '';
+    if (matches) {
+      textContent = textContent.replace(pattern, '');
+    }
+
+    return {
+      showSeparateIntroToc: Boolean(matches) && this.separateIntroTocEnabled,
+      text: this.parserService.insertSearchMatchTags(textContent, this.searchMatches),
+      textMenu
+    };
+  }
+
+  /** Create the common visible state for missing or failed introduction data. */
+  private getIntroductionLoadError() {
+    return {
+      showSeparateIntroToc: false,
+      text: $localize`:@@CollectionIntroduction.None:Inledningen kunde inte laddas.`,
+      textMenu: ''
+    };
+  }
+
+  /**
+   * Publish the completed load to the template and then scroll to either the
+   * requested position or the first highlighted search match. A separate TOC
+   * opens by default on desktop but remains closed on mobile.
+   */
+  private applyIntroductionResult(result: {
+    showSeparateIntroToc: boolean;
+    text: string;
+    textMenu: string;
+  }) {
+    this.text.set(result.text);
+    this.textMenu.set(result.textMenu);
+    this.textLoading.set(false);
+    this.showSeparateIntroToc.set(result.showSeparateIntroToc);
+    this.tocMenuOpen.set(result.showSeparateIntroToc && !this.mobileMode);
+
+    // Try to scroll to a position in the text or first search match.
+    if (this.pos) {
+      this.scrollToPos();
+    } else if (this.searchMatches.length) {
+      this.clearScrollInterval();
+      this.intervalTimerId = this.scrollService.scrollToFirstSearchMatch(
+        this.elementRef.nativeElement
+      );
+    }
   }
 
   /**
@@ -232,74 +308,75 @@ export class CollectionIntroductionPage implements OnInit, OnDestroy {
   private scrollToPos(timeout: number = 1000) {
     if (isBrowser()) {
       const that = this;
-      this.ngZone.runOutsideAngular(() => {
-        let iterationsLeft = 10;
-        clearInterval(this.intervalTimerId);
-        this.intervalTimerId = window.setInterval(function() {
-          if (iterationsLeft < 1) {
-            clearInterval(that.intervalTimerId);
-          } else {
-            iterationsLeft -= 1;
-            if (that.pos !== undefined && that.pos !== null) {
-              // Look for position in name attributes
-              let posElem: HTMLElement | null = that.elementRef.nativeElement.querySelector(
-                '[name="' + that.pos + '"]'
-              );
-              if (posElem) {
-                const parentElem = posElem.parentElement;
-                if (parentElem) {
-                  if (
-                    parentElem.classList.contains('ttFixed') ||
-                    parentElem.parentElement?.classList?.contains('ttFixed')
-                  ) {
-                    // Anchor is in footnote --> look for next occurence
-                    // since the first footnote element is not displayed
-                    // (footnote elements are copied to a list at the
-                    // end of the introduction and that's the position
-                    // we need to find).
-                    posElem = that.elementRef.nativeElement.querySelectorAll(
-                      '[name="' + that.pos + '"]'
-                    )[1] as HTMLElement;
-                  }
-                }
-                if (posElem && !posElem.classList?.contains('anchor')) {
-                  posElem = null;
-                }
-              } else {
-                // Look for position in data-id attributes
-                posElem = that.elementRef.nativeElement.querySelector(
-                  '[data-id="' + that.pos + '"]'
-                );
-              }
-              if (posElem) {
+      let iterationsLeft = 10;
+      this.clearScrollInterval();
+      this.intervalTimerId = window.setInterval(function() {
+        if (iterationsLeft < 1) {
+          that.clearScrollInterval();
+        } else {
+          iterationsLeft -= 1;
+          if (that.pos !== undefined && that.pos !== null) {
+            // Look for position in name attributes
+            let posElem: HTMLElement | null = that.elementRef.nativeElement.querySelector(
+              '[name="' + that.pos + '"]'
+            );
+            if (posElem) {
+              const parentElem = posElem.parentElement;
+              if (parentElem) {
                 if (
-                  posElem.classList?.contains('anchor') ||
-                  posElem.classList?.contains('footnoteindicator')
+                  parentElem.classList.contains('ttFixed') ||
+                  parentElem.parentElement?.classList?.contains('ttFixed')
                 ) {
-                  that.scrollService.scrollToHTMLElement(posElem, 'top');
-                } else {
-                  that.scrollService.scrollElementIntoView(posElem, 'top');
+                  // Anchor is in footnote --> look for next occurence
+                  // since the first footnote element is not displayed
+                  // (footnote elements are copied to a list at the
+                  // end of the introduction and that's the position
+                  // we need to find).
+                  posElem = that.elementRef.nativeElement.querySelectorAll(
+                    '[name="' + that.pos + '"]'
+                  )[1] as HTMLElement;
                 }
-                clearInterval(that.intervalTimerId);
+              }
+              if (posElem && !posElem.classList?.contains('anchor')) {
+                posElem = null;
               }
             } else {
-              clearInterval(that.intervalTimerId);
+              // Look for position in data-id attributes
+              posElem = that.elementRef.nativeElement.querySelector(
+                '[data-id="' + that.pos + '"]'
+              );
             }
+            if (posElem) {
+              if (
+                posElem.classList?.contains('anchor') ||
+                posElem.classList?.contains('footnoteindicator')
+              ) {
+                that.scrollService.scrollToHTMLElement(posElem, 'top');
+              } else {
+                that.scrollService.scrollElementIntoView(posElem, 'top');
+              }
+              that.clearScrollInterval();
+            }
+          } else {
+            that.clearScrollInterval();
           }
-        }.bind(this), timeout);
-      });
+        }
+      }.bind(this), timeout);
     }
   }
 
   private setCollectionLegacyId(id: string) {
-    this.collectionsService.getLegacyIdByCollectionId(id).subscribe({
+    this.legacyIdSubscription?.unsubscribe();
+    this.legacyIdSubscription = this.collectionsService.getLegacyIdByCollectionId(id).pipe(
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe({
       next: (collection: any[]) => {
         this.collectionLegacyId = '';
-        if (collection[0].legacy_id) {
+        if (collection[0]?.legacy_id) {
           this.collectionLegacyId = collection[0].legacy_id;
         }
       },
-      error: (e: any) => {
+      error: () => {
         this.collectionLegacyId = '';
         console.log('could not get collection data trying to resolve collection legacy id');
       }
@@ -309,150 +386,204 @@ export class CollectionIntroductionPage implements OnInit, OnDestroy {
   private setUpTextListeners() {
     const nElement: HTMLElement = this.elementRef.nativeElement;
 
-    this.ngZone.runOutsideAngular(() => {
+    /* CHECK ONCE IF THE USER IF TOUCHING THE SCREEN */
+    this.unlistenFirstTouchStartEvent = this.renderer2.listen(nElement, 'touchstart', (event) => {
+      this.userIsTouching = true;
+      // Don't listen for keyup enter, mouseover and mouseout
+      // events since they should have no effect on touch devices
+      this.unlistenKeyUpEnterEvents?.();
+      this.unlistenMouseoverEvents?.();
+      this.unlistenMouseoutEvents?.();
+      this.unlistenFirstTouchStartEvent?.();
+    });
 
-      /* CHECK ONCE IF THE USER IF TOUCHING THE SCREEN */
-      this.unlistenFirstTouchStartEvent = this.renderer2.listen(nElement, 'touchstart', (event) => {
-        this.userIsTouching = true;
-        // Don't listen for keyup enter, mouseover and mouseout
-        // events since they should have no effect on touch devices
-        this.unlistenKeyUpEnterEvents?.();
-        this.unlistenMouseoverEvents?.();
-        this.unlistenMouseoutEvents?.();
-        this.unlistenFirstTouchStartEvent?.();
-      });
+    /* KEY UP ENTER EVENTS */
+    // For keyboard navigation to work on semantic information in
+    // dynamically loaded content we need to convert keyup events
+    // on the Enter key to click events, since spans are used for
+    // them and they won't natively trigger click events on Enter
+    // key hits.
+    this.unlistenKeyUpEnterEvents = this.renderer2.listen(nElement, 'keyup.enter', (event) => {
+      const keyTarget = event.target as HTMLElement;
+      if (
+        keyTarget?.tagName !== 'A' &&
+        keyTarget?.tagName !== 'BUTTON' &&
+        keyTarget?.classList.contains('tooltiptrigger')
+      ) {
+        keyTarget.click();
+      }
+    });
 
-      /* KEY UP ENTER EVENTS */
-      // For keyboard navigation to work on semantic information in
-      // dynamically loaded content we need to convert keyup events
-      // on the Enter key to click events, since spans are used for
-      // them and they won't natively trigger click events on Enter
-      // key hits.
-      this.unlistenKeyUpEnterEvents = this.renderer2.listen(nElement, 'keyup.enter', (event) => {
-        const keyTarget = event.target as HTMLElement;
+    /* CLICK EVENTS */
+    this.unlistenClickEvents = this.renderer2.listen(nElement, 'click', (event) => {
+      if (!this.userIsTouching) {
+        this.hideToolTip();
+      }
+
+      if (event?.target?.classList.contains('close-info-overlay')) {
+        this.hideInfoOverlay();
+        return;
+      }
+
+      let eventTarget = this.getEventTarget(event);
+
+      // Modal trigger for person-, place- or workinfo and info overlay trigger for footnote.
+      if (
+        eventTarget.classList.contains('tooltiptrigger') &&
+        eventTarget.hasAttribute('data-id')
+      ) {
+        const viewOptions = this.viewOptionsService.show();
         if (
-          keyTarget?.tagName !== 'A' &&
-          keyTarget?.tagName !== 'BUTTON' &&
-          keyTarget?.classList.contains('tooltiptrigger')
+          eventTarget.classList.contains('person') &&
+          viewOptions.personInfo
         ) {
-          keyTarget.click();
-        }
-      });
-
-      /* CLICK EVENTS */
-      this.unlistenClickEvents = this.renderer2.listen(nElement, 'click', (event) => {
-        if (!this.userIsTouching) {
-          this.ngZone.run(() => {
-            this.hideToolTip();
-          });
-        }
-
-        if (event?.target?.classList.contains('close-info-overlay')) {
-          this.ngZone.run(() => {
-            this.hideInfoOverlay();
-            return;
-          });
-        }
-
-        let eventTarget = this.getEventTarget(event);
-
-        // Modal trigger for person-, place- or workinfo and info overlay trigger for footnote.
-        if (
-          eventTarget.classList.contains('tooltiptrigger') &&
-          eventTarget.hasAttribute('data-id')
+          this.showSemanticDataObjectModal(eventTarget.getAttribute('data-id') || '', 'subject');
+        } else if (
+          eventTarget.classList.contains('placeName') &&
+          viewOptions.placeInfo
         ) {
-          this.ngZone.run(() => {
-            const viewOptions = this.viewOptionsService.show();
-            if (
-              eventTarget.classList.contains('person') &&
-              viewOptions.personInfo
-            ) {
-              this.showSemanticDataObjectModal(eventTarget.getAttribute('data-id') || '', 'subject');
-            } else if (
-              eventTarget.classList.contains('placeName') &&
-              viewOptions.placeInfo
-            ) {
-              this.showSemanticDataObjectModal(eventTarget.getAttribute('data-id') || '', 'location');
-            } else if (
-              eventTarget.classList.contains('title') &&
-              viewOptions.workInfo
-            ) {
-              this.showSemanticDataObjectModal(eventTarget.getAttribute('data-id') || '', 'work');
-            } else if (eventTarget.classList.contains('ttFoot')) {
-              this.showFootnoteInfoOverlay(eventTarget.getAttribute('data-id') || '', eventTarget);
-            }
-          });
+          this.showSemanticDataObjectModal(eventTarget.getAttribute('data-id') || '', 'location');
+        } else if (
+          eventTarget.classList.contains('title') &&
+          viewOptions.workInfo
+        ) {
+          this.showSemanticDataObjectModal(eventTarget.getAttribute('data-id') || '', 'work');
+        } else if (eventTarget.classList.contains('ttFoot')) {
+          this.showFootnoteInfoOverlay(eventTarget.getAttribute('data-id') || '', eventTarget);
         }
+      }
 
-        // Possibly click on link.
-        eventTarget = event.target as HTMLElement;
-        if (eventTarget !== null && !eventTarget.classList.contains('xreference')) {
-          if (eventTarget.parentElement) {
+      // Possibly click on link.
+      eventTarget = event.target as HTMLElement;
+      if (eventTarget !== null && !eventTarget.classList.contains('xreference')) {
+        if (eventTarget.parentElement) {
+          eventTarget = eventTarget.parentElement;
+          if (!eventTarget.classList.contains('xreference') && eventTarget.parentElement) {
             eventTarget = eventTarget.parentElement;
-            if (!eventTarget.classList.contains('xreference') && eventTarget.parentElement) {
-              eventTarget = eventTarget.parentElement;
-            }
           }
         }
+      }
 
-        // Links in the introduction.
-        if (eventTarget?.classList.contains('xreference')) {
-          event.preventDefault();
-          const anchorElem: HTMLAnchorElement = eventTarget as HTMLAnchorElement;
+      // Links in the introduction.
+      if (eventTarget?.classList.contains('xreference')) {
+        event.preventDefault();
+        const anchorElem: HTMLAnchorElement = eventTarget as HTMLAnchorElement;
 
-          if (anchorElem.classList.contains('ref_external')) {
-            // Link to external web page, open in new window/tab.
-            if (anchorElem.hasAttribute('href')) {
-              window.open(anchorElem.href, '_blank');
+        if (anchorElem.classList.contains('ref_external')) {
+          // Link to external web page, open in new window/tab.
+          if (anchorElem.hasAttribute('href')) {
+            window.open(anchorElem.href, '_blank');
+          }
+
+        } else if (
+          anchorElem.classList.contains('ref_readingtext') ||
+          anchorElem.classList.contains('ref_comment') ||
+          anchorElem.classList.contains('ref_introduction')
+        ) {
+          // Link to reading text, comment or introduction.
+          // Get the href parts for the targeted text.
+          const link = anchorElem.href;
+          const hrefTargetItems: Array<string> = decodeURIComponent(
+            String(link).split('/').pop() || ''
+          ).trim().split(' ');
+          let publicationId = '';
+          let textId = '';
+          let chapterId = '';
+          let positionId = '';
+
+          if (
+            anchorElem.classList.contains('ref_readingtext') ||
+            anchorElem.classList.contains('ref_comment')
+          ) {
+            // Link to reading text or comment, open in new window.
+            const newWindowRef = window.open();
+
+            publicationId = hrefTargetItems[0];
+            textId = hrefTargetItems[1];
+            this.collectionsService.getCollectionAndPublicationByLegacyId(
+              publicationId + '_' + textId
+            ).pipe(
+              takeUntilDestroyed(this.destroyRef)
+            ).subscribe({
+              next: (data: any) => {
+                if (data?.length && data[0]['coll_id'] && data[0]['pub_id']) {
+                  publicationId = data[0]['coll_id'];
+                  textId = data[0]['pub_id'];
+                }
+
+                if (hrefTargetItems.length > 2 && !hrefTargetItems[2].startsWith('#')) {
+                  chapterId = hrefTargetItems[2];
+                }
+
+                let hrefString = '/collection/' + publicationId + '/text/' + textId;
+                if (chapterId) {
+                  hrefString += '/' + chapterId;
+                  if (hrefTargetItems.length > 3 && hrefTargetItems[3].startsWith('#')) {
+                    positionId = hrefTargetItems[3].replace('#', '');
+                    hrefString += '?position=' + positionId;
+                  }
+                } else if (hrefTargetItems.length > 2 && hrefTargetItems[2].startsWith('#')) {
+                  positionId = hrefTargetItems[2].replace('#', '');
+                  hrefString += '?position=' + positionId;
+                }
+                if (newWindowRef) {
+                  newWindowRef.location.href = '/' + this.activeLocale + hrefString;
+                }
+              }
+            });
+
+          } else if (anchorElem.classList.contains('ref_introduction')) {
+            // Link to introduction.
+            if (hrefTargetItems.length === 1 && hrefTargetItems[0].startsWith('#')) {
+              // If only a position starting with a hash, assume it's in the same publication.
+              publicationId = this.collectionID;
+              positionId = hrefTargetItems[0];
+            } else {
+              publicationId = hrefTargetItems[0];
+            }
+            if (
+              hrefTargetItems.length > 1 &&
+              hrefTargetItems[hrefTargetItems.length - 1].startsWith('#')
+            ) {
+              positionId = hrefTargetItems[hrefTargetItems.length - 1];
             }
 
-          } else if (
-            anchorElem.classList.contains('ref_readingtext') ||
-            anchorElem.classList.contains('ref_comment') ||
-            anchorElem.classList.contains('ref_introduction')
-          ) {
-            // Link to reading text, comment or introduction.
-            // Get the href parts for the targeted text.
-            const link = anchorElem.href;
-            const hrefTargetItems: Array<string> = decodeURIComponent(
-              String(link).split('/').pop() || ''
-            ).trim().split(' ');
-            let publicationId = '';
-            let textId = '';
-            let chapterId = '';
-            let positionId = '';
-
+            // Check if we are already on the same page.
             if (
-              anchorElem.classList.contains('ref_readingtext') ||
-              anchorElem.classList.contains('ref_comment')
+              (
+                String(publicationId) === String(this.collectionID) ||
+                String(publicationId) === String(this.collectionLegacyId)
+              ) && positionId !== undefined 
             ) {
-              // Link to reading text or comment, open in new window.
+              // Same introduction.
+              positionId = positionId.replace('#', '');
+              if (positionId !== this.pos) {
+                this.router.navigate(
+                  [],
+                  {
+                    relativeTo: this.route,
+                    queryParams: { position: positionId },
+                    queryParamsHandling: 'merge'
+                  }
+                );
+              } else {
+                this.scrollToPos(100);
+              }
+            } else {
+              // Different introduction, open in new window.
               const newWindowRef = window.open();
-
-              publicationId = hrefTargetItems[0];
-              textId = hrefTargetItems[1];
               this.collectionsService.getCollectionAndPublicationByLegacyId(
-                publicationId + '_' + textId
+                publicationId
+              ).pipe(
+                takeUntilDestroyed(this.destroyRef)
               ).subscribe({
                 next: (data: any) => {
-                  if (data?.length && data[0]['coll_id'] && data[0]['pub_id']) {
+                  if (data?.length && data[0]['coll_id']) {
                     publicationId = data[0]['coll_id'];
-                    textId = data[0]['pub_id'];
                   }
-
-                  if (hrefTargetItems.length > 2 && !hrefTargetItems[2].startsWith('#')) {
-                    chapterId = hrefTargetItems[2];
-                  }
-
-                  let hrefString = '/collection/' + publicationId + '/text/' + textId;
-                  if (chapterId) {
-                    hrefString += '/' + chapterId;
-                    if (hrefTargetItems.length > 3 && hrefTargetItems[3].startsWith('#')) {
-                      positionId = hrefTargetItems[3].replace('#', '');
-                      hrefString += '?position=' + positionId;
-                    }
-                  } else if (hrefTargetItems.length > 2 && hrefTargetItems[2].startsWith('#')) {
-                    positionId = hrefTargetItems[2].replace('#', '');
+                  let hrefString = '/collection/' + publicationId + '/introduction';
+                  if (hrefTargetItems.length > 1 && hrefTargetItems[1].startsWith('#')) {
+                    positionId = hrefTargetItems[1].replace('#', '');
                     hrefString += '?position=' + positionId;
                   }
                   if (newWindowRef) {
@@ -460,161 +591,93 @@ export class CollectionIntroductionPage implements OnInit, OnDestroy {
                   }
                 }
               });
-
-            } else if (anchorElem.classList.contains('ref_introduction')) {
-              // Link to introduction.
-              if (hrefTargetItems.length === 1 && hrefTargetItems[0].startsWith('#')) {
-                // If only a position starting with a hash, assume it's in the same publication.
-                publicationId = this.collectionID;
-                positionId = hrefTargetItems[0];
-              } else {
-                publicationId = hrefTargetItems[0];
-              }
-              if (
-                hrefTargetItems.length > 1 &&
-                hrefTargetItems[hrefTargetItems.length - 1].startsWith('#')
-              ) {
-                positionId = hrefTargetItems[hrefTargetItems.length - 1];
-              }
-
-              // Check if we are already on the same page.
-              if (
-                (
-                  String(publicationId) === String(this.collectionID) ||
-                  String(publicationId) === String(this.collectionLegacyId)
-                ) && positionId !== undefined 
-              ) {
-                // Same introduction.
-                positionId = positionId.replace('#', '');
-                this.ngZone.run(() => {
-                  if (positionId !== this.pos) {
-                    this.router.navigate(
-                      [],
-                      {
-                        relativeTo: this.route,
-                        queryParams: { position: positionId },
-                        queryParamsHandling: 'merge'
-                      }
-                    );
-                  } else {
-                    this.scrollToPos(100);
-                  }
-                });
-              } else {
-                // Different introduction, open in new window.
-                const newWindowRef = window.open();
-                this.collectionsService.getCollectionAndPublicationByLegacyId(
-                  publicationId
-                ).subscribe({
-                  next: (data: any) => {
-                    if (data?.length && data[0]['coll_id']) {
-                      publicationId = data[0]['coll_id'];
-                    }
-                    let hrefString = '/collection/' + publicationId + '/introduction';
-                    if (hrefTargetItems.length > 1 && hrefTargetItems[1].startsWith('#')) {
-                      positionId = hrefTargetItems[1].replace('#', '');
-                      hrefString += '?position=' + positionId;
-                    }
-                    if (newWindowRef) {
-                      newWindowRef.location.href = '/' + this.activeLocale + hrefString;
-                    }
-                  }
-                });
-              }
             }
-          } else if (anchorElem.classList.contains('ref_illustration')) {
-            const imageNumber = anchorElem.hash.split('#')[1];
-            this.ngZone.run(() => {
-              this.showIllustrationModal(imageNumber);
-            });
-          } else {
-            // Link in the introduction's TOC or link to (foot)note reference
-            let targetId = '' as any;
-            if (anchorElem.hasAttribute('href')) {
-              targetId = anchorElem.getAttribute('href');
-            } else if (anchorElem.parentElement?.hasAttribute('href')) {
-              targetId = anchorElem.parentElement.getAttribute('href');
-            }
-            targetId = String(targetId).replace('#', '');
-            const dataIdSelector = '[data-id="' + targetId + '"]';
-            let target = nElement.querySelector(dataIdSelector) as HTMLElement;
-            if (target !== null) {
-              this.ngZone.run(() => {
-                if (targetId !== this.pos) {
-                  this.router.navigate(
-                    [],
-                    {
-                      relativeTo: this.route,
-                      queryParams: { position: targetId },
-                      queryParamsHandling: 'merge'
-                    }
-                  );
-                } else {
-                  this.scrollToPos(100);
+          }
+        } else if (anchorElem.classList.contains('ref_illustration')) {
+          const imageNumber = anchorElem.hash.split('#')[1];
+          this.showIllustrationModal(imageNumber);
+        } else {
+          // Link in the introduction's TOC or link to (foot)note reference
+          let targetId = '' as any;
+          if (anchorElem.hasAttribute('href')) {
+            targetId = anchorElem.getAttribute('href');
+          } else if (anchorElem.parentElement?.hasAttribute('href')) {
+            targetId = anchorElem.parentElement.getAttribute('href');
+          }
+          targetId = String(targetId).replace('#', '');
+          const dataIdSelector = '[data-id="' + targetId + '"]';
+          const target = nElement.querySelector(dataIdSelector) as HTMLElement;
+          if (target !== null) {
+            if (targetId !== this.pos) {
+              this.router.navigate(
+                [],
+                {
+                  relativeTo: this.route,
+                  queryParams: { position: targetId },
+                  queryParamsHandling: 'merge'
                 }
-              });
+              );
+            } else {
+              this.scrollToPos(100);
             }
           }
         }
-      });
+      }
+    });
 
-      /* MOUSE OVER EVENTS */
-      this.unlistenMouseoverEvents = this.renderer2.listen(nElement, 'mouseover', (event) => {
-        if (!this.userIsTouching) {
-          // Mouseover effects only if using a cursor, not if the user is touching the screen
-          const eventTarget = this.getEventTarget(event) as any;
+    /* MOUSE OVER EVENTS */
+    this.unlistenMouseoverEvents = this.renderer2.listen(nElement, 'mouseover', (event) => {
+      if (!this.userIsTouching) {
+        // Mouseover effects only if using a cursor, not if the user is touching the screen
+        const eventTarget = this.getEventTarget(event) as any;
 
+        if (
+          eventTarget.classList.contains('tooltiptrigger') &&
+          eventTarget.hasAttribute('data-id')
+        ) {
+          const show = this.viewOptionsService.show();
           if (
-            eventTarget.classList.contains('tooltiptrigger') &&
-            eventTarget.hasAttribute('data-id')
+            eventTarget.classList.contains('person') &&
+            show.personInfo
           ) {
-            this.ngZone.run(() => {
-              const show = this.viewOptionsService.show();
-              if (
-                eventTarget.classList.contains('person') &&
-                show.personInfo
-              ) {
-                this.showSemanticDataObjectTooltip(
-                  eventTarget.getAttribute('data-id'), 'person', eventTarget
-                );
-              } else if (
-                eventTarget.classList.contains('placeName') &&
-                show.placeInfo
-              ) {
-                this.showSemanticDataObjectTooltip(
-                  eventTarget.getAttribute('data-id'), 'place', eventTarget
-                );
-              } else if (
-                eventTarget.classList.contains('title') &&
-                show.workInfo
-              ) {
-                this.showSemanticDataObjectTooltip(
-                  eventTarget.getAttribute('data-id'), 'work', eventTarget
-                );
-              } else if (eventTarget.classList.contains('ttFoot')) {
-                this.showFootnoteTooltip(
-                  eventTarget.getAttribute('data-id'), eventTarget
-                );
-              }
-            });
+            this.showSemanticDataObjectTooltip(
+              eventTarget.getAttribute('data-id'), 'person', eventTarget
+            );
+          } else if (
+            eventTarget.classList.contains('placeName') &&
+            show.placeInfo
+          ) {
+            this.showSemanticDataObjectTooltip(
+              eventTarget.getAttribute('data-id'), 'place', eventTarget
+            );
+          } else if (
+            eventTarget.classList.contains('title') &&
+            show.workInfo
+          ) {
+            this.showSemanticDataObjectTooltip(
+              eventTarget.getAttribute('data-id'), 'work', eventTarget
+            );
+          } else if (eventTarget.classList.contains('ttFoot')) {
+            this.showFootnoteTooltip(
+              eventTarget.getAttribute('data-id'), eventTarget
+            );
           }
         }
-      });
+      }
+    });
 
-      /* MOUSE OUT EVENTS */
-      this.unlistenMouseoutEvents = this.renderer2.listen(nElement, 'mouseout', (event) => {
-        if (!this.userIsTouching && this.tooltipVisible) {
-          this.ngZone.run(() => {
-            this.hideToolTip();
-          });
-        }
-      });
-
+    /* MOUSE OUT EVENTS */
+    this.unlistenMouseoutEvents = this.renderer2.listen(nElement, 'mouseout', () => {
+      if (!this.userIsTouching && this.tooltipVisible) {
+        this.hideToolTip();
+      }
     });
   }
 
   showSemanticDataObjectTooltip(id: string, type: string, targetElem: HTMLElement) {
-    this.tooltipService.getSemanticDataObjectTooltip(id, type, targetElem).subscribe(
+    this.tooltipService.getSemanticDataObjectTooltip(id, type, targetElem).pipe(
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe(
       (text) => {
         this.setToolTipPosition(targetElem, text);
         this.setToolTipText(text);
@@ -623,7 +686,9 @@ export class CollectionIntroductionPage implements OnInit, OnDestroy {
   }
 
   showFootnoteTooltip(id: string, targetElem: HTMLElement) {
-    this.tooltipService.getFootnoteTooltip(id, 'introduction', targetElem).subscribe(
+    this.tooltipService.getFootnoteTooltip(id, 'introduction', targetElem).pipe(
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe(
       (footnoteHTML: string) => {
         if (footnoteHTML) {
           this.setToolTipPosition(targetElem, footnoteHTML);
@@ -634,7 +699,9 @@ export class CollectionIntroductionPage implements OnInit, OnDestroy {
   }
 
   showFootnoteInfoOverlay(id: string, targetElem: HTMLElement) {
-    this.tooltipService.getFootnoteTooltip(id, 'introduction', targetElem).subscribe(
+    this.tooltipService.getFootnoteTooltip(id, 'introduction', targetElem).pipe(
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe(
       (footnoteHTML: string) => {
         if (footnoteHTML) {
           this.setInfoOverlayTitle($localize`:@@ViewOptions.Note:Not`);
@@ -650,26 +717,29 @@ export class CollectionIntroductionPage implements OnInit, OnDestroy {
 
     if (ttProperties !== undefined && ttProperties !== null) {
       // Set tooltip width, position and visibility
-      this.toolTipMaxWidth = ttProperties.maxWidth;
-      this.toolTipScaleValue = ttProperties.scaleValue;
-      this.toolTipPosition = {
+      this.toolTipMaxWidth.set(ttProperties.maxWidth);
+      this.toolTipScaleValue.set(ttProperties.scaleValue);
+      this.toolTipPosition.set({
         top: ttProperties.top,
         left: ttProperties.left
-      };
-      this.toolTipPosType = 'absolute';
-      if (this.platformService.isMobile()) {
-        this.toolTipPosType = 'fixed';
-      }
+      });
+      this.toolTipPosType.set(this.mobileMode ? 'fixed' : 'absolute');
       this.tooltipVisible = true;
     }
   }
 
-  /** Set position and width of infoOverlay element. This function is not exactly
-   *  the same as in read.ts due to different page structure in introductions.
+  /**
+   * Set position and width of infoOverlay element. This function is not exactly
+   * the same as in collection-text.page.ts due to different page structure in
+   * introductions.
    */
   private setInfoOverlayPositionAndWidth(triggerElement: HTMLElement, defaultMargins = 10, maxWidth = 600) {
     // Store triggering element so focus can later be restored to it
-    this.infoOverlayTriggerElem = triggerElement;
+    if (this.restoreInfoOverlayFocusTimer !== undefined) {
+      clearTimeout(this.restoreInfoOverlayFocusTimer);
+      this.restoreInfoOverlayFocusTimer = undefined;
+    }
+    this.infoOverlayTriggerElem.set(triggerElement);
 
     let margins = defaultMargins;
 
@@ -718,14 +788,14 @@ export class CollectionIntroductionPage implements OnInit, OnDestroy {
       }
 
       // Set info overlay position
-      this.infoOverlayPosition = {
+      this.infoOverlayPosition.set({
         bottom: bottomPos + 'px',
         left: (containerElemRect.left + margins - contentElem.getBoundingClientRect().left) + 'px'
-      };
-      this.infoOverlayPosType = 'absolute';
+      });
+      this.infoOverlayPosType.set('absolute');
 
       // Set info overlay width
-      this.infoOverlayWidth = calcWidth + 'px';
+      this.infoOverlayWidth.set(calcWidth + 'px');
 
       // Set focus to info overlay
       const ioElem = this.elementRef.nativeElement.querySelector(
@@ -768,24 +838,24 @@ export class CollectionIntroductionPage implements OnInit, OnDestroy {
   }
 
   setToolTipText(text: string) {
-    this.toolTipText = text;
+    this.toolTipText.set(text);
   }
 
   setInfoOverlayText(text: string) {
-    this.infoOverlayText = text;
+    this.infoOverlayText.set(text);
   }
 
   setInfoOverlayTitle(title: string) {
-    this.infoOverlayTitle = title;
+    this.infoOverlayTitle.set(title);
   }
 
   hideToolTip() {
     this.setToolTipText('');
-    this.toolTipPosType = 'fixed'; // Position needs to be fixed so we can safely hide it outside viewport
-    this.toolTipPosition = {
+    this.toolTipPosType.set('fixed'); // Position needs to be fixed so we can safely hide it outside viewport
+    this.toolTipPosition.set({
       top: 0 + 'px',
       left: -1500 + 'px'
-    };
+    });
     this.tooltipVisible = false;
   }
 
@@ -793,21 +863,20 @@ export class CollectionIntroductionPage implements OnInit, OnDestroy {
     // Clear info overlay content and move it out of viewport
     this.setInfoOverlayText('');
     this.setInfoOverlayTitle('');
-    this.infoOverlayPosType = 'fixed'; // Position needs to be fixed so we can hide it outside viewport
-    this.infoOverlayPosition = {
+    this.infoOverlayPosType.set('fixed'); // Position needs to be fixed so we can hide it outside viewport
+    this.infoOverlayPosition.set({
       bottom: 0 + 'px',
       left: -1500 + 'px'
-    };
+    });
 
     // Return focus to element that triggered the info overlay
     // timeout so the info overlay isn't triggered again on
     // keyup.enter event
-    this.ngZone.runOutsideAngular(() => {
-      setTimeout(() => {
-        this.infoOverlayTriggerElem?.focus({ preventScroll: true });
-        this.infoOverlayTriggerElem = null;
-      }, 250);
-    });
+    this.restoreInfoOverlayFocusTimer = setTimeout(() => {
+      this.infoOverlayTriggerElem()?.focus({ preventScroll: true });
+      this.infoOverlayTriggerElem.set(null);
+      this.restoreInfoOverlayFocusTimer = undefined;
+    }, 250);
   }
 
   async showSemanticDataObjectModal(id: string, type: string) {
@@ -866,7 +935,7 @@ export class CollectionIntroductionPage implements OnInit, OnDestroy {
   }
 
   toggleTocMenu() {
-    this.tocMenuOpen = !this.tocMenuOpen;
+    this.tocMenuOpen.update(tocMenuOpen => !tocMenuOpen);
   }
 
 }

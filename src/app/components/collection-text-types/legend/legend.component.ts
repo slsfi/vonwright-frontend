@@ -1,6 +1,6 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, ElementRef, Injector, LOCALE_ID, NgZone, Renderer2, afterRenderEffect, computed, inject, input, signal, untracked } from '@angular/core';
+import { Component, DestroyRef, ElementRef, Injector, LOCALE_ID, Renderer2, afterRenderEffect, computed, inject, input, signal, untracked } from '@angular/core';
 import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
-import { IonicModule } from '@ionic/angular/lazy';
+import { IonSpinner } from '@ionic/angular';
 import { catchError, Observable, of, switchMap, tap } from 'rxjs';
 
 import { TextKey } from '@models/collection.models';
@@ -16,8 +16,7 @@ import { ScrollService } from '@services/scroll.service';
   selector: 'text-legend',
   templateUrl: './legend.component.html',
   styleUrls: ['./legend.component.scss'],
-  imports: [IonicModule, TrustHtmlPipe],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  imports: [IonSpinner, TrustHtmlPipe]
 })
 export class LegendComponent {
   // ─────────────────────────────────────────────────────────────────────────────
@@ -27,7 +26,6 @@ export class LegendComponent {
   private elementRef = inject(ElementRef);
   private injector = inject(Injector);
   private mdService = inject(MarkdownService);
-  private ngZone = inject(NgZone);
   private renderer2 = inject(Renderer2);
   private scrollService = inject(ScrollService);
   private activeLocale = inject(LOCALE_ID);
@@ -164,36 +162,34 @@ export class LegendComponent {
     const host: HTMLElement = this.elementRef.nativeElement;
 
     /* CLICK EVENTS */
-    this.unlistenClickEvents = this.ngZone.runOutsideAngular(() =>
-      this.renderer2.listen(host, 'click', (event) => {
-        try {
-          const clickedElem = event.target as HTMLElement | null;
-          const targetHref = clickedElem?.getAttribute('href');
+    this.unlistenClickEvents = this.renderer2.listen(host, 'click', (event) => {
+      try {
+        const clickedElem = event.target as HTMLElement | null;
+        const targetHref = clickedElem?.getAttribute('href');
 
-          if (!targetHref?.startsWith('#')) {
-            return;
-          }
-
-          // Same-legend fragment → prevent default & scroll into view
-          event.preventDefault();
-
-          // Find the nearest <text-legend> container
-          let containerElem: HTMLElement | null = clickedElem;
-          while (containerElem && containerElem.tagName !== 'TEXT-LEGEND') {
-            containerElem = containerElem.parentElement;
-          }
-
-          if (containerElem) {
-            const targetElem = containerElem.querySelector<HTMLElement>(
-              `[data-id="${targetHref.slice(1)}"]`
-            );
-            this.scrollService.scrollElementIntoView(targetElem, 'top');
-          }
-        } catch (e) {
-          console.error(e);
+        if (!targetHref?.startsWith('#')) {
+          return;
         }
-      })
-    );
+
+        // Same-legend fragment → prevent default & scroll into view
+        event.preventDefault();
+
+        // Find the nearest <text-legend> container
+        let containerElem: HTMLElement | null = clickedElem;
+        while (containerElem && containerElem.tagName !== 'TEXT-LEGEND') {
+          containerElem = containerElem.parentElement;
+        }
+
+        if (containerElem) {
+          const targetElem = containerElem.querySelector<HTMLElement>(
+            `[data-id="${targetHref.slice(1)}"]`
+          );
+          this.scrollService.scrollElementIntoView(targetElem, 'top');
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    });
   }
 
 

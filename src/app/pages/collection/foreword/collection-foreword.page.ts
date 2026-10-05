@@ -1,9 +1,23 @@
-import { Component, ElementRef, LOCALE_ID, OnInit, inject, ChangeDetectionStrategy } from '@angular/core';
+import { AsyncPipe } from '@angular/common';
+import { Component, ElementRef, LOCALE_ID, OnDestroy, OnInit, inject, signal } from '@angular/core';
+import { toObservable } from '@angular/core/rxjs-interop';
 import { ActivatedRoute } from '@angular/router';
-import { ModalController, PopoverController } from '@ionic/angular/lazy';
-import { catchError, combineLatest, map, Observable, of, switchMap, tap } from 'rxjs';
+import {
+  IonButton,
+  IonButtons,
+  IonContent,
+  IonHeader,
+  IonIcon,
+  IonSpinner,
+  IonToolbar,
+  ModalController,
+  PopoverController
+} from '@ionic/angular';
+import { catchError, combineLatest, filter, map, Observable, of, switchMap, tap } from 'rxjs';
 
+import { TextChangerComponent } from '@components/text-changer/text-changer.component';
 import { config } from '@config';
+import { TrustHtmlPipe } from '@pipes/trust-html.pipe';
 import { CollectionContentService } from '@services/collection-content.service';
 import { HtmlParserService } from '@services/html-parser.service';
 import { PlatformService } from '@services/platform.service';
@@ -15,10 +29,20 @@ import { ViewOptionsService } from '@services/view-options.service';
   selector: 'page-foreword',
   templateUrl: './collection-foreword.page.html',
   styleUrls: ['./collection-foreword.page.scss'],
-  changeDetection: ChangeDetectionStrategy.Eager,
-  standalone: false
+  imports: [
+    AsyncPipe,
+    IonButton,
+    IonButtons,
+    IonContent,
+    IonHeader,
+    IonIcon,
+    IonSpinner,
+    IonToolbar,
+    TextChangerComponent,
+    TrustHtmlPipe
+  ]
 })
-export class CollectionForewordPage implements OnInit {
+export class CollectionForewordPage implements OnInit, OnDestroy {
   private collectionContentService = inject(CollectionContentService);
   private elementRef = inject(ElementRef);
   private modalController = inject(ModalController);
@@ -34,51 +58,65 @@ export class CollectionForewordPage implements OnInit {
   readonly showURNButton: boolean = config.page?.foreword?.showURNButton ?? false;
   readonly showViewOptionsButton: boolean = config.page?.foreword?.showViewOptionsButton ?? true;
 
-  _activeComponent: boolean = true;
-  collectionID: string = '';
-  intervalTimerId: number = 0;
-  mobileMode: boolean = false;
-  searchMatches: string[] = [];
+  readonly activeComponent = signal(true);
+  readonly mobileMode = this.platformService.isMobile();
   text$: Observable<string>;
+  private readonly active$ = toObservable(this.activeComponent);
+  private intervalTimerId?: number;
 
   ngOnInit() {
-    this.mobileMode = this.platformService.isMobile();
-
     this.text$ = combineLatest(
-      [this.route.params, this.route.queryParams]
+      [this.route.params, this.route.queryParams, this.active$]
     ).pipe(
-      map(([params, queryParams]) => ({...params, ...queryParams})),
-      tap(({collectionID, q}) => {
-        this.collectionID = collectionID;
-        if (q) {
-          this.searchMatches = this.parserService.getSearchMatchesFromQueryParams(q);
-          if (this.searchMatches.length) {
-            this.scrollService.scrollToFirstSearchMatch(this.elementRef.nativeElement, this.intervalTimerId);
-          }
+      filter(([, , active]) => active),
+      map(([params, queryParams]) => ({
+        collectionID: params['collectionID'],
+        searchMatches: queryParams['q']
+          ? this.parserService.getSearchMatchesFromQueryParams(queryParams['q'])
+          : []
+      })),
+      tap(({searchMatches}) => {
+        if (searchMatches.length) {
+          this.clearSearchMatchInterval();
+          this.intervalTimerId = this.scrollService.scrollToFirstSearchMatch(
+            this.elementRef.nativeElement
+          );
         }
       }),
-      switchMap(({collectionID}) => {
-        return this.loadForeword(collectionID, this.activeLocale);
+      switchMap(({collectionID, searchMatches}) => {
+        return this.loadForeword(collectionID, this.activeLocale, searchMatches);
       })
     );
   }
 
   ionViewWillEnter() {
-    this._activeComponent = true;
+    this.activeComponent.set(true);
   }
 
   ionViewWillLeave() {
-    this._activeComponent = false;
+    this.activeComponent.set(false);
+    this.clearSearchMatchInterval();
   }
 
-  private loadForeword(id: string, lang: string): Observable<string> {
+  ngOnDestroy() {
+    this.clearSearchMatchInterval();
+  }
+
+  private clearSearchMatchInterval() {
+    if (this.intervalTimerId !== undefined) {
+      clearInterval(this.intervalTimerId);
+      this.intervalTimerId = undefined;
+    }
+  }
+
+  private loadForeword(id: string, lang: string, searchMatches: string[]): Observable<string> {
     return this.collectionContentService.getForeword(id, lang).pipe(
       map((res: any) => {
         if (res?.content && res?.content !== 'File not found') {
           let text = this.replaceImageAssetsPaths
             ? res.content.replace(/src="images\//g, 'src="assets/images/')
             : res.content;
-          return this.parserService.insertSearchMatchTags(text, this.searchMatches);
+          return this.parserService.insertSearchMatchTags(text, searchMatches);
         } else {
           return $localize`:@@CollectionForeword.None:Förordet kunde inte laddas.`;
         }

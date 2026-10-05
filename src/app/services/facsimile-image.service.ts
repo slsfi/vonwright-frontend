@@ -21,7 +21,8 @@ export interface ResolveFacsimileImageSrcOptions {
  * - Browser: authenticated image URLs may need HttpClient + interceptors.
  * - Server (SSR): always return plain URLs and avoid browser-only APIs.
  *
- * Platform-specific implementations are provided in AppModule/AppServerModule.
+ * Platform-specific implementations are selected by the browser/server
+ * application configurations.
  */
 export abstract class FacsimileImageService {
   abstract resolveImageSrc(

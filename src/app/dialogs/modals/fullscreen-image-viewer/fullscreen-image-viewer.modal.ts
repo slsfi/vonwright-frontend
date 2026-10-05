@@ -1,5 +1,5 @@
-import { ChangeDetectionStrategy, Component, ElementRef, Input, OnDestroy, OnInit, afterRenderEffect, computed, inject, signal, untracked, viewChild } from '@angular/core';
-import { IonicModule, ModalController } from '@ionic/angular/lazy';
+import { Component, ElementRef, Input, OnDestroy, OnInit, afterRenderEffect, computed, inject, signal, untracked, viewChild } from '@angular/core';
+import { IonFab, IonFabButton, IonIcon, IonInput, IonSpinner, ModalController } from '@ionic/angular';
 import { Subscription } from 'rxjs';
 
 import { DraggableImageDirective } from '@directives/draggable-image.directive';
@@ -14,8 +14,7 @@ import { PlatformService } from '@services/platform.service';
   selector: 'modal-fullscreen-image-viewer',
   templateUrl: './fullscreen-image-viewer.modal.html',
   styleUrls: ['./fullscreen-image-viewer.modal.scss'],
-  imports: [IonicModule, DraggableImageDirective],
-  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [IonFab, IonFabButton, IonIcon, IonInput, IonSpinner, DraggableImageDirective],
   // Change image on keyboard arrow key strokes
   host: {
     ngSkipHydration: 'true',

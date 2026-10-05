@@ -1,3 +1,5 @@
+@let searchQuery = this.searchQuery();
+
 <ion-content class="no-padding"
       [class.portrait-mode]="imageOrientationPortrait"
       [class.title-on-image]="titleOnImage"
@@ -102,7 +104,8 @@
               enterkeyhint="search"
               inputmode="search"
               [searchIcon]="undefined"
-              [(ngModel)]="searchQuery"
+              [ngModel]="searchQuery"
+              (ngModelChange)="setSearchQuery($event)"
               (ionClear)="clearSearchQuery()"
               (keyup.enter)="submitSearchQuery()"
         ></ion-searchbar>

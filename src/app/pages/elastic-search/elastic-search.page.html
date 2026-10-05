@@ -1,3 +1,22 @@
+@let activeFilters = this.activeFilters();
+@let dateHistogramData = this.dateHistogramData();
+@let disableFilterCheckboxes = this.disableFilterCheckboxes();
+@let elasticError = this.elasticError();
+@let filterGroups = this.filterGroups();
+@let filterLoadingError = this.filterLoadingError();
+@let filtersVisible = this.filtersVisible();
+@let from = this.from();
+@let hits = this.hits();
+@let initializing = this.initializing();
+@let loading = this.loading();
+@let loadingMoreHits = this.loadingMoreHits();
+@let query = this.query();
+@let rangeYears = this.rangeYears();
+@let searchResultsColumnMinHeight = this.searchResultsColumnMinHeight();
+@let showAllFor = this.showAllFor();
+@let sort = this.sort();
+@let total = this.total();
+
 <ion-content>
 
   <h1 class="page-title" i18n="@@ElasticSearch.SearchEdition">Sök i utgåvan</h1>
@@ -20,7 +39,8 @@
             inputmode="search"
             [searchIcon]="undefined"
             [disabled]="initializing || filterLoadingError"
-            [(ngModel)]="query"
+            [ngModel]="query"
+            (ngModelChange)="this.query.set($event)"
             (ionClear)="clearSearchQuery()"
             (keyup.enter)="submitSearchQuery()"
       ></ion-searchbar>
@@ -51,7 +71,7 @@
       <div class="search-result-column" [style.min-height]="loading && !loadingMoreHits ? searchResultsColumnMinHeight : null">
 
         <!-- Active filters -->
-        @if (this.activeFilters.length || rangeYears) {
+        @if (activeFilters.length || rangeYears) {
           <div class="active-filters-row">
             <div class="active-filters-wrapper">
               @for (activeFilterGroup of activeFilters; track activeFilterGroup.name) {
@@ -320,7 +340,7 @@
             </ol>
           }
 
-          @if (canShowHits() && total > 0 && ((this.total > this.from + this.hitsPerPage) || loadingMoreHits)) {
+          @if (canShowHits() && total > 0 && ((total > from + hitsPerPage) || loadingMoreHits)) {
             <div class="load-more-hits-wrapper">
               <div class="loading-spinner-wrapper">
                 <ion-spinner [class.visible]="loadingMoreHits" class="loading" name="crescent"></ion-spinner>
@@ -455,7 +475,7 @@
                     <li>
                       @if (filterGroup.filters.length > 10) {
                         <ion-button class="custom-button more-filters"
-                              (click)="showAllFor[filterGroup.name] = !showAllFor[filterGroup.name]"
+                              (click)="toggleShowAllFor(filterGroup.name)"
                         >
                           @if (!showAllFor[filterGroup.name]) {
                             <ng-container i18n="@@ElasticSearch.ShowMore">Visa fler</ng-container>

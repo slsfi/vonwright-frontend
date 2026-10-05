@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, effect, inject, input, signal } from '@angular/core';
+import { Component, effect, inject, input, signal } from '@angular/core';
 
 import { config } from '@config';
 import { CollectionTableOfContentsService } from '@services/collection-toc.service';
@@ -13,8 +13,7 @@ import { isBrowser } from '@utility-functions';
   selector: 'static-html',
   templateUrl: './static-html.component.html',
   styleUrl: './static-html.component.scss',
-  imports: [TrustHtmlPipe],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  imports: [TrustHtmlPipe]
 })
 export class StaticHtmlComponent {
   private tocService = inject(CollectionTableOfContentsService);
@@ -27,7 +26,7 @@ export class StaticHtmlComponent {
 
   readonly staticContent = signal<string>('');
 
-  private _effect = effect((onCleanup) => {
+  private readonly loadEffect = effect((onCleanup) => {
     const type = this.type();
     const id = this.id();
 

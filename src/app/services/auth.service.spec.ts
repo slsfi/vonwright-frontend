@@ -1,6 +1,6 @@
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
-import { fakeAsync, TestBed, tick } from '@angular/core/testing';
+import { TestBed } from '@angular/core/testing';
 import { DefaultUrlSerializer, Router, UrlTree } from '@angular/router';
 
 import { authInterceptor } from '@interceptors/auth.interceptor';
@@ -718,22 +718,24 @@ describe('AuthService', () => {
     expect(service.passwordResetCompleted()).toBeFalse();
   });
 
-  it('verifies email with jwt token and marks verification as completed on success', fakeAsync(() => {
-    const service = createService();
+  it('verifies email with jwt token and marks verification as completed on success', () => {
+    jasmine.clock().withMock(() => {
+      const service = createService();
 
-    service.verifyEmail(' verify-token ');
+      service.verifyEmail(' verify-token ');
 
-    const request = httpMock.expectOne((req) => req.url.endsWith('/auth/verify_email'));
-    expect(request.request.body).toBeNull();
-    expect(request.request.headers.get('Authorization')).toBe('Bearer verify-token');
-    expect(service.emailVerificationInProgress()).toBeTrue();
-    request.flush({ msg: 'Email verified' });
-    tick(2000);
+      const request = httpMock.expectOne((req) => req.url.endsWith('/auth/verify_email'));
+      expect(request.request.body).toBeNull();
+      expect(request.request.headers.get('Authorization')).toBe('Bearer verify-token');
+      expect(service.emailVerificationInProgress()).toBeTrue();
+      request.flush({ msg: 'Email verified' });
+      jasmine.clock().tick(2000);
 
-    expect(service.verifyEmailError()).toBeNull();
-    expect(service.emailVerificationInProgress()).toBeFalse();
-    expect(service.emailVerificationCompleted()).toBeTrue();
-  }));
+      expect(service.verifyEmailError()).toBeNull();
+      expect(service.emailVerificationInProgress()).toBeFalse();
+      expect(service.emailVerificationCompleted()).toBeTrue();
+    });
+  });
 
   it('does not call backend verify email endpoint when jwt token is missing', () => {
     const service = createService();
@@ -746,54 +748,60 @@ describe('AuthService', () => {
     expect(service.emailVerificationCompleted()).toBeFalse();
   });
 
-  it('maps INVALID_CREDENTIALS backend error code to invalid_link for verify email', fakeAsync(() => {
-    const service = createService();
+  it('maps INVALID_CREDENTIALS backend error code to invalid_link for verify email', () => {
+    jasmine.clock().withMock(() => {
+      const service = createService();
 
-    service.verifyEmail('verify-token');
+      service.verifyEmail('verify-token');
 
-    const request = httpMock.expectOne((req) => req.url.endsWith('/auth/verify_email'));
-    expect(request.request.headers.get('Authorization')).toBe('Bearer verify-token');
-    request.flush(
-      { msg: 'invalid token', err: 'INVALID_CREDENTIALS' },
-      { status: 400, statusText: 'Bad Request' }
-    );
-    tick(2000);
+      const request = httpMock.expectOne((req) => req.url.endsWith('/auth/verify_email'));
+      expect(request.request.headers.get('Authorization')).toBe('Bearer verify-token');
+      request.flush(
+        { msg: 'invalid token', err: 'INVALID_CREDENTIALS' },
+        { status: 400, statusText: 'Bad Request' }
+      );
+      jasmine.clock().tick(2000);
 
-    expect(service.verifyEmailError()).toBe('invalid_link');
-    expect(service.emailVerificationInProgress()).toBeFalse();
-    expect(service.emailVerificationCompleted()).toBeFalse();
-  }));
+      expect(service.verifyEmailError()).toBe('invalid_link');
+      expect(service.emailVerificationInProgress()).toBeFalse();
+      expect(service.emailVerificationCompleted()).toBeFalse();
+    });
+  });
 
-  it('maps generic verify email failures to request_failed', fakeAsync(() => {
-    const service = createService();
+  it('maps generic verify email failures to request_failed', () => {
+    jasmine.clock().withMock(() => {
+      const service = createService();
 
-    service.verifyEmail('verify-token');
+      service.verifyEmail('verify-token');
 
-    const request = httpMock.expectOne((req) => req.url.endsWith('/auth/verify_email'));
-    expect(request.request.headers.get('Authorization')).toBe('Bearer verify-token');
-    request.flush({ detail: 'server error' }, { status: 500, statusText: 'Server Error' });
-    tick(2000);
+      const request = httpMock.expectOne((req) => req.url.endsWith('/auth/verify_email'));
+      expect(request.request.headers.get('Authorization')).toBe('Bearer verify-token');
+      request.flush({ detail: 'server error' }, { status: 500, statusText: 'Server Error' });
+      jasmine.clock().tick(2000);
 
-    expect(service.verifyEmailError()).toBe('request_failed');
-    expect(service.emailVerificationInProgress()).toBeFalse();
-    expect(service.emailVerificationCompleted()).toBeFalse();
-  }));
+      expect(service.verifyEmailError()).toBe('request_failed');
+      expect(service.emailVerificationInProgress()).toBeFalse();
+      expect(service.emailVerificationCompleted()).toBeFalse();
+    });
+  });
 
-  it('clears verify email feedback state explicitly', fakeAsync(() => {
-    const service = createService();
+  it('clears verify email feedback state explicitly', () => {
+    jasmine.clock().withMock(() => {
+      const service = createService();
 
-    service.verifyEmail('verify-token');
+      service.verifyEmail('verify-token');
 
-    const request = httpMock.expectOne((req) => req.url.endsWith('/auth/verify_email'));
-    request.flush({ msg: 'Email verified' });
-    tick(2000);
-    expect(service.emailVerificationCompleted()).toBeTrue();
+      const request = httpMock.expectOne((req) => req.url.endsWith('/auth/verify_email'));
+      request.flush({ msg: 'Email verified' });
+      jasmine.clock().tick(2000);
+      expect(service.emailVerificationCompleted()).toBeTrue();
 
-    service.clearVerifyEmailState();
-    expect(service.verifyEmailError()).toBeNull();
-    expect(service.emailVerificationInProgress()).toBeFalse();
-    expect(service.emailVerificationCompleted()).toBeFalse();
-  }));
+      service.clearVerifyEmailState();
+      expect(service.verifyEmailError()).toBeNull();
+      expect(service.emailVerificationInProgress()).toBeFalse();
+      expect(service.emailVerificationCompleted()).toBeFalse();
+    });
+  });
 
   it('clears stored marker return URL on logout when authenticated', () => {
     tokenMap.set('access_token', 'access-token-1');

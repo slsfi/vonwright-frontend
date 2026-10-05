@@ -1,6 +1,6 @@
 import { LOCALE_ID } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
-import { Router } from '@angular/router';
+import { provideRouter, Router } from '@angular/router';
 
 import { config } from '@config';
 import { Article } from '@models/article.models';
@@ -13,7 +13,7 @@ type TestTopMenuComponent = TopMenuComponent & {
 
 describe('TopMenuComponent', () => {
   let originalArticles: Article[];
-  let router: { url: string };
+  let routerUrl: string;
 
   const translatedArticles: Article[] = [
     {
@@ -31,16 +31,19 @@ describe('TopMenuComponent', () => {
   beforeEach(async () => {
     originalArticles = config.articles ?? [];
     config.articles = [];
-    router = { url: '/' };
+    routerUrl = '/';
 
     await TestBed.configureTestingModule({
       imports: [TopMenuComponent],
       providers: [
+        provideRouter([]),
         { provide: AUTH_ENABLED, useValue: false },
-        { provide: LOCALE_ID, useValue: 'sv' },
-        { provide: Router, useValue: router }
+        { provide: LOCALE_ID, useValue: 'sv' }
       ]
     }).compileComponents();
+
+    spyOnProperty(TestBed.inject(Router), 'url', 'get')
+      .and.callFake(() => routerUrl);
   });
 
   afterEach(() => {
@@ -56,7 +59,7 @@ describe('TopMenuComponent', () => {
   }
 
   it('preserves router query params when the input URL has the same path without query params', () => {
-    router.url = '/login?rt=1';
+    routerUrl = '/login?rt=1';
     const { fixture, component } = createComponent();
 
     fixture.componentRef.setInput('currentRouterUrl', '/login');
@@ -65,7 +68,7 @@ describe('TopMenuComponent', () => {
   });
 
   it('uses input query params when they are already present', () => {
-    router.url = '/login?rt=1';
+    routerUrl = '/login?rt=1';
     const { fixture, component } = createComponent();
 
     fixture.componentRef.setInput('currentRouterUrl', '/login?returnUrl=%2Fsearch');
@@ -75,7 +78,7 @@ describe('TopMenuComponent', () => {
 
   it('localizes article route names in language links', () => {
     config.articles = translatedArticles;
-    router.url = '/article/om-tove-jansson';
+    routerUrl = '/article/om-tove-jansson';
     const { fixture, component } = createComponent();
 
     fixture.componentRef.setInput('currentRouterUrl', '/article/om-tove-jansson');
@@ -85,7 +88,7 @@ describe('TopMenuComponent', () => {
 
   it('preserves live router query params while localizing article route names', () => {
     config.articles = translatedArticles;
-    router.url = '/article/om-tove-jansson?view=full';
+    routerUrl = '/article/om-tove-jansson?view=full';
     const { fixture, component } = createComponent();
 
     fixture.componentRef.setInput('currentRouterUrl', '/article/om-tove-jansson');

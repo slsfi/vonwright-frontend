@@ -1,8 +1,8 @@
 import { Injectable, inject } from '@angular/core';
 import { catchError, map, Observable, of } from 'rxjs';
 import { Parser } from 'htmlparser2';
-import { DomHandler } from 'domhandler';
-import { existsOne, findAll, findOne, getChildren, getAttributeValue, isTag } from 'domutils';
+import { DomHandler, isTag } from 'domhandler';
+import { existsOne, findAll, findOne, getChildren, getAttributeValue } from 'domutils';
 import { render } from 'dom-serializer';
 
 import { config } from '@config';

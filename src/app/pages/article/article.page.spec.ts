@@ -1,7 +1,7 @@
 import { LOCALE_ID } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { ActivatedRoute, Params, Router } from '@angular/router';
-import { ModalController, PopoverController } from '@ionic/angular/lazy';
+import { ModalController, PopoverController } from '@ionic/angular';
 import { BehaviorSubject, of } from 'rxjs';
 
 import { config } from '@config';
@@ -14,6 +14,7 @@ import { ArticlePage } from './article.page';
 describe('ArticlePage', () => {
   let originalArticles: Article[];
   let routeParams$: BehaviorSubject<Params>;
+  let routeFragment$: BehaviorSubject<string | null>;
   let route: Partial<ActivatedRoute>;
   let router: jasmine.SpyObj<Pick<Router, 'navigate'>>;
   let markdownService: jasmine.SpyObj<Pick<MarkdownService, 'getParsedMdContent'>>;
@@ -34,6 +35,14 @@ describe('ArticlePage', () => {
       title: 'About Tove Jansson',
       enableTOC: false,
       downloadOptions: []
+    },
+    {
+      id: '04-02',
+      language: 'en',
+      routeName: 'another-article',
+      title: 'Another article',
+      enableTOC: true,
+      downloadOptions: []
     }
   ];
 
@@ -41,9 +50,10 @@ describe('ArticlePage', () => {
     originalArticles = config.articles ?? [];
     config.articles = translatedArticles;
     routeParams$ = new BehaviorSubject<Params>({ name: 'about-tove-jansson' });
+    routeFragment$ = new BehaviorSubject<string | null>(null);
     route = {
       params: routeParams$.asObservable(),
-      fragment: of(null)
+      fragment: routeFragment$.asObservable()
     };
     router = jasmine.createSpyObj<Pick<Router, 'navigate'>>('Router', ['navigate']);
     router.navigate.and.resolveTo(true);
@@ -51,10 +61,12 @@ describe('ArticlePage', () => {
       'MarkdownService',
       ['getParsedMdContent']
     );
-    markdownService.getParsedMdContent.and.returnValue(of('<p>Article</p>'));
+    markdownService.getParsedMdContent.and.callFake(
+      (fileId: string) => of(`<p>${fileId}</p>`)
+    );
 
     await TestBed.configureTestingModule({
-      declarations: [ArticlePage],
+      imports: [ArticlePage],
       providers: [
         { provide: ActivatedRoute, useValue: route },
         { provide: LOCALE_ID, useValue: 'en' },
@@ -82,14 +94,14 @@ describe('ArticlePage', () => {
     fixture.detectChanges();
     const subscription = component.markdownText$.subscribe(value => values.push(value));
 
-    expect(component.article?.id).toBe('04-01');
-    expect(component.article?.language).toBe('en');
+    expect(component.article()?.id).toBe('04-01');
+    expect(component.article()?.language).toBe('en');
     expect(router.navigate).not.toHaveBeenCalled();
     expect(markdownService.getParsedMdContent).toHaveBeenCalledOnceWith(
       'en-04-01',
       jasmine.any(String)
     );
-    expect(values).toEqual(['<p>Article</p>']);
+    expect(values).toEqual(['<p>en-04-01</p>']);
 
     subscription.unsubscribe();
   });
@@ -103,8 +115,8 @@ describe('ArticlePage', () => {
     fixture.detectChanges();
     const subscription = component.markdownText$.subscribe(value => values.push(value));
 
-    expect(component.article?.id).toBe('04-01');
-    expect(component.article?.language).toBe('en');
+    expect(component.article()?.id).toBe('04-01');
+    expect(component.article()?.language).toBe('en');
     expect(router.navigate).toHaveBeenCalledOnceWith(['..', 'about-tove-jansson'], {
       relativeTo: route as ActivatedRoute,
       queryParamsHandling: 'preserve',
@@ -115,5 +127,47 @@ describe('ArticlePage', () => {
     expect(values).toEqual([null]);
 
     subscription.unsubscribe();
+  });
+
+  it('updates article state when the route changes on the reused component', () => {
+    const fixture = TestBed.createComponent(ArticlePage);
+    const component = fixture.componentInstance;
+    const values: Array<string | null> = [];
+
+    fixture.detectChanges();
+    const subscription = component.markdownText$.subscribe(value => values.push(value));
+    routeParams$.next({ name: 'another-article' });
+
+    expect(component.article()?.id).toBe('04-02');
+    expect(component.enableTOC()).toBeTrue();
+    expect(component.tocMenuOpen()).toBeTrue();
+    expect(values).toEqual(['<p>en-04-01</p>', '<p>en-04-02</p>']);
+
+    subscription.unsubscribe();
+  });
+
+  it('removes its click listener and pending scroll retry when destroyed', () => {
+    const clearTimeoutSpy = spyOn(window, 'clearTimeout').and.callThrough();
+    const fixture = TestBed.createComponent(ArticlePage);
+    fixture.detectChanges();
+    const anchor = document.createElement('a');
+    anchor.setAttribute('href', '#section');
+    fixture.nativeElement.appendChild(anchor);
+    const dispatchFragmentClick = () => {
+      const event = new MouseEvent('click', { bubbles: true, cancelable: true });
+      event.preventDefault();
+      anchor.dispatchEvent(event);
+    };
+
+    dispatchFragmentClick();
+    expect(router.navigate).toHaveBeenCalledWith([], jasmine.objectContaining({ fragment: 'section' }));
+
+    router.navigate.calls.reset();
+    routeFragment$.next('missing-section');
+    fixture.destroy();
+    dispatchFragmentClick();
+
+    expect(clearTimeoutSpy).toHaveBeenCalled();
+    expect(router.navigate).not.toHaveBeenCalled();
   });
 });

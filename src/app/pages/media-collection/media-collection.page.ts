@@ -1,13 +1,31 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, LOCALE_ID, OnDestroy, OnInit, inject } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
-import { ModalController } from '@ionic/angular/lazy';
-import { combineLatest, forkJoin, map, Observable, Subscription } from 'rxjs';
+import { NgTemplateOutlet } from '@angular/common';
+import { Component, DestroyRef, LOCALE_ID, OnDestroy, OnInit, inject, signal } from '@angular/core';
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import {
+  IonButton,
+  IonButtons,
+  IonCol,
+  IonContent,
+  IonGrid,
+  IonHeader,
+  IonIcon,
+  IonRow,
+  IonSelect,
+  IonSelectOption,
+  IonSpinner,
+  IonToolbar,
+  ModalController
+} from '@ionic/angular';
+import { combineLatest, forkJoin, map, of, Subscription, switchMap } from 'rxjs';
 
+import { GalleryThumbImageComponent } from '@components/gallery-thumb-image/gallery-thumb-image.component';
 import { config } from '@config';
 import { ReferenceDataModal } from '@modals/reference-data/reference-data.modal';
 import { GalleryItem } from '@models/gallery-item-models';
 import { MediaCollection } from '@models/media-collection.models';
 import { FullscreenImageViewerModal } from '@modals/fullscreen-image-viewer/fullscreen-image-viewer.modal';
+import { TrustHtmlPipe } from '@pipes/trust-html.pipe';
 import { DocumentHeadService } from '@services/document-head.service';
 import { FacsimileImageService } from '@services/facsimile-image.service';
 import { MarkdownService } from '@services/markdown.service';
@@ -20,11 +38,27 @@ import { isEmptyObject, sortArrayOfObjectsAlphabetically, sortArrayOfObjectsNume
   selector: 'page-media-collection',
   templateUrl: './media-collection.page.html',
   styleUrls: ['./media-collection.page.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  standalone: false
+  imports: [
+    GalleryThumbImageComponent,
+    IonButton,
+    IonButtons,
+    IonCol,
+    IonContent,
+    IonGrid,
+    IonHeader,
+    IonIcon,
+    IonRow,
+    IonSelect,
+    IonSelectOption,
+    IonSpinner,
+    IonToolbar,
+    NgTemplateOutlet,
+    RouterLink,
+    TrustHtmlPipe
+  ]
 })
 export class MediaCollectionPage implements OnDestroy, OnInit {
-  private cdRef = inject(ChangeDetectorRef);
+  private destroyRef = inject(DestroyRef);
   private headService = inject(DocumentHeadService);
   private mdService = inject(MarkdownService);
   private mediaCollectionService = inject(MediaCollectionService);
@@ -53,79 +87,87 @@ export class MediaCollectionPage implements OnDestroy, OnInit {
   readonly projectName: string = config.app?.projectNameDB ?? '';
   readonly showURNButton: boolean = config.page?.mediaCollection?.showURNButton ?? false;
 
-  activeKeywordFilters: number[] = [];
-  activePersonFilters: number[] = [];
-  activePlaceFilters: number[] = [];
-  allMediaCollections: GalleryItem[] = [];
-  allMediaConnections: any = {};
-  filterOptionsKeywords: any[] = [];
-  filterOptionsPersons: any[] = [];
-  filterOptionsPlaces: any[] = [];
-  filterOptionsSubscription: Subscription | null = null;
-  galleryThumbObjectURLsByID: Record<string, string | null> = {};
-  galleryThumbResolutionSubscription: Subscription | null = null;
-  galleryThumbResolvedURLsByID: Record<string, string> = {};
-  filterResultCount: number = -1;
-  galleryBacksideImageURLs: (string | undefined)[] = [];
-  galleryData: GalleryItem[] = [];
-  galleryDescriptions: (string | undefined)[] = [];
-  galleryImageURLs: (string | undefined)[] = [];
-  galleryTitles: (string | undefined)[] = [];
-  loadingGallery: boolean = true;
-  loadingImageModal: boolean = false;
-  mdContent$: Observable<string | null>;
-  mediaCollectionID: string | undefined = undefined;
-  mediaCollectionDescription: string = '';
-  mediaCollectionTitle: string = '';
-  namedEntityID: string = '';
-  namedEntityType: string = '';
-  urlParametersSubscription: Subscription | null = null;
+  readonly activeKeywordFilters = signal<number[]>([]);
+  readonly activePersonFilters = signal<number[]>([]);
+  readonly activePlaceFilters = signal<number[]>([]);
+  private allMediaCollections: GalleryItem[] = [];
+  private allMediaConnections: any = {};
+  readonly filterOptionsKeywords = signal<any[]>([]);
+  readonly filterOptionsPersons = signal<any[]>([]);
+  readonly filterOptionsPlaces = signal<any[]>([]);
+  private filterOptionsSubscription: Subscription | null = null;
+  private galleryThumbObjectURLsByID: Record<string, string | null> = {};
+  private galleryThumbResolutionSubscription: Subscription | null = null;
+  readonly galleryThumbResolvedURLsByID = signal<Record<string, string>>({});
+  readonly filterResultCount = signal(-1);
+  private galleryBacksideImageURLs: (string | undefined)[] = [];
+  readonly galleryData = signal<GalleryItem[]>([]);
+  private galleryDescriptions: (string | undefined)[] = [];
+  private galleryImageURLs: (string | undefined)[] = [];
+  private galleryTitles: (string | undefined)[] = [];
+  readonly loadingGallery = signal(true);
+  readonly loadingImageModal = signal(false);
+  readonly mdContent = toSignal(
+    this.route.params.pipe(
+      map(params => params['mediaCollectionID']),
+      switchMap(mediaCollectionID => mediaCollectionID === 'entity'
+        ? of(null)
+        : this.mdService.getParsedMdContent(
+            `${this.activeLocale}-11-${mediaCollectionID || 'all'}`
+          )
+      )
+    ),
+    { initialValue: null }
+  );
+  readonly mediaCollectionID = signal<string | undefined>(undefined);
+  readonly mediaCollectionDescription = signal('');
+  readonly mediaCollectionTitle = signal('');
+  readonly namedEntityID = signal('');
+  private namedEntityType = '';
 
   ngOnInit() {
-    this.urlParametersSubscription = combineLatest(
+    combineLatest(
       [this.route.params, this.route.queryParams]
     ).pipe(
-      map(([params, queryParams]) => ({...params, ...queryParams}))
+      map(([params, queryParams]) => ({...params, ...queryParams})),
+      takeUntilDestroyed(this.destroyRef)
     ).subscribe((routeParams: any) => {
       if (
-        (isEmptyObject(routeParams) && this.mediaCollectionID !== '') ||
+        (isEmptyObject(routeParams) && this.mediaCollectionID() !== '') ||
         (
           !routeParams.mediaCollectionID &&
           (
             routeParams.filters ||
             !routeParams.filters &&
             (
-              this.activePersonFilters.length ||
-              this.activePlaceFilters.length ||
-              this.activeKeywordFilters.length
+              this.activePersonFilters().length ||
+              this.activePlaceFilters().length ||
+              this.activeKeywordFilters().length
             )
           )
         )
       ) {
         // Load all media collections
-        this.loadingGallery = true;
-        const shouldSetFilters = this.mediaCollectionID !== '' ? true : false;
-        this.mediaCollectionID = '';
-        this.namedEntityID = '';
-        this.mediaCollectionTitle = $localize`:@@MainSideMenu.MediaCollections:Bildbank`;
-        this.cdRef.detectChanges();
-        this.mdContent$ = this.mdService.getParsedMdContent(
-          this.activeLocale + '-11-all'
-        );
+        this.loadingGallery.set(true);
+        const shouldSetFilters = this.mediaCollectionID() !== '';
+        this.mediaCollectionID.set('');
+        this.namedEntityID.set('');
+        this.mediaCollectionTitle.set($localize`:@@MainSideMenu.MediaCollections:Bildbank`);
+        this.mediaCollectionDescription.set('');
 
         if (routeParams.filters) {
           this.setActiveFiltersFromQueryParams(routeParams.filters);
         } else {
-          this.activePersonFilters = [];
-          this.activePlaceFilters = [];
-          this.activeKeywordFilters = [];
+          this.activePersonFilters.set([]);
+          this.activePlaceFilters.set([]);
+          this.activeKeywordFilters.set([]);
         }
 
         if (this.allMediaCollections.length < 1) {
           this.loadMediaCollections();
         } else {
           this.clearGalleryThumbResolution();
-          this.galleryData = this.allMediaCollections;
+          this.galleryData.set(this.allMediaCollections);
           this.resolveGalleryThumbURLs();
           if (shouldSetFilters) {
             this.setFilterOptionsAndApplyActiveFilters();
@@ -137,13 +179,13 @@ export class MediaCollectionPage implements OnDestroy, OnInit {
         routeParams.mediaCollectionID &&
         routeParams.mediaCollectionID !== 'entity' &&
         (
-          routeParams.mediaCollectionID !== this.mediaCollectionID ||
+          routeParams.mediaCollectionID !== this.mediaCollectionID() ||
           routeParams.filters ||
           !routeParams.filters &&
           (
-            this.activePersonFilters.length ||
-            this.activePlaceFilters.length ||
-            this.activeKeywordFilters.length
+            this.activePersonFilters().length ||
+            this.activePlaceFilters().length ||
+            this.activeKeywordFilters().length
           )
         )
       ) {
@@ -151,31 +193,31 @@ export class MediaCollectionPage implements OnDestroy, OnInit {
         if (routeParams.filters) {
           this.setActiveFiltersFromQueryParams(routeParams.filters);
         } else {
-          this.activePersonFilters = [];
-          this.activePlaceFilters = [];
-          this.activeKeywordFilters = [];
+          this.activePersonFilters.set([]);
+          this.activePlaceFilters.set([]);
+          this.activeKeywordFilters.set([]);
         }
 
-        if (routeParams.mediaCollectionID !== this.mediaCollectionID) {
-          this.loadingGallery = true;
-          this.mediaCollectionID = routeParams.mediaCollectionID;
+        if (routeParams.mediaCollectionID !== this.mediaCollectionID()) {
+          this.loadingGallery.set(true);
+          this.mediaCollectionID.set(routeParams.mediaCollectionID);
           this.loadSingleMediaCollection(routeParams.mediaCollectionID);
         } else {
-          this.mediaCollectionID = routeParams.mediaCollectionID;
+          this.mediaCollectionID.set(routeParams.mediaCollectionID);
           this.applyActiveFilters();
         }
-        this.namedEntityID = '';
+        this.namedEntityID.set('');
       } else if (
         routeParams.mediaCollectionID === 'entity' &&
         routeParams.id &&
         routeParams.type
       ) {
         // Load specific images related to a named entity
-        this.loadingGallery = true;
-        this.mediaCollectionID = 'entity';
-        this.namedEntityID = routeParams.id;
+        this.loadingGallery.set(true);
+        this.mediaCollectionID.set('entity');
+        this.namedEntityID.set(routeParams.id);
         this.namedEntityType = routeParams.type;
-        this.loadNamedEntityGallery(this.namedEntityID, this.namedEntityType);
+        this.loadNamedEntityGallery(this.namedEntityID(), this.namedEntityType);
       }
     });
   }
@@ -183,17 +225,18 @@ export class MediaCollectionPage implements OnDestroy, OnInit {
   ngOnDestroy() {
     this.filterOptionsSubscription?.unsubscribe();
     this.clearGalleryThumbResolution();
-    this.urlParametersSubscription?.unsubscribe();
   }
 
   private loadMediaCollections() {
     this.clearGalleryThumbResolution();
-    this.galleryData = [];
+    this.galleryData.set([]);
 
-    this.mediaCollectionService.getMediaCollections(this.activeLocale).subscribe(
+    this.mediaCollectionService.getMediaCollections(this.activeLocale).pipe(
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe(
       (collections: MediaCollection[]) => {
         this.allMediaCollections = this.getTransformedGalleryData(collections);
-        this.galleryData = this.allMediaCollections;
+        this.galleryData.set(this.allMediaCollections);
         this.resolveGalleryThumbURLs();
         this.setFilterOptionsAndApplyActiveFilters();
       }
@@ -202,17 +245,18 @@ export class MediaCollectionPage implements OnDestroy, OnInit {
 
   private loadSingleMediaCollection(mediaCollectionID: string) {
     this.clearGalleryThumbResolution();
-    this.galleryData = [];
+    this.galleryData.set([]);
 
     // Get all media collections if not yet loaded, set current collection title and description
     if (this.allMediaCollections.length < 1) {
-      this.mediaCollectionService.getMediaCollections(this.activeLocale).subscribe(
+      this.mediaCollectionService.getMediaCollections(this.activeLocale).pipe(
+        takeUntilDestroyed(this.destroyRef)
+      ).subscribe(
         (collections: MediaCollection[]) => {
           for (let i = 0; i < collections.length; i++) {
             if (collections[i].id === Number(mediaCollectionID)) {
-              this.mediaCollectionTitle = collections[i].title || '';
-              this.mediaCollectionDescription = collections[i].description || '';
-              this.cdRef.detectChanges();
+              this.mediaCollectionTitle.set(collections[i].title || '');
+              this.mediaCollectionDescription.set(collections[i].description || '');
               break;
             }
           }
@@ -222,22 +266,19 @@ export class MediaCollectionPage implements OnDestroy, OnInit {
     } else {
       for (let i = 0; i < this.allMediaCollections.length; i++) {
         if (this.allMediaCollections[i].collectionID === Number(mediaCollectionID)) {
-          this.mediaCollectionTitle = this.allMediaCollections[i].title || '';
-          this.mediaCollectionDescription = this.allMediaCollections[i].description || '';
-          this.cdRef.detectChanges();
+          this.mediaCollectionTitle.set(this.allMediaCollections[i].title || '');
+          this.mediaCollectionDescription.set(this.allMediaCollections[i].description || '');
           break;
         }
       }
     }
 
-    this.mdContent$ = this.mdService.getParsedMdContent(
-      this.activeLocale + '-11-' + mediaCollectionID
-    );
-
     // Get selected media collection data, then filter options and apply any active filters
-    this.mediaCollectionService.getSingleMediaCollection(mediaCollectionID, this.activeLocale).subscribe(
+    this.mediaCollectionService.getSingleMediaCollection(mediaCollectionID, this.activeLocale).pipe(
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe(
       (galleryItems: any[]) => {
-        this.galleryData = this.getTransformedGalleryData(galleryItems, true);
+        this.galleryData.set(this.getTransformedGalleryData(galleryItems, true));
         this.resolveGalleryThumbURLs();
         this.setFilterOptionsAndApplyActiveFilters();
       }
@@ -246,23 +287,24 @@ export class MediaCollectionPage implements OnDestroy, OnInit {
 
   private loadNamedEntityGallery(objectID: string, objectType: string) {
     this.clearGalleryThumbResolution();
-    this.mediaCollectionService.getNamedEntityOccInMediaColls(objectType, objectID).subscribe(
+    this.mediaCollectionService.getNamedEntityOccInMediaColls(objectType, objectID).pipe(
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe(
       (occurrences: any) => {
-        this.galleryData = this.getTransformedGalleryData(occurrences, true);
+        this.galleryData.set(this.getTransformedGalleryData(occurrences, true));
         this.resolveGalleryThumbURLs();
 
         if (objectType === 'person') {
-          this.mediaCollectionTitle = occurrences[0]['full_name'];
-          this.mediaCollectionDescription = '';
+          this.mediaCollectionTitle.set(occurrences[0]['full_name']);
+          this.mediaCollectionDescription.set('');
         } else {
-          this.mediaCollectionTitle = occurrences[0]['name'];
-          this.mediaCollectionDescription = '';
+          this.mediaCollectionTitle.set(occurrences[0]['name']);
+          this.mediaCollectionDescription.set('');
         }
 
-        this.headService.setTitle([this.mediaCollectionTitle, $localize`:@@MainSideMenu.MediaCollections:Bildbank`]);
+        this.headService.setTitle([this.mediaCollectionTitle(), $localize`:@@MainSideMenu.MediaCollections:Bildbank`]);
 
-        this.loadingGallery = false;
-        this.cdRef.detectChanges();
+        this.loadingGallery.set(false);
         this.setGalleryZoomedImageData();
       }
     );
@@ -276,7 +318,7 @@ export class MediaCollectionPage implements OnDestroy, OnInit {
       this.facsimileImageService.revokeObjectURL(objectURL);
     });
     this.galleryThumbObjectURLsByID = {};
-    this.galleryThumbResolvedURLsByID = {};
+    this.galleryThumbResolvedURLsByID.set({});
   }
 
   private resolveGalleryThumbURLs() {
@@ -290,11 +332,13 @@ export class MediaCollectionPage implements OnDestroy, OnInit {
     this.clearGalleryThumbResolution();
 
     this.galleryThumbResolutionSubscription = new Subscription();
-    this.galleryData.forEach((item: GalleryItem) => {
+    this.galleryData().forEach((item: GalleryItem) => {
       const subscription = this.facsimileImageService.resolveImageSrc(item.imageURLThumb ?? null).subscribe((resolvedImage) => {
         this.galleryThumbObjectURLsByID[item.id] = resolvedImage.objectURL;
-        this.galleryThumbResolvedURLsByID[item.id] = resolvedImage.src;
-        this.cdRef.markForCheck();
+        this.galleryThumbResolvedURLsByID.update(urls => ({
+          ...urls,
+          [item.id]: resolvedImage.src
+        }));
       });
       this.galleryThumbResolutionSubscription?.add(subscription);
     });
@@ -339,7 +383,7 @@ export class MediaCollectionPage implements OnDestroy, OnInit {
     this.galleryDescriptions = [];
     this.galleryTitles = [];
 
-    this.galleryData.forEach((element: GalleryItem) => {
+    this.galleryData().forEach((element: GalleryItem) => {
       if (element.visible) {
         this.galleryImageURLs.push(element.imageURL);
         this.galleryBacksideImageURLs.push(element.imageURLBack);
@@ -353,21 +397,21 @@ export class MediaCollectionPage implements OnDestroy, OnInit {
     const parsedActiveFilters = this.urlService.parse(urlFilters, true) || [];
 
     // Clear the current active filters before setting them from queryparams
-    this.activePersonFilters = [];
-    this.activePlaceFilters = [];
-    this.activeKeywordFilters = [];
+    this.activePersonFilters.set([]);
+    this.activePlaceFilters.set([]);
+    this.activeKeywordFilters.set([]);
 
     parsedActiveFilters.forEach((filterGroup: any) => {
       if (filterGroup.person?.length) {
-        this.activePersonFilters = filterGroup.person;
+        this.activePersonFilters.set(filterGroup.person);
       }
 
       if (filterGroup.place?.length) {
-        this.activePlaceFilters = filterGroup.place;
+        this.activePlaceFilters.set(filterGroup.place);
       }
       
       if (filterGroup.keyword?.length) {
-        this.activeKeywordFilters = filterGroup.keyword;
+        this.activeKeywordFilters.set(filterGroup.keyword);
       }
     });
   }
@@ -382,13 +426,13 @@ export class MediaCollectionPage implements OnDestroy, OnInit {
     this.filterOptionsSubscription = forkJoin(
       [
         this.mediaCollectionService.getAllNamedEntityOccInMediaCollsByType(
-          'keyword', this.mediaCollectionID
+          'keyword', this.mediaCollectionID()
         ),
         this.mediaCollectionService.getAllNamedEntityOccInMediaCollsByType(
-          'person', this.mediaCollectionID
+          'person', this.mediaCollectionID()
         ),
         this.mediaCollectionService.getAllNamedEntityOccInMediaCollsByType(
-          'place', this.mediaCollectionID
+          'place', this.mediaCollectionID()
         )
       ]
     ).pipe(
@@ -451,33 +495,38 @@ export class MediaCollectionPage implements OnDestroy, OnInit {
     
     sortArrayOfObjectsAlphabetically(filterOptions, 'name');
     if (type === 'person') {
-      this.filterOptionsPersons = filterOptions;
+      this.filterOptionsPersons.set(filterOptions);
     } else if (type === 'place') {
-      this.filterOptionsPlaces = filterOptions;
+      this.filterOptionsPlaces.set(filterOptions);
     } else if (type === 'keyword') {
-      this.filterOptionsKeywords = filterOptions;
+      this.filterOptionsKeywords.set(filterOptions);
     }
   }
 
   private applyActiveFilters() {
     let filterResultCount = 0;
-    const connKey = this.mediaCollectionID ? 'filenames' : 'mediaCollectionIDs';
-    const itemKey = this.mediaCollectionID ? 'filename' : 'collectionID';
+    const mediaCollectionID = this.mediaCollectionID();
+    const activePersonFilters = this.activePersonFilters();
+    const activePlaceFilters = this.activePlaceFilters();
+    const activeKeywordFilters = this.activeKeywordFilters();
+    const galleryData = this.galleryData();
+    const connKey = mediaCollectionID ? 'filenames' : 'mediaCollectionIDs';
+    const itemKey = mediaCollectionID ? 'filename' : 'collectionID';
 
     if (
-      this.activePersonFilters.length ||
-      this.activePlaceFilters.length ||
-      this.activeKeywordFilters.length
+      activePersonFilters.length ||
+      activePlaceFilters.length ||
+      activeKeywordFilters.length
     ) {
       // Apply filters
-      this.galleryData.forEach((item: GalleryItem) => {
+      galleryData.forEach((item: GalleryItem) => {
         let personOk = false;
         let placeOk = false;
         let keywordOk = false;
 
-        if (this.activePersonFilters.length) {
-          for (let f = 0; f < this.activePersonFilters.length; f++) {
-            if (this.allMediaConnections['person']?.[this.activePersonFilters[f]]?.[connKey]?.includes(item[itemKey])) {
+        if (activePersonFilters.length) {
+          for (let f = 0; f < activePersonFilters.length; f++) {
+            if (this.allMediaConnections['person']?.[activePersonFilters[f]]?.[connKey]?.includes(item[itemKey])) {
               personOk = true;
               break;
             } else {
@@ -488,9 +537,9 @@ export class MediaCollectionPage implements OnDestroy, OnInit {
           personOk = true;
         }
 
-        if (this.activePlaceFilters.length) {
-          for (let f = 0; f < this.activePlaceFilters.length; f++) {
-            if (this.allMediaConnections['place']?.[this.activePlaceFilters[f]]?.[connKey]?.includes(item[itemKey])) {
+        if (activePlaceFilters.length) {
+          for (let f = 0; f < activePlaceFilters.length; f++) {
+            if (this.allMediaConnections['place']?.[activePlaceFilters[f]]?.[connKey]?.includes(item[itemKey])) {
               placeOk = true;
               break;
             } else {
@@ -501,9 +550,9 @@ export class MediaCollectionPage implements OnDestroy, OnInit {
           placeOk = true;
         }
 
-        if (this.activeKeywordFilters.length) {
-          for (let f = 0; f < this.activeKeywordFilters.length; f++) {
-            if (this.allMediaConnections['keyword']?.[this.activeKeywordFilters[f]]?.[connKey]?.includes(item[itemKey])) {
+        if (activeKeywordFilters.length) {
+          for (let f = 0; f < activeKeywordFilters.length; f++) {
+            if (this.allMediaConnections['keyword']?.[activeKeywordFilters[f]]?.[connKey]?.includes(item[itemKey])) {
               keywordOk = true;
               break;
             } else {
@@ -521,17 +570,17 @@ export class MediaCollectionPage implements OnDestroy, OnInit {
       });
     } else {
       // Clear all filters --> show all collection items
-      this.galleryData.forEach((item: GalleryItem) => {
+      galleryData.forEach((item: GalleryItem) => {
         item.visible = true;
       });
       filterResultCount = -1;
     }
 
-    this.filterResultCount = filterResultCount;
-    this.loadingGallery = false;
-    this.cdRef.detectChanges();
+    this.galleryData.set([...galleryData]);
+    this.filterResultCount.set(filterResultCount);
+    this.loadingGallery.set(false);
 
-    if (this.mediaCollectionID) {
+    if (mediaCollectionID) {
       this.setGalleryZoomedImageData();
     }
   }
@@ -550,23 +599,26 @@ export class MediaCollectionPage implements OnDestroy, OnInit {
 
   onFilterChanged(type: string, event: any) {
     const filters: any[] = [];
+    const activePersonFilters = this.activePersonFilters();
+    const activePlaceFilters = this.activePlaceFilters();
+    const activeKeywordFilters = this.activeKeywordFilters();
 
     if (type === 'person' && event?.detail?.value?.length) {
       filters.push({ person: event?.detail?.value });
-    } else if (type !== 'person' && this.activePersonFilters.length) {
-      filters.push({ person: this.activePersonFilters });
+    } else if (type !== 'person' && activePersonFilters.length) {
+      filters.push({ person: activePersonFilters });
     }
 
     if (type === 'place' && event?.detail?.value?.length) {
       filters.push({ place: event?.detail?.value });
-    } else if (type !== 'place' && this.activePlaceFilters.length) {
-      filters.push({ place: this.activePlaceFilters });
+    } else if (type !== 'place' && activePlaceFilters.length) {
+      filters.push({ place: activePlaceFilters });
     }
 
     if (type === 'keyword' && event?.detail?.value?.length) {
       filters.push({ keyword: event?.detail?.value });
-    } else if (type !== 'keyword' && this.activeKeywordFilters.length) {
-      filters.push({ keyword: this.activeKeywordFilters });
+    } else if (type !== 'keyword' && activeKeywordFilters.length) {
+      filters.push({ keyword: activeKeywordFilters });
     }
 
     this.updateURLQueryParameters(
@@ -585,8 +637,7 @@ export class MediaCollectionPage implements OnDestroy, OnInit {
   }
 
   async openImage(imageURL: string) {
-    this.loadingImageModal = true;
-    this.cdRef.detectChanges();
+    this.loadingImageModal.set(true);
     let index = 0;
 
     for(let i = 0; i < this.galleryImageURLs.length; i++) {
@@ -614,8 +665,7 @@ export class MediaCollectionPage implements OnDestroy, OnInit {
 
     const { data, role } = await modal.onWillDismiss();
     if (role) {
-      this.loadingImageModal = false;
-      this.cdRef.detectChanges();
+      this.loadingImageModal.set(false);
     }
   }
 

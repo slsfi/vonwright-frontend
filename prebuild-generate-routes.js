@@ -8,11 +8,15 @@ const outputFilepath = 'src/app/app.routes.generated.ts';
 const authProtectedOutputFilepath = 'src/app/auth-protected-route-paths.generated.ts';
 
 /**
- * Generates the app routes file used by AppRoutingModule.
+ * Generates the app routes file consumed by the root router configuration.
  *
  * If app.prebuild.featureBasedRoutes is true in config.ts, feature flags
- * in config determine which lazy route imports are included in the file.
+ * in config determine which top-level routes are included in the file.
  * If false, all default routes are included.
+ *
+ * The parser intentionally treats loadComponent declarations and loadChildren
+ * references to standalone route arrays as opaque route-block content. Feature
+ * filtering and auth-protected path generation operate only on top-level paths.
  */
 function generateRoutes() {
   const config = common.getConfig(configFilepath);
@@ -23,21 +27,44 @@ function generateRoutes() {
   }
 
   const sourceContent = fs.readFileSync(path.join(__dirname, sourceRoutesFilepath), 'utf-8');
+  const generationPlan = createRouteGenerationPlan(sourceContent, config);
+
+  warnUnknownRoutePaths(generationPlan.unknownRoutePaths);
+  fs.writeFileSync(path.join(__dirname, outputFilepath), generationPlan.routesFileContent);
+  writeAuthProtectedRoutesFile(
+    generationPlan.routeBlocks,
+    generationPlan.featureBasedRoutes,
+    generationPlan.authEnabled
+  );
+
+  if (!generationPlan.featureBasedRoutes) {
+    console.log('Copied app routes file (feature-based mode: false).');
+    return;
+  }
+
+  console.log(
+    `Generated app routes file (${generationPlan.routeBlocks.length} routes, feature-based mode: true).`
+  );
+}
+
+function createRouteGenerationPlan(sourceContent, config) {
   const featureBasedRoutes = config.app?.prebuild?.featureBasedRoutes ?? false;
   const authEnabled = config.app?.auth?.enabled === true;
   const sourceRouteBlocks = extractRouteBlocks(sourceContent);
   validateSourceRouteBlocks(sourceRouteBlocks);
 
   if (!featureBasedRoutes) {
-    fs.writeFileSync(path.join(__dirname, outputFilepath), sourceContent);
-    writeAuthProtectedRoutesFile(sourceRouteBlocks, featureBasedRoutes, authEnabled);
-    console.log('Copied app routes file (feature-based mode: false).');
-    return;
+    return {
+      routesFileContent: sourceContent,
+      routeBlocks: sourceRouteBlocks,
+      unknownRoutePaths: new Set(),
+      featureBasedRoutes,
+      authEnabled
+    };
   }
 
   const includeByPath = common.getRouteIncludeByPath(config);
   const unknownRoutePaths = new Set();
-
   const filteredRoutes = sourceRouteBlocks.filter((routeBlock) => {
     const routePath = getRoutePath(routeBlock);
     if (routePath === null) {
@@ -50,16 +77,15 @@ function generateRoutes() {
     }
     return include === undefined ? true : include;
   });
-  warnUnknownRoutePaths(unknownRoutePaths);
   validateFilteredRoutes(sourceRouteBlocks, filteredRoutes);
 
-  const fileContent = renderRoutesFile(filteredRoutes, featureBasedRoutes);
-
-  fs.writeFileSync(path.join(__dirname, outputFilepath), fileContent);
-  writeAuthProtectedRoutesFile(filteredRoutes, featureBasedRoutes, authEnabled);
-  console.log(
-    `Generated app routes file (${filteredRoutes.length} routes, feature-based mode: ${featureBasedRoutes}).`
-  );
+  return {
+    routesFileContent: renderRoutesFile(filteredRoutes, featureBasedRoutes),
+    routeBlocks: filteredRoutes,
+    unknownRoutePaths,
+    featureBasedRoutes,
+    authEnabled
+  };
 }
 
 function extractRouteBlocks(sourceContent) {
@@ -452,6 +478,7 @@ if (require.main === module) {
 
 module.exports = {
   generateRoutes,
+  createRouteGenerationPlan,
   extractRouteBlocks,
   extractRoutesArrayBody,
   getRoutePath,

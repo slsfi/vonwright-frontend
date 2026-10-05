@@ -1,4 +1,7 @@
+@let staticContent = this.staticContent();
+@let type = this.type();
+
 <div
-      [class.static-collection-toc]="type() == 'collection-toc'"
-      [innerHTML]="staticContent() | trustHtml"
+      [class.static-collection-toc]="type === 'collection-toc'"
+      [innerHTML]="staticContent | trustHtml"
 ></div>

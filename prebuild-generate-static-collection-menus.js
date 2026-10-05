@@ -5,8 +5,13 @@ const common = require('./prebuild-common-fns');
 const configFilepath = 'src/assets/config/config.ts';
 const translationsPath = 'src/locale/';
 const outputPath = 'src/static-html/collection-toc/';
+const tocFetchRetries = 3;
+const tocFetchRetryDelay = 2000;
+const tocFetchRetryDelayIncrement = 1000;
 
-generateStaticCollectionMenus();
+if (require.main === module) {
+  generateStaticCollectionMenus();
+}
 
 
 /**
@@ -53,47 +58,32 @@ async function generateStaticCollectionMenus() {
 
   let createdFilesCount = 0;
   let linksCount = 0;
+  const locales = languages.map(lang => lang.code);
+  const fmPagesTranslations = getFrontMatterTranslations(locales, fmPages);
 
-  // Loop through all locales
-  for (const lang of languages) {
-    const locale = lang.code;
+  // A non-multilingual collection TOC is shared by every output locale. Use a
+  // single data pass in that case, while localized TOCs retain one pass per locale.
+  const dataLocales = multilingualCollectionTOC ? locales : [null];
 
-    // Load translations
-    const fmPagesTranslations = {};
-    for (const [page, enabled] of Object.entries(fmPages)) {
-      if (enabled) {
-        const translationId = page === 'cover' ? 'CollectionCover.Cover'
-          : page === 'title' ? 'CollectionTitle.TitlePage'
-          : page === 'foreword' ? 'CollectionForeword.Foreword'
-          : page === 'introduction' ? 'CollectionIntroduction.Introduction'
-          : '';
-        const text = common.getTranslation(translationsPath, locale, translationId);
-        fmPagesTranslations[page] = text;
-      }
-    }
-
+  for (const dataLocale of dataLocales) {
     // Fetch collections
     let collectionsEndpoint = APIBase + '/collections';
-    if (multilingualCollectionTOC) {
-      collectionsEndpoint += '/' + locale;
+    if (dataLocale) {
+      collectionsEndpoint += '/' + dataLocale;
     }
 
     const collections = await common.fetchWithRetry(collectionsEndpoint);
     if (!collections) {
-      console.warn(`Skipping locale "${locale}": could not fetch collections from ${collectionsEndpoint}`);
+      const affectedLocales = dataLocale ? `locale "${dataLocale}"` : 'all locales';
+      console.warn(`Skipping ${affectedLocales}: could not fetch collections from ${collectionsEndpoint}`);
       continue;
     }
 
-    let collectionCount = 0;
+    const outputLocales = dataLocale ? [dataLocale] : locales;
+    let tocFetchCount = 0;
 
     // Loop through each collection
     for (const collection of collections) {
-      collectionCount++;
-      if (collectionCount % 10 === 0) {
-        // Pause every 10th collection to avoid backend overload
-        await common.sleep(2000);
-      }
-
       const collectionId = collection?.id;
       const collectionTitle = collection?.title ?? '';
 
@@ -101,78 +91,126 @@ async function generateStaticCollectionMenus() {
         continue;
       }
 
+      if (tocFetchCount > 0 && tocFetchCount % 10 === 0) {
+        // Pause after every 10 actual TOC requests to avoid backend overload
+        await common.sleep(2000);
+      }
+      tocFetchCount++;
+
       // Fetch TOC for collection
       let tocEndpoint = APIBase + '/toc/' + collectionId;
-      if (multilingualCollectionTOC) {
-        tocEndpoint += '/' + locale;
+      if (dataLocale) {
+        tocEndpoint += '/' + dataLocale;
       }
 
-      const tocJSON = await common.fetchWithRetry(tocEndpoint);
+      const tocJSON = await common.fetchWithRetry(
+        tocEndpoint,
+        tocFetchRetries,
+        tocFetchRetryDelay,
+        tocFetchRetryDelayIncrement
+      );
       if (!tocJSON) {
-        console.warn(`Skipping collection ${collectionId} (${locale}): could not fetch TOC from ${tocEndpoint}`);
+        const affectedLocales = dataLocale ? dataLocale : outputLocales.join(', ');
+        console.warn(`Skipping collection ${collectionId} (${affectedLocales}): could not fetch TOC from ${tocEndpoint}`);
         continue;
       }
 
       const toc = common.flattenObjectTree(tocJSON, 'children', 'itemId');
       if (!toc || !toc.length) {
-        console.warn(`Collection ${collectionId} (${locale}) has empty TOC.`);
+        const affectedLocales = dataLocale ? dataLocale : outputLocales.join(', ');
+        console.warn(`Collection ${collectionId} (${affectedLocales}) has empty TOC.`);
         continue;
       }
 
-      // Generate HTML fragment
-      // The .htm file extension is used here on purpose so these
-      // files can be distinguished from other HTML files with
-      // .html extension. This way you can easily prevent the
-      // files from being gzipped by removing "htm" from the file
-      // formats that gzipper compresses in package.json. Serving
-      // gzipped versions of the static TOC files might put an
-      // unecessary load on the server.
-      const filename = `${collectionId}_${locale}.htm`;
-      let html = `<p><b>${collectionTitle}</b></p>\n`;
-      if (!initializeOutputFile(filename, html)) {
-        console.warn(`Could not initialize file ${outputPath + filename}`);
-        continue;
-      }
-      createdFilesCount++;
-
-      appendToFile(filename, '<ul>\n');
-
-      // Front matter links
-      for (const [page, text] of Object.entries(fmPagesTranslations)) {
-        if (common.enableFrontMatterPage(page, collectionId, config)) {
-          html = `<li><a href="/${locale}/collection/${collectionId}/${page}">${text}</a></li>\n`;
-          appendToFile(filename, html);
-          linksCount++;
+      for (const locale of outputLocales) {
+        const generatedMenu = generateStaticCollectionMenu(
+          collectionId,
+          collectionTitle,
+          toc,
+          locale,
+          fmPagesTranslations[locale],
+          config
+        );
+        if (generatedMenu.created) {
+          createdFilesCount++;
+          linksCount += generatedMenu.links;
         }
       }
-
-      // TOC item links
-      for (const item of toc) {
-        const itemId = item?.itemId?.split(';')[0];
-        const posId = item?.itemId?.split(';')[1] ?? null;
-        if (!itemId) continue;
-
-        const parts = itemId.split('_');
-        if (parts.length > 1) {
-          const textId = parts[1];
-          const chapterId = parts[2] || '';
-
-          let url = `/${locale}/collection/${collectionId}/text/${textId}`;
-          if (chapterId) url += `/${chapterId}`;
-          if (posId) url += `?position=${posId}`;
-
-          const linkText = String(item.text ?? '').trim();
-          html = `<li><a href="${url}">${linkText}</a></li>\n`;
-          appendToFile(filename, html);
-          linksCount++;
-        }
-      }
-
-      appendToFile(filename, '</ul>\n');
     }
   }
 
   console.log(`Generated html files: ${createdFilesCount} (${languages.length} languages, ${linksCount} links)`);
+}
+
+
+function getFrontMatterTranslations(locales, fmPages) {
+  const translations = {};
+
+  for (const locale of locales) {
+    translations[locale] = {};
+    for (const [page, enabled] of Object.entries(fmPages)) {
+      if (enabled) {
+        const translationId = page === 'cover' ? 'CollectionCover.Cover'
+          : page === 'title' ? 'CollectionTitle.TitlePage'
+          : page === 'foreword' ? 'CollectionForeword.Foreword'
+          : page === 'introduction' ? 'CollectionIntroduction.Introduction'
+          : '';
+        translations[locale][page] = common.getTranslation(translationsPath, locale, translationId);
+      }
+    }
+  }
+
+  return translations;
+}
+
+
+function generateStaticCollectionMenu(collectionId, collectionTitle, toc, locale, fmPagesTranslations, config) {
+  // The .htm file extension is used here on purpose so these files can be
+  // distinguished from other HTML files with .html extension and excluded
+  // from compression when serving them uncompressed is more efficient.
+  const filename = `${collectionId}_${locale}.htm`;
+  let html = `<p><b>${collectionTitle}</b></p>\n`;
+  if (!initializeOutputFile(filename, html)) {
+    console.warn(`Could not initialize file ${outputPath + filename}`);
+    return { created: false, links: 0 };
+  }
+
+  let links = 0;
+  appendToFile(filename, '<ul>\n');
+
+  // Front matter links
+  for (const [page, text] of Object.entries(fmPagesTranslations)) {
+    if (common.enableFrontMatterPage(page, collectionId, config)) {
+      html = `<li><a href="/${locale}/collection/${collectionId}/${page}">${text}</a></li>\n`;
+      appendToFile(filename, html);
+      links++;
+    }
+  }
+
+  // TOC item links
+  for (const item of toc) {
+    const itemId = item?.itemId?.split(';')[0];
+    const posId = item?.itemId?.split(';')[1] ?? null;
+    if (!itemId) continue;
+
+    const parts = itemId.split('_');
+    if (parts.length > 1) {
+      const textId = parts[1];
+      const chapterId = parts[2] || '';
+
+      let url = `/${locale}/collection/${collectionId}/text/${textId}`;
+      if (chapterId) url += `/${chapterId}`;
+      if (posId) url += `?position=${posId}`;
+
+      const linkText = String(item.text ?? '').trim();
+      html = `<li><a href="${url}">${linkText}</a></li>\n`;
+      appendToFile(filename, html);
+      links++;
+    }
+  }
+
+  appendToFile(filename, '</ul>\n');
+  return { created: true, links };
 }
 
 
@@ -193,3 +231,8 @@ function appendToFile(filename, content) {
     console.error(err);
   }
 }
+
+
+module.exports = {
+  generateStaticCollectionMenus
+};

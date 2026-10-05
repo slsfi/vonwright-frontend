@@ -1,11 +1,11 @@
-@let email = authenticatedEmail();
+@let authenticatedEmail = this.authenticatedEmail();
 
 <ion-content>
   <article>
     <div class="narrow-wrap">
       <h1 i18n="@@Account.Title">Användarkonto</h1>
-      @if (email) {
-        <p class="center"><ng-container i18n="@@Account.DescriptionWithEmail">Du är inloggad med e-postadressen</ng-container><br> {{ email }}</p>
+      @if (authenticatedEmail) {
+        <p class="center"><ng-container i18n="@@Account.DescriptionWithEmail">Du är inloggad med e-postadressen</ng-container><br> {{ authenticatedEmail }}</p>
       } @else {
         <p class="center" i18n="@@Account.Description">Du är inloggad.</p>
       }

@@ -1,7 +1,7 @@
-import { ChangeDetectionStrategy, Component, computed, effect, input, output, signal } from '@angular/core';
+import { Component, computed, effect, input, output, signal } from '@angular/core';
 import { NgClass } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonicModule } from '@ionic/angular/lazy';
+import { IonButton, IonIcon } from '@ionic/angular';
 
 import { YearBucket, YearRange } from '@models/elastic-search.models';
 
@@ -18,8 +18,7 @@ import { YearBucket, YearRange } from '@models/elastic-search.models';
   selector: 'date-histogram',
   templateUrl: './date-histogram.component.html',
   styleUrls: ['./date-histogram.component.scss'],
-  imports: [NgClass, FormsModule, IonicModule],
-  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [NgClass, FormsModule, IonButton, IonIcon]
 })
 export class DateHistogramComponent {
   // --- Inputs & outputs (signal-based) ------------------------------

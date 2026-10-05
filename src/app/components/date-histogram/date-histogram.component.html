@@ -1,13 +1,15 @@
-@let fromYear = from();
-@let toYear = to();
+@let from = this.from();
+@let max = this.max();
+@let paddedYearsAll = this.paddedYearsAll();
+@let to = this.to();
 
 <div class="year-input-row">
   <span class="current-year-range">
-    @if (fromYear) {
-      <span>{{ fromYear }}</span>
+    @if (from) {
+      <span>{{ from }}</span>
     }</span><span class="dash">–</span><span class="current-year-range">
-      @if (toYear) {
-        <span>{{ toYear }}</span>
+      @if (to) {
+        <span>{{ to }}</span>
     }</span>
   <ion-button fill="clear"
         size="small"
@@ -25,7 +27,7 @@
 
 <div class="histogram-wrapper">
   <div class="diagram">
-    @for (year of paddedYearsAll(); track year.key_as_string) {
+    @for (year of paddedYearsAll; track year.key_as_string) {
       <div class="year" [ngClass]="{'yearIsDecade': isDecade(year)}" (click)="selectYear(year)">
         <div class="yearBar" [ngClass]="{'yearBarInRange': isYearInRange(year)}" [style.width]="getYearRelativeToMax(year)"></div>
         <div class="yearDetails">{{ year.key_as_string }}: {{ year.doc_count_current }}</div>
@@ -39,6 +41,6 @@
   </div>
   <div class="doc-count-line">
     <span>0</span>
-    <span>{{ max() }}</span>
+    <span>{{ max }}</span>
   </div>
 </div>

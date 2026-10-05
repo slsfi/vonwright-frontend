@@ -1,8 +1,16 @@
-import { Component, inject, OnDestroy, ChangeDetectionStrategy } from '@angular/core';
 import { Location } from '@angular/common';
-import { ActivatedRoute } from '@angular/router';
-import { FormBuilder, Validators } from '@angular/forms';
+import { Component, inject, OnDestroy } from '@angular/core';
+import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { ActivatedRoute, RouterLink } from '@angular/router';
+import {
+  IonButton,
+  IonContent,
+  IonInput,
+  IonInputPasswordToggle,
+  IonSpinner
+} from '@ionic/angular';
 
+import { AuthStatusMessageComponent } from '@components/auth-status-message/auth-status-message.component';
 import {
   getPasswordFieldValidators,
   PASSWORD_COMPLEXITY_ERROR_KEY,
@@ -14,8 +22,16 @@ import { AuthService } from '@services/auth.service';
   selector: 'page-reset-password',
   templateUrl: './reset-password.page.html',
   styleUrls: ['./reset-password.page.scss'],
-  changeDetection: ChangeDetectionStrategy.Eager,
-  standalone: false
+  imports: [
+    AuthStatusMessageComponent,
+    IonButton,
+    IonContent,
+    IonInput,
+    IonInputPasswordToggle,
+    IonSpinner,
+    ReactiveFormsModule,
+    RouterLink
+  ]
 })
 export class ResetPasswordPage implements OnDestroy {
   private readonly location = inject(Location);

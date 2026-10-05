@@ -1,15 +1,16 @@
-import { Component, inject, OnDestroy, ChangeDetectionStrategy } from '@angular/core';
 import { Location } from '@angular/common';
-import { ActivatedRoute } from '@angular/router';
+import { Component, inject, OnDestroy } from '@angular/core';
+import { ActivatedRoute, RouterLink } from '@angular/router';
+import { IonContent } from '@ionic/angular';
 
+import { AuthStatusMessageComponent } from '@components/auth-status-message/auth-status-message.component';
 import { AuthService } from '@services/auth.service';
 
 @Component({
   selector: 'page-verify-email',
   templateUrl: './verify-email.page.html',
   styleUrls: ['./verify-email.page.scss'],
-  changeDetection: ChangeDetectionStrategy.Eager,
-  standalone: false
+  imports: [AuthStatusMessageComponent, IonContent, RouterLink]
 })
 export class VerifyEmailPage implements OnDestroy {
   private readonly location = inject(Location);

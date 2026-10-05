@@ -1,3 +1,20 @@
+@let activeKeywordFilters = this.activeKeywordFilters();
+@let activePersonFilters = this.activePersonFilters();
+@let activePlaceFilters = this.activePlaceFilters();
+@let filterOptionsKeywords = this.filterOptionsKeywords();
+@let filterOptionsPersons = this.filterOptionsPersons();
+@let filterOptionsPlaces = this.filterOptionsPlaces();
+@let filterResultCount = this.filterResultCount();
+@let galleryData = this.galleryData();
+@let galleryThumbResolvedURLsByID = this.galleryThumbResolvedURLsByID();
+@let loadingGallery = this.loadingGallery();
+@let loadingImageModal = this.loadingImageModal();
+@let mdContent = this.mdContent();
+@let mediaCollectionDescription = this.mediaCollectionDescription();
+@let mediaCollectionID = this.mediaCollectionID();
+@let mediaCollectionTitle = this.mediaCollectionTitle();
+@let namedEntityID = this.namedEntityID();
+
 @if (mediaCollectionID || namedEntityID) {
   <ion-header class="ion-no-border">
     <ion-toolbar class="secondary">
@@ -36,7 +53,7 @@
     <p [innerHTML]="mediaCollectionDescription"></p>
   }
 
-  @if ((mdContent$ | async); as mdContent) {
+  @if (mdContent) {
     <div class="info markdown" [innerHTML]="mdContent | trustHtml"></div>
   }
 

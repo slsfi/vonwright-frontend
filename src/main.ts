@@ -1,17 +1,9 @@
 /// <reference types="@angular/localize" />
 
-import { enableProdMode, provideZoneChangeDetection } from '@angular/core';
-import { platformBrowser } from '@angular/platform-browser';
+import { bootstrapApplication } from '@angular/platform-browser';
 
-import { AppModule } from './app/app.module';
-import { environment } from './environments/environment';
+import { appConfig } from './app/app.config';
+import { AppComponent } from './app/app.component';
 
-
-if (environment.production) {
-  enableProdMode();
-}
-
-platformBrowser().bootstrapModule(
-  AppModule,
-  { applicationProviders: [provideZoneChangeDetection()], }
-).catch(err => console.error(err));
+bootstrapApplication(AppComponent, appConfig)
+  .catch(err => console.error(err));

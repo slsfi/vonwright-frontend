@@ -1,18 +1,26 @@
 <ion-content>
+  @let data = this.data();
+  @let filters = this.filters();
+  @let indexDatabase = this.indexDatabase();
+  @let indexType = this.indexType();
+  @let mdContent = this.mdContent();
+  @let searchText = this.searchText();
+  @let showFilter = this.showFilter();
+  @let showLoading = this.showLoading();
 
   <h1 class="page-title">
-    @if (this.indexType === 'persons') {
+    @if (indexType === 'persons') {
       <ng-container i18n="@@MainSideMenu.IndexPersons">Personregister</ng-container>
-    } @else if (this.indexType === 'places') {
+    } @else if (indexType === 'places') {
       <ng-container i18n="@@MainSideMenu.IndexPlaces">Ortregister</ng-container>
-    } @else if (this.indexType === 'keywords') {
+    } @else if (indexType === 'keywords') {
       <ng-container i18n="@@MainSideMenu.IndexKeywords">Ämnesord</ng-container>
-    } @else if (this.indexType === 'works') {
+    } @else if (indexType === 'works') {
       <ng-container i18n="@@MainSideMenu.IndexWorks">Verkregister</ng-container>
     }
   </h1>
 
-  @if ((mdContent$ | async); as mdContent) {
+  @if (mdContent) {
     <div class="info markdown" [innerHTML]="mdContent | trustHtml"></div>
   }
 
@@ -22,7 +30,8 @@
         <ion-searchbar class="custom-searchbar"
               placeholder="Sök ..."
               i18n-placeholder="@@Index.SearchPlaceholder"
-              [(ngModel)]="searchText"
+              [ngModel]="searchText"
+              (ngModelChange)="this.searchText.set($event)"
               [debounce]="500"
               (ionInput)="searchData()"
         ></ion-searchbar>

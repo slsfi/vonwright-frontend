@@ -1,6 +1,6 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, ElementRef, Injector, NgZone, Renderer2, afterRenderEffect, computed, inject, input, output, signal, untracked } from '@angular/core';
+import { Component, DestroyRef, ElementRef, Injector, OnDestroy, Renderer2, afterRenderEffect, computed, inject, input, output, signal, untracked } from '@angular/core';
 import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
-import { IonicModule, ModalController } from '@ionic/angular/lazy';
+import { IonSpinner, ModalController } from '@ionic/angular';
 import { catchError, combineLatest, map, of, switchMap, tap } from 'rxjs';
 
 import { config } from '@config';
@@ -23,10 +23,9 @@ import { enableFrontMatterPageOrTextViewType, isFileNotFoundHtml } from '@utilit
   selector: 'reading-text',
   templateUrl: './reading-text.component.html',
   styleUrls: ['./reading-text.component.scss'],
-  imports: [IonicModule, MathJaxDirective, TrustHtmlPipe],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  imports: [IonSpinner, MathJaxDirective, TrustHtmlPipe]
 })
-export class ReadingTextComponent {
+export class ReadingTextComponent implements OnDestroy {
   // ─────────────────────────────────────────────────────────────────────────────
   // Dependency injection, Input/Output signals, Fields, Local state signals
   // ─────────────────────────────────────────────────────────────────────────────
@@ -35,7 +34,6 @@ export class ReadingTextComponent {
   private elementRef = inject(ElementRef);
   private injector = inject(Injector);
   private modalController = inject(ModalController);
-  private ngZone = inject(NgZone);
   private parserService = inject(HtmlParserService);
   private renderer2 = inject(Renderer2);
   private scrollService = inject(ScrollService);
@@ -48,7 +46,7 @@ export class ReadingTextComponent {
   readonly openNewIllustrView = output<any>();
   readonly selectedIllustration = output<any>();
 
-  intervalTimerId: number = 0;
+  private intervalTimerId?: number;
   private unlistenClickEvents?: () => void;
   private _lastScrollKey: string | null = null;
   private _lastTextPosition: string | null = null;
@@ -96,12 +94,24 @@ export class ReadingTextComponent {
 
   
   // ─────────────────────────────────────────────────────────────────────────────
-  // Constructor: wire side-effects (load, outputs, after-render, listeners, cleanup)
+  // Constructor: wire side-effects (load, outputs, after-render, listeners)
   // ─────────────────────────────────────────────────────────────────────────────
   constructor() {
     this.loadReadingtext();
     this.registerAfterRenderEffects();
-    this.registerCleanup();
+  }
+
+  ngOnDestroy() {
+    this.unlistenClickEvents?.();
+    this.unlistenClickEvents = undefined;
+    this.clearScrollInterval();
+  }
+
+  private clearScrollInterval() {
+    if (this.intervalTimerId !== undefined) {
+      clearInterval(this.intervalTimerId);
+      this.intervalTimerId = undefined;
+    }
   }
 
   private loadReadingtext() {
@@ -201,24 +211,14 @@ export class ReadingTextComponent {
         if (this._lastScrollKey !== key) {
           this._lastScrollKey = key;
 
-          this.scrollService.scrollToFirstSearchMatch(
-            this.elementRef.nativeElement,
-            this.intervalTimerId
+          this.clearScrollInterval();
+          this.intervalTimerId = this.scrollService.scrollToFirstSearchMatch(
+            this.elementRef.nativeElement
           );
         }
       }
     }, { injector: this.injector });
   }
-
-  private registerCleanup() {
-    // Clean up attached listeners and interval timer on destroy
-    this.destroyRef.onDestroy(() => {
-      this.unlistenClickEvents?.();
-      this.unlistenClickEvents = undefined;
-      clearInterval(this.intervalTimerId);
-    });
-  }
-
 
   // ─────────────────────────────────────────────────────────────────────────────
   // UI actions
@@ -246,7 +246,7 @@ export class ReadingTextComponent {
   }
 
   // ─────────────────────────────────────────────────────────────────────────────
-  // Event listeners (outside Angular) + scrolling helpers
+  // Event listeners + scrolling helpers
   // ─────────────────────────────────────────────────────────────────────────────
 
   private setUpTextListeners() {
@@ -257,83 +257,75 @@ export class ReadingTextComponent {
     const host: HTMLElement = this.elementRef.nativeElement;
 
     /* CLICK EVENTS */
-    this.unlistenClickEvents = this.ngZone.runOutsideAngular(() =>
-      this.renderer2.listen(host, 'click', (event) => {
-        try {
-          const eventTarget = event.target as HTMLElement;
+    this.unlistenClickEvents = this.renderer2.listen(host, 'click', (event) => {
+      try {
+        const eventTarget = event.target as HTMLElement;
 
-          // Some of the texts, e.g. ordsprak.sls.fi, have links to external sites
-          if (
-            eventTarget.hasAttribute('href') &&
-            !eventTarget.getAttribute('href')?.includes('http')
-          ) {
-            event.preventDefault();
-          }
-
-          let image: { src: string; class: string } | null = null;
-
-          // Check if click on an illustration or icon representing an illustration
-          if (eventTarget.classList.contains('doodle') && eventTarget.hasAttribute('src')) {
-            // Click on a pictogram ("doodle")
-            image = {
-              src: this.parserService.getMappedMediaCollectionURL(this.textKey()?.collectionID ?? '')
-                  + String((eventTarget as any).dataset['id']).replace('tag_', '') + '.jpg',
-              class: 'doodle'
-            };
-          } else if (this.inlineVisibleIllustrations()) {
-            // There are possibly visible illustrations in the read text. Check if click on such an image.
-            if (
-              eventTarget.classList.contains('est_figure_graphic') &&
-              eventTarget.hasAttribute('src')
-            ) {
-              image = { src: (eventTarget as HTMLImageElement).src, class: 'visible-illustration' };
-            }
-          } else {
-            // Check if click on an icon representing an image which is NOT visible in the reading text
-            const prev = eventTarget.previousElementSibling as (HTMLElement | null);
-            if (
-              prev?.classList.contains('est_figure_graphic') &&
-              prev?.hasAttribute('src')
-            ) {
-              image = { src: (prev as HTMLImageElement).src, class: 'illustration' };
-            }
-          }
-
-          // Check if we have an image to show in the illustrations-view
-          if (image) {
-            // Check if we have an illustrations-view open, if not, open and display the clicked image there
-            if (document.querySelector(
-              'page-text:not([ion-page-hidden]):not(.ion-page-hidden) illustrations'
-            )) {
-              // Display image in an illustrations-view which is already open
-              this.ngZone.run(() => {
-                this.updateSelectedIllustrationImage(image);
-              });
-            } else {
-              this.ngZone.run(() => {
-                this.openIllustrationInNewView(image);
-              });
-            }
-          }
-        } catch (e) {
-          console.error(e);
-        }
-
-        // Check if click on an icon which links to an illustration that should be opened in a modal
-        const target = event.target as HTMLElement;
-        const parent = target.parentElement;
+        // Some of the texts, e.g. ordsprak.sls.fi, have links to external sites
         if (
-          target.classList.contains('ref_illustration') ||
-          parent?.classList.contains('ref_illustration')
+          eventTarget.hasAttribute('href') &&
+          !eventTarget.getAttribute('href')?.includes('http')
         ) {
-          const hashNumber = (parent as HTMLAnchorElement)?.hash ?? (target as HTMLAnchorElement)?.hash;
-          const imageNumber = hashNumber?.split('#')[1] || '';
-          this.ngZone.run(() => {
-            this.openIllustration(imageNumber);
-          });
+          event.preventDefault();
         }
-      })
-    );
+
+        let image: { src: string; class: string } | null = null;
+
+        // Check if click on an illustration or icon representing an illustration
+        if (eventTarget.classList.contains('doodle') && eventTarget.hasAttribute('src')) {
+          // Click on a pictogram ("doodle")
+          image = {
+            src: this.parserService.getMappedMediaCollectionURL(this.textKey()?.collectionID ?? '')
+                + String((eventTarget as any).dataset['id']).replace('tag_', '') + '.jpg',
+            class: 'doodle'
+          };
+        } else if (this.inlineVisibleIllustrations()) {
+          // There are possibly visible illustrations in the read text. Check if click on such an image.
+          if (
+            eventTarget.classList.contains('est_figure_graphic') &&
+            eventTarget.hasAttribute('src')
+          ) {
+            image = { src: (eventTarget as HTMLImageElement).src, class: 'visible-illustration' };
+          }
+        } else {
+          // Check if click on an icon representing an image which is NOT visible in the reading text
+          const prev = eventTarget.previousElementSibling as (HTMLElement | null);
+          if (
+            prev?.classList.contains('est_figure_graphic') &&
+            prev?.hasAttribute('src')
+          ) {
+            image = { src: (prev as HTMLImageElement).src, class: 'illustration' };
+          }
+        }
+
+        // Check if we have an image to show in the illustrations-view
+        if (image) {
+          // Check if we have an illustrations-view open, if not, open and display the clicked image there
+          if (document.querySelector(
+            'page-text:not([ion-page-hidden]):not(.ion-page-hidden) illustrations'
+          )) {
+            // Display image in an illustrations-view which is already open
+            this.updateSelectedIllustrationImage(image);
+          } else {
+            this.openIllustrationInNewView(image);
+          }
+        }
+      } catch (e) {
+        console.error(e);
+      }
+
+      // Check if click on an icon which links to an illustration that should be opened in a modal
+      const target = event.target as HTMLElement;
+      const parent = target.parentElement;
+      if (
+        target.classList.contains('ref_illustration') ||
+        parent?.classList.contains('ref_illustration')
+      ) {
+        const hashNumber = (parent as HTMLAnchorElement)?.hash ?? (target as HTMLAnchorElement)?.hash;
+        const imageNumber = hashNumber?.split('#')[1] || '';
+        this.openIllustration(imageNumber);
+      }
+    });
   }
 
   private scrollToTextPosition(targetName: string) {
@@ -344,11 +336,11 @@ export class ReadingTextComponent {
 
     const nElement: HTMLElement = this.elementRef.nativeElement;
     let iterationsLeft = 10;
-    clearInterval(this.intervalTimerId);
+    this.clearScrollInterval();
 
     this.intervalTimerId = window.setInterval(() => {
       if (iterationsLeft-- < 1) {
-        clearInterval(this.intervalTimerId);
+        this.clearScrollInterval();
         return;
       }
       let target = nElement.querySelector(
@@ -367,20 +359,18 @@ export class ReadingTextComponent {
 
       if (target) {
         this.scrollService.scrollToHTMLElement(target);
-        clearInterval(this.intervalTimerId);
+        this.clearScrollInterval();
       }
     }, 1000);
   }
 
   private scrollReadingTextToTop() {
-    this.ngZone.runOutsideAngular(() => {
-      const target = document.querySelector<HTMLElement>(
-        'page-text:not([ion-page-hidden]):not(.ion-page-hidden) reading-text'
-      );
-      if (target) {
-        this.scrollService.scrollElementIntoView(target, 'top', 50);
-      }
-    });
+    const target = document.querySelector<HTMLElement>(
+      'page-text:not([ion-page-hidden]):not(.ion-page-hidden) reading-text'
+    );
+    if (target) {
+      this.scrollService.scrollElementIntoView(target, 'top', 50);
+    }
   }
 
 }

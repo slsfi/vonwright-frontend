@@ -11,9 +11,9 @@ import { ActivatedRoute, Router } from '@angular/router';
  * - Server (SSR): we must avoid route churn caused by query-param writes
  *   during render, since that can trigger extra route-processing cycles.
  *
- * Platform modules provide different implementations:
- * - `AppModule` -> browser implementation
- * - `AppServerModule` -> server no-op implementation
+ * Application configurations provide different implementations:
+ * - `app.config.ts` -> browser implementation
+ * - `app.config.server.ts` -> server no-op implementation
  */
 export abstract class CollectionTextViewsQueryParamSyncService {
   /**

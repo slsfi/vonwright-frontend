@@ -13,7 +13,7 @@ const { performance } = require('node:perf_hooks');
  * - Provide a repeatable alternative to manual checks in browser DevTools.
  *
  * What each test asserts:
- * - HTTP status is 200.
+ * - HTTP status matches the test case (200 by default).
  * - Content-Type includes "text/html".
  * - Response body contains one or more expected SSR markers.
  *
@@ -48,6 +48,7 @@ const DEFAULT_TIMEOUT_MS = 30000;
  *
  * Optional test-case fields:
  * - headers: request headers to send for the route.
+ * - expectedStatus: expected HTTP status (defaults to 200).
  */
 const TEST_CASES = [
   {
@@ -351,6 +352,18 @@ const TEST_CASES = [
       },
     ],
   },
+  {
+    name: 'Page not found',
+    route: '/sv/__ssr-smoke-page-not-found__',
+    expectedStatus: 404,
+    checks: [
+      {
+        description: 'Contains the page-not-found component',
+        type: 'includes',
+        value: '<page-not-found',
+      },
+    ],
+  },
 ];
 
 function printHelp() {
@@ -577,8 +590,9 @@ async function runTest(baseUrl, timeoutMs, testCase) {
     };
   }
 
-  if (response.status !== 200) {
-    errors.push(`Expected HTTP 200, got ${response.status}`);
+  const expectedStatus = testCase.expectedStatus ?? 200;
+  if (response.status !== expectedStatus) {
+    errors.push(`Expected HTTP ${expectedStatus}, got ${response.status}`);
   }
 
   if (!response.contentType.toLowerCase().includes('text/html')) {

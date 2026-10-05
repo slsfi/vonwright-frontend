@@ -2,7 +2,6 @@
  * Load `$localize` onto the global scope - used if i18n tags appear in Angular templates.
  */
 import '@angular/localize/init';
-import 'zone.js/node';
 import { LOCALE_ID } from '@angular/core';
 import { APP_BASE_HREF } from '@angular/common';
 import { CommonEngine } from '@angular/ssr/node';
@@ -11,9 +10,9 @@ import { existsSync, readFileSync } from 'node:fs';
 import rateLimit from 'express-rate-limit';
 import { join } from 'node:path';
 
-import AppServerModule from './src/main.server';
+import bootstrap from './src/main.server';
 import { environment } from './src/environments/environment';
-import { REQUEST } from './src/express.tokens';
+import { REQUEST, RESPONSE } from './src/express.tokens';
 import { config } from './src/assets/config/config';
 import { authProtectedRoutePaths } from './src/app/auth-protected-route-paths.generated';
 import { getConfiguredSiteHostname, getRequestRenderUrl } from './src/app/utils/request-origin';
@@ -211,7 +210,7 @@ export function app(lang: string): express.Express {
     // * architect.build.configurations.production.optimization.styles.inlineCritical
     commonEngine
       .render({
-        bootstrap: AppServerModule,
+        bootstrap,
         documentFilePath: indexHtml,
         url: getRequestRenderUrl(req),
         inlineCriticalCss: false,
@@ -220,6 +219,7 @@ export function app(lang: string): express.Express {
           { provide: APP_BASE_HREF, useValue: baseUrl },
           { provide: LOCALE_ID, useValue: lang },
           { provide: REQUEST, useValue: req },
+          { provide: RESPONSE, useValue: res },
         ],
       })
       .then((html) => res.send(html))
