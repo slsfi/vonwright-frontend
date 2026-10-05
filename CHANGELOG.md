@@ -8,9 +8,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ## Unreleased
 
+
+
+## [3.1.1-production.1] – 2026-10-05
+
 ### Changed
 
-- Update to base version [`3.1.1`](https://github.com/slsfi/digital-edition-frontend-ng/releases/tag/3.1.1) from upstream, original repository.
+- Update to base version [`3.1.1`](https://github.com/slsfi/digital-edition-frontend-ng/releases/tag/3.1.1) from upstream, original repository. ([db99068](https://github.com/slsfi/vonwright-frontend/commit/db99068c68a21a298b3dde3fc0f2e18bf37fbca4))
 
 
 
@@ -1915,6 +1919,7 @@ siteLogoDimensions: {
 [1.0.1]: https://github.com/slsfi/digital-edition-frontend-ng/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/slsfi/digital-edition-frontend-ng/releases/tag/v1.0.0
 
+[3.1.1-production.1]: https://github.com/slsfi/vonwright-frontend/compare/3.0.1-production.1...3.1.1-production.1
 [3.0.1-production.1]: https://github.com/slsfi/vonwright-frontend/compare/2.7.9-production.1...3.0.1-production.1
 [2.7.9-production.1]: https://github.com/slsfi/vonwright-frontend/compare/2.7.5-production.1...2.7.9-production.1
 [2.7.5-production.1]: https://github.com/slsfi/vonwright-frontend/compare/2.7.0-production.1...2.7.5-production.1
