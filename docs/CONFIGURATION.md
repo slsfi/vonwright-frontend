@@ -358,7 +358,7 @@ alternateSources: [
 ]
 ```
 
-### Named-entity indexes (`page.index`)
+### Named-entity indices (`page.index`)
 
 | Option | Type / possible values | Default / fallback | Description |
 | --- | --- | --- | --- |
@@ -505,6 +505,8 @@ The grid is displayed when `page.home.showContentGrid` is enabled. Collection ca
 
 Each `component.mainSideMenu.items` flag enables a navigation group or link. Hiding a menu item alone leaves routes available when feature-based filtering is off. With filtering enabled, some flags also control supported production routes; see [route filtering](PROJECT-CUSTOMIZATION.md#feature-based-route-generation).
 
+Index entries form one menu block at the first enabled index flag's position in `items`, including when ungrouped. Their order within that block follows the flags' order.
+
 | Option | Type / possible values | Default / fallback | Description |
 | --- | --- | --- | --- |
 | `component.mainSideMenu.items.about` | `boolean` | `false` | Show the backend about-page tree. |
@@ -523,6 +525,7 @@ Each `component.mainSideMenu.items` flag enables a navigation group or link. Hid
 | `component.mainSideMenu.items.accessibilityStatement` | `boolean` | `false` | Show the accessibility-statement link. |
 | `component.mainSideMenu.defaultExpanded` | `boolean` | `false` | Initially expand menu groups rather than keeping them collapsed. |
 | `component.mainSideMenu.ungroupArticles` | `boolean` | `false` | Put article entries directly in the menu rather than beneath their backend article-root group. |
+| `component.mainSideMenu.ungroupIndices` | `boolean` | `false` | Put enabled index links directly in the menu rather than beneath a collapsible localized group. When `false` or omitted, group all enabled indices, including a single index, preserving index order from `items`. No group appears when all indices are disabled. |
 
 ### Manuscripts
 

@@ -348,7 +348,8 @@ export const config: Config = {
         accessibilityStatement: false,
       },
       defaultExpanded: false,
-      ungroupArticles: false
+      ungroupArticles: false,
+      ungroupIndices: false
     },
     manuscripts: {
       showTitle: true,

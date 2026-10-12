@@ -15,6 +15,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 - Test tooling: replace Jasmine/Karma with Vitest and jsdom; fork-owned specs and CI commands must be converted.
 - SSR proxy trust: require both the configured hop limit and trusted proxy addresses. Review the settings against the deployment's proxy chain.
 - Defaults for config options `collections.addTEIClassNames` and `collections.replaceImageAssetsPaths` changed to `false`, and `page.foreword.showURNButton` and `page.title.showURNButton` changed to `true`.
+- Main side menu: enabled indices now appear under a collapsible localized group ("Register" in Swedish, "Hakemistot" in Finnish, "Indices" in English), including a single index, consistent with article grouping. The new `component.mainSideMenu.ungroupIndices` option defaults to `false` even when omitted; set it to `true` to retain separate root-level index links. Both modes use one menu block at the first enabled index flag's position, preserving the configured index order within that block.
 - The page-not-found page no longer fetches its message from backend Markdown (node ID `{language}-404`), but from localized interface text instead.
 - The content page no longer fetches its introduction from backend Markdown (node ID `{language}-02`). Move any custom introduction to the `Content.Introduction` translation target; it is empty by default.
 
@@ -23,7 +24,8 @@ See the [v4 breaking changes and fork migration notes](https://github.com/slsfi/
 ### Added
 
 - Config: add `app.ssr.trustedProxyAddresses` to configure trusted proxy IP addresses and ranges alongside `app.ssr.trustProxyHops`. An empty array disables proxy trust.
-- Config: add `page.ebook.showURNButton` (boolean) to show the reference button on ebook pages (defaults to `false`).
+- Config: add `page.ebook.showURNButton` (boolean, defaults to `false`) to show the reference button on ebook pages.
+- Config: add `component.mainSideMenu.ungroupIndices` (boolean, defaults to `false`) to keep enabled index links separate in the main side menu.
 
 ### Changed
 

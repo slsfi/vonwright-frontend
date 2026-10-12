@@ -1282,6 +1282,12 @@
         <target>Index of works</target>
       </segment>
     </unit>
+    <unit id="MainSideMenu.Indices">
+      <segment state="initial">
+        <source>Register</source>
+        <target>Indices</target>
+      </segment>
+    </unit>
     <unit id="MainSideMenu.Login">
       <segment state="initial">
         <source>Logga in</source>

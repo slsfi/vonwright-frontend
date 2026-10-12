@@ -87,6 +87,12 @@ export class MainSideMenuComponent {
     'privacy-policy',
     'accessibility-statement'
   ];
+  private readonly indexMenuTypes: Record<string, string> = {
+    indexKeywords: 'keywords',
+    indexPersons: 'persons',
+    indexPlaces: 'places',
+    indexWorks: 'works'
+  };
 
   // Menu Observable to signal
   private readonly menuDataSig = toSignal<MainMenuNode[] | null>(
@@ -180,16 +186,7 @@ export class MainSideMenuComponent {
    * config.
    */
   private getMenuItemsArray(): Observable<MainMenuGroupNode>[] {
-    // Get enabled menu items from config, and prepend with home and auth.
-    // Home is always shown; auth is shown only when auth feature is enabled.
-    let enabledPages = {
-      home: true,
-      auth: this.authEnabled,
-      ...(config.component?.mainSideMenu?.items ?? {})
-    };
-    enabledPages.home = true;
-    enabledPages.auth = this.authEnabled;
-
+    const enabledPages = this.getEnabledMenuPages();
     const menuItemGetters: Record<string, () => Observable<MainMenuGroupNode>> = {
       home: () => this.getHomePageMenuItem(),
       auth: () => this.getAuthMenuItem(),
@@ -198,10 +195,7 @@ export class MainSideMenuComponent {
       ebooks: () => this.getEbookPagesMenu(),
       collections: () => this.getCollectionPagesMenu(),
       mediaCollections: () => this.getMediaCollectionPagesMenu(),
-      indexKeywords: () => this.getIndexPageMenuItem('keywords'),
-      indexPersons: () => this.getIndexPageMenuItem('persons'),
-      indexPlaces: () => this.getIndexPageMenuItem('places'),
-      indexWorks: () => this.getIndexPageMenuItem('works'),
+      indices: () => this.getIndexPagesMenu(),
       search: () => this.getRootPageMenuItem(
         'search',
         $localize`:@@MainSideMenu.Search:Sök i utgåvan`
@@ -225,8 +219,26 @@ export class MainSideMenuComponent {
     };
 
     return Object.entries(enabledPages)
-          .filter(([key, isEnabled]) => isEnabled && menuItemGetters.hasOwnProperty(key))
-          .map(([key]) => menuItemGetters[key]());
+      .filter(([key, isEnabled]) => isEnabled && Object.hasOwn(menuItemGetters, key))
+      .map(([key]) => menuItemGetters[key]());
+  }
+
+  /**
+   * Map enabled config flags to menu slots. All index flags share one slot at
+   * the first enabled index's position; the index getter builds its contents.
+   */
+  private getEnabledMenuPages(): Record<string, boolean> {
+    const enabledPages: Record<string, boolean> = { home: true, auth: this.authEnabled };
+    for (const [key, isEnabled] of Object.entries(config.component?.mainSideMenu?.items ?? {})) {
+      if (isEnabled) {
+        const menuKey = Object.hasOwn(this.indexMenuTypes, key) ? 'indices' : key;
+        enabledPages[menuKey] = true;
+      }
+    }
+    // Home is always shown; auth is controlled by the auth feature.
+    enabledPages.home = true;
+    enabledPages.auth = this.authEnabled;
+    return enabledPages;
   }
 
   private getHomePageMenuItem(): Observable<MainMenuGroupNode> {
@@ -420,19 +432,30 @@ export class MainSideMenuComponent {
     );
   }
 
-  private getIndexPageMenuItem(indexType: string): Observable<MainMenuGroupNode> {
+  private getIndexPagesMenu(): Observable<MainMenuGroupNode> {
+    const ungroupIndices = config.component?.mainSideMenu?.ungroupIndices ?? false;
+    const indexTypes = Object.entries(config.component?.mainSideMenu?.items ?? {})
+      .filter(([key, isEnabled]) => isEnabled && Object.hasOwn(this.indexMenuTypes, key))
+      .map(([key]) => this.indexMenuTypes[key]);
     const indexTitles: Record<string, string> = {
       persons: $localize`:@@MainSideMenu.IndexPersons:Personregister`,
       places: $localize`:@@MainSideMenu.IndexPlaces:Ortregister`,
       keywords: $localize`:@@MainSideMenu.IndexKeywords:Ämnesord`,
       works: $localize`:@@MainSideMenu.IndexWorks:Verkregister`
     };
-    const title = indexTitles[indexType];
-
-    return of({
-      menuType: indexType,
-      menuData: [{ id: '', title, parentPath: `/index/${indexType}` }]
-    });
+    let menuData: MainMenuNode[] = indexTypes.map(indexType => ({
+      id: '',
+      title: indexTitles[indexType],
+      parentPath: `/index/${indexType}`,
+      menuType: indexType
+    }));
+    if (menuData.length > 0 && !ungroupIndices) {
+      menuData = [{
+        title: $localize`:@@MainSideMenu.Indices:Register`,
+        children: menuData
+      }];
+    }
+    return of({ menuType: 'indices', menuData });
   }
 
   private groupCollections(collections: Collection[]): Collection[][] {

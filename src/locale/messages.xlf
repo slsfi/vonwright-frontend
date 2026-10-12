@@ -1069,6 +1069,11 @@
         <source>Verkregister</source>
       </segment>
     </unit>
+    <unit id="MainSideMenu.Indices">
+      <segment>
+        <source>Register</source>
+      </segment>
+    </unit>
     <unit id="MainSideMenu.Login">
       <segment>
         <source>Logga in</source>
