@@ -21,11 +21,6 @@ jobs:
   build-and-push:
     runs-on: ubuntu-latest
 
-    env:
-      # Node image tag used by Dockerfile base image.
-      # https://hub.docker.com/_/node/
-      NODE_IMAGE_TAG: 24-alpine
-
     steps:
       # 1) Check out source code used for docker build context.
       - name: Check out repository
@@ -43,19 +38,14 @@ jobs:
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      # 4) Intentionally pull the latest Node base image tag on the runner.
-      # This is kept for explicitness and visibility in workflow logs.
-      - name: Pull latest Node.js image
-        run: docker pull node:${{ env.NODE_IMAGE_TAG }}
-
-      # 5) Compute Docker tags and OCI labels from GitHub event metadata.
+      # 4) Compute Docker tags and OCI labels from GitHub event metadata.
       - name: Pull metadata from GitHub
         id: meta
         uses: docker/metadata-action@v6
         with:
           images: ghcr.io/${{ github.repository }}
 
-      # 6) Build and push image using BuildKit/Buildx.
+      # 5) Build and push image using BuildKit/Buildx.
       # `pull: true` ensures base layers are refreshed by the builder itself,
       # which is the key setting for avoiding stale base images in buildx builds.
       - name: Build and push Docker image
@@ -67,5 +57,3 @@ jobs:
           pull: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          build-args: |
-            NODE_IMAGE_TAG=${{ env.NODE_IMAGE_TAG }}

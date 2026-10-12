@@ -146,15 +146,12 @@ docker compose down --volumes
 
 ## Node.js version and building using GitHub Actions
 
-The Node.js Docker-image tag can be passed as a build argument to `Dockerfile` using the argument `NODE_IMAGE_TAG`. `Dockerfile` sets a default value for the argument if it is not passed.
+The Node.js Docker-image tag is defined by the default `NODE_IMAGE_TAG` build argument in [`Dockerfile`](../Dockerfile). Local builds and the supplied GitHub Actions workflow use this default. For an individual build, it can still be overridden with `--build-arg NODE_IMAGE_TAG=<tag>`.
 
-The supplied GitHub Actions build workflow is defined in `.github/workflows/docker-build-and-push.yml`. It sets up a Docker Buildx builder using `docker/setup-buildx-action` and then runs the build with `docker/build-push-action` (BuildKit), passing `NODE_IMAGE_TAG` to `Dockerfile` and using `pull: true` so base image layers are refreshed by the builder.
-
-The workflow also runs `docker pull node:${NODE_IMAGE_TAG}` before the build. This is intentional for explicitness and log visibility.
+The supplied GitHub Actions build workflow is defined in [`.github/workflows/docker-build-and-push.yml`](../.github/workflows/docker-build-and-push.yml). It sets up a Docker Buildx builder using `docker/setup-buildx-action` and then runs the build with `docker/build-push-action` (BuildKit). The workflow uses `pull: true` so the builder refreshes base images using the tag defined in `Dockerfile`.
 
 When updating the supported Node.js version, keep all version declarations and developer-facing guidance aligned:
 
-- update `NODE_IMAGE_TAG` in [`.github/workflows/docker-build-and-push.yml`](../.github/workflows/docker-build-and-push.yml),
 - update the default `NODE_IMAGE_TAG` in [`Dockerfile`](../Dockerfile),
 - update both `engines.node` and `devEngines.runtime.version` in [`package.json`](../package.json),
 - update the Node.js prerequisite in [`README.md`](../README.md),

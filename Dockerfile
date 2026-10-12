@@ -5,7 +5,7 @@
 # 2) Fast rebuilds (dependency layers cached separately from source files).
 # 3) Secure runtime image (non-root user + production dependencies only).
 
-# Pin the Node base image by tag (set from CI workflow build arg).
+# Default Node base image tag for local and CI builds.
 ARG NODE_IMAGE_TAG=24-alpine
 
 
