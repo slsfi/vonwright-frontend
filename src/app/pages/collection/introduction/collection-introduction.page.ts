@@ -66,7 +66,7 @@ export class CollectionIntroductionPage implements OnInit, OnDestroy {
   private activeLocale = inject(LOCALE_ID);
 
   readonly legacyIDsEnabled: boolean = config.collections?.enableLegacyIDs ?? false;
-  readonly replaceImageAssetsPaths: boolean = config.collections?.replaceImageAssetsPaths ?? true;
+  readonly replaceImageAssetsPaths: boolean = config.collections?.replaceImageAssetsPaths ?? false;
   readonly separateIntroTocEnabled: boolean = config.page?.introduction?.hasSeparateTOC ?? false;
   readonly showTextDownloadButton: boolean = config.page?.introduction?.showTextDownloadButton ?? false;
   readonly showURNButton: boolean = config.page?.introduction?.showURNButton ?? true;

@@ -95,7 +95,7 @@ export class DownloadTextsModal {
   publicationTitle = signal('');
 
   readTextsMode: boolean = false;
-  replaceImageAssetsPaths: boolean = true;
+  replaceImageAssetsPaths = config.collections?.replaceImageAssetsPaths ?? false;
 
   showLoadingError = signal(false);
 
@@ -165,7 +165,6 @@ export class DownloadTextsModal {
       this.downloadFormatsMs.splice(this.downloadFormatsMs.indexOf('print'), 1)[0]
     );
 
-    this.replaceImageAssetsPaths = config.collections?.replaceImageAssetsPaths ?? true;
     this.destroyRef.onDestroy(() => {
       this.downloadTextSubscription?.unsubscribe();
       this.printTextSubscription?.unsubscribe();

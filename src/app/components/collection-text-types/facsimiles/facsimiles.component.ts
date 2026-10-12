@@ -52,7 +52,7 @@ export class FacsimilesComponent {
 
   readonly facsSize: number | null = config.component?.facsimiles?.imageQuality ?? 1;
   readonly facsURLAlternate: string = config.app?.alternateFacsimileBaseURL ?? '';
-  readonly replaceImageAssetsPaths: boolean = config.collections?.replaceImageAssetsPaths ?? true;
+  readonly replaceImageAssetsPaths: boolean = config.collections?.replaceImageAssetsPaths ?? false;
   readonly showTitle: boolean = config.component?.facsimiles?.showTitle ?? true;
 
   angle: number = 0;

@@ -148,8 +148,8 @@ articles: [
 
 | Option | Type / possible values | Default / fallback | Description |
 | --- | --- | --- | --- |
-| `collections.addTEIClassNames` | `boolean` | `true` | Add shared TEI CSS classes to processed reading texts, manuscripts, and variants so the shared TEI styles apply. |
-| `collections.replaceImageAssetsPaths` | `boolean` | `true` | Rewrite `src="images/..."` references in processed content to `src="assets/images/..."`. |
+| `collections.addTEIClassNames` | `boolean` | `false` | Add shared TEI CSS classes to processed reading texts, manuscripts, and variants so the shared TEI styles apply. |
+| `collections.replaceImageAssetsPaths` | `boolean` | `false` | Rewrite `src="images/..."` references in processed content to `src="assets/images/..."`. |
 | `collections.enableLegacyIDs` | `boolean` | `false` | Resolve legacy collection/publication IDs through the backend for legacy links and references. |
 | `collections.enableMathJax` | `boolean` | `false` | Enable browser MathJax typesetting for text content. Requires a compatible MathJax script exposing `MathJax.Hub` in `src/index.html`. |
 | `collections.firstTextItem` | Object mapping collection IDs to `string` text-item IDs | No configured text destinations | Fallback destination when a collection has no enabled front-matter page. IDs use `<collectionId>_<publicationId>` with an optional chapter suffix, such as `216_20280` or `218_20230_ch2`. |
@@ -307,7 +307,7 @@ These definitions are sent to Elasticsearch through the backend. The application
 
 | Option | Type / possible values | Default / fallback | Description |
 | --- | --- | --- | --- |
-| `page.foreword.showURNButton` | `boolean` | `false` | Show the foreword reference/URN button. |
+| `page.foreword.showURNButton` | `boolean` | `true` | Show the foreword reference/URN button. |
 | `page.foreword.showViewOptionsButton` | `boolean` | `true` | Show the foreword display-options button. |
 
 ### Home (`page.home`)
@@ -457,7 +457,7 @@ Each boolean makes a toggle available in the display-options popover. Set initia
 | Option | Type / possible values | Default / fallback | Description |
 | --- | --- | --- | --- |
 | `page.title.loadContentFromMarkdown` | `boolean` | `false` | Load title-page content from backend Markdown instead of the title-text endpoint. |
-| `page.title.showURNButton` | `boolean` | `false` | Show the title-page reference/URN button. |
+| `page.title.showURNButton` | `boolean` | `true` | Show the title-page reference/URN button. |
 | `page.title.showViewOptionsButton` | `boolean` | `true` | Show the title-page display-options button. |
 
 ## Component settings (`component`)

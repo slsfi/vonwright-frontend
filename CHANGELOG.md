@@ -14,6 +14,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 - Project files: move edition configuration and style overrides to `src/project/`, rename `src/global.scss` to `src/styles.scss`, and move static assets, crawler documents, and generated HTML to `public/`.
 - Test tooling: replace Jasmine/Karma with Vitest and jsdom; fork-owned specs and CI commands must be converted.
 - SSR proxy trust: require both the configured hop limit and trusted proxy addresses. Review the settings against the deployment's proxy chain.
+- Defaults for config options `collections.addTEIClassNames` and `collections.replaceImageAssetsPaths` changed to `false`, and `page.foreword.showURNButton` and `page.title.showURNButton` changed to `true`.
 
 See the [v4 breaking changes and fork migration notes](https://github.com/slsfi/digital-edition-frontend-ng/blob/main/docs/breaking-changes/v4.md) for the required fork changes.
 
@@ -26,6 +27,7 @@ See the [v4 breaking changes and fork migration notes](https://github.com/slsfi/
 - Angular modernization: complete the Angular application-builder and Vitest migration, reorganize project files and public assets, and update documentation. See the [migration plan](https://github.com/slsfi/digital-edition-frontend-ng/blob/main/docs/migrations/completed/angular-22-modernization/STAGE-2-APPLICATION-BUILDER.md).
 - Build: align TypeScript configuration with the Angular toolchain, enable isolated compilation, consolidate shared diagnostics, and reference the application and test configurations from the root configuration.
 - Docker: centralize the Node base image tag in `Dockerfile`; the GitHub Actions workflow uses its default and refreshes base images through Buildx's `pull: true` setting.
+- Config defaults.
 
 ### Fixed
 

@@ -54,8 +54,8 @@ export class CollectionForewordPage implements OnInit, OnDestroy {
   viewOptionsService = inject(ViewOptionsService);
   private activeLocale = inject(LOCALE_ID);
 
-  readonly replaceImageAssetsPaths: boolean = config.collections?.replaceImageAssetsPaths ?? true;
-  readonly showURNButton: boolean = config.page?.foreword?.showURNButton ?? false;
+  readonly replaceImageAssetsPaths: boolean = config.collections?.replaceImageAssetsPaths ?? false;
+  readonly showURNButton: boolean = config.page?.foreword?.showURNButton ?? true;
   readonly showViewOptionsButton: boolean = config.page?.foreword?.showViewOptionsButton ?? true;
 
   readonly activeComponent = signal(true);

@@ -48,8 +48,8 @@ export const config: Config = {
   },
   articles: [],
   collections: {
-    addTEIClassNames: true,
-    replaceImageAssetsPaths: true,
+    addTEIClassNames: false,
+    replaceImageAssetsPaths: false,
     enableLegacyIDs: true,
     enableMathJax: false,
     firstTextItem: {
@@ -252,7 +252,7 @@ export const config: Config = {
       }
     },
     mediaCollection: {
-      showURNButton: true
+      showURNButton: false
     },
     text: {
       defaultViews: ["readingtext", "comments", "facsimiles"],

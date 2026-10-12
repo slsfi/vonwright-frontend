@@ -57,8 +57,8 @@ export class CollectionTitlePage implements OnInit, OnDestroy {
   private activeLocale = inject(LOCALE_ID);
 
   readonly loadContentFromMarkdown: boolean = config.page?.title?.loadContentFromMarkdown ?? false;
-  readonly replaceImageAssetsPaths: boolean = config.collections?.replaceImageAssetsPaths ?? true;
-  readonly showURNButton: boolean = config.page?.title?.showURNButton ?? false;
+  readonly replaceImageAssetsPaths: boolean = config.collections?.replaceImageAssetsPaths ?? false;
+  readonly showURNButton: boolean = config.page?.title?.showURNButton ?? true;
   readonly showViewOptionsButton: boolean = config.page?.title?.showViewOptionsButton ?? true;
 
   readonly activeComponent = signal(true);

@@ -15,8 +15,8 @@ export class CommentService {
   private http = inject(HttpClient);
 
   private readonly apiURL: string = `${config.app?.backendBaseURL ?? ''}/${config.app?.projectNameDB ?? ''}`;
-  private readonly addTEIClassNames: boolean = config.collections?.addTEIClassNames ?? true;
-  private readonly replaceImageAssetsPaths: boolean = config.collections?.replaceImageAssetsPaths ?? true;
+  private readonly addTEIClassNames: boolean = config.collections?.addTEIClassNames ?? false;
+  private readonly replaceImageAssetsPaths: boolean = config.collections?.replaceImageAssetsPaths ?? false;
 
   private cachedCollectionComments: Record<string, any> = {};
 
