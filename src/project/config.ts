@@ -109,6 +109,9 @@ export const config: Config = {
       showTextDownloadButton: false,
       showURNButton: false
     },
+    ebook: {
+      showURNButton: false
+    },
     elasticSearch: {
       enableFilters: true,
       enableSortOptions: true,

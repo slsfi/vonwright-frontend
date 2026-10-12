@@ -226,6 +226,12 @@ ebooks: [
 | `page.article.showTextDownloadButton` | `boolean` | `false` | Show the article download button using the article's first `downloadOptions` entry. Supply a valid download URL. |
 | `page.article.showURNButton` | `boolean` | `false` | Show the reference/URN button on article pages. |
 
+### Ebook
+
+| Option | Type / possible values | Default / fallback | Description |
+| --- | --- | --- | --- |
+| `page.ebook.showURNButton` | `boolean` | `false` | Show the reference/URN button on ebook pages. |
+
 ### Search (`page.elasticSearch`)
 
 These settings configure the Elasticsearch-backed search page. Search indices, fields, type codes, and query objects must match the backend's index mappings.
