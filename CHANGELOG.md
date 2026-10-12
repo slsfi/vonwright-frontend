@@ -29,6 +29,7 @@ See the [v4 breaking changes and fork migration notes](https://github.com/slsfi/
 - Build: align TypeScript configuration with the Angular toolchain, enable isolated compilation, consolidate shared diagnostics, and reference the application and test configurations from the root configuration.
 - Docker: centralize the Node base image tag in `Dockerfile`; the GitHub Actions workflow uses its default and refreshes base images through Buildx's `pull: true` setting.
 - Config defaults.
+- Docs: record route-prerendering findings and implementation requirements in [docs/TODO.md](docs/TODO.md#route-prerendering-after-the-redesign), including the decision to postpone the feature until the UI redesign resolves device-dependent layouts.
 
 ### Fixed
 
