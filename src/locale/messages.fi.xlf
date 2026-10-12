@@ -403,6 +403,15 @@
         <target>Ei kommentteja.</target>
       </segment>
     </unit>
+    <unit id="Content.Introduction">
+      <notes>
+        <note category="description">Optional HTML above the content grid. Leave empty to hide this block.</note>
+      </notes>
+      <segment state="initial">
+        <source/>
+        <target/>
+      </segment>
+    </unit>
     <unit id="DateHistogram.Clear">
       <segment state="initial">
         <source>Nollställ</source>

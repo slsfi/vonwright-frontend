@@ -16,6 +16,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 - SSR proxy trust: require both the configured hop limit and trusted proxy addresses. Review the settings against the deployment's proxy chain.
 - Defaults for config options `collections.addTEIClassNames` and `collections.replaceImageAssetsPaths` changed to `false`, and `page.foreword.showURNButton` and `page.title.showURNButton` changed to `true`.
 - The page-not-found page no longer fetches its message from backend Markdown (node ID `{language}-404`), but from localized interface text instead.
+- The content page no longer fetches its introduction from backend Markdown (node ID `{language}-02`). Move any custom introduction to the `Content.Introduction` translation target; it is empty by default.
 
 See the [v4 breaking changes and fork migration notes](https://github.com/slsfi/digital-edition-frontend-ng/blob/main/docs/breaking-changes/v4.md) for the required fork changes.
 
@@ -32,6 +33,7 @@ See the [v4 breaking changes and fork migration notes](https://github.com/slsfi/
 - Config defaults.
 - Docs: record route-prerendering findings and implementation requirements in [docs/TODO.md](docs/TODO.md#route-prerendering-after-the-redesign), including the decision to postpone the feature until the UI redesign resolves device-dependent layouts.
 - Page not found: use localized interface text and a home-page link instead of fetching the message from backend Markdown.
+- Content: use optional localized HTML above the content grid, configured entirely in translation targets, with no introduction or extra spacing by default.
 
 ### Fixed
 

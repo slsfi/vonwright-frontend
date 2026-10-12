@@ -1,29 +1,15 @@
-import { AsyncPipe } from '@angular/common';
-import { Component, LOCALE_ID, OnInit, inject } from '@angular/core';
+import { Component } from '@angular/core';
 import { IonContent } from '@ionic/angular';
-import { Observable } from 'rxjs';
 
 import { ContentGridComponent } from '@components/content-grid/content-grid.component';
-import { TrustHtmlPipe } from '@pipes/trust-html.pipe';
-import { MarkdownService } from '@services/markdown.service';
 
 
 @Component({
   selector: 'page-content',
   templateUrl: './content.page.html',
   styleUrls: ['./content.page.scss'],
-  imports: [AsyncPipe, ContentGridComponent, IonContent, TrustHtmlPipe]
+  imports: [ContentGridComponent, IonContent]
 })
-export class ContentPage implements OnInit {
-  private mdService = inject(MarkdownService);
-  private activeLocale = inject(LOCALE_ID);
-
-  mdContent$: Observable<string | null>;
-
-  ngOnInit() {
-    this.mdContent$ = this.mdService.getParsedMdContent(
-      this.activeLocale + '-02'
-    );
-  }
-
+export class ContentPage {
+  private readonly introduction = $localize`:Optional HTML above the content grid. Leave empty to hide this block.@@Content.Introduction:`.trim();
 }

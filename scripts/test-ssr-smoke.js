@@ -153,6 +153,23 @@ const TEST_CASES = [
       },
     ],
   },
+  ...['sv', 'fi'].map(locale => ({
+    name: `Content page ${locale}`,
+    route: `/${locale}/content`,
+    authProtected: true,
+    checks: [
+      {
+        description: 'Contains the localized content heading',
+        type: 'includes',
+        value: locale === 'sv' ? '>Innehåll</h1>' : '>Sisältö</h1>',
+      },
+      {
+        description: 'Content grid follows the heading without an introduction block',
+        type: 'regex',
+        value: /<page-content\b[\s\S]*?<h1\b[^>]*class="page-title"[^>]*>[^<]+<\/h1>(?:\s|<!--[^>]*-->)*<content-grid\b/,
+      },
+    ],
+  })),
   {
     name: 'About page Markdown sv',
     route: '/sv/about/03-01-01',

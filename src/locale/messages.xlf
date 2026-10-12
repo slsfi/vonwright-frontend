@@ -336,6 +336,14 @@
         <source>Inga kommentarer.</source>
       </segment>
     </unit>
+    <unit id="Content.Introduction">
+      <notes>
+        <note category="description">Optional HTML above the content grid. Leave empty to hide this block.</note>
+      </notes>
+      <segment>
+        <source/>
+      </segment>
+    </unit>
     <unit id="DateHistogram.Clear">
       <segment>
         <source>Nollställ</source>
