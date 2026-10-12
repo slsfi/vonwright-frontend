@@ -1861,6 +1861,12 @@
         <target>Tapahtui virhe. Emme löydä hakemaasi sivua. Voit palata edelliselle sivulle selaimen näppäimestä, tai yrittää korjata selaimen osoiterivillä olevaa verkko-osoitetta.</target>
       </segment>
     </unit>
+    <unit id="PageNotFound.GoToHome">
+      <segment state="initial">
+        <source>Gå till <pc id="0" equivStart="START_LINK" equivEnd="CLOSE_LINK" type="link" dispStart="&lt;a [routerLink]=&quot;[&apos;/&apos;]&quot;&gt;" dispEnd="&lt;/a&gt;">startsidan</pc></source>
+        <target>Siirry <pc id="0" equivStart="START_LINK" equivEnd="CLOSE_LINK" type="link" dispStart="&lt;a [routerLink]=&quot;[&apos;/&apos;]&quot;&gt;" dispEnd="&lt;/a&gt;">etusivulle</pc></target>
+      </segment>
+    </unit>
     <unit id="Password.DoesNotMatch">
       <segment state="initial">
         <source>Lösenorden matchar inte.</source>

@@ -4,6 +4,9 @@
       <ion-icon name="warning-outline"></ion-icon>
       <ng-container i18n="@@PageNotFound.404PageNotFound">404 Sidan hittas inte</ng-container>
     </h1>
-    <div class="markdown" [innerHTML]="(markdownText$ | async) | trustHtml"></div>
+    <div class="markdown">
+      <p i18n="@@PageNotFound.DefaultMessage">Något gick fel. Vi kan inte hitta sidan du försökte nå. Du kan gå tillbaka till föregående sida med hjälp av webbläsarens tillbaka-knapp, eller försöka rätta adressen i webbläsarens adressfält.</p>
+      <p i18n="@@PageNotFound.GoToHome">Gå till <a [routerLink]="['/']">startsidan</a></p>
+    </div>
   </article>
 </ion-content>

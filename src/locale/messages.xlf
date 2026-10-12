@@ -1551,6 +1551,11 @@
         <source>Något gick fel. Vi kan inte hitta sidan du försökte nå. Du kan gå tillbaka till föregående sida med hjälp av webbläsarens tillbaka-knapp, eller försöka rätta adressen i webbläsarens adressfält.</source>
       </segment>
     </unit>
+    <unit id="PageNotFound.GoToHome">
+      <segment>
+        <source>Gå till <pc id="0" equivStart="START_LINK" equivEnd="CLOSE_LINK" type="link" dispStart="&lt;a [routerLink]=&quot;[&apos;/&apos;]&quot;&gt;" dispEnd="&lt;/a&gt;">startsidan</pc></source>
+      </segment>
+    </unit>
     <unit id="Password.DoesNotMatch">
       <segment>
         <source>Lösenorden matchar inte.</source>

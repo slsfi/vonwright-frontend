@@ -476,7 +476,7 @@ const TEST_CASES = [
     ],
   },
   {
-    name: 'Page not found',
+    name: 'Page not found sv',
     route: '/sv/__ssr-smoke-page-not-found__',
     expectedStatus: 404,
     checks: [
@@ -484,6 +484,33 @@ const TEST_CASES = [
         description: 'Contains the page-not-found component',
         type: 'includes',
         value: '<page-not-found',
+      },
+      {
+        description: 'Contains the localized not-found message',
+        type: 'includes',
+        value: 'Vi kan inte hitta sidan du försökte nå.',
+      },
+      {
+        description: 'Links to the Swedish home page',
+        type: 'regex',
+        value: /<a\b[^>]*href="\/sv\/"[^>]*>startsidan<\/a>/,
+      },
+    ],
+  },
+  {
+    name: 'Page not found fi',
+    route: '/fi/__ssr-smoke-page-not-found__',
+    expectedStatus: 404,
+    checks: [
+      {
+        description: 'Contains the localized not-found message',
+        type: 'includes',
+        value: 'Emme löydä hakemaasi sivua.',
+      },
+      {
+        description: 'Links to the Finnish home page',
+        type: 'regex',
+        value: /<a\b[^>]*href="\/fi\/"[^>]*>etusivulle<\/a>/,
       },
     ],
   },

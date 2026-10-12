@@ -1,56 +1,44 @@
-import type { MockedObject } from 'vitest';
+import { APP_BASE_HREF } from '@angular/common';
+import { provideHttpClient } from '@angular/common/http';
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { LOCALE_ID, RESPONSE_INIT } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
-import { BehaviorSubject } from 'rxjs';
+import { provideRouter } from '@angular/router';
 
-import { MarkdownService } from '@services/markdown.service';
 import { PageNotFoundPage } from './page-not-found.page';
 
 describe('PageNotFoundPage', () => {
-  it('renders asynchronous Markdown updates without a manual change-detection pass', async () => {
-    const markdown$ = new BehaviorSubject<string | null>('<p>Not found</p>');
-    const markdownService: MockedObject<Pick<MarkdownService, 'getParsedMdContent'>> = {
-      getParsedMdContent: vi.fn().mockName('MarkdownService.getParsedMdContent')
-    };
-    markdownService.getParsedMdContent.mockReturnValue(markdown$);
-
+  it.each(['sv', 'fi', 'en'])('renders without a backend request and links to the %s home page', async (locale) => {
     await TestBed.configureTestingModule({
       imports: [PageNotFoundPage],
       providers: [
-        { provide: LOCALE_ID, useValue: 'sv' },
-        { provide: MarkdownService, useValue: markdownService }
+        provideRouter([]),
+        provideHttpClient(),
+        provideHttpClientTesting(),
+        { provide: LOCALE_ID, useValue: locale },
+        { provide: APP_BASE_HREF, useValue: `/${locale}/` }
       ]
-    })
-      .overrideTemplate(PageNotFoundPage, '{{ markdownText$ | async }}')
-      .compileComponents();
+    }).compileComponents();
 
     const fixture = TestBed.createComponent(PageNotFoundPage);
     fixture.detectChanges();
-    expect(markdownService.getParsedMdContent).toHaveBeenCalledWith(
-      'sv-404',
-      expect.any(String)
-    );
-    expect(fixture.nativeElement.textContent).toContain('Not found');
-
-    markdown$.next('<p>Still not found</p>');
     await fixture.whenStable();
-    expect(fixture.nativeElement.textContent).toContain('Still not found');
+
+    const element: HTMLElement = fixture.nativeElement;
+    expect(element.querySelector('h1')?.textContent).toContain('404 Sidan hittas inte');
+    expect(element.querySelector('.markdown p')?.textContent)
+      .toContain('Vi kan inte hitta sidan du försökte nå.');
+    expect(element.querySelector('.markdown a')?.getAttribute('href')).toBe(`/${locale}/`);
+    TestBed.inject(HttpTestingController).expectNone(() => true);
+    TestBed.inject(HttpTestingController).verify();
   });
 
   it('sets the server response status to 404', async () => {
-    const markdownService: MockedObject<Pick<MarkdownService, 'getParsedMdContent'>> = {
-      getParsedMdContent: vi.fn().mockName('MarkdownService.getParsedMdContent')
-    };
-    markdownService.getParsedMdContent.mockReturnValue(
-      new BehaviorSubject<string | null>('<p>Not found</p>')
-    );
     const response: ResponseInit = {};
 
     await TestBed.configureTestingModule({
       imports: [PageNotFoundPage],
       providers: [
-        { provide: LOCALE_ID, useValue: 'sv' },
-        { provide: MarkdownService, useValue: markdownService },
         { provide: RESPONSE_INIT, useValue: response }
       ]
     })
