@@ -63,6 +63,7 @@ const DEFAULT_TIMEOUT_MS = 30000;
  * Optional test-case fields:
  * - headers: request headers to send for the route.
  * - expectedStatus: expected HTTP status (defaults to 200).
+ * - expectedLocation: exact Location header for an expected redirect.
  * - authProtected/authOnly: expect a CSR shell with --auth-enabled.
  * - renderMode: ssr (default), csr, or none for static/probe responses.
  * - absentHeaders: headers that must not be present (e.g. SSR limiter headers).
@@ -435,6 +436,22 @@ const TEST_CASES = [
     absentHeaders: ['ratelimit-limit'],
     checks: [],
   },
+  ...['sv', 'fi', ''].map(locale => ({
+    name: `Legacy ebook permanent redirect ${locale || 'default locale'}`,
+    route: `${locale ? '/' + locale : ''}/ebook/marriage-conditions-1.pdf`,
+    expectedStatus: 301,
+    expectedLocation: `/${locale || 'sv'}/ebook/pdf/marriage-conditions-1`,
+    renderMode: 'none',
+    checks: [],
+  })),
+  {
+    name: 'Legacy ebook redirect encodes the filename and splits at the last dot',
+    route: '/fi/ebook/Bok%20%C3%A5.andra.epub',
+    expectedStatus: 301,
+    expectedLocation: '/fi/ebook/epub/Bok%20%C3%A5.andra',
+    renderMode: 'none',
+    checks: [],
+  },
   {
     name: 'Missing static HTML bypasses Angular and the SSR limiter',
     route: '/sv/static-html/__ssr-smoke-missing__.html',
@@ -790,6 +807,10 @@ async function runTest(baseUrl, timeoutMs, testCase) {
   const expectedStatus = testCase.expectedStatus ?? 200;
   if (response.status !== expectedStatus) {
     errors.push(`Expected HTTP ${expectedStatus}, got ${response.status}`);
+  }
+
+  if (testCase.expectedLocation !== undefined && response.headers.location !== testCase.expectedLocation) {
+    errors.push(`Expected Location ${testCase.expectedLocation}, got ${response.headers.location || '(missing)'}`);
   }
 
   if (!response.contentType.toLowerCase().includes('text/html')) {

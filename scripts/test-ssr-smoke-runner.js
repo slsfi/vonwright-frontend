@@ -8,6 +8,7 @@
  * Coverage:
  *   - SSR/CSR/static response detection and auth-dependent rendering expectations.
  *   - Rejection of empty SSR content, protected SSR content, and unexpected redirects.
+ *   - Expected permanent redirects require the correct status and Location header.
  *   - Explicit Host/proxy headers through both HTTP request implementations.
  *   - Code-owned RegExp checks and literal-only JSON case-file validation.
  *
@@ -81,6 +82,12 @@ async function main() {
     if (req.url === '/redirect') {
       res.writeHead(302, { Location: '/rendered' });
       res.end();
+    } else if (req.url === '/permanent-redirect') {
+      res.writeHead(301, { Location: '/fi/ebook/pdf/book-one' });
+      res.end();
+    } else if (req.url === '/redirect-without-location') {
+      res.writeHead(301);
+      res.end();
     } else if (req.url === '/shell') {
       res.end(csrHtml);
     } else {
@@ -103,6 +110,23 @@ async function main() {
     });
     assert.equal(forwarded.passed, true);
     console.log('PASS: raw HTTP checks reject redirects/shells and preserve explicit proxy Host headers');
+
+    const redirectCase = {
+      name: 'Permanent redirect', route: '/permanent-redirect', renderMode: 'none',
+      expectedStatus: 301, expectedLocation: '/fi/ebook/pdf/book-one', checks: [],
+    };
+    for (const headers of [undefined, { Host: 'edition.example' }]) {
+      const result = await runTest(baseUrl, 5000, { ...redirectCase, headers });
+      assert.equal(result.status, 301);
+      assert.equal(result.passed, true);
+    }
+    const wrongLocation = await runTest(baseUrl, 5000, { ...redirectCase, expectedLocation: '/sv/ebook/pdf/book-one' });
+    assert.equal(wrongLocation.passed, false);
+    assert.ok(wrongLocation.errors.some(error => error.startsWith('Expected Location')));
+    const missingLocation = await runTest(baseUrl, 5000, { ...redirectCase, route: '/redirect-without-location' });
+    assert.equal(missingLocation.passed, false);
+    assert.ok(missingLocation.errors.some(error => error.includes('got (missing)')));
+    console.log('PASS: permanent redirect checks require HTTP 301 and the correct Location header');
 
     // Exercise --cases-file through the CLI, including rejection before HTTP.
     const fixtureDirectory = fs.mkdtempSync(path.join(os.tmpdir(), 'ssr-smoke-cases-'));

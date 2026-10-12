@@ -1,4 +1,5 @@
 import type { MockedObject } from 'vitest';
+import { RESPONSE_INIT } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { BehaviorSubject } from 'rxjs';
@@ -28,7 +29,8 @@ describe('EbookPage', () => {
       imports: [EbookPage],
       providers: [
         { provide: ActivatedRoute, useValue: { params: routeParams$ } },
-        { provide: Router, useValue: router }
+        { provide: Router, useValue: router },
+        { provide: RESPONSE_INIT, useValue: null }
       ]
     })
       .overrideTemplate(
@@ -72,6 +74,37 @@ describe('EbookPage', () => {
     fixture.destroy();
     router.navigate.mockClear();
     routeParams$.next({ filename: 'book-two.epub' });
+    expect(router.navigate).not.toHaveBeenCalled();
+  });
+
+  it('sets HTTP 301 for a legacy ebook redirect during SSR', () => {
+    const response: ResponseInit = { status: 200 };
+    TestBed.overrideProvider(RESPONSE_INIT, { useValue: response });
+    routeParams$.next({ filename: 'book-one.pdf' });
+
+    const fixture = TestBed.createComponent(EbookPage);
+    fixture.detectChanges();
+
+    expect(response.status).toBe(301);
+    expect(router.navigate).toHaveBeenCalledWith(
+      ['/ebook', 'pdf', 'book-one'],
+      { replaceUrl: true }
+    );
+  });
+
+  it.each([
+    { type: 'pdf', name: 'book-one' },
+    { filename: 'book-without-extension' },
+    { filename: 'book-with-empty-extension.' }
+  ])('keeps the server response unchanged when no redirect is needed: %j', params => {
+    const response: ResponseInit = { status: 200 };
+    TestBed.overrideProvider(RESPONSE_INIT, { useValue: response });
+    routeParams$.next(params);
+
+    const fixture = TestBed.createComponent(EbookPage);
+    fixture.detectChanges();
+
+    expect(response.status).toBe(200);
     expect(router.navigate).not.toHaveBeenCalled();
   });
 });

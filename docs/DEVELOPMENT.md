@@ -218,7 +218,7 @@ npm run test:ssr:smoke -- --base-url=http://localhost:4201 --timeout-ms=5000
 
 What the smoke test validates per route:
 
-- HTTP status matches the expected result (`200`, or `404` for missing files/pages and disabled auth-only routes); redirects are not followed.
+- HTTP status matches the expected result (`200`, `301` for legacy ebook redirects, or `404` for missing files/pages and disabled auth-only routes); redirects are not followed. Redirect cases also require an exact `Location` header through `expectedLocation`.
 - `Content-Type` contains `text/html`.
 - SSR responses contain a populated Angular root and the expected content/SEO snippets. CSR responses contain an empty root without server-rendered protected content; public pages remain SSR with auth enabled.
 - Dynamic responses include `Vary: User-Agent`. Missing static files contain no Angular application or SSR rate-limit headers.

@@ -33,7 +33,8 @@ See the [v4 breaking changes and fork migration notes](https://github.com/slsfi/
 ### Fixed
 
 - Pdf-viewer: broaden error message if the PDF can't be displayed. ([3f4968b](https://github.com/slsfi/digital-edition-frontend-ng/commit/3f4968b048d3bc89f6f7cc96129cbeaaa6f730a2))
-- Configuration: make omitted settings use consistent fallbacks for default-language selection, search routes, home-banner metadata, manuscript print titles, and introduction display options.
+- Config: make omitted settings use consistent fallbacks for default-language selection, search routes, home-banner metadata, manuscript print titles, and introduction display options.
+- Ebook: return HTTP 301 for legacy `/ebook/{filename}.{extension}` routes, redirecting to the current `/ebook/{extension}/{filename}` format.
 
 
 
