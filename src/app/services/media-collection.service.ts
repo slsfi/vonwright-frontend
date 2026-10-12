@@ -1,4 +1,4 @@
-import { Injectable, inject } from '@angular/core';
+import { inject, Service } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, map } from 'rxjs';
 
@@ -7,9 +7,7 @@ import { MediaCollection, MediaCollectionApiResponse, toMediaCollection } from '
 import { convertNamedEntityTypeForBackend } from '@utility-functions';
 
 
-@Injectable({
-  providedIn: 'root',
-})
+@Service()
 export class MediaCollectionService {
   private http = inject(HttpClient);
 

@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Service } from '@angular/core';
 import { NoPreloading, PreloadingStrategy, Route } from '@angular/router';
 import { EMPTY, Observable, Subscription } from 'rxjs';
 
@@ -56,7 +56,7 @@ export abstract class RouterPreloadingStrategyService implements PreloadingStrat
  * if browser network information is unavailable, the network is treated as
  * good and idle preloading is allowed.
  */
-@Injectable()
+@Service({ autoProvided: false })
 export class BrowserRouterPreloadingStrategyService
   extends RouterPreloadingStrategyService {
   preload(route: Route, load: () => Observable<any>): Observable<any> {
@@ -168,7 +168,7 @@ export class BrowserRouterPreloadingStrategyService
  * Server implementation:
  * uses Angular's NoPreloading strategy.
  */
-@Injectable()
+@Service({ autoProvided: false })
 export class ServerRouterPreloadingStrategyService
   extends RouterPreloadingStrategyService {
   private readonly strategy = new NoPreloading();

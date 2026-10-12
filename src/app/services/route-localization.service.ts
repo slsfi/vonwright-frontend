@@ -1,13 +1,11 @@
-import { Injectable, LOCALE_ID, inject } from '@angular/core';
+import { LOCALE_ID, inject, Service } from '@angular/core';
 
 import { config } from '@config';
 import { Article } from '@models/article.models';
 import { parseRelativeUrl } from '@utility-functions';
 
 
-@Injectable({
-  providedIn: 'root',
-})
+@Service()
 export class RouteLocalizationService {
   private activeLocale = inject(LOCALE_ID);
 

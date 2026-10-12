@@ -1,5 +1,5 @@
 import { Location } from '@angular/common';
-import { Injectable, inject } from '@angular/core';
+import { inject, Service } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 
 
@@ -34,7 +34,7 @@ export abstract class CollectionTextViewsQueryParamSyncService {
  * - `silent = true`: replace URL without triggering a navigation.
  * - `silent = false`: navigate with merged query params.
  */
-@Injectable()
+@Service({ autoProvided: false })
 export class BrowserCollectionTextViewsQueryParamSyncService
   extends CollectionTextViewsQueryParamSyncService {
   private location = inject(Location);
@@ -73,7 +73,7 @@ export class BrowserCollectionTextViewsQueryParamSyncService
  * intentionally no-op during SSR to prevent URL write side effects from
  * causing extra route processing while rendering.
  */
-@Injectable()
+@Service({ autoProvided: false })
 export class ServerCollectionTextViewsQueryParamSyncService
   extends CollectionTextViewsQueryParamSyncService {
   update(

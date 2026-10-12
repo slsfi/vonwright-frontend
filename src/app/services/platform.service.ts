@@ -1,4 +1,4 @@
-import { Injectable, PLATFORM_ID, inject } from '@angular/core';
+import { PLATFORM_ID, inject, Service } from '@angular/core';
 import { isPlatformServer } from '@angular/common';
 
 import { APPLICATION_REQUEST_CONTEXT } from '@tokens/request-context.token';
@@ -29,9 +29,7 @@ import { isBrowser } from '@utility-functions';
  * differences between mobile and desktop mode, it is not  easily achievable
  * or maybe even possible.
  */
-@Injectable({
-  providedIn: 'root',
-})
+@Service()
 export class PlatformService {
   private platformId = inject(PLATFORM_ID);
   private requestContext = inject(APPLICATION_REQUEST_CONTEXT, { optional: true });

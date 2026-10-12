@@ -1,4 +1,4 @@
-import { Injectable, inject } from '@angular/core';
+import { inject, Service } from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
 import { Observable, filter, map, of } from 'rxjs';
 
@@ -24,7 +24,7 @@ export abstract class RouterNavigationSourceService {
  * Browser implementation:
  * emits on each NavigationEnd.
  */
-@Injectable()
+@Service({ autoProvided: false })
 export class BrowserRouterNavigationSourceService
   extends RouterNavigationSourceService {
   get(router: Router): Observable<string> {
@@ -41,7 +41,7 @@ export class BrowserRouterNavigationSourceService
  * Server implementation:
  * emits one URL snapshot and completes.
  */
-@Injectable()
+@Service({ autoProvided: false })
 export class ServerRouterNavigationSourceService
   extends RouterNavigationSourceService {
   private requestContext = inject(APPLICATION_REQUEST_CONTEXT, { optional: true });

@@ -36,6 +36,7 @@ See the [v4 breaking changes and fork migration notes](https://github.com/slsfi/
 - Docs: record route-prerendering findings and implementation requirements in [docs/TODO.md](docs/TODO.md#route-prerendering-after-the-redesign), including the decision to postpone the feature until the UI redesign resolves device-dependent layouts.
 - Page not found: use localized interface text and a home-page link instead of fetching the message from backend Markdown.
 - Content: use optional localized HTML above the content grid, configured entirely in translation targets, with no introduction or extra spacing by default.
+- Angular services: migrate from `@Injectable` to `@Service`, preserving automatic root provisioning and explicit browser/server provider selection.
 
 ### Fixed
 

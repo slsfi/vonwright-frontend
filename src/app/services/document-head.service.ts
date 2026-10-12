@@ -1,4 +1,4 @@
-import { Injectable, LOCALE_ID, OnDestroy, Renderer2, RendererFactory2, DOCUMENT, inject } from '@angular/core';
+import { LOCALE_ID, OnDestroy, Renderer2, RendererFactory2, DOCUMENT, inject, Service } from '@angular/core';
 import { Meta, Title } from '@angular/platform-browser';
 import { BehaviorSubject, Observable } from 'rxjs';
 
@@ -8,9 +8,7 @@ import { APPLICATION_REQUEST_CONTEXT } from '@tokens/request-context.token';
 import { getConfiguredSiteOrigin } from '../utils/request-origin';
 
 
-@Injectable({
-  providedIn: 'root',
-})
+@Service()
 export class DocumentHeadService implements OnDestroy {
   private meta = inject(Meta);
   private rendererFactory = inject(RendererFactory2);

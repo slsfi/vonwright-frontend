@@ -1,4 +1,4 @@
-import { Injectable, inject } from '@angular/core';
+import { inject, Service } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
@@ -6,9 +6,7 @@ import { config } from '@config';
 import { AggregationQuery, Facets, SearchQuery, TimeRange } from '@models/elastic-search.models';
 
 
-@Injectable({
-  providedIn: 'root',
-})
+@Service()
 export class ElasticSearchService {
   private http = inject(HttpClient);
 

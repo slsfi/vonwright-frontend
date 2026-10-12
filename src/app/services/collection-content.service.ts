@@ -1,4 +1,4 @@
-import { Injectable, inject } from '@angular/core';
+import { inject, Service } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, map } from 'rxjs';
 
@@ -11,9 +11,7 @@ import { ReadingText, ReadingTextApiResponse, toReadingText } from '@models/read
 import { toVariant, Variant, VariantsApiResponse } from '@models/variant.models';
 
 
-@Injectable({
-  providedIn: 'root',
-})
+@Service()
 export class CollectionContentService {
   private http = inject(HttpClient);
 

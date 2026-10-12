@@ -1,4 +1,4 @@
-import { Injectable, inject } from '@angular/core';
+import { inject, Service } from '@angular/core';
 import { catchError, map, Observable, of } from 'rxjs';
 
 import { config } from '@config';
@@ -8,9 +8,7 @@ import { NamedEntityService } from '@services/named-entity.service';
 import { PlatformService } from '@services/platform.service';
 
 
-@Injectable({
-  providedIn: 'root',
-})
+@Service()
 export class TooltipService {
   private commentService = inject(CommentService);
   private namedEntityService = inject(NamedEntityService);

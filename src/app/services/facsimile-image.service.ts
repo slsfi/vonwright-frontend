@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { inject, Injectable } from '@angular/core';
+import { inject, Service } from '@angular/core';
 import { catchError, map, Observable, of } from 'rxjs';
 
 import { AUTH_ENABLED } from '@tokens/auth.tokens';
@@ -33,7 +33,7 @@ export abstract class FacsimileImageService {
   abstract revokeObjectURL(objectURL: string | null): void;
 }
 
-@Injectable()
+@Service({ autoProvided: false })
 export class BrowserFacsimileImageService extends FacsimileImageService {
   private readonly http = inject(HttpClient);
   private readonly authEnabled = inject(AUTH_ENABLED);
@@ -83,7 +83,7 @@ export class BrowserFacsimileImageService extends FacsimileImageService {
   }
 }
 
-@Injectable()
+@Service({ autoProvided: false })
 export class ServerFacsimileImageService extends FacsimileImageService {
   override resolveImageSrc(
     imageURL: string | null,

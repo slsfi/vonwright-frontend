@@ -1,4 +1,4 @@
-import { Injectable, LOCALE_ID, inject } from '@angular/core';
+import { LOCALE_ID, inject, Service } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { UrlSegment } from '@angular/router';
 import { Observable, catchError, of, switchMap } from 'rxjs';
@@ -7,9 +7,7 @@ import { config } from '@config';
 import { ReferenceData, ReferenceDataApiResponse, toReferenceData } from '@models/metadata.models';
 
 
-@Injectable({
-  providedIn: 'root',
-})
+@Service()
 export class ReferenceDataService {
   private http = inject(HttpClient);
   private activeLocale = inject(LOCALE_ID);

@@ -1,4 +1,4 @@
-import { Injectable, LOCALE_ID, inject } from '@angular/core';
+import { LOCALE_ID, inject, Service } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
@@ -6,9 +6,7 @@ import { config } from '@config';
 import { convertNamedEntityTypeForBackend, isEmptyObject } from '@utility-functions';
 
 
-@Injectable({
-  providedIn: 'root',
-})
+@Service()
 export class NamedEntityService {
   private http = inject(HttpClient);
   private activeLocale = inject(LOCALE_ID);

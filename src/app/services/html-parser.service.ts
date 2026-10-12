@@ -1,4 +1,4 @@
-import { Injectable, inject } from '@angular/core';
+import { inject, Service } from '@angular/core';
 import { catchError, map, Observable, of } from 'rxjs';
 import { Parser } from 'htmlparser2';
 import { DomHandler, isTag } from 'domhandler';
@@ -14,9 +14,7 @@ import { CollectionContentService } from '@services/collection-content.service';
 import { isFileNotFoundHtml } from '@utility-functions';
 
 
-@Injectable({
-  providedIn: 'root',
-})
+@Service()
 export class HtmlParserService {
   private collectionContentService = inject(CollectionContentService);
 
