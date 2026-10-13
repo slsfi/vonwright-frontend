@@ -43,6 +43,7 @@ See the [v4 breaking changes and fork migration notes](https://github.com/slsfi/
 - TypeScript/Angular: remove redundant compiler settings; retain strict type and template checking, filename casing checks, bundler resolution, and JSON-module support through toolchain defaults. Explicitly retain declaration-file checking with `skipLibCheck: false`.
 - Angular templates: remove explicit suppression of nullish-coalescing and optional-chain diagnostics, and redundant optional chains from guarded named-entity modal data.
 - Deps: update `@angular/core` and `@angular/cli` to 22.2.2.
+- Deps: update `@ionic/angular` and `@ionic/angular-server` to 9.0.7.
 
 ### Fixed
 
