@@ -13,7 +13,6 @@ This document tracks cross-cutting TODOs that should stay visible outside local 
 Consider these changes to the shared [TypeScript configuration](../tsconfig.json):
 
 - **Enable `noPropertyAccessFromIndexSignature`:** define explicit types for [`src/project/config.ts`](../src/project/config.ts) and other affected dictionary values, then distinguish known properties from dynamic keys before enabling the check.
-- **Evaluate `skipLibCheck` only if declaration checking becomes a measured bottleneck:** retain dependency declaration checks for now. Compare build/test timings and any lost diagnostics before enabling it.
 
 ## Route prerendering after the redesign
 

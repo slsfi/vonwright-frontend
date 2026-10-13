@@ -40,7 +40,8 @@ See the [v4 breaking changes and fork migration notes](https://github.com/slsfi/
 - Angular services: migrate from `@Injectable` to `@Service`, preserving automatic root provisioning and explicit browser/server provider selection.
 - TypeScript: enable strict property initialization and initialize content observables when their components are constructed.
 - TypeScript: use standard ES2022 class-field initialization by removing the legacy `useDefineForClassFields: false` override.
-- Angular templates: restore nullish-coalescing and optional-chain diagnostics, and remove redundant optional chains from guarded named-entity modal data.
+- TypeScript/Angular: remove redundant compiler settings; retain strict type and template checking, filename casing checks, bundler resolution, and JSON-module support through toolchain defaults. Explicitly retain declaration-file checking with `skipLibCheck: false`.
+- Angular templates: remove explicit suppression of nullish-coalescing and optional-chain diagnostics, and redundant optional chains from guarded named-entity modal data.
 
 ### Fixed
 
