@@ -45,6 +45,7 @@ See the [v4 breaking changes and fork migration notes](https://github.com/slsfi/
 - Deps: update `@angular/core` and `@angular/cli` to 22.2.2.
 - Deps: update `@ionic/angular` and `@ionic/angular-server` to 9.0.7.
 - Deps: update `express` to 5.3.0.
+- Deps: update `express-rate-limit` to 8.7.1.
 
 ### Fixed
 
