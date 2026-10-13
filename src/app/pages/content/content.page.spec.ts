@@ -16,6 +16,10 @@ class ContentGridStubComponent {}
 describe('ContentPage', () => {
   beforeEach(async () => {
     clearTranslations();
+    loadTranslations({
+      'Content.Introduction': '',
+      'TopMenu.Content': 'Innehåll'
+    });
     await TestBed.configureTestingModule({
       imports: [ContentPage],
       providers: [
@@ -48,6 +52,7 @@ describe('ContentPage', () => {
   });
 
   it('renders translated HTML with two paragraphs and a search link', async () => {
+    const warn = vi.spyOn(console, 'warn');
     loadTranslations({
       'Content.Introduction': '<p>Welcome to the edition!</p><p>Browse or <a href="search">search</a> the content.</p>'
     });
@@ -61,18 +66,22 @@ describe('ContentPage', () => {
     expect(element.querySelector('.info a')?.getAttribute('href')).toBe('search');
     expect(element.querySelector('content-grid')).not.toBeNull();
     TestBed.inject(HttpTestingController).expectNone(() => true);
+    expect(warn).not.toHaveBeenCalled();
   });
 
   it('omits the introduction block for a whitespace-only translation', async () => {
+    const warn = vi.spyOn(console, 'warn');
     loadTranslations({ 'Content.Introduction': ' \n ' });
     const fixture = TestBed.createComponent(ContentPage);
     fixture.detectChanges();
     await fixture.whenStable();
 
     expect(fixture.nativeElement.querySelector('.info')).toBeNull();
+    expect(warn).not.toHaveBeenCalled();
   });
 
   it('renders translated HTML with a single paragraph, line breaks, and a link', async () => {
+    const warn = vi.spyOn(console, 'warn');
     loadTranslations({
       'Content.Introduction': '<p>Welcome to the edition!<br><br>Browse or <a href="search">search</a> the content.</p>'
     });
@@ -85,6 +94,7 @@ describe('ContentPage', () => {
     expect(element.querySelectorAll('.info br')).toHaveLength(2);
     expect(element.querySelector('.info p')?.textContent)
       .toBe('Welcome to the edition!Browse or search the content.');
+    expect(warn).not.toHaveBeenCalled();
     expect(element.querySelector('.info a')?.getAttribute('href')).toBe('search');
   });
 });

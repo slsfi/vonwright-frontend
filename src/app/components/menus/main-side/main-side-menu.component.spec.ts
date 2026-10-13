@@ -20,6 +20,21 @@ describe('MainSideMenuComponent', () => {
 
   beforeEach(async () => {
     clearTranslations();
+    // Cover every message used by these fixtures before overriding individual labels.
+    loadTranslations({
+      'MainSideMenu.Account': 'Användarkonto',
+      'MainSideMenu.AriaLabel': 'Sekundär meny',
+      'MainSideMenu.Articles': 'Artiklar',
+      'MainSideMenu.Home': 'Hem',
+      'MainSideMenu.IndexKeywords': 'Ämnesord',
+      'MainSideMenu.IndexPersons': 'Personregister',
+      'MainSideMenu.IndexPlaces': 'Ortregister',
+      'MainSideMenu.IndexWorks': 'Verkregister',
+      'MainSideMenu.Indices': 'Register',
+      'MainSideMenu.Login': 'Logga in',
+      'MainSideMenu.Search': 'Sök i utgåvan',
+      'MainSideMenu.TermsOfUse': 'Användarvillkor'
+    });
     originalMenuItems = { ...config.component!.mainSideMenu!.items };
     originalUngroupIndices = config.component!.mainSideMenu!.ungroupIndices;
     originalDefaultExpanded = config.component!.mainSideMenu!.defaultExpanded;
@@ -109,11 +124,13 @@ describe('MainSideMenuComponent', () => {
     });
 
     it.each(['Articles', 'Artikkelit'])('uses the translated article wrapper label %s', async (label) => {
+      const warn = vi.spyOn(console, 'warn');
       loadTranslations({ 'MainSideMenu.Articles': label });
       const fixture = TestBed.createComponent(MainSideMenuComponent);
       await fixture.whenStable();
 
       expect(fixture.nativeElement.querySelector('button.submenu-label').textContent.trim()).toBe(label);
+      expect(warn).not.toHaveBeenCalled();
     });
 
     it('keeps article entries at the root when ungroupArticles is true', async () => {
@@ -296,12 +313,14 @@ describe('MainSideMenuComponent', () => {
   });
 
   it.each(['Indices', 'Hakemistot'])('uses the translated group label %s', async (label) => {
+    const warn = vi.spyOn(console, 'warn');
     loadTranslations({ 'MainSideMenu.Indices': label });
     config.component!.mainSideMenu!.items = { indexPersons: true, indexPlaces: true };
     const fixture = TestBed.createComponent(MainSideMenuComponent);
     await fixture.whenStable();
 
     expect(fixture.nativeElement.querySelector('button.submenu-label').textContent.trim()).toBe(label);
+    expect(warn).not.toHaveBeenCalled();
   });
 
   it('updates the highlighted item when navigation changes', async () => {

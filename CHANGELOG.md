@@ -50,6 +50,7 @@ See the [v4 breaking changes and fork migration notes](https://github.com/slsfi/
 - Config: make omitted settings use consistent fallbacks for default-language selection, search routes, home-banner metadata, manuscript print titles, and introduction display options.
 - Ebook: return HTTP 301 for legacy `/ebook/{filename}.{extension}` routes, redirecting to the current `/ebook/{extension}/{filename}` format.
 - Menu: use localized interface text for grouped article wrapper.
+- Tests: provide complete runtime translation dictionaries for main side menu and content page fixtures, and check that translated rendering emits no warnings.
 
 
 
