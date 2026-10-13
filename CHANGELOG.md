@@ -47,6 +47,7 @@ See the [v4 breaking changes and fork migration notes](https://github.com/slsfi/
 - Deps: update `express` to 5.3.0.
 - Deps: update `express-rate-limit` to 8.7.1.
 - Deps: update `marked` to 18.1.1.
+- Deps (dev): update `@types/node` to 24.19.2.
 
 ### Fixed
 
