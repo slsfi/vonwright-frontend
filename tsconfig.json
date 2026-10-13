@@ -17,7 +17,6 @@
     "target": "ES2022",
     "module": "preserve",
     "useDefineForClassFields": false,
-    "strictPropertyInitialization": false,
     "paths": {
       "@components/*": [
         "./src/app/components/*"

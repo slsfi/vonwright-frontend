@@ -12,7 +12,6 @@ This document tracks cross-cutting TODOs that should stay visible outside local 
 
 Consider these changes to the shared [TypeScript configuration](../tsconfig.json):
 
-- **Remove `strictPropertyInitialization: false`:** with `strict: true`, omitting this override enables the check. Some observable fields are assigned in lifecycle hooks rather than constructors. Give these fields an appropriate initial value or model their initially absent state before removing the override; avoid adding definite-assignment assertions solely to silence errors.
 - **Enable `noPropertyAccessFromIndexSignature`:** define explicit types for [`src/project/config.ts`](../src/project/config.ts) and other affected dictionary values, then distinguish known properties from dynamic keys before enabling the check.
 - **Remove `useDefineForClassFields: false`:** with `target: ES2022`, omitting this override enables standard class-field semantics and changes runtime initialization. Audit constructor, inheritance, and field initialization dependencies, then verify browser and SSR behavior before removing the override.
 - **Review suppressed Angular diagnostics:** `nullishCoalescingNotNullable` and `optionalChainNotNullable` remain suppressed in the shared configuration. Align nullable types and template guards, then remove the suppressions when the warnings have been resolved.

@@ -1,5 +1,5 @@
 import { AsyncPipe } from '@angular/common';
-import { Component, ElementRef, LOCALE_ID, OnDestroy, OnInit, inject, signal } from '@angular/core';
+import { Component, ElementRef, LOCALE_ID, OnDestroy, inject, signal } from '@angular/core';
 import { toObservable } from '@angular/core/rxjs-interop';
 import { ActivatedRoute } from '@angular/router';
 import {
@@ -42,7 +42,7 @@ import { ViewOptionsService } from '@services/view-options.service';
     TrustHtmlPipe
   ]
 })
-export class CollectionForewordPage implements OnInit, OnDestroy {
+export class CollectionForewordPage implements OnDestroy {
   private collectionContentService = inject(CollectionContentService);
   private elementRef = inject(ElementRef);
   private modalController = inject(ModalController);
@@ -60,34 +60,31 @@ export class CollectionForewordPage implements OnInit, OnDestroy {
 
   readonly activeComponent = signal(true);
   readonly mobileMode = this.platformService.isMobile();
-  text$: Observable<string>;
   private readonly active$ = toObservable(this.activeComponent);
   private intervalTimerId?: number;
 
-  ngOnInit() {
-    this.text$ = combineLatest(
-      [this.route.params, this.route.queryParams, this.active$]
-    ).pipe(
-      filter(([, , active]) => active),
-      map(([params, queryParams]) => ({
-        collectionID: params['collectionID'],
-        searchMatches: queryParams['q']
-          ? this.parserService.getSearchMatchesFromQueryParams(queryParams['q'])
-          : []
-      })),
-      tap(({searchMatches}) => {
-        if (searchMatches.length) {
-          this.clearSearchMatchInterval();
-          this.intervalTimerId = this.scrollService.scrollToFirstSearchMatch(
-            this.elementRef.nativeElement
-          );
-        }
-      }),
-      switchMap(({collectionID, searchMatches}) => {
-        return this.loadForeword(collectionID, this.activeLocale, searchMatches);
-      })
-    );
-  }
+  readonly text$: Observable<string> = combineLatest(
+    [this.route.params, this.route.queryParams, this.active$]
+  ).pipe(
+    filter(([, , active]) => active),
+    map(([params, queryParams]) => ({
+      collectionID: params['collectionID'],
+      searchMatches: queryParams['q']
+        ? this.parserService.getSearchMatchesFromQueryParams(queryParams['q'])
+        : []
+    })),
+    tap(({searchMatches}) => {
+      if (searchMatches.length) {
+        this.clearSearchMatchInterval();
+        this.intervalTimerId = this.scrollService.scrollToFirstSearchMatch(
+          this.elementRef.nativeElement
+        );
+      }
+    }),
+    switchMap(({collectionID, searchMatches}) => {
+      return this.loadForeword(collectionID, this.activeLocale, searchMatches);
+    })
+  );
 
   ionViewWillEnter() {
     this.activeComponent.set(true);

@@ -25,7 +25,28 @@ export class AboutPage implements OnInit, OnDestroy {
   private scrollService = inject(ScrollService);
   private activeLocale = inject(LOCALE_ID);
 
-  markdownText$: Observable<string | null>;
+  private readonly loadErrorMessage = '<p>' + $localize`:@@About.LoadingError:Sidans innehåll kunde inte laddas.` + '</p>';
+
+  readonly markdownText$: Observable<string | null> = combineLatest([
+    this.route.params,
+    this.route.data,
+    this.route.parent?.data ?? of({} as Data)
+  ]).pipe(
+    map(([params, routeData, parentRouteData]) => {
+      return params['id'] ?? routeData['backendPageId'] ?? parentRouteData['backendPageId'] ?? null;
+    }),
+    distinctUntilChanged(),
+    switchMap((id: string | null) => {
+      if (!id) {
+        return of(this.loadErrorMessage);
+      }
+
+      return this.mdService.getParsedMdContent(
+        this.activeLocale + '-' + id,
+        this.loadErrorMessage
+      );
+    })
+  );
 
   private fragmentSubscription?: Subscription;
   private scrollRetryTimer?: ReturnType<typeof setTimeout>;
@@ -41,30 +62,6 @@ export class AboutPage implements OnInit, OnDestroy {
         }
       });
     }
-
-    const loadErrorMessage = '<p>' + $localize`:@@About.LoadingError:Sidans innehåll kunde inte laddas.` + '</p>';
-    const parentRouteData$ = this.route.parent ? this.route.parent.data : of({} as Data);
-
-    this.markdownText$ = combineLatest([
-      this.route.params,
-      this.route.data,
-      parentRouteData$
-    ]).pipe(
-      map(([params, routeData, parentRouteData]) => {
-        return params['id'] ?? routeData['backendPageId'] ?? parentRouteData['backendPageId'] ?? null;
-      }),
-      distinctUntilChanged(),
-      switchMap((id: string | null) => {
-        if (!id) {
-          return of(loadErrorMessage);
-        }
-
-        return this.mdService.getParsedMdContent(
-          this.activeLocale + '-' + id,
-          loadErrorMessage
-        );
-      })
-    );
   }
 
   ngOnDestroy() {
