@@ -16,7 +16,6 @@
     "isolatedModules": true,
     "target": "ES2022",
     "module": "preserve",
-    "useDefineForClassFields": false,
     "paths": {
       "@components/*": [
         "./src/app/components/*"

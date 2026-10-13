@@ -13,7 +13,6 @@ This document tracks cross-cutting TODOs that should stay visible outside local 
 Consider these changes to the shared [TypeScript configuration](../tsconfig.json):
 
 - **Enable `noPropertyAccessFromIndexSignature`:** define explicit types for [`src/project/config.ts`](../src/project/config.ts) and other affected dictionary values, then distinguish known properties from dynamic keys before enabling the check.
-- **Remove `useDefineForClassFields: false`:** with `target: ES2022`, omitting this override enables standard class-field semantics and changes runtime initialization. Audit constructor, inheritance, and field initialization dependencies, then verify browser and SSR behavior before removing the override.
 - **Evaluate `skipLibCheck` only if declaration checking becomes a measured bottleneck:** retain dependency declaration checks for now. Compare build/test timings and any lost diagnostics before enabling it.
 
 ## Route prerendering after the redesign
