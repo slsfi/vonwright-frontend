@@ -524,7 +524,7 @@ Index entries form one menu block at the first enabled index flag's position in 
 | `component.mainSideMenu.items.privacyPolicy` | `boolean` | `false` | Show the privacy-policy link; also show it in login/registration. |
 | `component.mainSideMenu.items.accessibilityStatement` | `boolean` | `false` | Show the accessibility-statement link. |
 | `component.mainSideMenu.defaultExpanded` | `boolean` | `false` | Initially expand menu groups rather than keeping them collapsed. |
-| `component.mainSideMenu.ungroupArticles` | `boolean` | `false` | Put article entries directly in the menu rather than beneath their backend article-root group. |
+| `component.mainSideMenu.ungroupArticles` | `boolean` | `false` | Put article entries directly in the menu rather than beneath a group labeled by `MainSideMenu.Articles`. When `false` or omitted, retain the article wrapper. |
 | `component.mainSideMenu.ungroupIndices` | `boolean` | `false` | Put enabled index links directly in the menu rather than beneath a collapsible localized group. When `false` or omitted, group all enabled indices, including a single index, preserving index order from `items`. No group appears when all indices are disabled. |
 
 ### Manuscripts

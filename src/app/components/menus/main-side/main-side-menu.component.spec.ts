@@ -5,6 +5,7 @@ import { provideRouter, UrlSegment } from '@angular/router';
 import { of } from 'rxjs';
 
 import { config } from '@config';
+import { MdMenuNodeApiResponse } from '@models/menu.models';
 import { AUTH_ENABLED } from '@tokens/auth.tokens';
 import { CollectionsService } from '@services/collections.service';
 import { DocumentHeadService } from '@services/document-head.service';
@@ -48,6 +49,100 @@ describe('MainSideMenuComponent', () => {
     config.component!.mainSideMenu!.items = originalMenuItems;
     config.component!.mainSideMenu!.ungroupIndices = originalUngroupIndices;
     config.component!.mainSideMenu!.defaultExpanded = originalDefaultExpanded;
+  });
+
+  describe('article menu', () => {
+    let originalArticles: typeof config.articles;
+    let originalUngroupArticles: boolean | undefined;
+
+    beforeEach(() => {
+      originalArticles = config.articles;
+      originalUngroupArticles = config.component!.mainSideMenu!.ungroupArticles;
+      config.component!.mainSideMenu!.ungroupArticles = false;
+      config.component!.mainSideMenu!.items = { articles: true };
+      config.articles = [
+        { id: '04-01', language: 'sv', routeName: 'first-article', title: 'Configured article title' },
+        { id: '04-02-01', language: 'sv', routeName: 'second-article' }
+      ];
+
+      const articleTree: MdMenuNodeApiResponse = {
+        basename: '04', fullpath: '', id: '04', path: '', route: '', type: 'directory',
+        title: 'Backend article root title',
+        children: [
+          {
+            basename: '01', fullpath: '', id: '04-01', path: '', route: '', type: 'file',
+            title: 'Backend first article title'
+          },
+          {
+            basename: '02', fullpath: '', id: '04-02', path: '', route: '', type: 'directory',
+            title: 'Backend nested group title',
+            children: [{
+              basename: '01', fullpath: '', id: '04-02-01', path: '', route: '', type: 'file',
+              title: 'Backend second article title'
+            }]
+          }
+        ]
+      };
+      vi.spyOn(TestBed.inject(MarkdownService), 'getMenuTree').mockReturnValue(of(articleTree));
+    });
+
+    afterEach(() => {
+      config.articles = originalArticles;
+      config.component!.mainSideMenu!.ungroupArticles = originalUngroupArticles;
+    });
+
+    it.each([false, undefined])('uses the app label for the article wrapper when ungroupArticles is %s', async (setting) => {
+      config.component!.mainSideMenu!.ungroupArticles = setting;
+      const fixture = TestBed.createComponent(MainSideMenuComponent);
+      await fixture.whenStable();
+
+      const group = fixture.componentInstance.mainMenu().find(item => item.menuType === 'article')!;
+      expect(group.title).toBe('Artiklar');
+      expect(group.children?.map(item => item.title))
+        .toEqual(['Configured article title', 'Backend nested group title']);
+      expect(group.children?.[1].children?.[0].title).toBe('Backend second article title');
+      const element: HTMLElement = fixture.nativeElement;
+      expect(element.querySelector('button.submenu-label')?.textContent?.trim()).toBe('Artiklar');
+      expect(Array.from(element.querySelectorAll('a[href^="/article/"]'), link => link.getAttribute('href')))
+        .toEqual(['/article/first-article', '/article/second-article']);
+      expect(TestBed.inject(MarkdownService).getMenuTree).toHaveBeenCalledWith('sv', '04');
+    });
+
+    it.each(['Articles', 'Artikkelit'])('uses the translated article wrapper label %s', async (label) => {
+      loadTranslations({ 'MainSideMenu.Articles': label });
+      const fixture = TestBed.createComponent(MainSideMenuComponent);
+      await fixture.whenStable();
+
+      expect(fixture.nativeElement.querySelector('button.submenu-label').textContent.trim()).toBe(label);
+    });
+
+    it('keeps article entries at the root when ungroupArticles is true', async () => {
+      config.component!.mainSideMenu!.ungroupArticles = true;
+      const fixture = TestBed.createComponent(MainSideMenuComponent);
+      await fixture.whenStable();
+
+      expect(fixture.componentInstance.mainMenu().map(item => item.title))
+        .toEqual(['Hem', 'Configured article title', 'Backend nested group title']);
+      const element: HTMLElement = fixture.nativeElement;
+      expect(element.querySelector('button.submenu-label')?.textContent?.trim()).toBe('Backend nested group title');
+      expect(Array.from(element.querySelectorAll('a[href^="/article/"]'), link => link.getAttribute('href')))
+        .toEqual(['/article/first-article', '/article/second-article']);
+    });
+
+    it('expands the article wrapper and retains the article title on navigation', async () => {
+      const fixture = TestBed.createComponent(MainSideMenuComponent);
+      fixture.componentRef.setInput('urlSegments', [
+        new UrlSegment('article', {}),
+        new UrlSegment('first-article', {})
+      ]);
+      await fixture.whenStable();
+
+      const group = fixture.componentInstance.mainMenu().find(item => item.menuType === 'article')!;
+      expect(fixture.componentInstance.expandedMenuIds()).toContain(group.nodeId);
+      expect(fixture.componentInstance.highlightedNodeId()).toBe(group.children?.[0].nodeId);
+      expect(fixture.nativeElement.querySelector('a.menu-highlight').getAttribute('href')).toBe('/article/first-article');
+      expect(TestBed.inject(DocumentHeadService).setTitle).toHaveBeenCalledWith(['Configured article title']);
+    });
   });
 
   it.each([false, undefined])('groups multiple indices when ungroupIndices is %s', async (setting) => {

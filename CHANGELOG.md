@@ -16,6 +16,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 - SSR proxy trust: require both the configured hop limit and trusted proxy addresses. Review the settings against the deployment's proxy chain.
 - Defaults for config options `collections.addTEIClassNames` and `collections.replaceImageAssetsPaths` changed to `false`, and `page.foreword.showURNButton` and `page.title.showURNButton` changed to `true`.
 - Main side menu: enabled indices now appear under a collapsible localized group ("Register" in Swedish, "Hakemistot" in Finnish, "Indices" in English), including a single index, consistent with article grouping. The new `component.mainSideMenu.ungroupIndices` option defaults to `false` even when omitted; set it to `true` to retain separate root-level index links. Both modes use one menu block at the first enabled index flag's position, preserving the configured index order within that block.
+- Main side menu: the grouped article wrapper now uses the `MainSideMenu.Articles` interface translation instead of the backend article-root title. Move any custom wrapper wording into the translation target for each locale.
 - The page-not-found page no longer fetches its message from backend Markdown (node ID `{language}-404`), but from localized interface text instead.
 - The content page no longer fetches its introduction from backend Markdown (node ID `{language}-02`). Move any custom introduction to the `Content.Introduction` translation target; it is empty by default.
 
@@ -43,6 +44,7 @@ See the [v4 breaking changes and fork migration notes](https://github.com/slsfi/
 - Pdf-viewer: broaden error message if the PDF can't be displayed. ([3f4968b](https://github.com/slsfi/digital-edition-frontend-ng/commit/3f4968b048d3bc89f6f7cc96129cbeaaa6f730a2))
 - Config: make omitted settings use consistent fallbacks for default-language selection, search routes, home-banner metadata, manuscript print titles, and introduction display options.
 - Ebook: return HTTP 301 for legacy `/ebook/{filename}.{extension}` routes, redirecting to the current `/ebook/{extension}/{filename}` format.
+- Menu: use localized interface text for grouped article wrapper.
 
 
 

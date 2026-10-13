@@ -319,9 +319,10 @@ export class MainSideMenuComponent {
 
         this.recursivelyMapArticleData(res, articles);
         const menuDataNode: MainMenuNode = fromMdToMainMenuNode(res, '/article');
+        menuDataNode.title = $localize`:@@MainSideMenu.Articles:Artiklar`;
         const menuData: MainMenuNode[] = config.component?.mainSideMenu?.ungroupArticles
-              ? menuDataNode.children ?? []
-              : [menuDataNode]
+          ? menuDataNode.children ?? []
+          : [menuDataNode];
 
         return { menuType: 'article', menuData };
       }),

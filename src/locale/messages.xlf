@@ -1009,6 +1009,11 @@
         <source>Sekundär meny</source>
       </segment>
     </unit>
+    <unit id="MainSideMenu.Articles">
+      <segment>
+        <source>Artiklar</source>
+      </segment>
+    </unit>
     <unit id="MainSideMenu.CollectionsGroup1">
       <segment>
         <source>Innehåll</source>
