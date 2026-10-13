@@ -39,6 +39,7 @@ See the [v4 breaking changes and fork migration notes](https://github.com/slsfi/
 - Content: use optional localized HTML above the content grid, configured entirely in translation targets, with no introduction or extra spacing by default.
 - Angular services: migrate from `@Injectable` to `@Service`, preserving automatic root provisioning and explicit browser/server provider selection.
 - TypeScript: enable strict property initialization and initialize content observables when their components are constructed.
+- Angular templates: restore nullish-coalescing and optional-chain diagnostics, and remove redundant optional chains from guarded named-entity modal data.
 
 ### Fixed
 
