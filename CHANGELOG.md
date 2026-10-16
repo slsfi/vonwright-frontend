@@ -27,6 +27,7 @@ See the [v4 breaking changes and fork migration notes](https://github.com/slsfi/
 - Config: add `app.ssr.trustedProxyAddresses` to configure trusted proxy IP addresses and ranges alongside `app.ssr.trustProxyHops`. An empty array disables proxy trust.
 - Config: add `page.ebook.showURNButton` (boolean, defaults to `false`) to show the reference button on ebook pages.
 - Config: add `component.mainSideMenu.ungroupIndices` (boolean, defaults to `false`) to keep enabled index links separate in the main side menu.
+- Testing: add `test:ssr:docker` to check SSR memory usage in local and published Docker images.
 
 ### Changed
 

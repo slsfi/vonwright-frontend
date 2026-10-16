@@ -40,6 +40,8 @@
     "test:ssr:checks": "node ./scripts/test-ssr-smoke-runner.js",
     "test:ssr:server": "npm run build:ssr && node ./scripts/test-ssr-server.js",
     "test:ssr:benchmark": "node ./scripts/test-benchmark-ssr.js",
+    "test:ssr:docker": "node ./scripts/docker-ssr-memory.js",
+    "test:ssr:docker:checks": "node ./scripts/test-docker-ssr-memory.js",
     "bench:ssr": "node ./scripts/benchmark-ssr.js",
     "bench:ssr:build": "npm run build:ssr && npm run bench:ssr",
     "gzipper": "gzipper",

@@ -173,6 +173,7 @@ Use the Angular/Vitest unit suite as the primary automated check, with the scrip
 - `npm run test:ssr:server`: build SSR, import the middleware from the emitted server entry, and exercise it with a spy in place of Angular. Verify static/probe short-circuits, cache policies, dynamic limiting, locale paths, and trusted-proxy behavior without rendering Angular. The imported entry starts no listener; fixture apps use temporary local HTTP servers.
 - `npm run test:ssr:checks`: verify that the smoke runner rejects incorrect render modes and redirects, and sends explicit proxy Host headers, using local fixtures without a running app.
 - `npm run test:ssr:benchmark`: verify benchmark auto-start through `serve:ssr`, including an alternate runtime entry, failed startup, interruption, and child-process cleanup, using local fixtures without building the app.
+- `npm run test:ssr:docker`: build/run the local production Docker image and record memory across repeated SSR load/idle cycles; see the [Docker memory check](#repeatable-docker-ssr-memory-check). `npm run test:ssr:docker:checks` verifies argument/URL/sample handling and response validation with local fixtures, without Docker or a build.
 - `npm run test:build-output`: verify browser output for the production locales configured in `angular.json` and the runtime entry from `serve:ssr`; run after `npm run build:ssr`. Supports `--dist-root`, `--locales` (comma-separated), and `--server-entry` (relative to the output root) for custom output.
 
 The [unit-test target](../angular.json) lets Angular initialize TestBed and inherits application styles, assets, and polyfills, including `@angular/localize/init` and the Ionicons polyfill. Locale-specific XLF translations are not inlined into unit tests. [`tsconfig.spec.json`](../tsconfig.spec.json) supplies `vitest/globals`; [`src/test-setup.ts`](../src/test-setup.ts) restores spies and real timers after each test. Prefer Angular CLI test options; the suite does not need a custom Vitest configuration or browser provider. See the [Vitest notes](#vitest-and-jsdom) for localization, mock, and timer patterns. The supplied GitHub Actions workflow builds/pushes the Docker image; it does not run the unit suite, so run `test:ci` before a PR or add a dedicated unit-test CI job.
@@ -288,6 +289,40 @@ What the benchmark reports:
 - Cold run summary (run 1 per route).
 - Warm run summary with `avg`, `median`, `p95`, `min`, and `max`.
 
+
+
+## Repeatable Docker SSR memory check
+
+With Docker Desktop running in Linux-container mode, run the [memory test runner](../scripts/docker-ssr-memory.js):
+
+```bash
+npm run test:ssr:docker -- --pull
+```
+
+It builds the local image, warms public SSR routes, then repeats requests and idle periods while printing progress and memory usage. Allow **10–15 minutes for requests and idle periods**, including a two-minute final idle observation. This phase has a 15-minute limit; building, startup, and cleanup take additional time.
+
+Useful options:
+
+- `--skip-build`: reuse the local image.
+- `--keep-container`: leave the container running for Docker Desktop inspection.
+- `--routes-file=<path>`: replace the sample-edition routes with a public SSR URL list; all URLs are remapped to the local container.
+- `--final-idle-seconds=<n>`: change the final idle observation.
+- `--help`: show all options and defaults.
+
+Results are saved under `tmp/docker-ssr-memory/<timestamp>/` as `samples.csv`, `report.json`, and `container.log`. Press Ctrl+C to stop early and save partial results. The container is removed unless `--keep-container` is set; images and reports remain.
+
+Review idle values across cycles and recovery during the final pause. A stable warm plateau can remain above startup usage. Use `--max-growth-mib=<MiB>` to enforce an optional growth budget. See the script headers and `--help` for measurement and validation details.
+
+### Compare with a known-good release image
+
+Pull the release image and select it with `--skip-build --image`:
+
+```bash
+docker pull ghcr.io/slsfi/digital-edition-frontend-ng:3.1.1
+npm run test:ssr:docker -- --skip-build --image=ghcr.io/slsfi/digital-edition-frontend-ng:3.1.1
+```
+
+Run images sequentially with the same routes and settings, then compare the reports' idle trends, peaks, and final recovery. Absolute memory usage can differ between versions.
 
 
 ## Feature-based route generation
