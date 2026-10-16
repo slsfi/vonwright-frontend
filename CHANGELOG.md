@@ -42,7 +42,7 @@ See the [v4 breaking changes and fork migration notes](https://github.com/slsfi/
 - TypeScript: use standard ES2022 class-field initialization by removing the legacy `useDefineForClassFields: false` override.
 - TypeScript/Angular: remove redundant compiler settings; retain strict type and template checking, filename casing checks, bundler resolution, and JSON-module support through toolchain defaults. Explicitly retain declaration-file checking with `skipLibCheck: false`.
 - Angular templates: remove explicit suppression of nullish-coalescing and optional-chain diagnostics, and redundant optional chains from guarded named-entity modal data.
-- Deps: update `@angular/core` and `@angular/cli` to 22.2.2.
+- Deps: update `@angular/core` and `@angular/cli` to 22.2.3.
 - Deps: update `@ionic/angular` and `@ionic/angular-server` to 9.0.7.
 - Deps: update `express` to 5.3.0.
 - Deps: update `express-rate-limit` to 8.7.1.
