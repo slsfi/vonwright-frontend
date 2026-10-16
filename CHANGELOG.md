@@ -50,6 +50,7 @@ See the [v4 breaking changes and fork migration notes](https://github.com/slsfi/
 - Deps (dev): update `@types/node` to 24.19.2.
 - Deps (dev): update `jsdom` to 30.1.3.
 - Deps (dev): update `vitest` to 5.0.5.
+- Deps: update transitive dependencies.
 
 ### Fixed
 
