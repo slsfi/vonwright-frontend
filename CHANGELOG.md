@@ -8,6 +8,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ## [Unreleased]
 
+
+
+## [4.0.0] – 2026-10-16
+
 ### BREAKING CHANGES
 
 - Build/SSR: replace separate browser/server builds with the integrated Angular application builder. The production server entry is now `dist/app/server/server.mjs`, and the development server runs SSR.
@@ -15,51 +19,52 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 - Test tooling: replace Jasmine/Karma with Vitest and jsdom; fork-owned specs and CI commands must be converted.
 - SSR proxy trust: require both the configured hop limit and trusted proxy addresses. Review the settings against the deployment's proxy chain.
 - Defaults for config options `collections.addTEIClassNames` and `collections.replaceImageAssetsPaths` changed to `false`, and `page.foreword.showURNButton` and `page.title.showURNButton` changed to `true`.
-- Main side menu: enabled indices now appear under a collapsible localized group ("Register" in Swedish, "Hakemistot" in Finnish, "Indices" in English), including a single index, consistent with article grouping. The new `component.mainSideMenu.ungroupIndices` option defaults to `false` even when omitted; set it to `true` to retain separate root-level index links. Both modes use one menu block at the first enabled index flag's position, preserving the configured index order within that block.
+- Main side menu: enabled indices now appear under a collapsible localized group, including a single index, consistent with article grouping. The new `component.mainSideMenu.ungroupIndices` option defaults to `false` even when omitted; set it to `true` to retain separate root-level index links. Both modes use one menu block at the first enabled index flag's position, preserving the configured index order within that block.
 - Main side menu: the grouped article wrapper now uses the `MainSideMenu.Articles` interface translation instead of the backend article-root title. Move any custom wrapper wording into the translation target for each locale.
 - The page-not-found page no longer fetches its message from backend Markdown (node ID `{language}-404`), but from localized interface text instead.
 - The content page no longer fetches its introduction from backend Markdown (node ID `{language}-02`). Move any custom introduction to the `Content.Introduction` translation target; it is empty by default.
 
-See the [v4 breaking changes and fork migration notes](https://github.com/slsfi/digital-edition-frontend-ng/blob/main/docs/breaking-changes/v4.md) for the required fork changes.
+See the [v4 breaking changes and fork migration notes](docs/breaking-changes/v4.md) for the required fork changes.
 
 ### Added
 
-- Config: add `app.ssr.trustedProxyAddresses` to configure trusted proxy IP addresses and ranges alongside `app.ssr.trustProxyHops`. An empty array disables proxy trust.
-- Config: add `page.ebook.showURNButton` (boolean, defaults to `false`) to show the reference button on ebook pages.
-- Config: add `component.mainSideMenu.ungroupIndices` (boolean, defaults to `false`) to keep enabled index links separate in the main side menu.
-- Testing: add `test:ssr:docker` to check SSR memory usage in local and published Docker images.
+- Config: add `app.ssr.trustedProxyAddresses` to configure trusted proxy IP addresses and ranges alongside `app.ssr.trustProxyHops`. An empty array disables proxy trust. ([1d59359](https://github.com/slsfi/digital-edition-frontend-ng/commit/1d5935973c189113a1340d0ce94109bb9b4a6fb1))
+- Config: add `page.ebook.showURNButton` (boolean, defaults to `false`) to show the reference button on ebook pages. ([c7296c3](https://github.com/slsfi/digital-edition-frontend-ng/commit/c7296c317f769fc6ce91ad0a735767ebb9007e3c))
+- Config: add `component.mainSideMenu.ungroupIndices` (boolean, defaults to `false`) to keep enabled index links separate in the main side menu. ([d03392d](https://github.com/slsfi/digital-edition-frontend-ng/commit/d03392d6a79e77b4a5c7c87638ce3c5c2ae8d1ae))
+- Testing: add `test:ssr:docker` to check SSR memory usage in local and published Docker images. ([d5ba887](https://github.com/slsfi/digital-edition-frontend-ng/commit/d5ba887b84fabd705feaa64260af4b0322177549))
+- Docs: add guidance on [project customization](docs/PROJECT-CUSTOMIZATION.md) and [configuration](docs/CONFIGURATION.md), and [breaking changes between major versions](docs/breaking-changes/README.md). ([0b64b1e](https://github.com/slsfi/digital-edition-frontend-ng/commit/0b64b1e91868b5f4f687a5124cb5b8044d6efa49))
 
 ### Changed
 
-- Angular modernization: complete the Angular application-builder and Vitest migration, reorganize project files and public assets, and update documentation. See the [migration plan](https://github.com/slsfi/digital-edition-frontend-ng/blob/main/docs/migrations/completed/angular-22-modernization/STAGE-2-APPLICATION-BUILDER.md).
-- Build: align TypeScript configuration with the Angular toolchain, enable isolated compilation, consolidate shared diagnostics, and reference the application and test configurations from the root configuration.
-- Docker: centralize the Node base image tag in `Dockerfile`; the GitHub Actions workflow uses its default and refreshes base images through Buildx's `pull: true` setting.
-- Config defaults.
-- Docs: record route-prerendering findings and implementation requirements in [docs/TODO.md](docs/TODO.md#route-prerendering-after-the-redesign), including the decision to postpone the feature until the UI redesign resolves device-dependent layouts.
-- Page not found: use localized interface text and a home-page link instead of fetching the message from backend Markdown.
-- Content: use optional localized HTML above the content grid, configured entirely in translation targets, with no introduction or extra spacing by default.
-- Angular services: migrate from `@Injectable` to `@Service`, preserving automatic root provisioning and explicit browser/server provider selection.
-- TypeScript: enable strict property initialization and initialize content observables when their components are constructed.
-- TypeScript: use standard ES2022 class-field initialization by removing the legacy `useDefineForClassFields: false` override.
-- TypeScript/Angular: remove redundant compiler settings; retain strict type and template checking, filename casing checks, bundler resolution, and JSON-module support through toolchain defaults. Explicitly retain declaration-file checking with `skipLibCheck: false`.
-- Angular templates: remove explicit suppression of nullish-coalescing and optional-chain diagnostics, and redundant optional chains from guarded named-entity modal data.
-- Deps: update `@angular/core` and `@angular/cli` to 22.2.3.
-- Deps: update `@ionic/angular` and `@ionic/angular-server` to 9.0.8.
-- Deps: update `express` to 5.3.0.
-- Deps: update `express-rate-limit` to 8.7.1.
-- Deps: update `marked` to 18.1.1.
-- Deps (dev): update `@types/node` to 24.19.2.
-- Deps (dev): update `jsdom` to 30.1.3.
-- Deps (dev): update `vitest` to 5.0.5.
-- Deps: update transitive dependencies.
+- Angular modernization: complete the Angular application-builder and Vitest migration, reorganize project files and public assets, and update documentation. See the [migration plan](docs/migrations/completed/angular-22-modernization/STAGE-2-APPLICATION-BUILDER.md). ([782ea3d](https://github.com/slsfi/digital-edition-frontend-ng/commit/782ea3d379d3a493470151494fdc8896292b842e), [e8470f1](https://github.com/slsfi/digital-edition-frontend-ng/commit/e8470f1db619c28b62c293af762348101345873f), [6c89cb0](https://github.com/slsfi/digital-edition-frontend-ng/commit/6c89cb04c4d0a3115551d9274a8cae76fbba61b7), [0b24937](https://github.com/slsfi/digital-edition-frontend-ng/commit/0b2493752020cc1509f76f83005f967bc1b43a43), [484b8ed](https://github.com/slsfi/digital-edition-frontend-ng/commit/484b8ed9e2c4e0b3c9491a3367ae5ccf464055e1), [7db7e74](https://github.com/slsfi/digital-edition-frontend-ng/commit/7db7e74334957d3ae8943e0cd9bf7f58de1bc634), [b491f4d](https://github.com/slsfi/digital-edition-frontend-ng/commit/b491f4da6b3678de0618e667808777ad76d02ff9), [3ff7c6c](https://github.com/slsfi/digital-edition-frontend-ng/commit/3ff7c6c77b86f119044a6ed90498d8278960f0d7), [1d59359](https://github.com/slsfi/digital-edition-frontend-ng/commit/1d5935973c189113a1340d0ce94109bb9b4a6fb1), [7756999](https://github.com/slsfi/digital-edition-frontend-ng/commit/775699938d0084a5dd23bbf873b26b05cd6d630c), [395f128](https://github.com/slsfi/digital-edition-frontend-ng/commit/395f1282d53c9dfdcb1f1eacbdfeb378f25ba632), [546443b](https://github.com/slsfi/digital-edition-frontend-ng/commit/546443b0716604c3a9078147ecb59945cd4b6863), [8a5b12b](https://github.com/slsfi/digital-edition-frontend-ng/commit/8a5b12bde0c5dcc24d6aee19da8675e61ac41439), [27392fa](https://github.com/slsfi/digital-edition-frontend-ng/commit/27392fa43041ecad9e7c761b14b96c4085d8433f), [0931896](https://github.com/slsfi/digital-edition-frontend-ng/commit/0931896c50b90b1f41cc31cde8b138cf15291d09), [1fe50d2](https://github.com/slsfi/digital-edition-frontend-ng/commit/1fe50d2f05d3148e1e55191b8962e6d2babe5301), [ec33708](https://github.com/slsfi/digital-edition-frontend-ng/commit/ec33708fd70c58bf6aa16ce138ff546c8bd2d9be), [60bf669](https://github.com/slsfi/digital-edition-frontend-ng/commit/60bf669806ef5ec7f0a475021d51838d24a5e956), [c86fe39](https://github.com/slsfi/digital-edition-frontend-ng/commit/c86fe3992d8a7f365a9f986cddd6266c0ed43b95), [0b64b1e](https://github.com/slsfi/digital-edition-frontend-ng/commit/0b64b1e91868b5f4f687a5124cb5b8044d6efa49))
+- Build: align TypeScript configuration with the Angular toolchain, enable isolated compilation, consolidate shared diagnostics, and reference the application and test configurations from the root configuration. ([63fde92](https://github.com/slsfi/digital-edition-frontend-ng/commit/63fde92aae6d7d1ef0f801975d0814d393949ac3))
+- Docker: centralize the Node base image tag in `Dockerfile`; the GitHub Actions workflow uses its default and refreshes base images through Buildx's `pull: true` setting. ([d86957d](https://github.com/slsfi/digital-edition-frontend-ng/commit/d86957d6a1df472cab6c79a3f1fce82dfdfb4287))
+- Config defaults. ([8fedd76](https://github.com/slsfi/digital-edition-frontend-ng/commit/8fedd7633e90393499454edc2aebbddf577278ff))
+- Docs: record route-prerendering findings and implementation requirements in [docs/TODO.md](docs/TODO.md#route-prerendering-after-the-redesign), including the decision to postpone the feature until the UI redesign resolves device-dependent layouts. ([9aa2524](https://github.com/slsfi/digital-edition-frontend-ng/commit/9aa2524c4a446e42474abdb53a8bd2cbcb535f0f))
+- Page not found: use localized interface text. ([df60f07](https://github.com/slsfi/digital-edition-frontend-ng/commit/df60f07f1c60d580fbe44a43d5fb3ffe8bc55b46))
+- Content: use optional localized HTML above the content grid. ([f5eee68](https://github.com/slsfi/digital-edition-frontend-ng/commit/f5eee68fd028761e26fec6df09ea1f9b8d200dc3))
+- Menu: use localized interface text for grouped article wrapper. ([7a58598](https://github.com/slsfi/digital-edition-frontend-ng/commit/7a58598259633f11612e61965925488ba277fab3))
+- Angular services: migrate from `@Injectable` to `@Service`, preserving automatic root provisioning and explicit browser/server provider selection. ([99ff91e](https://github.com/slsfi/digital-edition-frontend-ng/commit/99ff91e140e1967bef39eb36518e1d3cda0be734))
+- TypeScript: enable strict property initialization and initialize content observables when their components are constructed. ([35bfb2d](https://github.com/slsfi/digital-edition-frontend-ng/commit/35bfb2d10f6dc2f60d0bc0e8e3bc4a32805ab0da))
+- TypeScript: use standard ES2022 class-field initialization by removing the legacy `useDefineForClassFields: false` override. ([f87c1af](https://github.com/slsfi/digital-edition-frontend-ng/commit/f87c1afec9bda1e74d777ff63c20916b88a94f67))
+- TypeScript/Angular: remove redundant compiler settings; retain strict type and template checking, filename casing checks, bundler resolution, and JSON-module support through toolchain defaults. Explicitly retain declaration-file checking with `skipLibCheck: false`. ([49f3565](https://github.com/slsfi/digital-edition-frontend-ng/commit/49f3565b27a84b4c24f7343a7f615e20e489ccfb))
+- Angular templates: remove explicit suppression of nullish-coalescing and optional-chain diagnostics, and redundant optional chains from guarded named-entity modal data. ([f2b9de7](https://github.com/slsfi/digital-edition-frontend-ng/commit/f2b9de7fd77bc721519c9f555ff9fcb23640aa20))
+- Deps: update `@angular/core` and `@angular/cli` to 22.2.3. ([2d5f121](https://github.com/slsfi/digital-edition-frontend-ng/commit/2d5f12143463bdc6bdf0106cfa77b427dae05d58), [d45ec1c](https://github.com/slsfi/digital-edition-frontend-ng/commit/d45ec1c992fbd4edf4dfa25db691a692246fe59e))
+- Deps: update `@ionic/angular` and `@ionic/angular-server` to 9.0.8. ([1be51ed](https://github.com/slsfi/digital-edition-frontend-ng/commit/1be51ed55743b6c1a207af8394ebbaf72dd20146), [3025709](https://github.com/slsfi/digital-edition-frontend-ng/commit/30257090fc238fd6eff04391f0dfffbfebf041cd))
+- Deps: update `express` to 5.3.0. ([bbee6f7](https://github.com/slsfi/digital-edition-frontend-ng/commit/bbee6f7937e3c8d1f7d613f8b18756430dc7a982))
+- Deps: update `express-rate-limit` to 8.7.1. ([a77fe00](https://github.com/slsfi/digital-edition-frontend-ng/commit/a77fe0000d2352ca6a83f2e04ba809a444a2b180))
+- Deps: update `marked` to 18.1.1. ([8d9cc0c](https://github.com/slsfi/digital-edition-frontend-ng/commit/8d9cc0c54dbaba73e8ec805361241264b6cad364))
+- Deps (dev): update `@types/node` to 24.19.2. ([6ab39b8](https://github.com/slsfi/digital-edition-frontend-ng/commit/6ab39b831ac5dc21840a5f65dd7cfc9e7a93a430))
+- Deps (dev): update `jsdom` to 30.1.3. ([ebc40c6](https://github.com/slsfi/digital-edition-frontend-ng/commit/ebc40c699a78e909e5dbae11c5c4532cdb383c1d))
+- Deps (dev): update `vitest` to 5.0.5. ([c74c76e](https://github.com/slsfi/digital-edition-frontend-ng/commit/c74c76e05934e24fde17b3cebd83226c8c381357), [cea7745](https://github.com/slsfi/digital-edition-frontend-ng/commit/cea7745140d5b74b238b1b554779422baf543509))
+- Deps: update transitive dependencies. ([aa7723e](https://github.com/slsfi/digital-edition-frontend-ng/commit/aa7723e38d2fbb456eb1573aa12558db3e00ebd9))
 
 ### Fixed
 
 - Pdf-viewer: broaden error message if the PDF can't be displayed. ([3f4968b](https://github.com/slsfi/digital-edition-frontend-ng/commit/3f4968b048d3bc89f6f7cc96129cbeaaa6f730a2))
-- Config: make omitted settings use consistent fallbacks for default-language selection, search routes, home-banner metadata, manuscript print titles, and introduction display options.
-- Ebook: return HTTP 301 for legacy `/ebook/{filename}.{extension}` routes, redirecting to the current `/ebook/{extension}/{filename}` format.
-- Menu: use localized interface text for grouped article wrapper.
-- Tests: provide complete runtime translation dictionaries for main side menu and content page fixtures, and check that translated rendering emits no warnings.
+- Config: make omitted settings use consistent fallbacks for default-language selection, search routes, home-banner metadata, manuscript print titles, and introduction display options. ([5c6e72b](https://github.com/slsfi/digital-edition-frontend-ng/commit/5c6e72b60c1f0296befb669bddfc7995426af37f))
+- Ebook: return HTTP 301 for legacy `/ebook/{filename}.{extension}` routes, redirecting to the current `/ebook/{extension}/{filename}` format. ([8249246](https://github.com/slsfi/digital-edition-frontend-ng/commit/824924675de56a620eca51cf6ff3886dbe46e060))
+- Tests: provide complete runtime translation dictionaries for main side menu and content page fixtures, and check that translated rendering emits no warnings. ([b2ea064](https://github.com/slsfi/digital-edition-frontend-ng/commit/b2ea064a86a903b8353f54aebf23348ab36ae5ca))
 
 
 
@@ -1667,7 +1672,8 @@ siteLogoDimensions: {
 
 
 
-[unreleased]: https://github.com/slsfi/digital-edition-frontend-ng/compare/3.1.1...HEAD
+[unreleased]: https://github.com/slsfi/digital-edition-frontend-ng/compare/4.0.0...HEAD
+[4.0.0]: https://github.com/slsfi/digital-edition-frontend-ng/compare/3.1.1...4.0.0
 [3.1.1]: https://github.com/slsfi/digital-edition-frontend-ng/compare/3.1.0...3.1.1
 [3.1.0]: https://github.com/slsfi/digital-edition-frontend-ng/compare/3.0.1...3.1.0
 [3.0.1]: https://github.com/slsfi/digital-edition-frontend-ng/compare/3.0.0...3.0.1
