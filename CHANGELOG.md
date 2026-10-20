@@ -8,13 +8,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ## Unreleased
 
-
-
-## [3.1.1-production.1] – 2026-10-05
-
 ### Changed
 
-- Update to base version [`3.1.1`](https://github.com/slsfi/digital-edition-frontend-ng/releases/tag/3.1.1) from upstream, original repository. ([db99068](https://github.com/slsfi/vonwright-frontend/commit/db99068c68a21a298b3dde3fc0f2e18bf37fbca4))
+- Update to base version [`4.0.0`](https://github.com/slsfi/digital-edition-frontend-ng/releases/tag/4.0.0) from upstream, original repository.
 
 
 
@@ -73,6 +69,14 @@ See the [v4 breaking changes and fork migration notes](docs/breaking-changes/v4.
 - Config: make omitted settings use consistent fallbacks for default-language selection, search routes, home-banner metadata, manuscript print titles, and introduction display options. ([5c6e72b](https://github.com/slsfi/digital-edition-frontend-ng/commit/5c6e72b60c1f0296befb669bddfc7995426af37f))
 - Ebook: return HTTP 301 for legacy `/ebook/{filename}.{extension}` routes, redirecting to the current `/ebook/{extension}/{filename}` format. ([8249246](https://github.com/slsfi/digital-edition-frontend-ng/commit/824924675de56a620eca51cf6ff3886dbe46e060))
 - Tests: provide complete runtime translation dictionaries for main side menu and content page fixtures, and check that translated rendering emits no warnings. ([b2ea064](https://github.com/slsfi/digital-edition-frontend-ng/commit/b2ea064a86a903b8353f54aebf23348ab36ae5ca))
+
+
+
+## [3.1.1-production.1] – 2026-10-05
+
+### Changed
+
+- Update to base version [`3.1.1`](https://github.com/slsfi/digital-edition-frontend-ng/releases/tag/3.1.1) from upstream, original repository. ([db99068](https://github.com/slsfi/vonwright-frontend/commit/db99068c68a21a298b3dde3fc0f2e18bf37fbca4))
 
 
 
