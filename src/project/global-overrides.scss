@@ -1,5 +1,5 @@
 /*
-  * INSTRUCTIONS FOR USING CUSTOM.SCSS
+  * INSTRUCTIONS FOR USING GLOBAL-OVERRIDES.SCSS
 
   In this file you can:
 
@@ -50,7 +50,7 @@
 
   * EDITING DEFAULT VALUES DIRECTLY
 
-  Instead of overriding variables in custom.scss, you can edit their default
+  Instead of overriding variables in global-overrides.scss, you can edit their default
   values directly. Global defaults are in /src/theme/_variables.scss. The
   centrally declared scoped defaults are in /src/theme/scoped-variables,
   while inline defaults are fallback arguments in the var() expressions
@@ -59,7 +59,7 @@
   Direct editing can make the CSS bundle marginally smaller, but it increases
   the risk of merge conflicts with the base app. An inline default may also
   occur in more than one stylesheet and must then be changed consistently.
-  Overriding variables in custom.scss is therefore recommended for forks.
+  Overriding variables in global-overrides.scss is therefore recommended for forks.
 
   If you edit a default directly, it’s recommended that you leave the
   original value as a comment at the end of the edited line.
@@ -67,7 +67,7 @@
   * REFERENCE FOR OVERRIDING CSS VARIABLES
 
   This is a complete reference of both global and scoped CSS variables that
-  can be overridden in custom.scss, including the required selectors and
+  can be overridden in global-overrides.scss, including the required selectors and
   default values of the variables:
 
   :root {

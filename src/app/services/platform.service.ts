@@ -1,14 +1,13 @@
-import { Injectable, PLATFORM_ID, inject } from '@angular/core';
+import { PLATFORM_ID, inject, Service } from '@angular/core';
 import { isPlatformServer } from '@angular/common';
-import { Request } from 'express';
 
-import { REQUEST } from 'src/express.tokens';
+import { APPLICATION_REQUEST_CONTEXT } from '@tokens/request-context.token';
 import { isBrowser } from '@utility-functions';
 
 
 /**
  * User agent sniffing is used to set the mode of the app (either mobile
- * or desktop). On the server, the request headers are used to get the
+ * or desktop). On the server, the request context supplies the
  * user agent string, in the browser, the window object has the information.
  * 
  * The app starts in mobile mode if the user agent string contains any
@@ -30,12 +29,10 @@ import { isBrowser } from '@utility-functions';
  * differences between mobile and desktop mode, it is not  easily achievable
  * or maybe even possible.
  */
-@Injectable({
-  providedIn: 'root',
-})
+@Service()
 export class PlatformService {
   private platformId = inject(PLATFORM_ID);
-  private request = inject<Request>(REQUEST, { optional: true });
+  private requestContext = inject(APPLICATION_REQUEST_CONTEXT, { optional: true });
 
   private mode: string = 'desktop'; // mode is either 'desktop' or 'mobile'
 
@@ -46,7 +43,7 @@ export class PlatformService {
   private setMode() {
     let userAgent = '';
     if (isPlatformServer(this.platformId)) {
-      userAgent = (this.request?.headers?.['user-agent'] as string) || '';
+      userAgent = this.requestContext?.userAgent || '';
     } else if (isBrowser()) {
       userAgent = window?.navigator?.userAgent;
     }

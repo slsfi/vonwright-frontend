@@ -1,3 +1,4 @@
+import type { MockedObject } from 'vitest';
 import { LOCALE_ID, signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { ActivatedRoute, Params } from '@angular/router';
@@ -24,10 +25,20 @@ describe('CollectionTextPage', () => {
   let queryParams$: BehaviorSubject<Params>;
   let mobileMode: boolean;
   let tooltipResult$: Subject<string>;
-  let collectionsService: jasmine.SpyObj<CollectionsService>;
-  let parserService: jasmine.SpyObj<HtmlParserService>;
-  let tooltipService: jasmine.SpyObj<TooltipService>;
-  let viewsQueryParamSync: jasmine.SpyObj<CollectionTextViewsQueryParamSyncService>;
+  let collectionsService: MockedObject<Pick<
+    CollectionsService,
+    'getCollectionAndPublicationByLegacyId'
+    | 'getLegacyIdByPublicationId'
+  >>;
+  let parserService: MockedObject<Pick<HtmlParserService, 'getSearchMatchesFromQueryParams'>>;
+  let tooltipService: MockedObject<Pick<
+    TooltipService,
+    'getCommentTooltip'
+    | 'getFootnoteTooltip'
+    | 'getSemanticDataObjectTooltip'
+    | 'getTooltipProperties'
+  >>;
+  let viewsQueryParamSync: MockedObject<Pick<CollectionTextViewsQueryParamSyncService, 'update'>>;
 
   beforeEach(async () => {
     params$ = new BehaviorSubject<Params>({
@@ -39,44 +50,39 @@ describe('CollectionTextPage', () => {
     mobileMode = false;
     tooltipResult$ = new Subject<string>();
 
-    collectionsService = jasmine.createSpyObj<CollectionsService>(
-      'CollectionsService',
-      ['getCollectionAndPublicationByLegacyId', 'getLegacyIdByPublicationId']
-    );
-    collectionsService.getCollectionAndPublicationByLegacyId.and.returnValue(of([]));
-    collectionsService.getLegacyIdByPublicationId.and.callFake(publicationID =>
+    collectionsService = {
+      getCollectionAndPublicationByLegacyId: vi.fn().mockName('CollectionsService.getCollectionAndPublicationByLegacyId'),
+      getLegacyIdByPublicationId: vi.fn().mockName('CollectionsService.getLegacyIdByPublicationId')
+    };
+    collectionsService.getCollectionAndPublicationByLegacyId.mockReturnValue(of([]));
+    collectionsService.getLegacyIdByPublicationId.mockImplementation(publicationID =>
       of([{ legacy_id: `legacy-${publicationID}` }])
     );
 
-    parserService = jasmine.createSpyObj<HtmlParserService>(
-      'HtmlParserService',
-      ['getSearchMatchesFromQueryParams']
-    );
-    parserService.getSearchMatchesFromQueryParams.and.callFake(query =>
+    parserService = {
+      getSearchMatchesFromQueryParams: vi.fn().mockName('HtmlParserService.getSearchMatchesFromQueryParams')
+    };
+    parserService.getSearchMatchesFromQueryParams.mockImplementation(query =>
       Array.isArray(query) ? query : [query]
     );
 
-    tooltipService = jasmine.createSpyObj<TooltipService>(
-      'TooltipService',
-      [
-        'getCommentTooltip',
-        'getFootnoteTooltip',
-        'getSemanticDataObjectTooltip',
-        'getTooltipProperties'
-      ]
-    );
-    tooltipService.getSemanticDataObjectTooltip.and.returnValue(tooltipResult$);
-    tooltipService.getTooltipProperties.and.returnValue({
+    tooltipService = {
+      getCommentTooltip: vi.fn().mockName('TooltipService.getCommentTooltip'),
+      getFootnoteTooltip: vi.fn().mockName('TooltipService.getFootnoteTooltip'),
+      getSemanticDataObjectTooltip: vi.fn().mockName('TooltipService.getSemanticDataObjectTooltip'),
+      getTooltipProperties: vi.fn().mockName('TooltipService.getTooltipProperties')
+    };
+    tooltipService.getSemanticDataObjectTooltip.mockReturnValue(tooltipResult$);
+    tooltipService.getTooltipProperties.mockReturnValue({
       left: '12px',
       maxWidth: '320px',
       scaleValue: 1,
       top: '24px'
     });
 
-    viewsQueryParamSync = jasmine.createSpyObj<CollectionTextViewsQueryParamSyncService>(
-      'CollectionTextViewsQueryParamSyncService',
-      ['update']
-    );
+    viewsQueryParamSync = {
+      update: vi.fn().mockName('CollectionTextViewsQueryParamSyncService.update')
+    };
 
     const collectionContentService = {
       activeCollectionTextMobileModeView: undefined,
@@ -84,18 +90,24 @@ describe('CollectionTextPage', () => {
       readViewTextId: '',
       recentCollectionTextViews: []
     };
-    const scrollService = jasmine.createSpyObj<ScrollService>(
-      'ScrollService',
-      [
-        'findElementInColumnByAttribute',
-        'scrollElementIntoView',
-        'scrollLastViewIntoView',
-        'scrollToComment',
-        'scrollToCommentLemma',
-        'scrollToHTMLElement',
-        'scrollToVariant'
-      ]
-    );
+    const scrollService: MockedObject<Pick<
+      ScrollService,
+      'findElementInColumnByAttribute'
+      | 'scrollElementIntoView'
+      | 'scrollLastViewIntoView'
+      | 'scrollToComment'
+      | 'scrollToCommentLemma'
+      | 'scrollToHTMLElement'
+      | 'scrollToVariant'
+    >> = {
+      findElementInColumnByAttribute: vi.fn().mockName('ScrollService.findElementInColumnByAttribute'),
+      scrollElementIntoView: vi.fn().mockName('ScrollService.scrollElementIntoView'),
+      scrollLastViewIntoView: vi.fn().mockName('ScrollService.scrollLastViewIntoView'),
+      scrollToComment: vi.fn().mockName('ScrollService.scrollToComment'),
+      scrollToCommentLemma: vi.fn().mockName('ScrollService.scrollToCommentLemma'),
+      scrollToHTMLElement: vi.fn().mockName('ScrollService.scrollToHTMLElement'),
+      scrollToVariant: vi.fn().mockName('ScrollService.scrollToVariant')
+    };
 
     await TestBed.configureTestingModule({
       imports: [CollectionTextPage],
@@ -175,7 +187,8 @@ describe('CollectionTextPage', () => {
     );
     expect(fixture.nativeElement.querySelector('.matches').textContent).toContain('first-match');
     expect(fixture.nativeElement.querySelector('.views').textContent).toContain('readingtext:');
-    expect(collectionsService.getLegacyIdByPublicationId).toHaveBeenCalledOnceWith('20217');
+    expect(collectionsService.getLegacyIdByPublicationId).toHaveBeenCalledTimes(1);
+    expect(collectionsService.getLegacyIdByPublicationId).toHaveBeenCalledWith('20217');
 
     fixture.componentInstance.ionViewWillLeave();
     await fixture.whenStable();

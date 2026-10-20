@@ -1,3 +1,4 @@
+import type { Mock, MockedObject } from 'vitest';
 import { signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { CanActivateFn, UrlTree, provideRouter } from '@angular/router';
@@ -16,11 +17,14 @@ describe('authGuard', () => {
   const executeGuard: CanActivateFn = (...guardParameters) =>
     TestBed.runInInjectionContext(() => authGuard(...guardParameters));
   const isAuthenticated = signal<boolean>(false);
-  let validateSessionIfStale: jasmine.Spy<() => any>;
-  let waitForStartupValidation: jasmine.Spy<() => any>;
-  let authRedirectStorage: jasmine.SpyObj<
-    Pick<AuthRedirectStorageService, 'storeReturnUrl' | 'consumeReturnUrl' | 'clearReturnUrl'>
-  >;
+  let validateSessionIfStale: Mock;
+  let waitForStartupValidation: Mock;
+  let authRedirectStorage: MockedObject<Pick<
+    AuthRedirectStorageService,
+    'storeReturnUrl'
+    | 'consumeReturnUrl'
+    | 'clearReturnUrl'
+  >>;
 
   function asUrl(value: unknown): string | null {
     return value instanceof UrlTree ? value.toString() : null;
@@ -45,13 +49,15 @@ describe('authGuard', () => {
   describe('when auth feature is disabled', () => {
     beforeEach(() => {
       isAuthenticated.set(false);
-      validateSessionIfStale = jasmine.createSpy('validateSessionIfStale').and.returnValue(of(true));
-      waitForStartupValidation = jasmine.createSpy('waitForStartupValidation').and.returnValue(of(true));
-      authRedirectStorage = jasmine.createSpyObj<
-        Pick<AuthRedirectStorageService, 'storeReturnUrl' | 'consumeReturnUrl' | 'clearReturnUrl'>
-      >('AuthRedirectStorageService', ['storeReturnUrl', 'consumeReturnUrl', 'clearReturnUrl']);
-      authRedirectStorage.storeReturnUrl.and.returnValue(true);
-      authRedirectStorage.consumeReturnUrl.and.returnValue(null);
+      validateSessionIfStale = vi.fn().mockName('validateSessionIfStale').mockReturnValue(of(true));
+      waitForStartupValidation = vi.fn().mockName('waitForStartupValidation').mockReturnValue(of(true));
+      authRedirectStorage = {
+        storeReturnUrl: vi.fn().mockName('AuthRedirectStorageService.storeReturnUrl'),
+        consumeReturnUrl: vi.fn().mockName('AuthRedirectStorageService.consumeReturnUrl'),
+        clearReturnUrl: vi.fn().mockName('AuthRedirectStorageService.clearReturnUrl')
+      };
+      authRedirectStorage.storeReturnUrl.mockReturnValue(true);
+      authRedirectStorage.consumeReturnUrl.mockReturnValue(null);
       TestBed.configureTestingModule({
         providers: [
           provideRouter([]),
@@ -75,13 +81,15 @@ describe('authGuard', () => {
   describe('when auth feature is enabled', () => {
     beforeEach(() => {
       isAuthenticated.set(false);
-      validateSessionIfStale = jasmine.createSpy('validateSessionIfStale').and.returnValue(of(true));
-      waitForStartupValidation = jasmine.createSpy('waitForStartupValidation').and.returnValue(of(true));
-      authRedirectStorage = jasmine.createSpyObj<
-        Pick<AuthRedirectStorageService, 'storeReturnUrl' | 'consumeReturnUrl' | 'clearReturnUrl'>
-      >('AuthRedirectStorageService', ['storeReturnUrl', 'consumeReturnUrl', 'clearReturnUrl']);
-      authRedirectStorage.storeReturnUrl.and.returnValue(true);
-      authRedirectStorage.consumeReturnUrl.and.returnValue(null);
+      validateSessionIfStale = vi.fn().mockName('validateSessionIfStale').mockReturnValue(of(true));
+      waitForStartupValidation = vi.fn().mockName('waitForStartupValidation').mockReturnValue(of(true));
+      authRedirectStorage = {
+        storeReturnUrl: vi.fn().mockName('AuthRedirectStorageService.storeReturnUrl'),
+        consumeReturnUrl: vi.fn().mockName('AuthRedirectStorageService.consumeReturnUrl'),
+        clearReturnUrl: vi.fn().mockName('AuthRedirectStorageService.clearReturnUrl')
+      };
+      authRedirectStorage.storeReturnUrl.mockReturnValue(true);
+      authRedirectStorage.consumeReturnUrl.mockReturnValue(null);
       TestBed.configureTestingModule({
         providers: [
           provideRouter([]),
@@ -103,7 +111,7 @@ describe('authGuard', () => {
 
     it('waits for startup validation before allowing a protected route', async () => {
       const startupValidation = new Subject<boolean>();
-      waitForStartupValidation.and.returnValue(startupValidation.asObservable());
+      waitForStartupValidation.mockReturnValue(startupValidation.asObservable());
       const result = runGuard('/collection/123/text');
       const resolvedResult = resolveGuardResult(result);
 
@@ -117,7 +125,7 @@ describe('authGuard', () => {
     });
 
     it('redirects protected route to /login when startup validation fails', async () => {
-      waitForStartupValidation.and.returnValue(of(false));
+      waitForStartupValidation.mockReturnValue(of(false));
 
       const result = runGuard('/collection/123/text');
       const resolvedResult = await resolveGuardResult(result);
@@ -127,7 +135,7 @@ describe('authGuard', () => {
     });
 
     it('allows /login when startup validation fails', async () => {
-      waitForStartupValidation.and.returnValue(of(false));
+      waitForStartupValidation.mockReturnValue(of(false));
 
       const result = runGuard('/login');
 
@@ -136,7 +144,7 @@ describe('authGuard', () => {
 
     it('validates session for routes requiring session validation when authenticated', async () => {
       isAuthenticated.set(true);
-      validateSessionIfStale.and.returnValue(of(true));
+      validateSessionIfStale.mockReturnValue(of(true));
 
       const result = runGuard('/account', { requiresSessionValidation: true });
 
@@ -146,12 +154,12 @@ describe('authGuard', () => {
 
     it('redirects to /login when session validation fails with 401', async () => {
       isAuthenticated.set(true);
-      validateSessionIfStale.and.returnValue(throwError(() => ({ status: 401 })));
+      validateSessionIfStale.mockReturnValue(throwError(() => ({ status: 401 })));
 
       const result = runGuard('/account', { requiresSessionValidation: true });
       const resolvedResult = await resolveGuardResult(result);
 
-      expect(resolvedResult).toEqual(jasmine.any(UrlTree));
+      expect(resolvedResult).toEqual(expect.any(UrlTree));
       expect(authRedirectStorage.storeReturnUrl).toHaveBeenCalledWith('/account');
       expect(asUrl(resolvedResult)).toBe(
         `/login?${AUTH_REDIRECT_MARKER_QUERY_PARAM}=${AUTH_REDIRECT_MARKER_VALUE}`
@@ -160,12 +168,12 @@ describe('authGuard', () => {
 
     it('redirects to /login when session validation fails with 422', async () => {
       isAuthenticated.set(true);
-      validateSessionIfStale.and.returnValue(throwError(() => ({ status: 422 })));
+      validateSessionIfStale.mockReturnValue(throwError(() => ({ status: 422 })));
 
       const result = runGuard('/account', { requiresSessionValidation: true });
       const resolvedResult = await resolveGuardResult(result);
 
-      expect(resolvedResult).toEqual(jasmine.any(UrlTree));
+      expect(resolvedResult).toEqual(expect.any(UrlTree));
       expect(authRedirectStorage.storeReturnUrl).toHaveBeenCalledWith('/account');
       expect(asUrl(resolvedResult)).toBe(
         `/login?${AUTH_REDIRECT_MARKER_QUERY_PARAM}=${AUTH_REDIRECT_MARKER_VALUE}`
@@ -174,7 +182,7 @@ describe('authGuard', () => {
 
     it('fails open when session validation fails with non-401 error', async () => {
       isAuthenticated.set(true);
-      validateSessionIfStale.and.returnValue(throwError(() => ({ status: 503 })));
+      validateSessionIfStale.mockReturnValue(throwError(() => ({ status: 503 })));
 
       const result = runGuard('/account', { requiresSessionValidation: true });
 
@@ -192,7 +200,7 @@ describe('authGuard', () => {
     });
 
     it('falls back to legacy returnUrl query param when marker storage fails', async () => {
-      authRedirectStorage.storeReturnUrl.and.returnValue(false);
+      authRedirectStorage.storeReturnUrl.mockReturnValue(false);
 
       const result = runGuard('/collection/123/text');
       const resolvedResult = await resolveGuardResult(result);
@@ -249,7 +257,7 @@ describe('authGuard', () => {
 
     it('redirects /login marker flow to stored URL when authenticated', async () => {
       isAuthenticated.set(true);
-      authRedirectStorage.consumeReturnUrl.and.returnValue('/collection/123/text');
+      authRedirectStorage.consumeReturnUrl.mockReturnValue('/collection/123/text');
 
       const result = runGuard(`/login?${AUTH_REDIRECT_MARKER_QUERY_PARAM}=${AUTH_REDIRECT_MARKER_VALUE}`);
       const resolvedResult = await resolveGuardResult(result);
@@ -270,7 +278,7 @@ describe('authGuard', () => {
 
     it('falls back to / when stored marker URL is missing or invalid', async () => {
       isAuthenticated.set(true);
-      authRedirectStorage.consumeReturnUrl.and.returnValue('//evil.example');
+      authRedirectStorage.consumeReturnUrl.mockReturnValue('//evil.example');
 
       const result = runGuard(`/login?${AUTH_REDIRECT_MARKER_QUERY_PARAM}=${AUTH_REDIRECT_MARKER_VALUE}`);
       const resolvedResult = await resolveGuardResult(result);

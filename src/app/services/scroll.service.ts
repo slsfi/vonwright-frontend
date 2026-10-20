@@ -1,12 +1,10 @@
-import { Injectable } from '@angular/core';
+import { Service } from '@angular/core';
 
 import { ScrollPlan, ScrollYPos } from '@models/scroll.models';
 import { isBrowser } from '@utility-functions';
 
 
-@Injectable({
-  providedIn: 'root',
-})
+@Service()
 export class ScrollService {
   private activeComHighl: Record<string, any> = {
     commentTimeOutId: null,

@@ -1,3 +1,4 @@
+import type { MockedObject } from 'vitest';
 import { LOCALE_ID } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { ActivatedRoute, Params, Router } from '@angular/router';
@@ -14,9 +15,15 @@ describe('ElasticSearchPage', () => {
   let queryParams$: BehaviorSubject<Params>;
   let searchAggregations$: Subject<any>;
   let searchHits$: Subject<any>;
-  let elasticSearchService: jasmine.SpyObj<ElasticSearchService>;
-  let router: jasmine.SpyObj<Router>;
-  let urlService: jasmine.SpyObj<UrlService>;
+  let elasticSearchService: MockedObject<Pick<
+    ElasticSearchService,
+    'executeAggregationQuery'
+    | 'executeSearchQuery'
+    | 'getAggregationKeys'
+    | 'isDateHistogramAggregation'
+  >>;
+  let router: MockedObject<Pick<Router, 'navigate'>>;
+  let urlService: MockedObject<Pick<UrlService, 'parse' | 'stringify'>>;
 
   const initialAggregationResponse = {
     aggregations: {
@@ -30,27 +37,29 @@ describe('ElasticSearchPage', () => {
     queryParams$ = new BehaviorSubject<Params>({ query: 'motiv' });
     searchAggregations$ = new Subject<any>();
     searchHits$ = new Subject<any>();
-    elasticSearchService = jasmine.createSpyObj<ElasticSearchService>(
-      'ElasticSearchService',
-      [
-        'executeAggregationQuery',
-        'executeSearchQuery',
-        'getAggregationKeys',
-        'isDateHistogramAggregation'
-      ]
-    );
-    elasticSearchService.executeAggregationQuery.and.returnValues(
-      initialAggregations$,
-      searchAggregations$
-    );
-    elasticSearchService.executeSearchQuery.and.returnValue(searchHits$);
-    elasticSearchService.getAggregationKeys.and.returnValue(['Years', 'Type']);
-    elasticSearchService.isDateHistogramAggregation.and.callFake(key => key === 'Years');
-    router = jasmine.createSpyObj<Router>('Router', ['navigate']);
-    router.navigate.and.resolveTo(true);
-    urlService = jasmine.createSpyObj<UrlService>('UrlService', ['parse', 'stringify']);
-    urlService.parse.and.returnValue([]);
-    urlService.stringify.and.returnValue('encoded-filters');
+    elasticSearchService = {
+      executeAggregationQuery: vi.fn().mockName('ElasticSearchService.executeAggregationQuery'),
+      executeSearchQuery: vi.fn().mockName('ElasticSearchService.executeSearchQuery'),
+      getAggregationKeys: vi.fn().mockName('ElasticSearchService.getAggregationKeys'),
+      isDateHistogramAggregation: vi.fn().mockName('ElasticSearchService.isDateHistogramAggregation')
+    };
+    elasticSearchService.executeAggregationQuery
+      .mockReset()
+      .mockReturnValueOnce(initialAggregations$)
+      .mockReturnValueOnce(searchAggregations$);
+    elasticSearchService.executeSearchQuery.mockReturnValue(searchHits$);
+    elasticSearchService.getAggregationKeys.mockReturnValue(['Years', 'Type']);
+    elasticSearchService.isDateHistogramAggregation.mockImplementation(key => key === 'Years');
+    router = {
+      navigate: vi.fn().mockName('Router.navigate')
+    };
+    router.navigate.mockResolvedValue(true);
+    urlService = {
+      parse: vi.fn().mockName('UrlService.parse'),
+      stringify: vi.fn().mockName('UrlService.stringify')
+    };
+    urlService.parse.mockReturnValue([]);
+    urlService.stringify.mockReturnValue('encoded-filters');
 
     await TestBed.configureTestingModule({
       imports: [ElasticSearchPage],
@@ -120,11 +129,11 @@ describe('ElasticSearchPage', () => {
 
     searchAggregations$.next(initialAggregationResponse);
     await fixture.whenStable();
-    expect(fixture.componentInstance.disableFilterCheckboxes()).toBeFalse();
+    expect(fixture.componentInstance.disableFilterCheckboxes()).toBe(false);
   });
 
   it('renders the initial-filter error state', async () => {
-    spyOn(console, 'error');
+    vi.spyOn(console, 'error').mockReturnValue(undefined);
     const fixture = TestBed.createComponent(ElasticSearchPage);
     fixture.detectChanges();
 
@@ -139,13 +148,16 @@ describe('ElasticSearchPage', () => {
   it('applies query-parameter filters, range, sorting, and pagination', async () => {
     const secondSearchHits$ = new Subject<any>();
     const secondSearchAggregations$ = new Subject<any>();
-    elasticSearchService.executeSearchQuery.and.returnValues(searchHits$, secondSearchHits$);
-    elasticSearchService.executeAggregationQuery.and.returnValues(
-      initialAggregations$,
-      searchAggregations$,
-      secondSearchAggregations$
-    );
-    urlService.parse.and.returnValue([{ name: 'Type', keys: ['est'] }]);
+    elasticSearchService.executeSearchQuery
+      .mockReset()
+      .mockReturnValueOnce(searchHits$)
+      .mockReturnValueOnce(secondSearchHits$);
+    elasticSearchService.executeAggregationQuery
+      .mockReset()
+      .mockReturnValueOnce(initialAggregations$)
+      .mockReturnValueOnce(searchAggregations$)
+      .mockReturnValueOnce(secondSearchAggregations$);
+    urlService.parse.mockReturnValue([{ name: 'Type', keys: ['est'] }]);
 
     const fixture = TestBed.createComponent(ElasticSearchPage);
     fixture.detectChanges();
@@ -166,8 +178,8 @@ describe('ElasticSearchPage', () => {
     expect(fixture.componentInstance.rangeYears()).toEqual({ from: '1900', to: '1910' });
     expect(fixture.componentInstance.sort()).toBe('orig_date_sort.asc');
     expect(fixture.componentInstance.pages()).toBe(2);
-    expect(elasticSearchService.executeSearchQuery.calls.mostRecent().args[0]).toEqual(
-      jasmine.objectContaining({
+    expect(vi.mocked(elasticSearchService.executeSearchQuery).mock.lastCall?.[0]).toEqual(
+      expect.objectContaining({
         from: 0,
         size: fixture.componentInstance.hitsPerPage * 2,
         range: { from: '1900-01-01', to: '1911-01-01' },
@@ -180,8 +192,8 @@ describe('ElasticSearchPage', () => {
     expect(fixture.componentInstance.from()).toBe(fixture.componentInstance.hitsPerPage);
 
     fixture.componentInstance.loadMore();
-    expect(fixture.componentInstance.loadingMoreHits()).toBeTrue();
-    expect(router.navigate).toHaveBeenCalledWith([], jasmine.objectContaining({
+    expect(fixture.componentInstance.loadingMoreHits()).toBe(true);
+    expect(router.navigate).toHaveBeenCalledWith([], expect.objectContaining({
       queryParams: { pages: 3 },
       replaceUrl: true
     }));

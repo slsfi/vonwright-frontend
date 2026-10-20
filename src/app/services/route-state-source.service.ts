@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Service } from '@angular/core';
 import { ActivatedRoute, Params } from '@angular/router';
 import { Observable, combineLatest, filter, map, of } from 'rxjs';
 
@@ -33,7 +33,7 @@ export abstract class RouteStateSourceService {
  * - without `active$`: emits on every route/query change.
  * - with `active$`: emits only while `active$` is true.
  */
-@Injectable()
+@Service({ autoProvided: false })
 export class BrowserRouteStateSourceService extends RouteStateSourceService {
   get(
     route: ActivatedRoute,
@@ -56,7 +56,7 @@ export class BrowserRouteStateSourceService extends RouteStateSourceService {
  * Server implementation:
  * emits route snapshot state once and completes.
  */
-@Injectable()
+@Service({ autoProvided: false })
 export class ServerRouteStateSourceService extends RouteStateSourceService {
   get(
     route: ActivatedRoute,

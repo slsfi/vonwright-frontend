@@ -95,7 +95,7 @@ export class DownloadTextsModal {
   publicationTitle = signal('');
 
   readTextsMode: boolean = false;
-  replaceImageAssetsPaths: boolean = true;
+  replaceImageAssetsPaths = config.collections?.replaceImageAssetsPaths ?? false;
 
   showLoadingError = signal(false);
 
@@ -165,7 +165,6 @@ export class DownloadTextsModal {
       this.downloadFormatsMs.splice(this.downloadFormatsMs.indexOf('print'), 1)[0]
     );
 
-    this.replaceImageAssetsPaths = config.collections?.replaceImageAssetsPaths ?? true;
     this.destroyRef.onDestroy(() => {
       this.downloadTextSubscription?.unsubscribe();
       this.printTextSubscription?.unsubscribe();
@@ -538,7 +537,7 @@ export class DownloadTextsModal {
     }
 
     const textTitle = this.constructPrintHtmlTitle(textType);
-    typeTitle = typeTitle && config.component?.manuscripts?.showTitle ? typeTitle : '';
+    typeTitle = typeTitle && (config.component?.manuscripts?.showTitle ?? true) ? typeTitle : '';
     const referenceURL = this.referenceData?.urn
           ? this.urnResolverUrl + this.referenceData.urn
           : this.currentUrl;

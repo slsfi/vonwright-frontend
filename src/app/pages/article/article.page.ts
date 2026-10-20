@@ -63,9 +63,36 @@ export class ArticlePage implements OnInit, OnDestroy {
 
   readonly article = signal<Article | null>(null);
   readonly enableTOC = signal(true);
-  markdownText$: Observable<string | null>;
   readonly mobileMode = this.platformService.isMobile();
   readonly tocMenuOpen = signal(false);
+
+  readonly markdownText$: Observable<string | null> = this.route.params.pipe(
+    map(({name}) => ({
+      name,
+      article: this.resolveArticle(name)
+    })),
+    tap(({article}) => {
+      this.article.set(article);
+      this.enableTOC.set(article?.enableTOC ?? true);
+
+      if (article && !this.mobileMode && !this.tocMenuOpen()) {
+        this.tocMenuOpen.set(true);
+      }
+    }),
+    switchMap(({name, article}) => {
+      if (article && article.routeName !== name) {
+        this.redirectToArticleRoute(article.routeName);
+        return of(null);
+      }
+
+      const id = article?.id ?? name;
+
+      return this.mdService.getParsedMdContent(
+        this.activeLocale + '-' + id,
+        '<p>' + $localize`:@@Article.LoadingError:Artikeln kunde inte laddas.` + '</p>'
+      );
+    })
+  );
 
   private fragmentSubscription?: Subscription;
   private scrollRetryTimer?: ReturnType<typeof setTimeout>;
@@ -81,34 +108,6 @@ export class ArticlePage implements OnInit, OnDestroy {
         }
       });
     }
-
-    this.markdownText$ = this.route.params.pipe(
-      map(({name}) => ({
-        name,
-        article: this.resolveArticle(name)
-      })),
-      tap(({article}) => {
-        this.article.set(article);
-        this.enableTOC.set(article?.enableTOC ?? true);
-
-        if (article && !this.mobileMode && !this.tocMenuOpen()) {
-          this.tocMenuOpen.set(true);
-        }
-      }),
-      switchMap(({name, article}) => {
-        if (article && article.routeName !== name) {
-          this.redirectToArticleRoute(article.routeName);
-          return of(null);
-        }
-
-        const id = article?.id ?? name;
-
-        return this.mdService.getParsedMdContent(
-          this.activeLocale + '-' + id,
-          '<p>' + $localize`:@@Article.LoadingError:Artikeln kunde inte laddas.` + '</p>'
-        );
-      })
-    );
   }
 
   ngOnDestroy() {

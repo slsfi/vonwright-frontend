@@ -1,12 +1,10 @@
-import { Injectable, signal } from '@angular/core';
+import { signal, Service } from '@angular/core';
 
 import { config } from '@config';
 import { Textsize, VariationType, ViewFlags } from '@models/view-options.models';
 
 
-@Injectable({
-  providedIn: 'root',
-})
+@Service()
 export class ViewOptionsService {
   readonly selectedVariationType = signal<VariationType>(
     (() => {

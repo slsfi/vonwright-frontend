@@ -1,3 +1,4 @@
+import type { MockedObject } from 'vitest';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { Subject } from 'rxjs';
@@ -12,24 +13,31 @@ describe('AppComponent', () => {
   let fixture: ComponentFixture<AppComponent>;
   let navigationUrls: Subject<string>;
   let mobileMode: boolean;
-  let headService: jasmine.SpyObj<DocumentHeadService>;
-  let tocService: jasmine.SpyObj<CollectionTableOfContentsService>;
+  let headService: MockedObject<Pick<
+    DocumentHeadService,
+    'setCommonOpenGraphTags'
+    | 'setLinks'
+    | 'setMetaTag'
+    | 'setOpenGraphDescriptionProperty'
+    | 'setOpenGraphURLProperty'
+    | 'setTitle'
+  >>;
+  let tocService: MockedObject<Pick<CollectionTableOfContentsService, 'setCurrentCollectionToc'>>;
 
   beforeEach(async () => {
     navigationUrls = new Subject<string>();
     mobileMode = false;
-    headService = jasmine.createSpyObj<DocumentHeadService>('DocumentHeadService', [
-      'setCommonOpenGraphTags',
-      'setLinks',
-      'setMetaTag',
-      'setOpenGraphDescriptionProperty',
-      'setOpenGraphURLProperty',
-      'setTitle'
-    ]);
-    tocService = jasmine.createSpyObj<CollectionTableOfContentsService>(
-      'CollectionTableOfContentsService',
-      ['setCurrentCollectionToc']
-    );
+    headService = {
+      setCommonOpenGraphTags: vi.fn().mockName('DocumentHeadService.setCommonOpenGraphTags'),
+      setLinks: vi.fn().mockName('DocumentHeadService.setLinks'),
+      setMetaTag: vi.fn().mockName('DocumentHeadService.setMetaTag'),
+      setOpenGraphDescriptionProperty: vi.fn().mockName('DocumentHeadService.setOpenGraphDescriptionProperty'),
+      setOpenGraphURLProperty: vi.fn().mockName('DocumentHeadService.setOpenGraphURLProperty'),
+      setTitle: vi.fn().mockName('DocumentHeadService.setTitle')
+    };
+    tocService = {
+      setCurrentCollectionToc: vi.fn().mockName('CollectionTableOfContentsService.setCurrentCollectionToc')
+    };
 
     await TestBed.configureTestingModule({
       imports: [AppComponent],
@@ -70,8 +78,8 @@ describe('AppComponent', () => {
     const component = await createComponent();
 
     expect(component).toBeTruthy();
-    expect(component.mobileMode).toBeFalse();
-    expect(component.showSideNav()).toBeTrue();
+    expect(component.mobileMode).toBe(false);
+    expect(component.showSideNav()).toBe(true);
     expect(element('#side-nav').classList).toContain('visible');
   });
 
@@ -89,9 +97,10 @@ describe('AppComponent', () => {
       .toEqual(['collection', '203', 'introduction']);
     expect(component.collectionID()).toBe('203');
     expect(component.collSideMenuQueryParams()['position']).toBe('2');
-    expect(component.showCollectionSideMenu()).toBeTrue();
-    expect(component.showSideNav()).toBeTrue();
-    expect(tocService.setCurrentCollectionToc).toHaveBeenCalledOnceWith('203');
+    expect(component.showCollectionSideMenu()).toBe(true);
+    expect(component.showSideNav()).toBe(true);
+    expect(tocService.setCurrentCollectionToc).toHaveBeenCalledTimes(1);
+    expect(tocService.setCurrentCollectionToc).toHaveBeenCalledWith('203');
     expect(element('#current-url').textContent).toContain(
       '/collection/203/introduction?position=2'
     );
@@ -110,9 +119,9 @@ describe('AppComponent', () => {
     await fixture.whenStable();
 
     expect(component.collectionID()).toBe('');
-    expect(component.showCollectionSideMenu()).toBeFalse();
-    expect(component.mountMainSideMenu()).toBeTrue();
-    expect(tocService.setCurrentCollectionToc.calls.allArgs()).toEqual([['203'], ['']]);
+    expect(component.showCollectionSideMenu()).toBe(false);
+    expect(component.mountMainSideMenu()).toBe(true);
+    expect(vi.mocked(tocService.setCurrentCollectionToc).mock.calls).toEqual([['203'], ['']]);
     expect(element('#collection-id').textContent?.trim()).toBe('');
     expect(element('#collection-side-menu').classList).not.toContain('visible');
     expect(element('#main-side-menu').classList).toContain('mounted');
@@ -133,40 +142,44 @@ describe('AppComponent', () => {
 
     navigationUrls.next('/search?query=topelius');
     await fixture.whenStable();
-    expect(component.showSideNav()).toBeTrue();
+    expect(component.showSideNav()).toBe(true);
     expect(element('#side-nav').classList).toContain('visible');
 
     navigationUrls.next('/content');
     await fixture.whenStable();
-    expect(component.showSideNav()).toBeFalse();
+    expect(component.showSideNav()).toBe(false);
     expect(element('#side-nav').classList).not.toContain('visible');
   });
 
   it('updates the loading bar after its delay and cancels stale hide timers', async () => {
     const component = await createComponent();
-    jasmine.clock().install();
+    vi.useFakeTimers();
 
     try {
       component.hideLoadingBar(true);
-      jasmine.clock().tick(699);
-      expect(component.loadingBarHidden()).toBeFalse();
+      vi.advanceTimersByTime(699);
+      expect(component.loadingBarHidden()).toBe(false);
 
-      jasmine.clock().tick(1);
+      vi.advanceTimersByTime(1);
+      // Flush Angular's scheduled rendering before waiting for stability under fake timers.
+      await vi.advanceTimersByTimeAsync(1);
       await fixture.whenStable();
-      expect(component.loadingBarHidden()).toBeTrue();
+      expect(component.loadingBarHidden()).toBe(true);
       expect(element('#loading-bar-hidden').textContent).toContain('true');
 
       component.hideLoadingBar(false);
+      await vi.advanceTimersByTimeAsync(1);
       await fixture.whenStable();
       component.hideLoadingBar(true);
       component.hideLoadingBar(false);
-      jasmine.clock().tick(700);
+      vi.advanceTimersByTime(700);
+      await vi.advanceTimersByTimeAsync(1);
       await fixture.whenStable();
 
-      expect(component.loadingBarHidden()).toBeFalse();
+      expect(component.loadingBarHidden()).toBe(false);
       expect(element('#loading-bar-hidden').textContent).toContain('false');
     } finally {
-      jasmine.clock().uninstall();
+      vi.useRealTimers();
     }
   });
 });

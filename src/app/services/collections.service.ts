@@ -1,4 +1,4 @@
-import { Injectable, LOCALE_ID, inject } from '@angular/core';
+import { LOCALE_ID, inject, Service } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { map, Observable, of } from 'rxjs';
 
@@ -6,9 +6,7 @@ import { config } from '@config';
 import { Collection, CollectionApiResponse, toCollection } from '@models/collection.models';
 
 
-@Injectable({
-  providedIn: 'root',
-})
+@Service()
 export class CollectionsService {
   private http = inject(HttpClient);
   private activeLocale = inject(LOCALE_ID);

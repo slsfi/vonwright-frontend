@@ -1,36 +1,100 @@
-import { LOCALE_ID } from '@angular/core';
+import { provideHttpClient } from '@angular/common/http';
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
+import { Component } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
-import { BehaviorSubject } from 'rxjs';
+import { clearTranslations, loadTranslations } from '@angular/localize';
 
-import { MarkdownService } from '@services/markdown.service';
+import { ContentGridComponent } from '@components/content-grid/content-grid.component';
 import { ContentPage } from './content.page';
 
-describe('ContentPage', () => {
-  it('renders asynchronous Markdown updates without a manual change-detection pass', async () => {
-    const markdown$ = new BehaviorSubject<string | null>('<p>Initial content</p>');
-    const markdownService = jasmine.createSpyObj<MarkdownService>(
-      'MarkdownService',
-      ['getParsedMdContent']
-    );
-    markdownService.getParsedMdContent.and.returnValue(markdown$);
+@Component({
+  selector: 'content-grid',
+  template: ''
+})
+class ContentGridStubComponent {}
 
+describe('ContentPage', () => {
+  beforeEach(async () => {
+    clearTranslations();
+    loadTranslations({
+      'Content.Introduction': '',
+      'TopMenu.Content': 'Innehåll'
+    });
     await TestBed.configureTestingModule({
       imports: [ContentPage],
       providers: [
-        { provide: LOCALE_ID, useValue: 'sv' },
-        { provide: MarkdownService, useValue: markdownService }
+        provideHttpClient(),
+        provideHttpClientTesting()
       ]
     })
-      .overrideTemplate(ContentPage, '{{ mdContent$ | async }}')
+      .overrideComponent(ContentPage, {
+        remove: { imports: [ContentGridComponent] },
+        add: { imports: [ContentGridStubComponent] }
+      })
       .compileComponents();
+  });
 
+  afterEach(() => {
+    clearTranslations();
+    TestBed.inject(HttpTestingController).verify();
+  });
+
+  it('defaults to an empty introduction without fetching backend Markdown', async () => {
     const fixture = TestBed.createComponent(ContentPage);
     fixture.detectChanges();
-    expect(markdownService.getParsedMdContent).toHaveBeenCalledOnceWith('sv-02');
-    expect(fixture.nativeElement.textContent).toContain('Initial content');
-
-    markdown$.next('<p>Updated content</p>');
     await fixture.whenStable();
-    expect(fixture.nativeElement.textContent).toContain('Updated content');
+
+    const element: HTMLElement = fixture.nativeElement;
+    expect(element.querySelector('.info')).toBeNull();
+    expect(element.querySelector('h1')?.textContent).toBe('Innehåll');
+    expect(element.querySelector('content-grid')).not.toBeNull();
+    TestBed.inject(HttpTestingController).expectNone(() => true);
+  });
+
+  it('renders translated HTML with two paragraphs and a search link', async () => {
+    const warn = vi.spyOn(console, 'warn');
+    loadTranslations({
+      'Content.Introduction': '<p>Welcome to the edition!</p><p>Browse or <a href="search">search</a> the content.</p>'
+    });
+    const fixture = TestBed.createComponent(ContentPage);
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    const element: HTMLElement = fixture.nativeElement;
+    expect(Array.from(element.querySelectorAll('.info p'), paragraph => paragraph.textContent))
+      .toEqual(['Welcome to the edition!', 'Browse or search the content.']);
+    expect(element.querySelector('.info a')?.getAttribute('href')).toBe('search');
+    expect(element.querySelector('content-grid')).not.toBeNull();
+    TestBed.inject(HttpTestingController).expectNone(() => true);
+    expect(warn).not.toHaveBeenCalled();
+  });
+
+  it('omits the introduction block for a whitespace-only translation', async () => {
+    const warn = vi.spyOn(console, 'warn');
+    loadTranslations({ 'Content.Introduction': ' \n ' });
+    const fixture = TestBed.createComponent(ContentPage);
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    expect(fixture.nativeElement.querySelector('.info')).toBeNull();
+    expect(warn).not.toHaveBeenCalled();
+  });
+
+  it('renders translated HTML with a single paragraph, line breaks, and a link', async () => {
+    const warn = vi.spyOn(console, 'warn');
+    loadTranslations({
+      'Content.Introduction': '<p>Welcome to the edition!<br><br>Browse or <a href="search">search</a> the content.</p>'
+    });
+    const fixture = TestBed.createComponent(ContentPage);
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    const element: HTMLElement = fixture.nativeElement;
+    expect(element.querySelectorAll('.info p')).toHaveLength(1);
+    expect(element.querySelectorAll('.info br')).toHaveLength(2);
+    expect(element.querySelector('.info p')?.textContent)
+      .toBe('Welcome to the edition!Browse or search the content.');
+    expect(warn).not.toHaveBeenCalled();
+    expect(element.querySelector('.info a')?.getAttribute('href')).toBe('search');
   });
 });

@@ -1,3 +1,4 @@
+import type { MockedObject } from 'vitest';
 import { signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
@@ -9,17 +10,20 @@ describe('RegisterPage', () => {
   const registerError = signal<RegisterErrorCode | null>(null);
   const registerInProgress = signal(false);
   const registrationCompleted = signal(false);
-  let authService: jasmine.SpyObj<AuthService>;
+  let authService: MockedObject<Pick<AuthService, 'register' | 'clearRegisterState'>>
+    & Pick<AuthService, 'registerError' | 'registerInProgress' | 'registrationCompleted'>;
 
   beforeEach(async () => {
     registerError.set(null);
     registerInProgress.set(false);
     registrationCompleted.set(false);
-    authService = jasmine.createSpyObj<AuthService>(
-      'AuthService',
-      ['register', 'clearRegisterState'],
-      { registerError, registerInProgress, registrationCompleted }
-    );
+    authService = {
+      register: vi.fn().mockName('AuthService.register'),
+      clearRegisterState: vi.fn().mockName('AuthService.clearRegisterState'),
+      registerError,
+      registerInProgress,
+      registrationCompleted
+    };
 
     await TestBed.configureTestingModule({
       imports: [RegisterPage],
@@ -36,8 +40,8 @@ describe('RegisterPage', () => {
     fixture.detectChanges();
 
     component.attemptRegistration();
-    expect(component.form.controls.name.touched).toBeTrue();
-    expect(component.form.controls.email.touched).toBeTrue();
+    expect(component.form.controls.name.touched).toBe(true);
+    expect(component.form.controls.email.touched).toBe(true);
     expect(authService.register).not.toHaveBeenCalled();
 
     component.form.setValue({
@@ -52,11 +56,13 @@ describe('RegisterPage', () => {
     });
     await fixture.whenStable();
 
-    expect(fixture.nativeElement.querySelector('ion-button[type="submit"]').disabled).toBeFalse();
+    expect(fixture.nativeElement.querySelector('ion-button[type="submit"]').disabled).toBe(false);
 
     component.attemptRegistration();
 
-    expect(authService.register).toHaveBeenCalledOnceWith(
+    expect(authService.register).toHaveBeenCalledTimes(1);
+
+    expect(authService.register).toHaveBeenCalledWith(
       'Test Reader',
       'reader@example.org',
       'Verysecure12',
@@ -72,14 +78,14 @@ describe('RegisterPage', () => {
     registerInProgress.set(true);
     await fixture.whenStable();
 
-    expect(fixture.componentInstance.form.controls.country.disabled).toBeTrue();
-    expect(fixture.componentInstance.form.controls.intendedUsage.disabled).toBeTrue();
+    expect(fixture.componentInstance.form.controls.country.disabled).toBe(true);
+    expect(fixture.componentInstance.form.controls.intendedUsage.disabled).toBe(true);
 
     registerInProgress.set(false);
     registrationCompleted.set(true);
     await fixture.whenStable();
 
-    expect(fixture.componentInstance.form.controls.country.enabled).toBeTrue();
+    expect(fixture.componentInstance.form.controls.country.enabled).toBe(true);
     expect(fixture.nativeElement.textContent).toContain('Kontot har skapats.');
     expect(fixture.nativeElement.querySelector('ion-input')).toBeNull();
   });

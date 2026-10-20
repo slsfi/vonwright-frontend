@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { inject, Injectable, LOCALE_ID, signal } from '@angular/core';
+import { inject, LOCALE_ID, signal, Service } from '@angular/core';
 import { Router } from '@angular/router';
 import { BehaviorSubject, catchError, delay, dematerialize, filter, finalize, map, materialize, Observable, of, shareReplay, switchMap, take, throwError } from 'rxjs';
 
@@ -68,9 +68,7 @@ type AuthErrorResolverMap<TErrorCode extends ResolvedAuthErrorCode> = {
  * This service does not access browser globals directly. Token persistence is
  * delegated to AuthTokenStorageService so browser/server behavior can differ.
  */
-@Injectable({
-  providedIn: 'root'
-})
+@Service()
 export class AuthService {
   private readonly http = inject(HttpClient);
   private readonly localeId = inject(LOCALE_ID);

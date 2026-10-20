@@ -3,8 +3,9 @@
 dist
 node_modules
 .angular
+tmp
 src/app/app.routes.generated.ts
-src/app/auth-protected-route-paths.generated.ts
+src/app/app.routes.server.generated.ts
 
 # VCS and CI metadata (not needed to build/run the app)
 .git

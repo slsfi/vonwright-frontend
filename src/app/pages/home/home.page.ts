@@ -1,9 +1,9 @@
 import { AsyncPipe } from '@angular/common';
-import { Component, LOCALE_ID, OnInit, inject, signal } from '@angular/core';
+import { Component, LOCALE_ID, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { IonButton, IonContent, IonIcon, IonSearchbar } from '@ionic/angular';
-import { Observable } from 'rxjs';
+import { EMPTY, Observable } from 'rxjs';
 
 import { ContentGridComponent } from '@components/content-grid/content-grid.component';
 import { config } from '@config';
@@ -26,7 +26,7 @@ import { MarkdownService } from '@services/markdown.service';
     TrustHtmlPipe
   ]
 })
-export class HomePage implements OnInit {
+export class HomePage {
   private mdService = inject(MarkdownService);
   private router = inject(Router);
   private activeLocale = inject(LOCALE_ID);
@@ -46,20 +46,13 @@ export class HomePage implements OnInit {
   readonly siteHasSubtitle: boolean = $localize`:@@Site.Subtitle:Webbplatsens undertitel` ? true : false;
   readonly titleOnImage: boolean = config.page?.home?.portraitOrientationSettings?.siteTitleOnImageOnSmallScreens ?? false;
 
-  descriptionText$: Observable<string | null>;
-  footerText$: Observable<string | null>;
+  readonly descriptionText$: Observable<string | null> = this.mdService.getParsedMdContent(
+    this.activeLocale + '-01'
+  );
+  readonly footerText$: Observable<string | null> = this.showFooter
+    ? this.mdService.getParsedMdContent(this.activeLocale + '-06')
+    : EMPTY;
   readonly searchQuery = signal('');
-
-  ngOnInit() {
-    this.descriptionText$ = this.mdService.getParsedMdContent(
-      this.activeLocale + '-01'
-    );
-    if (this.showFooter) {
-      this.footerText$ = this.mdService.getParsedMdContent(
-        this.activeLocale + '-06'
-      );
-    }
-  }
 
   submitSearchQuery() {
     const searchQuery = this.searchQuery();

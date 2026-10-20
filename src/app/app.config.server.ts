@@ -3,7 +3,7 @@ import {
   importProvidersFrom,
   mergeApplicationConfig
 } from '@angular/core';
-import { provideServerRendering } from '@angular/platform-server';
+import { provideServerRendering, withRoutes } from '@angular/ssr';
 import { IonicServerModule } from '@ionic/angular-server';
 
 import {
@@ -35,10 +35,13 @@ import {
   ServerRouterPreloadingStrategyService
 } from '@services/router-preloading-strategy.service';
 import { appConfig } from './app.config';
+import { provideServerRequestContext } from '../ssr/server-request-context';
+import { serverRoutes } from './app.routes.server.generated';
 
 const serverConfig: ApplicationConfig = {
   providers: [
-    provideServerRendering(),
+    provideServerRendering(withRoutes(serverRoutes)),
+    provideServerRequestContext(),
     // Ionic exposes its SSR providers only through this NgModule. This is the
     // sole intentional application-level compatibility bridge.
     importProvidersFrom(IonicServerModule),

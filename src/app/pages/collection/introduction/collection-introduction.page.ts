@@ -66,7 +66,7 @@ export class CollectionIntroductionPage implements OnInit, OnDestroy {
   private activeLocale = inject(LOCALE_ID);
 
   readonly legacyIDsEnabled: boolean = config.collections?.enableLegacyIDs ?? false;
-  readonly replaceImageAssetsPaths: boolean = config.collections?.replaceImageAssetsPaths ?? true;
+  readonly replaceImageAssetsPaths: boolean = config.collections?.replaceImageAssetsPaths ?? false;
   readonly separateIntroTocEnabled: boolean = config.page?.introduction?.hasSeparateTOC ?? false;
   readonly showTextDownloadButton: boolean = config.page?.introduction?.showTextDownloadButton ?? false;
   readonly showURNButton: boolean = config.page?.introduction?.showURNButton ?? true;
@@ -115,29 +115,18 @@ export class CollectionIntroductionPage implements OnInit, OnDestroy {
 
   constructor() {
     const configuredToggles = config.page?.introduction?.viewOptions;
-    if (!configuredToggles || Object.keys(configuredToggles).length === 0) {
-      this.viewOptionsTogglesIntro = {
-        'comments': false,
-        'personInfo': false,
-        'placeInfo': false,
-        'workInfo': false,
-        'emendations': false,
-        'normalisations': false,
-        'abbreviations': false,
-        'paragraphNumbering': true,
-        'pageBreakOriginal': false,
-        'pageBreakEdition': false
-      };
-    } else {
-      this.viewOptionsTogglesIntro = {
-        ...configuredToggles,
-        comments: false,
-        emendations: false,
-        normalisations: false,
-        abbreviations: false,
-        pageBreakOriginal: false
-      };
-    }
+    this.viewOptionsTogglesIntro = {
+      personInfo: configuredToggles?.personInfo ?? false,
+      placeInfo: configuredToggles?.placeInfo ?? false,
+      workInfo: configuredToggles?.workInfo ?? false,
+      paragraphNumbering: configuredToggles?.paragraphNumbering ?? true,
+      pageBreakEdition: configuredToggles?.pageBreakEdition ?? false,
+      comments: false,
+      emendations: false,
+      normalisations: false,
+      abbreviations: false,
+      pageBreakOriginal: false
+    };
   }
 
   /**

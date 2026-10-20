@@ -1,3 +1,4 @@
+import type { MockedObject } from 'vitest';
 import { signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { provideRouter, Router } from '@angular/router';
@@ -10,23 +11,28 @@ describe('ForgotPasswordPage', () => {
   const forgotPasswordError = signal<ForgotPasswordErrorCode | null>(null);
   const forgotPasswordInProgress = signal(false);
   const passwordResetRequested = signal(false);
-  let authService: jasmine.SpyObj<AuthService>;
+  let authService: MockedObject<Pick<AuthService, 'requestPasswordReset' | 'clearForgotPasswordState'>>
+    & Pick<
+      AuthService,
+      'authenticatedEmail'
+      | 'forgotPasswordError'
+      | 'forgotPasswordInProgress'
+      | 'passwordResetRequested'
+    >;
 
   beforeEach(async () => {
     authenticatedEmail.set(null);
     forgotPasswordError.set(null);
     forgotPasswordInProgress.set(false);
     passwordResetRequested.set(false);
-    authService = jasmine.createSpyObj<AuthService>(
-      'AuthService',
-      ['requestPasswordReset', 'clearForgotPasswordState'],
-      {
-        authenticatedEmail,
-        forgotPasswordError,
-        forgotPasswordInProgress,
-        passwordResetRequested
-      }
-    );
+    authService = {
+      requestPasswordReset: vi.fn().mockName('AuthService.requestPasswordReset'),
+      clearForgotPasswordState: vi.fn().mockName('AuthService.clearForgotPasswordState'),
+      authenticatedEmail,
+      forgotPasswordError,
+      forgotPasswordInProgress,
+      passwordResetRequested
+    };
 
     await TestBed.configureTestingModule({
       imports: [ForgotPasswordPage],
@@ -43,7 +49,7 @@ describe('ForgotPasswordPage', () => {
 
     const component = TestBed.createComponent(ForgotPasswordPage).componentInstance;
 
-    expect(component.isChangePasswordMode()).toBeTrue();
+    expect(component.isChangePasswordMode()).toBe(true);
     expect(component.backRoute()).toBe('/account');
     expect(component.form.controls.email.value).toBe('reader@example.org');
   });
@@ -52,13 +58,15 @@ describe('ForgotPasswordPage', () => {
     const component = TestBed.createComponent(ForgotPasswordPage).componentInstance;
 
     component.attemptPasswordRecovery();
-    expect(component.form.controls.email.touched).toBeTrue();
+    expect(component.form.controls.email.touched).toBe(true);
     expect(authService.requestPasswordReset).not.toHaveBeenCalled();
 
     component.form.controls.email.setValue('reader@example.org');
     component.attemptPasswordRecovery();
 
-    expect(authService.requestPasswordReset).toHaveBeenCalledOnceWith('reader@example.org');
+    expect(authService.requestPasswordReset).toHaveBeenCalledTimes(1);
+
+    expect(authService.requestPasswordReset).toHaveBeenCalledWith('reader@example.org');
   });
 
   it('renders signal-driven confirmation without a manual change-detection pass', async () => {

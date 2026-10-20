@@ -2,9 +2,9 @@ const fs = require('fs');
 const path = require('path');
 const common = require('./prebuild-common-fns');
 
-const configFilepath = 'src/assets/config/config.ts';
+const configFilepath = 'src/project/config.ts';
 const translationsPath = 'src/locale/';
-const outputPath = 'src/static-html/collection-toc/';
+const outputPath = 'public/static-html/collection-toc/';
 const tocFetchRetries = 3;
 const tocFetchRetryDelay = 2000;
 const tocFetchRetryDelayIncrement = 1000;
@@ -22,6 +22,8 @@ if (require.main === module) {
  * The collections’ TOC-files in JSON format are fetched from
  * the backend, flattened and parsed into a single-level
  * unordered HTML-list.
+ * Writes to `public/static-html/collection-toc/`, which Angular copies
+ * to each locale's browser output at the existing `static-html/` URL.
  */
 async function generateStaticCollectionMenus() {
   const config = common.getConfig(configFilepath);

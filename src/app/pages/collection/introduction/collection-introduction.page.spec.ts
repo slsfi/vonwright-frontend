@@ -1,9 +1,11 @@
+import type { MockedObject } from 'vitest';
 import { LOCALE_ID, signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { ModalController, PopoverController } from '@ionic/angular';
 import { BehaviorSubject, Subject, of } from 'rxjs';
 
+import { config } from '@config';
 import { CollectionContentService } from '@services/collection-content.service';
 import { CollectionsService } from '@services/collections.service';
 import { HtmlParserService } from '@services/html-parser.service';
@@ -18,66 +20,89 @@ import { ViewOptionsService } from '@services/view-options.service';
 import { CollectionIntroductionPage } from './collection-introduction.page';
 
 describe('CollectionIntroductionPage', () => {
+  let originalViewOptions: typeof config.page.introduction.viewOptions;
   let params$: BehaviorSubject<Params>;
   let queryParams$: BehaviorSubject<Params>;
   let firstIntroduction$: Subject<any>;
   let secondIntroduction$: Subject<any>;
   let tooltipResult$: Subject<string>;
-  let collectionContentService: jasmine.SpyObj<CollectionContentService>;
-  let parserService: jasmine.SpyObj<HtmlParserService>;
-  let scrollService: jasmine.SpyObj<ScrollService>;
-  let tooltipService: jasmine.SpyObj<TooltipService>;
+  let collectionContentService: MockedObject<Pick<CollectionContentService, 'getIntroduction'>>;
+  let parserService: MockedObject<Pick<
+    HtmlParserService,
+    'getSearchMatchesFromQueryParams'
+    | 'insertSearchMatchTags'
+  >>;
+  let scrollService: MockedObject<Pick<
+    ScrollService,
+    'scrollElementIntoView'
+    | 'scrollToFirstSearchMatch'
+    | 'scrollToHTMLElement'
+  >>;
+  let tooltipService: MockedObject<Pick<
+    TooltipService,
+    'getFootnoteTooltip'
+    | 'getSemanticDataObjectTooltip'
+    | 'getTooltipProperties'
+  >>;
 
   beforeEach(async () => {
+    originalViewOptions = config.page.introduction.viewOptions;
     params$ = new BehaviorSubject<Params>({ collectionID: '203' });
     queryParams$ = new BehaviorSubject<Params>({});
     firstIntroduction$ = new Subject<any>();
     secondIntroduction$ = new Subject<any>();
     tooltipResult$ = new Subject<string>();
-    collectionContentService = jasmine.createSpyObj<CollectionContentService>(
-      'CollectionContentService',
-      ['getIntroduction']
-    );
-    collectionContentService.getIntroduction.and.callFake(id =>
+    collectionContentService = {
+      getIntroduction: vi.fn().mockName('CollectionContentService.getIntroduction')
+    };
+    collectionContentService.getIntroduction.mockImplementation(id =>
       id === '203' ? firstIntroduction$ : secondIntroduction$
     );
-    parserService = jasmine.createSpyObj<HtmlParserService>(
-      'HtmlParserService',
-      ['getSearchMatchesFromQueryParams', 'insertSearchMatchTags']
-    );
-    parserService.getSearchMatchesFromQueryParams.and.callFake(query =>
+    parserService = {
+      getSearchMatchesFromQueryParams: vi.fn().mockName('HtmlParserService.getSearchMatchesFromQueryParams'),
+      insertSearchMatchTags: vi.fn().mockName('HtmlParserService.insertSearchMatchTags')
+    };
+    parserService.getSearchMatchesFromQueryParams.mockImplementation(query =>
       Array.isArray(query) ? query : [query]
     );
-    parserService.insertSearchMatchTags.and.callFake(
+    parserService.insertSearchMatchTags.mockImplementation(
       (text, matches) => `${text}|${(matches ?? []).join(',')}`
     );
-    scrollService = jasmine.createSpyObj<ScrollService>(
-      'ScrollService',
-      ['scrollElementIntoView', 'scrollToFirstSearchMatch', 'scrollToHTMLElement']
-    );
-    tooltipService = jasmine.createSpyObj<TooltipService>(
-      'TooltipService',
-      ['getFootnoteTooltip', 'getSemanticDataObjectTooltip', 'getTooltipProperties']
-    );
-    tooltipService.getFootnoteTooltip.and.returnValue(of('Footnote'));
-    tooltipService.getSemanticDataObjectTooltip.and.returnValue(tooltipResult$);
-    tooltipService.getTooltipProperties.and.returnValue({
+    scrollService = {
+      scrollElementIntoView: vi.fn().mockName('ScrollService.scrollElementIntoView'),
+      scrollToFirstSearchMatch: vi.fn().mockName('ScrollService.scrollToFirstSearchMatch'),
+      scrollToHTMLElement: vi.fn().mockName('ScrollService.scrollToHTMLElement')
+    };
+    tooltipService = {
+      getFootnoteTooltip: vi.fn().mockName('TooltipService.getFootnoteTooltip'),
+      getSemanticDataObjectTooltip: vi.fn().mockName('TooltipService.getSemanticDataObjectTooltip'),
+      getTooltipProperties: vi.fn().mockName('TooltipService.getTooltipProperties')
+    };
+    tooltipService.getFootnoteTooltip.mockReturnValue(of('Footnote'));
+    tooltipService.getSemanticDataObjectTooltip.mockReturnValue(tooltipResult$);
+    tooltipService.getTooltipProperties.mockReturnValue({
       left: '10px',
       maxWidth: '320px',
       scaleValue: 1,
       top: '20px'
     });
 
-    const collectionsService = jasmine.createSpyObj<CollectionsService>(
-      'CollectionsService',
-      ['getCollectionAndPublicationByLegacyId', 'getLegacyIdByCollectionId']
-    );
-    collectionsService.getCollectionAndPublicationByLegacyId.and.returnValue(of([]));
-    collectionsService.getLegacyIdByCollectionId.and.callFake(id =>
+    const collectionsService: MockedObject<Pick<
+      CollectionsService,
+      'getCollectionAndPublicationByLegacyId'
+      | 'getLegacyIdByCollectionId'
+    >> = {
+      getCollectionAndPublicationByLegacyId: vi.fn().mockName('CollectionsService.getCollectionAndPublicationByLegacyId'),
+      getLegacyIdByCollectionId: vi.fn().mockName('CollectionsService.getLegacyIdByCollectionId')
+    };
+    collectionsService.getCollectionAndPublicationByLegacyId.mockReturnValue(of([]));
+    collectionsService.getLegacyIdByCollectionId.mockImplementation(id =>
       of([{ legacy_id: `legacy-${id}` }])
     );
-    const router = jasmine.createSpyObj<Router>('Router', ['navigate']);
-    router.navigate.and.resolveTo(true);
+    const router: MockedObject<Pick<Router, 'navigate'>> = {
+      navigate: vi.fn().mockName('Router.navigate')
+    };
+    router.navigate.mockResolvedValue(true);
 
     await TestBed.configureTestingModule({
       imports: [CollectionIntroductionPage],
@@ -131,6 +156,27 @@ describe('CollectionIntroductionPage', () => {
       .compileComponents();
   });
 
+  afterEach(() => {
+    config.page.introduction.viewOptions = originalViewOptions;
+  });
+
+  it.each([undefined, {}, { personInfo: true }])('offers paragraph numbering with omitted settings: %j', viewOptions => {
+    config.page.introduction.viewOptions = viewOptions;
+    const page = TestBed.createComponent(CollectionIntroductionPage).componentInstance;
+
+    expect(page.viewOptionsTogglesIntro['paragraphNumbering']).toBe(true);
+    expect(page.viewOptionsTogglesIntro['comments']).toBe(false);
+  });
+
+  it('preserves explicit introduction options while keeping reading-text-only options hidden', () => {
+    config.page.introduction.viewOptions = { paragraphNumbering: false, personInfo: true, comments: true };
+    const page = TestBed.createComponent(CollectionIntroductionPage).componentInstance;
+
+    expect(page.viewOptionsTogglesIntro['paragraphNumbering']).toBe(false);
+    expect(page.viewOptionsTogglesIntro['personInfo']).toBe(true);
+    expect(page.viewOptionsTogglesIntro['comments']).toBe(false);
+  });
+
   it('renders content and reloads a reused page while cancelling the stale request', async () => {
     const fixture = TestBed.createComponent(CollectionIntroductionPage);
     fixture.detectChanges();
@@ -169,19 +215,20 @@ describe('CollectionIntroductionPage', () => {
   it('handles a position-only route change without reloading the introduction', () => {
     const fixture = TestBed.createComponent(CollectionIntroductionPage);
     const component = fixture.componentInstance;
-    const scrollToPos = spyOn<any>(component, 'scrollToPos');
+    const scrollToPos = vi.spyOn(component as unknown as { scrollToPos(timeout?: number): void }, 'scrollToPos').mockReturnValue(undefined);
     fixture.detectChanges();
 
     queryParams$.next({ position: 'section-2' });
 
     expect(collectionContentService.getIntroduction).toHaveBeenCalledTimes(1);
-    expect(scrollToPos).toHaveBeenCalledOnceWith(100);
+    expect(scrollToPos).toHaveBeenCalledTimes(1);
+    expect(scrollToPos).toHaveBeenCalledWith(100);
   });
 
   it('clears the search-match retry interval when the Ionic page leaves', async () => {
     queryParams$.next({ q: 'match' });
-    scrollService.scrollToFirstSearchMatch.and.returnValue(101);
-    const clearIntervalSpy = spyOn(window, 'clearInterval').and.callThrough();
+    scrollService.scrollToFirstSearchMatch.mockReturnValue(101);
+    const clearIntervalSpy = vi.spyOn(window, 'clearInterval');
     const fixture = TestBed.createComponent(CollectionIntroductionPage);
     fixture.detectChanges();
 

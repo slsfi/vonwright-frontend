@@ -1,3 +1,4 @@
+import type { MockedObject } from 'vitest';
 import { Location } from '@angular/common';
 import { signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
@@ -10,24 +11,32 @@ describe('VerifyEmailPage', () => {
   const verifyEmailError = signal<VerifyEmailErrorCode | null>(null);
   const emailVerificationCompleted = signal(false);
   const emailVerificationInProgress = signal(false);
-  const route: { snapshot: { fragment: string | null } } = {
+  const route: { snapshot: {
+    fragment: string | null;
+} } = {
     snapshot: { fragment: 'jwt=verify-token&campaign=fall' }
   };
-  let authService: jasmine.SpyObj<AuthService>;
-  let location: jasmine.SpyObj<Location>;
+  let authService: MockedObject<Pick<AuthService, 'verifyEmail' | 'clearVerifyEmailState'>>
+    & Pick<AuthService, 'verifyEmailError' | 'emailVerificationCompleted' | 'emailVerificationInProgress'>;
+  let location: MockedObject<Pick<Location, 'path' | 'replaceState'>>;
 
   beforeEach(async () => {
     verifyEmailError.set(null);
     emailVerificationCompleted.set(false);
     emailVerificationInProgress.set(false);
     route.snapshot.fragment = 'jwt=verify-token&campaign=fall';
-    authService = jasmine.createSpyObj<AuthService>(
-      'AuthService',
-      ['verifyEmail', 'clearVerifyEmailState'],
-      { verifyEmailError, emailVerificationCompleted, emailVerificationInProgress }
-    );
-    location = jasmine.createSpyObj<Location>('Location', ['path', 'replaceState']);
-    location.path.and.returnValue('/verify-email?source=email');
+    authService = {
+      verifyEmail: vi.fn().mockName('AuthService.verifyEmail'),
+      clearVerifyEmailState: vi.fn().mockName('AuthService.clearVerifyEmailState'),
+      verifyEmailError,
+      emailVerificationCompleted,
+      emailVerificationInProgress
+    };
+    location = {
+      path: vi.fn().mockName('Location.path'),
+      replaceState: vi.fn().mockName('Location.replaceState')
+    };
+    location.path.mockReturnValue('/verify-email?source=email');
 
     await TestBed.configureTestingModule({
       imports: [VerifyEmailPage],
@@ -45,8 +54,11 @@ describe('VerifyEmailPage', () => {
 
     component.ionViewWillEnter();
 
-    expect(authService.verifyEmail).toHaveBeenCalledOnceWith('verify-token');
-    expect(location.replaceState).toHaveBeenCalledOnceWith(
+    expect(authService.verifyEmail).toHaveBeenCalledTimes(1);
+
+    expect(authService.verifyEmail).toHaveBeenCalledWith('verify-token');
+    expect(location.replaceState).toHaveBeenCalledTimes(1);
+    expect(location.replaceState).toHaveBeenCalledWith(
       '/verify-email#campaign=fall',
       'source=email'
     );

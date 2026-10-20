@@ -37,7 +37,7 @@ describe('TextChangerComponent', () => {
         },
         {
           provide: DocumentHeadService,
-          useValue: { setTitle: jasmine.createSpy('setTitle') }
+          useValue: { setTitle: vi.fn().mockName('setTitle') }
         },
         { provide: PlatformService, useValue: { isMobile: () => false } }
       ]

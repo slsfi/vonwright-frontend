@@ -1,7 +1,7 @@
 # Angular 22 modernization — Stage 1: standalone and zoneless migration
 
 > [!NOTE]
-> **Status: Completed for release 3.1.0.** This plan is retained as a historical implementation record. Its commands, paths, and dependency references describe the migration period and may become outdated; the current repository configuration and [development notes](../DEVELOPMENT.md) take precedence.
+> **Status: Completed for release 3.1.0.** This plan is retained as a historical implementation record. Its commands, paths, and dependency references describe the migration period and may become outdated; the current repository configuration and [development notes](../../../DEVELOPMENT.md) take precedence.
 
 This was the first stage of the repository's [two-stage Angular modernization](README.md) from an Angular 20-era architecture using legacy APIs to a modern Angular 22 architecture. It produced a fully standalone, zoneless application while retaining the existing Webpack browser/server builders, `CommonEngine`, output layout, deployment model, and non-hydrated SSR.
 
@@ -818,7 +818,7 @@ If fixes are needed, commit them by feature rather than as one miscellaneous mig
 
 Update:
 
-- [DEVELOPMENT.md](../DEVELOPMENT.md)
+- [DEVELOPMENT.md](../../../DEVELOPMENT.md)
 - Relevant README architecture references
 - Comments in services and route-generation scripts
 - `CHANGELOG.md`

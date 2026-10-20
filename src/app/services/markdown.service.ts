@@ -1,4 +1,4 @@
-import { Injectable, inject } from '@angular/core';
+import { inject, Service } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { catchError, map, Observable, of, shareReplay } from 'rxjs';
 import { Marked } from 'marked';
@@ -10,9 +10,7 @@ import { MarkdownApiResponse } from '@models/markdown.models';
 import { MdMenuNodeApiResponse } from '@models/menu.models';
 
 
-@Injectable({
-  providedIn: 'root',
-})
+@Service()
 export class MarkdownService {
   private http = inject(HttpClient);
 

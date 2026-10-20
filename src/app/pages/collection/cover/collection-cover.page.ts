@@ -1,5 +1,5 @@
 import { AsyncPipe } from '@angular/common';
-import { Component, LOCALE_ID, OnInit, inject, signal } from '@angular/core';
+import { Component, LOCALE_ID, inject, signal } from '@angular/core';
 import { toObservable } from '@angular/core/rxjs-interop';
 import { ActivatedRoute } from '@angular/router';
 import { IonContent, IonHeader, IonSpinner, IonToolbar } from '@ionic/angular';
@@ -16,27 +16,24 @@ import { PlatformService } from '@services/platform.service';
   styleUrls: ['./collection-cover.page.scss'],
   imports: [AsyncPipe, IonContent, IonHeader, IonSpinner, IonToolbar, TextChangerComponent]
 })
-export class CollectionCoverPage implements OnInit {
+export class CollectionCoverPage {
   private mdService = inject(MarkdownService);
   private platformService = inject(PlatformService);
   private route = inject(ActivatedRoute);
   private activeLocale = inject(LOCALE_ID);
 
   readonly activeComponent = signal(true);
-  coverData$: Observable<any>;
   readonly mobileMode = this.platformService.isMobile();
   private readonly active$ = toObservable(this.activeComponent);
 
-  ngOnInit() {
-    this.coverData$ = combineLatest([this.route.params, this.active$]).pipe(
-      filter(([, active]) => active),
-      switchMap(([{collectionID}]) => {
-        return this.getCoverDataFromMdContent(
-          `${this.activeLocale}-08-${collectionID}`
-        );
-      })
-    );
-  }
+  readonly coverData$: Observable<any> = combineLatest([this.route.params, this.active$]).pipe(
+    filter(([, active]) => active),
+    switchMap(([{collectionID}]) => {
+      return this.getCoverDataFromMdContent(
+        `${this.activeLocale}-08-${collectionID}`
+      );
+    })
+  );
 
   ionViewWillEnter() {
     this.activeComponent.set(true);

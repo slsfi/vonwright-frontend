@@ -1,3 +1,4 @@
+import type { MockedObject } from 'vitest';
 import { signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { provideRouter, Router } from '@angular/router';
@@ -7,15 +8,15 @@ import { AccountPage } from './account.page';
 
 describe('AccountPage', () => {
   const authenticatedEmail = signal<string | null>(null);
-  let authService: jasmine.SpyObj<AuthService>;
+  let authService: MockedObject<Pick<AuthService, 'logout'>>
+    & Pick<AuthService, 'authenticatedEmail'>;
 
   beforeEach(async () => {
     authenticatedEmail.set(null);
-    authService = jasmine.createSpyObj<AuthService>(
-      'AuthService',
-      ['logout'],
-      { authenticatedEmail }
-    );
+    authService = {
+      logout: vi.fn().mockName('AuthService.logout'),
+      authenticatedEmail
+    };
 
     await TestBed.configureTestingModule({
       imports: [AccountPage],
@@ -38,12 +39,13 @@ describe('AccountPage', () => {
 
   it('logs out and redirects to login', () => {
     const router = TestBed.inject(Router);
-    const navigateByUrl = spyOn(router, 'navigateByUrl').and.resolveTo(true);
+    const navigateByUrl = vi.spyOn(router, 'navigateByUrl').mockResolvedValue(true);
     const component = TestBed.createComponent(AccountPage).componentInstance;
 
     component.logout();
 
     expect(authService.logout).toHaveBeenCalledTimes(1);
-    expect(navigateByUrl).toHaveBeenCalledOnceWith('/login');
+    expect(navigateByUrl).toHaveBeenCalledTimes(1);
+    expect(navigateByUrl).toHaveBeenCalledWith('/login');
   });
 });

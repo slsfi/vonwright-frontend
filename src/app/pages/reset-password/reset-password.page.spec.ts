@@ -1,3 +1,4 @@
+import type { MockedObject } from 'vitest';
 import { Location } from '@angular/common';
 import { signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
@@ -11,21 +12,27 @@ describe('ResetPasswordPage', () => {
   const passwordResetCompleted = signal(false);
   const passwordResetInProgress = signal(false);
   const route = { snapshot: { fragment: 'jwt=reset-token' } };
-  let authService: jasmine.SpyObj<AuthService>;
-  let location: jasmine.SpyObj<Location>;
+  let authService: MockedObject<Pick<AuthService, 'resetPassword' | 'clearResetPasswordState'>>
+    & Pick<AuthService, 'resetPasswordError' | 'passwordResetCompleted' | 'passwordResetInProgress'>;
+  let location: MockedObject<Pick<Location, 'path' | 'replaceState'>>;
 
   beforeEach(async () => {
     resetPasswordError.set(null);
     passwordResetCompleted.set(false);
     passwordResetInProgress.set(false);
     route.snapshot.fragment = 'jwt=reset-token';
-    authService = jasmine.createSpyObj<AuthService>(
-      'AuthService',
-      ['resetPassword', 'clearResetPasswordState'],
-      { resetPasswordError, passwordResetCompleted, passwordResetInProgress }
-    );
-    location = jasmine.createSpyObj<Location>('Location', ['path', 'replaceState']);
-    location.path.and.returnValue('/reset-password?source=email');
+    authService = {
+      resetPassword: vi.fn().mockName('AuthService.resetPassword'),
+      clearResetPasswordState: vi.fn().mockName('AuthService.clearResetPasswordState'),
+      resetPasswordError,
+      passwordResetCompleted,
+      passwordResetInProgress
+    };
+    location = {
+      path: vi.fn().mockName('Location.path'),
+      replaceState: vi.fn().mockName('Location.replaceState')
+    };
+    location.path.mockReturnValue('/reset-password?source=email');
 
     await TestBed.configureTestingModule({
       imports: [ResetPasswordPage],
@@ -42,7 +49,9 @@ describe('ResetPasswordPage', () => {
     const component = TestBed.createComponent(ResetPasswordPage).componentInstance;
     component.ionViewWillEnter();
 
-    expect(location.replaceState).toHaveBeenCalledOnceWith('/reset-password', 'source=email');
+    expect(location.replaceState).toHaveBeenCalledTimes(1);
+
+    expect(location.replaceState).toHaveBeenCalledWith('/reset-password', 'source=email');
 
     component.form.setValue({
       password: 'ValidPassword1',
@@ -50,7 +59,9 @@ describe('ResetPasswordPage', () => {
     });
     component.attemptPasswordReset();
 
-    expect(authService.resetPassword).toHaveBeenCalledOnceWith('reset-token', 'ValidPassword1');
+    expect(authService.resetPassword).toHaveBeenCalledTimes(1);
+
+    expect(authService.resetPassword).toHaveBeenCalledWith('reset-token', 'ValidPassword1');
   });
 
   it('blocks invalid form submission and marks its controls as touched', () => {
@@ -58,8 +69,8 @@ describe('ResetPasswordPage', () => {
 
     component.attemptPasswordReset();
 
-    expect(component.form.controls.password.touched).toBeTrue();
-    expect(component.form.controls.confirmPassword.touched).toBeTrue();
+    expect(component.form.controls.password.touched).toBe(true);
+    expect(component.form.controls.confirmPassword.touched).toBe(true);
     expect(authService.resetPassword).not.toHaveBeenCalled();
   });
 

@@ -15,17 +15,18 @@ describe('AuthRedirectStorageService', () => {
     });
 
     afterEach(() => {
+      vi.restoreAllMocks();
       sessionStorage.removeItem(storageKey);
     });
 
     it('stores and consumes return URL with one-time semantics', () => {
-      expect(service.storeReturnUrl('/account')).toBeTrue();
+      expect(service.storeReturnUrl('/account')).toBe(true);
       expect(service.consumeReturnUrl()).toBe('/account');
       expect(service.consumeReturnUrl()).toBeNull();
     });
 
     it('clears stored return URL', () => {
-      expect(service.storeReturnUrl('/collection/123/text')).toBeTrue();
+      expect(service.storeReturnUrl('/collection/123/text')).toBe(true);
 
       service.clearReturnUrl();
 
@@ -33,24 +34,30 @@ describe('AuthRedirectStorageService', () => {
     });
 
     it('returns false when storing fails', () => {
-      spyOn(Storage.prototype, 'setItem').and.throwError('quota exceeded');
+      vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {
+        throw new Error('quota exceeded');
+      });
 
-      expect(service.storeReturnUrl('/account')).toBeFalse();
+      expect(service.storeReturnUrl('/account')).toBe(false);
     });
 
     it('returns null when consuming fails', () => {
-      spyOn(Storage.prototype, 'getItem').and.throwError('storage failure');
+      vi.spyOn(Storage.prototype, 'getItem').mockImplementation(() => {
+        throw new Error('storage failure');
+      });
 
       expect(service.consumeReturnUrl()).toBeNull();
     });
 
     it('swallows errors when clearing fails', () => {
-      const removeItemSpy = spyOn(Storage.prototype, 'removeItem')
-        .and.throwError('storage failure');
+      const removeItemSpy = vi.spyOn(Storage.prototype, 'removeItem')
+        .mockImplementation(() => {
+          throw new Error('storage failure');
+        });
 
       expect(() => service.clearReturnUrl()).not.toThrow();
 
-      removeItemSpy.and.callThrough();
+      removeItemSpy.mockRestore();
     });
   });
 
@@ -62,7 +69,7 @@ describe('AuthRedirectStorageService', () => {
     });
 
     it('does not store redirect URLs', () => {
-      expect(service.storeReturnUrl('/account')).toBeFalse();
+      expect(service.storeReturnUrl('/account')).toBe(false);
     });
 
     it('returns null on consume', () => {

@@ -7,9 +7,7 @@ import { Article } from '@models/article.models';
 import { AUTH_ENABLED } from '@tokens/auth.tokens';
 import { TopMenuComponent } from './top-menu.component';
 
-type TestTopMenuComponent = TopMenuComponent & {
-  languageHrefByCode: () => Record<string, string>;
-};
+type TestTopMenuComponent = TopMenuComponent & { languageHrefByCode: () => Record<string, string> };
 
 describe('TopMenuComponent', () => {
   let originalArticles: Article[];
@@ -42,8 +40,8 @@ describe('TopMenuComponent', () => {
       ]
     }).compileComponents();
 
-    spyOnProperty(TestBed.inject(Router), 'url', 'get')
-      .and.callFake(() => routerUrl);
+    vi.spyOn(TestBed.inject(Router), 'url', 'get')
+      .mockImplementation(() => routerUrl);
   });
 
   afterEach(() => {

@@ -1,3 +1,4 @@
+import type { MockedObject } from 'vitest';
 import { LOCALE_ID } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
@@ -7,17 +8,18 @@ import { MarkdownService } from '@services/markdown.service';
 import { HomePage } from './home.page';
 
 describe('HomePage', () => {
-  let markdownService: jasmine.SpyObj<MarkdownService>;
-  let router: jasmine.SpyObj<Router>;
+  let markdownService: MockedObject<Pick<MarkdownService, 'getParsedMdContent'>>;
+  let router: MockedObject<Pick<Router, 'navigate'>>;
 
   beforeEach(async () => {
-    markdownService = jasmine.createSpyObj<MarkdownService>(
-      'MarkdownService',
-      ['getParsedMdContent']
-    );
-    markdownService.getParsedMdContent.and.returnValue(of('<p>Markdown</p>'));
-    router = jasmine.createSpyObj<Router>('Router', ['navigate']);
-    router.navigate.and.resolveTo(true);
+    markdownService = {
+      getParsedMdContent: vi.fn().mockName('MarkdownService.getParsedMdContent')
+    };
+    markdownService.getParsedMdContent.mockReturnValue(of('<p>Markdown</p>'));
+    router = {
+      navigate: vi.fn().mockName('Router.navigate')
+    };
+    router.navigate.mockResolvedValue(true);
 
     await TestBed.configureTestingModule({
       imports: [HomePage],
@@ -48,7 +50,8 @@ describe('HomePage', () => {
 
     component.submitSearchQuery();
     await fixture.whenStable();
-    expect(router.navigate).toHaveBeenCalledOnceWith(
+    expect(router.navigate).toHaveBeenCalledTimes(1);
+    expect(router.navigate).toHaveBeenCalledWith(
       ['/search'],
       { queryParams: { query: 'motiv' } }
     );

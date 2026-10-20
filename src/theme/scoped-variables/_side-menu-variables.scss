@@ -2,7 +2,7 @@
   Side menu CSS variables scoped to <ion-app> by import, so in practice these are
   global, though they won’t be included in the global styles.css.
 
-  To override any of these variables in custom.scss you must use
+  To override any of these variables in project/global-overrides.scss you must use
   this selector for defining the scope:
 
   ion-app[class][class] { }

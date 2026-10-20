@@ -102,7 +102,7 @@ describe('appConfig', () => {
     expect(findProvider(PreloadingStrategy).useExisting)
       .toBe(RouterPreloadingStrategyService);
     expect(findProvider(ɵIS_ENABLED_BLOCKING_INITIAL_NAVIGATION).useValue)
-      .toBeTrue();
+      .toBe(true);
   });
 
   it('uses Ionic route reuse', () => {
@@ -111,8 +111,7 @@ describe('appConfig', () => {
 
   it('selects browser implementations for platform-specific services', () => {
     for (const expectation of platformProviderExpectations) {
-      expect(findProvider(expectation.token).useClass)
-        .withContext(expectation.browser.name)
+      expect(findProvider(expectation.token).useClass, expectation.browser.name)
         .toBe(expectation.browser);
     }
   });
@@ -132,25 +131,26 @@ describe('appConfig', () => {
       isProviderRecord(provider) && provider.provide === ɵPROVIDED_NG_ZONE
     );
 
-    expect(optsIntoNgZoneChangeDetection).toBeFalse();
+    expect(optsIntoNgZoneChangeDetection).toBe(false);
   });
 
   it('uses a standalone OnPush root component', () => {
     const componentDefinition = (
-      AppComponent as typeof AppComponent & {
-        ɵcmp?: { onPush?: boolean; standalone?: boolean };
-      }
+      AppComponent as typeof AppComponent & { ɵcmp?: {
+    onPush?: boolean;
+    standalone?: boolean;
+} }
     ).ɵcmp;
 
-    expect(componentDefinition?.standalone).toBeTrue();
-    expect(componentDefinition?.onPush).toBeTrue();
+    expect(componentDefinition?.standalone).toBe(true);
+    expect(componentDefinition?.onPush).toBe(true);
   });
 
   function findProvider(token: unknown): ProviderRecord {
     const provider = providers.find((candidate): candidate is ProviderRecord =>
       isProviderRecord(candidate) && candidate.provide === token
     );
-    expect(provider).withContext(String(token)).toBeDefined();
+    expect(provider, String(token)).toBeDefined();
     return provider as ProviderRecord;
   }
 });

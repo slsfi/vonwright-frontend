@@ -1,3 +1,4 @@
+import type { MockedObject } from 'vitest';
 import { TestBed } from '@angular/core/testing';
 import { HttpClient, HttpHeaders, provideHttpClient, withInterceptors } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
@@ -13,14 +14,17 @@ import { AUTH_ENABLED } from '@tokens/auth.tokens';
 describe('authInterceptor', () => {
   let http: HttpClient;
   let httpMock: HttpTestingController;
-  let authService: jasmine.SpyObj<
-    Pick<
-      AuthService,
-      'getAccessToken' | 'getRefreshToken' | 'refreshToken' | 'expireSession' |
-      'preserveReturnUrlForReauthentication' | 'isRequestToConfiguredBackend' | 'isRequestToAuthEndpoint'
-    >
-  >;
-  let router: jasmine.SpyObj<Pick<Router, 'navigate'>>;
+  let authService: MockedObject<Pick<
+    AuthService,
+    'getAccessToken'
+    | 'getRefreshToken'
+    | 'refreshToken'
+    | 'expireSession'
+    | 'preserveReturnUrlForReauthentication'
+    | 'isRequestToConfiguredBackend'
+    | 'isRequestToAuthEndpoint'
+  >>;
+  let router: MockedObject<Pick<Router, 'navigate'>>;
   const backendBaseURL = ensureTrailingSlash(config.app.backendBaseURL);
   const backendAuthBaseURL = ensureTrailingSlash(resolveBackendAuthBaseURLForTests());
   const backendAuthEndpointPrefix = `${backendAuthBaseURL}auth`;
@@ -30,35 +34,28 @@ describe('authInterceptor', () => {
   const nonBackendURL = 'https://example.com/non-backend';
 
   beforeEach(() => {
-    authService = jasmine.createSpyObj<
-      Pick<
-        AuthService,
-        'getAccessToken' | 'getRefreshToken' | 'refreshToken' | 'expireSession' |
-        'preserveReturnUrlForReauthentication' | 'isRequestToConfiguredBackend' | 'isRequestToAuthEndpoint'
-      >
-    >(
-      'AuthService',
-      [
-        'getAccessToken',
-        'getRefreshToken',
-        'refreshToken',
-        'expireSession',
-        'preserveReturnUrlForReauthentication',
-        'isRequestToConfiguredBackend',
-        'isRequestToAuthEndpoint'
-      ]
-    );
-    router = jasmine.createSpyObj<Pick<Router, 'navigate'>>('Router', ['navigate']);
-    router.navigate.and.resolveTo(true);
+    authService = {
+      getAccessToken: vi.fn().mockName('AuthService.getAccessToken'),
+      getRefreshToken: vi.fn().mockName('AuthService.getRefreshToken'),
+      refreshToken: vi.fn().mockName('AuthService.refreshToken'),
+      expireSession: vi.fn().mockName('AuthService.expireSession'),
+      preserveReturnUrlForReauthentication: vi.fn().mockName('AuthService.preserveReturnUrlForReauthentication'),
+      isRequestToConfiguredBackend: vi.fn().mockName('AuthService.isRequestToConfiguredBackend'),
+      isRequestToAuthEndpoint: vi.fn().mockName('AuthService.isRequestToAuthEndpoint')
+    };
+    router = {
+      navigate: vi.fn().mockName('Router.navigate')
+    };
+    router.navigate.mockResolvedValue(true);
     Object.defineProperty(router, 'url', { value: '/collection/123/text?tab=notes', writable: true });
-    authService.getRefreshToken.and.returnValue('refresh-token');
-    authService.preserveReturnUrlForReauthentication.and.returnValue({
+    authService.getRefreshToken.mockReturnValue('refresh-token');
+    authService.preserveReturnUrlForReauthentication.mockReturnValue({
       [AUTH_REDIRECT_MARKER_QUERY_PARAM]: AUTH_REDIRECT_MARKER_VALUE
     });
-    authService.isRequestToConfiguredBackend.and.callFake((url: string) =>
+    authService.isRequestToConfiguredBackend.mockImplementation((url: string) =>
       url.startsWith(backendBaseURL) || url.startsWith(backendAuthBaseURL)
     );
-    authService.isRequestToAuthEndpoint.and.callFake((url: string) => {
+    authService.isRequestToAuthEndpoint.mockImplementation((url: string) => {
       if (!url.startsWith(backendAuthEndpointPrefix)) {
         return false;
       }
@@ -86,7 +83,7 @@ describe('authInterceptor', () => {
   });
 
   it('adds bearer token for non-auth requests when token exists', () => {
-    authService.getAccessToken.and.returnValue('abc-token');
+    authService.getAccessToken.mockReturnValue('abc-token');
 
     http.get(backendProtectedURL).subscribe();
 
@@ -96,17 +93,17 @@ describe('authInterceptor', () => {
   });
 
   it('does not add bearer token for /auth/ requests', () => {
-    authService.getAccessToken.and.returnValue('abc-token');
+    authService.getAccessToken.mockReturnValue('abc-token');
 
     http.post(backendAuthLoginURL, {}).subscribe();
 
     const req = httpMock.expectOne(backendAuthLoginURL);
-    expect(req.request.headers.has('Authorization')).toBeFalse();
+    expect(req.request.headers.has('Authorization')).toBe(false);
     req.flush({ ok: true });
   });
 
   it('preserves existing authorization header for reset-password auth endpoint requests', () => {
-    authService.getAccessToken.and.returnValue('abc-token');
+    authService.getAccessToken.mockReturnValue('abc-token');
 
     http.post(backendAuthResetPasswordURL, {}, {
       headers: new HttpHeaders({ Authorization: 'Bearer reset-token' })
@@ -118,7 +115,7 @@ describe('authInterceptor', () => {
   });
 
   it('does not enter the interceptor-managed refresh flow for requests with a caller-supplied Authorization header', () => {
-    authService.getAccessToken.and.returnValue('abc-token');
+    authService.getAccessToken.mockReturnValue('abc-token');
 
     let receivedError: any;
     http.get(backendProtectedURL, {
@@ -136,22 +133,22 @@ describe('authInterceptor', () => {
     expect(authService.refreshToken).not.toHaveBeenCalled();
     expect(authService.expireSession).not.toHaveBeenCalled();
     expect(router.navigate).not.toHaveBeenCalled();
-    expect(receivedError).toEqual(jasmine.objectContaining({ status: 401 }));
+    expect(receivedError).toEqual(expect.objectContaining({ status: 401 }));
   });
 
   it('does not add bearer token for non-backend requests', () => {
-    authService.getAccessToken.and.returnValue('abc-token');
+    authService.getAccessToken.mockReturnValue('abc-token');
 
     http.get(nonBackendURL).subscribe();
 
     const req = httpMock.expectOne(nonBackendURL);
-    expect(req.request.headers.has('Authorization')).toBeFalse();
+    expect(req.request.headers.has('Authorization')).toBe(false);
     req.flush({ ok: true });
   });
 
   it('refreshes token and retries request on 401 for non-refresh endpoint', () => {
-    authService.getAccessToken.and.returnValue('expired-token');
-    authService.refreshToken.and.returnValue(of('new-token'));
+    authService.getAccessToken.mockReturnValue('expired-token');
+    authService.refreshToken.mockReturnValue(of('new-token'));
 
     http.get(backendProtectedURL).subscribe();
 
@@ -167,7 +164,7 @@ describe('authInterceptor', () => {
   });
 
   it('does not try to refresh when /auth/login returns 401', () => {
-    authService.getAccessToken.and.returnValue('expired-token');
+    authService.getAccessToken.mockReturnValue('expired-token');
 
     let receivedError: any;
     http.post(backendAuthLoginURL, { email: 'u', password: 'p' }).subscribe({
@@ -177,18 +174,18 @@ describe('authInterceptor', () => {
     });
 
     const loginReq = httpMock.expectOne(backendAuthLoginURL);
-    expect(loginReq.request.headers.has('Authorization')).toBeFalse();
+    expect(loginReq.request.headers.has('Authorization')).toBe(false);
     loginReq.flush({ message: 'invalid credentials' }, { status: 401, statusText: 'Unauthorized' });
 
     expect(authService.refreshToken).not.toHaveBeenCalled();
     expect(authService.expireSession).not.toHaveBeenCalled();
     expect(router.navigate).not.toHaveBeenCalled();
-    expect(receivedError).toEqual(jasmine.objectContaining({ status: 401 }));
+    expect(receivedError).toEqual(expect.objectContaining({ status: 401 }));
   });
 
   it('does not try to refresh when refresh token is missing', () => {
-    authService.getAccessToken.and.returnValue('expired-token');
-    authService.getRefreshToken.and.returnValue(null);
+    authService.getAccessToken.mockReturnValue('expired-token');
+    authService.getRefreshToken.mockReturnValue(null);
 
     let receivedError: any;
     http.get(backendProtectedURL).subscribe({
@@ -209,12 +206,12 @@ describe('authInterceptor', () => {
         [AUTH_REDIRECT_MARKER_QUERY_PARAM]: AUTH_REDIRECT_MARKER_VALUE
       }
     });
-    expect(receivedError).toEqual(jasmine.objectContaining({ status: 401 }));
+    expect(receivedError).toEqual(expect.objectContaining({ status: 401 }));
   });
 
   it('logs out and redirects to /login when refresh returns 401', () => {
-    authService.getAccessToken.and.returnValue('expired-token');
-    authService.refreshToken.and.returnValue(
+    authService.getAccessToken.mockReturnValue('expired-token');
+    authService.refreshToken.mockReturnValue(
       throwError(() => ({ status: 401 }))
     );
 
@@ -236,12 +233,12 @@ describe('authInterceptor', () => {
         [AUTH_REDIRECT_MARKER_QUERY_PARAM]: AUTH_REDIRECT_MARKER_VALUE
       }
     });
-    expect(receivedError).toEqual(jasmine.objectContaining({ status: 401 }));
+    expect(receivedError).toEqual(expect.objectContaining({ status: 401 }));
   });
 
   it('does not redirect to /login when refresh fails with a non-401 error', () => {
-    authService.getAccessToken.and.returnValue('expired-token');
-    authService.refreshToken.and.returnValue(
+    authService.getAccessToken.mockReturnValue('expired-token');
+    authService.refreshToken.mockReturnValue(
       throwError(() => ({ status: 500 }))
     );
 
@@ -258,12 +255,12 @@ describe('authInterceptor', () => {
     expect(authService.preserveReturnUrlForReauthentication).not.toHaveBeenCalled();
     expect(authService.expireSession).not.toHaveBeenCalled();
     expect(router.navigate).not.toHaveBeenCalled();
-    expect(receivedError).toEqual(jasmine.objectContaining({ status: 500 }));
+    expect(receivedError).toEqual(expect.objectContaining({ status: 500 }));
   });
 
   it('logs out and redirects to /login when refreshed access token validation fails', () => {
-    authService.getAccessToken.and.returnValue('expired-token');
-    authService.refreshToken.and.returnValue(
+    authService.getAccessToken.mockReturnValue('expired-token');
+    authService.refreshToken.mockReturnValue(
       throwError(() => ({ status: 503, postRefreshSessionValidationFailed: true }))
     );
 
@@ -285,15 +282,15 @@ describe('authInterceptor', () => {
         [AUTH_REDIRECT_MARKER_QUERY_PARAM]: AUTH_REDIRECT_MARKER_VALUE
       }
     });
-    expect(receivedError).toEqual(jasmine.objectContaining({
+    expect(receivedError).toEqual(expect.objectContaining({
       status: 503,
       postRefreshSessionValidationFailed: true
     }));
   });
 
   it('does not redirect to /login when refresh fails with a network error', () => {
-    authService.getAccessToken.and.returnValue('expired-token');
-    authService.refreshToken.and.returnValue(
+    authService.getAccessToken.mockReturnValue('expired-token');
+    authService.refreshToken.mockReturnValue(
       throwError(() => ({ status: 0 }))
     );
 
@@ -310,11 +307,11 @@ describe('authInterceptor', () => {
     expect(authService.preserveReturnUrlForReauthentication).not.toHaveBeenCalled();
     expect(authService.expireSession).not.toHaveBeenCalled();
     expect(router.navigate).not.toHaveBeenCalled();
-    expect(receivedError).toEqual(jasmine.objectContaining({ status: 0 }));
+    expect(receivedError).toEqual(expect.objectContaining({ status: 0 }));
   });
 
   it('does not try to refresh for non-backend 401 responses', () => {
-    authService.getAccessToken.and.returnValue('expired-token');
+    authService.getAccessToken.mockReturnValue('expired-token');
 
     let receivedError: any;
     http.get(nonBackendURL).subscribe({
@@ -329,13 +326,13 @@ describe('authInterceptor', () => {
     expect(authService.refreshToken).not.toHaveBeenCalled();
     expect(authService.expireSession).not.toHaveBeenCalled();
     expect(router.navigate).not.toHaveBeenCalled();
-    expect(receivedError).toEqual(jasmine.objectContaining({ status: 401 }));
+    expect(receivedError).toEqual(expect.objectContaining({ status: 401 }));
   });
 
   it('falls back to legacy returnUrl query params when marker storage is unavailable during forced re-authentication', () => {
-    authService.getAccessToken.and.returnValue('expired-token');
-    authService.getRefreshToken.and.returnValue(null);
-    authService.preserveReturnUrlForReauthentication.and.returnValue({ returnUrl: '/collection/123/text?tab=notes' });
+    authService.getAccessToken.mockReturnValue('expired-token');
+    authService.getRefreshToken.mockReturnValue(null);
+    authService.preserveReturnUrlForReauthentication.mockReturnValue({ returnUrl: '/collection/123/text?tab=notes' });
 
     http.get(backendProtectedURL).subscribe({
       error: () => undefined

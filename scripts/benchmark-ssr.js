@@ -1,8 +1,7 @@
 #!/usr/bin/env node
 
-const fs = require('node:fs');
 const path = require('node:path');
-const { spawn } = require('node:child_process');
+const { spawn, spawnSync } = require('node:child_process');
 const { performance } = require('node:perf_hooks');
 const { setTimeout: delay } = require('node:timers/promises');
 
@@ -32,7 +31,7 @@ const DEFAULT_ROUTES = [
  *     Alias for --warm-runs.
  *
  *   --port <n> | --port=<n>
- *     Port used when starting dist/app/proxy-server.js (default: 4201).
+ *     Port used when starting npm run serve:ssr (default: 4201).
  *
  *   --route <path> | --route=<path>
  *     Add a single route. Can be repeated.
@@ -44,7 +43,7 @@ const DEFAULT_ROUTES = [
  *     Positional routes are also accepted (e.g. /sv/ /sv/collection/216/text/20280).
  *
  *   --skip-start
- *     Do not start proxy-server.js; benchmark an already running SSR server.
+ *     Do not start SSR; benchmark an already running server.
  *
  *   --base-url <url> | --base-url=<url>
  *     Base URL to benchmark. Default: http://127.0.0.1:<port>.
@@ -76,7 +75,7 @@ Usage:
 Options:
   --warm-runs <n> | --warm-runs=<n>          Number of warm runs per route (default: 5)
   --runs <n> | --runs=<n>                    Alias for --warm-runs
-  --port <n> | --port=<n>                    Port for proxy-server.js when auto-starting (default: 4201)
+  --port <n> | --port=<n>                    Port for serve:ssr when auto-starting (default: 4201)
   --route <path> | --route=<path>            Add one route (repeatable)
   --routes <csv> | --routes=<csv>            Add comma-separated routes
   --skip-start                               Benchmark an already running SSR server
@@ -271,10 +270,12 @@ async function fetchWithTiming(url, timeoutMs) {
   }
 }
 
-async function waitForServer(baseUrl, readyRoute, startupTimeoutMs, requestTimeoutMs) {
+async function waitForServer(baseUrl, readyRoute, startupTimeoutMs, requestTimeoutMs, getStartupError) {
   const started = performance.now();
 
   while (performance.now() - started < startupTimeoutMs) {
+    const startupError = getStartupError();
+    if (startupError) throw startupError;
     const result = await fetchWithTiming(
       getUrl(baseUrl, readyRoute),
       Math.min(requestTimeoutMs, 5000),
@@ -336,19 +337,30 @@ async function main() {
   const repoRoot = path.resolve(__dirname, '..');
   const baseUrl = opts.baseUrl || `http://127.0.0.1:${opts.port}`;
   const routes = opts.routes.map(normalizeRoute);
-  const serverEntrypoint = path.join(repoRoot, 'dist', 'app', 'proxy-server.js');
-
-  if (!opts.skipStart && !fs.existsSync(serverEntrypoint)) {
-    throw new Error(
-      `Missing ${serverEntrypoint}. Run "npm run build:ssr" first.`,
-    );
-  }
 
   let serverProc = null;
+  let startupError = null;
+  let serverStderr = '';
 
   const stopServer = () => {
-    if (serverProc && !serverProc.killed) {
-      serverProc.kill('SIGTERM');
+    if (!serverProc?.pid || serverProc.exitCode !== null || serverProc.signalCode !== null) return;
+
+    // npm adds a shell/runtime process below the launcher. Stop the whole tree
+    // so completion, interruption, and failed startup do not leave SSR running.
+    if (process.platform === 'win32') {
+      const result = spawnSync('taskkill', ['/pid', String(serverProc.pid), '/T', '/F'], {
+        encoding: 'utf8', windowsHide: true, timeout: 10000,
+      });
+      if (result.error) throw result.error;
+      if (result.status !== 0) {
+        throw new Error(`Could not stop SSR process tree: ${result.stderr || result.stdout}`);
+      }
+    } else {
+      try {
+        process.kill(-serverProc.pid, 'SIGTERM');
+      } catch (error) {
+        if (error.code !== 'ESRCH') throw error;
+      }
     }
   };
 
@@ -361,25 +373,36 @@ async function main() {
     process.exit(143);
   });
 
-  if (!opts.skipStart) {
-    serverProc = spawn(process.execPath, [serverEntrypoint], {
-      cwd: repoRoot,
-      env: { ...process.env, PORT: String(opts.port) },
-      stdio: ['ignore', 'pipe', 'pipe'],
-    });
-
-    serverProc.stdout.on('data', () => {});
-    serverProc.stderr.on('data', () => {});
-
-    await waitForServer(
-      baseUrl,
-      routes[0] || '/sv/',
-      opts.startupTimeoutMs,
-      opts.requestTimeoutMs,
-    );
-  }
-
   try {
+    if (!opts.skipStart) {
+      // The command is constant; CLI inputs are passed through the environment.
+      // A shell also supports npm.cmd on Windows without assuming npm's path.
+      serverProc = spawn('npm run serve:ssr', {
+        cwd: repoRoot,
+        env: { ...process.env, PORT: String(opts.port) },
+        stdio: ['ignore', 'pipe', 'pipe'],
+        shell: true,
+        detached: process.platform !== 'win32',
+        windowsHide: true,
+      });
+      serverProc.stdout.on('data', () => {});
+      serverProc.stderr.on('data', data => {
+        serverStderr = (serverStderr + data.toString()).slice(-4000);
+      });
+      serverProc.once('error', error => { startupError = error; });
+      serverProc.once('exit', (code, signal) => {
+        startupError = new Error(`npm run serve:ssr exited (${signal || code}). Run "npm run build:ssr" first if output is missing.\n${serverStderr.trim()}`);
+      });
+
+      await waitForServer(
+        baseUrl,
+        routes[0] || '/sv/',
+        opts.startupTimeoutMs,
+        opts.requestTimeoutMs,
+        () => startupError,
+      );
+    }
+
     const results = [];
     const totalRequestsPerRoute = opts.warmRuns + 1;
 

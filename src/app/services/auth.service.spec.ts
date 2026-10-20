@@ -1,5 +1,7 @@
+import type { MockedObject } from 'vitest';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
+import { LOCALE_ID } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { DefaultUrlSerializer, Router, UrlTree } from '@angular/router';
 
@@ -15,11 +17,14 @@ import { AuthService } from './auth.service';
 
 describe('AuthService', () => {
   let httpMock: HttpTestingController;
-  let router: jasmine.SpyObj<Pick<Router, 'navigateByUrl' | 'parseUrl'>>;
-  let redirectStorage: jasmine.SpyObj<
-    Pick<AuthRedirectStorageService, 'consumeReturnUrl' | 'clearReturnUrl' | 'storeReturnUrl'>
-  >;
-  let tokenStorage: jasmine.SpyObj<Pick<AuthTokenStorageService, 'setItem' | 'getItem' | 'removeItem'>>;
+  let router: MockedObject<Pick<Router, 'navigateByUrl' | 'parseUrl'>>;
+  let redirectStorage: MockedObject<Pick<
+    AuthRedirectStorageService,
+    'consumeReturnUrl'
+    | 'clearReturnUrl'
+    | 'storeReturnUrl'
+  >>;
+  let tokenStorage: MockedObject<Pick<AuthTokenStorageService, 'setItem' | 'getItem' | 'removeItem'>>;
   let tokenMap: Map<string, string>;
 
   function createService(): AuthService {
@@ -33,32 +38,39 @@ describe('AuthService', () => {
     const request = httpMock.expectOne((req) => req.url.endsWith('/session/validate'));
     expect(request.request.headers.get('Authorization')).toBe(`Bearer ${tokenMap.get('access_token')}`);
     request.flush({ authenticated: true });
-    expect(service.isAuthenticated()).toBeTrue();
+    expect(service.isAuthenticated()).toBe(true);
   }
 
   beforeEach(() => {
     tokenMap = new Map<string, string>();
     const urlSerializer = new DefaultUrlSerializer();
 
-    router = jasmine.createSpyObj<Pick<Router, 'navigateByUrl' | 'parseUrl'>>('Router', ['navigateByUrl', 'parseUrl']);
-    router.navigateByUrl.and.resolveTo(true);
-    router.parseUrl.and.callFake((url: string): UrlTree => urlSerializer.parse(url));
+    router = {
+      navigateByUrl: vi.fn().mockName('Router.navigateByUrl'),
+      parseUrl: vi.fn().mockName('Router.parseUrl')
+    };
+    router.navigateByUrl.mockResolvedValue(true);
+    router.parseUrl.mockImplementation((url: string): UrlTree => urlSerializer.parse(url));
     Object.defineProperty(router, 'url', { value: '/login', writable: true });
 
-    redirectStorage = jasmine.createSpyObj<
-      Pick<AuthRedirectStorageService, 'consumeReturnUrl' | 'clearReturnUrl' | 'storeReturnUrl'>
-    >('AuthRedirectStorageService', ['consumeReturnUrl', 'clearReturnUrl', 'storeReturnUrl']);
-    redirectStorage.consumeReturnUrl.and.returnValue(null);
-    redirectStorage.storeReturnUrl.and.returnValue(true);
+    redirectStorage = {
+      consumeReturnUrl: vi.fn().mockName('AuthRedirectStorageService.consumeReturnUrl'),
+      clearReturnUrl: vi.fn().mockName('AuthRedirectStorageService.clearReturnUrl'),
+      storeReturnUrl: vi.fn().mockName('AuthRedirectStorageService.storeReturnUrl')
+    };
+    redirectStorage.consumeReturnUrl.mockReturnValue(null);
+    redirectStorage.storeReturnUrl.mockReturnValue(true);
 
-    tokenStorage = jasmine.createSpyObj<
-      Pick<AuthTokenStorageService, 'setItem' | 'getItem' | 'removeItem'>
-    >('AuthTokenStorageService', ['setItem', 'getItem', 'removeItem']);
-    tokenStorage.setItem.and.callFake((key: string, value: string) => {
+    tokenStorage = {
+      setItem: vi.fn().mockName('AuthTokenStorageService.setItem'),
+      getItem: vi.fn().mockName('AuthTokenStorageService.getItem'),
+      removeItem: vi.fn().mockName('AuthTokenStorageService.removeItem')
+    };
+    tokenStorage.setItem.mockImplementation((key: string, value: string) => {
       tokenMap.set(key, value);
     });
-    tokenStorage.getItem.and.callFake((key: string) => tokenMap.get(key) ?? null);
-    tokenStorage.removeItem.and.callFake((key: string) => {
+    tokenStorage.getItem.mockImplementation((key: string) => tokenMap.get(key) ?? null);
+    tokenStorage.removeItem.mockImplementation((key: string) => {
       tokenMap.delete(key);
     });
 
@@ -66,6 +78,8 @@ describe('AuthService', () => {
       providers: [
         provideHttpClient(withInterceptors([authInterceptor])),
         provideHttpClientTesting(),
+        // Keep the request-language assertion independent of the workspace's technical source locale.
+        { provide: LOCALE_ID, useValue: 'en' },
         { provide: AUTH_ENABLED, useValue: true },
         { provide: Router, useValue: router },
         { provide: AuthRedirectStorageService, useValue: redirectStorage },
@@ -83,7 +97,7 @@ describe('AuthService', () => {
   it('initializes isAuthenticated as false when access token is missing', () => {
     const service = createService();
 
-    expect(service.isAuthenticated()).toBeFalse();
+    expect(service.isAuthenticated()).toBe(false);
   });
 
   it('keeps a complete stored session unauthenticated until startup validation succeeds', () => {
@@ -92,9 +106,9 @@ describe('AuthService', () => {
 
     const service = createService();
 
-    expect(service.isAuthenticated()).toBeFalse();
+    expect(service.isAuthenticated()).toBe(false);
     flushStartupValidation(service);
-    expect(service.isAuthenticated()).toBeTrue();
+    expect(service.isAuthenticated()).toBe(true);
   });
 
   it('initializes authenticatedEmail from storage only after startup validation succeeds', () => {
@@ -114,9 +128,9 @@ describe('AuthService', () => {
 
     const service = createService();
 
-    expect(service.isAuthenticated()).toBeFalse();
-    expect(tokenMap.has('access_token')).toBeFalse();
-    expect(tokenMap.has('refresh_token')).toBeFalse();
+    expect(service.isAuthenticated()).toBe(false);
+    expect(tokenMap.has('access_token')).toBe(false);
+    expect(tokenMap.has('refresh_token')).toBe(false);
   });
 
   it('clears stored tokens when startup validation fails', () => {
@@ -132,11 +146,11 @@ describe('AuthService', () => {
     expect(request.request.headers.get('Authorization')).toBe('Bearer existing-access-token');
     request.flush({ detail: 'backend unavailable' }, { status: 503, statusText: 'Server Error' });
 
-    expect(service.isAuthenticated()).toBeFalse();
+    expect(service.isAuthenticated()).toBe(false);
     expect(service.authenticatedEmail()).toBeNull();
-    expect(tokenMap.has('access_token')).toBeFalse();
-    expect(tokenMap.has('refresh_token')).toBeFalse();
-    expect(tokenMap.has('auth_email')).toBeFalse();
+    expect(tokenMap.has('access_token')).toBe(false);
+    expect(tokenMap.has('refresh_token')).toBe(false);
+    expect(tokenMap.has('auth_email')).toBe(false);
     expect(redirectStorage.clearReturnUrl).not.toHaveBeenCalled();
   });
 
@@ -166,8 +180,8 @@ describe('AuthService', () => {
     expect(retryValidationRequest.request.headers.get('Authorization')).toBe('Bearer fresh-access-token');
     retryValidationRequest.flush({ authenticated: true });
 
-    expect(startupValidationResult).toBeTrue();
-    expect(service.isAuthenticated()).toBeTrue();
+    expect(startupValidationResult).toBe(true);
+    expect(service.isAuthenticated()).toBe(true);
     expect(tokenMap.get('access_token')).toBe('fresh-access-token');
     expect(tokenMap.get('refresh_token')).toBe('refresh-token-1');
     expect(service.authenticatedEmail()).toBe('user@example.com');
@@ -177,7 +191,7 @@ describe('AuthService', () => {
     const service = createService();
 
     service.login('user@example.com', 'secret');
-    expect(service.loginInProgress()).toBeTrue();
+    expect(service.loginInProgress()).toBe(true);
 
     const request = httpMock.expectOne((req) => req.url.endsWith('/auth/login'));
     request.flush({
@@ -190,9 +204,9 @@ describe('AuthService', () => {
     expect(tokenMap.get('access_token')).toBe('access-token-1');
     expect(tokenMap.get('refresh_token')).toBe('refresh-token-1');
     expect(tokenMap.get('auth_email')).toBe('user@example.com');
-    expect(service.isAuthenticated()).toBeTrue();
+    expect(service.isAuthenticated()).toBe(true);
     expect(service.authenticatedEmail()).toBe('user@example.com');
-    expect(service.loginInProgress()).toBeFalse();
+    expect(service.loginInProgress()).toBe(false);
     expect(service.loginError()).toBeNull();
     expect(router.navigateByUrl).toHaveBeenCalledWith('/account');
   });
@@ -217,7 +231,7 @@ describe('AuthService', () => {
   it('prefers marker-based stored return URL over query returnUrl after successful login', () => {
     (router as unknown as { url: string }).url =
       `/login?${AUTH_REDIRECT_MARKER_QUERY_PARAM}=${AUTH_REDIRECT_MARKER_VALUE}&returnUrl=%2Fsearch`;
-    redirectStorage.consumeReturnUrl.and.returnValue('/collection/123/text');
+    redirectStorage.consumeReturnUrl.mockReturnValue('/collection/123/text');
     const service = createService();
 
     service.login('user@example.com', 'secret');
@@ -237,7 +251,7 @@ describe('AuthService', () => {
   it('falls back to query returnUrl when marker is present but stored target is missing', () => {
     (router as unknown as { url: string }).url =
       `/login?${AUTH_REDIRECT_MARKER_QUERY_PARAM}=${AUTH_REDIRECT_MARKER_VALUE}&returnUrl=%2Fsearch`;
-    redirectStorage.consumeReturnUrl.and.returnValue(null);
+    redirectStorage.consumeReturnUrl.mockReturnValue(null);
     const service = createService();
 
     service.login('user@example.com', 'secret');
@@ -255,7 +269,7 @@ describe('AuthService', () => {
 
   it('ignores non-matching marker value and uses query returnUrl', () => {
     (router as unknown as { url: string }).url = '/login?rt=unexpected&returnUrl=%2Fsearch';
-    redirectStorage.consumeReturnUrl.and.returnValue('/collection/123/text');
+    redirectStorage.consumeReturnUrl.mockReturnValue('/collection/123/text');
     const service = createService();
 
     service.login('user@example.com', 'secret');
@@ -309,7 +323,7 @@ describe('AuthService', () => {
   it('ignores returnUrl when Angular router parsing of the target fails', () => {
     (router as unknown as { url: string }).url = '/login?returnUrl=%2Fbroken';
     const fallbackParser = new DefaultUrlSerializer();
-    router.parseUrl.and.callFake((url: string): UrlTree => {
+    router.parseUrl.mockImplementation((url: string): UrlTree => {
       if (url === '/broken') {
         throw new Error('invalid redirect target');
       }
@@ -355,17 +369,17 @@ describe('AuthService', () => {
     tokenMap.set('auth_email', 'stale@example.com');
 
     service.login('user@example.com', 'wrong-password');
-    expect(service.loginInProgress()).toBeTrue();
+    expect(service.loginInProgress()).toBe(true);
 
     const request = httpMock.expectOne((req) => req.url.endsWith('/auth/login'));
     request.flush({ detail: 'invalid credentials' }, { status: 401, statusText: 'Unauthorized' });
 
-    expect(service.isAuthenticated()).toBeFalse();
-    expect(service.loginInProgress()).toBeFalse();
+    expect(service.isAuthenticated()).toBe(false);
+    expect(service.loginInProgress()).toBe(false);
     expect(service.loginError()).toBe('invalid_credentials');
-    expect(tokenMap.has('access_token')).toBeFalse();
-    expect(tokenMap.has('refresh_token')).toBeFalse();
-    expect(tokenMap.has('auth_email')).toBeFalse();
+    expect(tokenMap.has('access_token')).toBe(false);
+    expect(tokenMap.has('refresh_token')).toBe(false);
+    expect(tokenMap.has('auth_email')).toBe(false);
     expect(service.authenticatedEmail()).toBeNull();
     expect(redirectStorage.clearReturnUrl).not.toHaveBeenCalled();
   });
@@ -437,7 +451,7 @@ describe('AuthService', () => {
     const service = createService();
 
     service.register(' Test User ', ' user@example.com ', 'new-password-1234', ' FI ', ['personal', 'scholarly']);
-    expect(service.registerInProgress()).toBeTrue();
+    expect(service.registerInProgress()).toBe(true);
 
     const request = httpMock.expectOne((req) => req.url.endsWith('/auth/register'));
     expect(request.request.body).toEqual({
@@ -451,8 +465,8 @@ describe('AuthService', () => {
     request.flush({ msg: 'User was created' }, { status: 201, statusText: 'Created' });
 
     expect(service.registerError()).toBeNull();
-    expect(service.registerInProgress()).toBeFalse();
-    expect(service.registrationCompleted()).toBeTrue();
+    expect(service.registerInProgress()).toBe(false);
+    expect(service.registrationCompleted()).toBe(true);
   });
 
   it('omits optional register metadata when not provided', () => {
@@ -479,7 +493,7 @@ describe('AuthService', () => {
     request.flush({ msg: 'missing credentials', err: 'NO_CREDENTIALS' }, { status: 400, statusText: 'Bad Request' });
 
     expect(service.registerError()).toBe('no_credentials');
-    expect(service.registrationCompleted()).toBeFalse();
+    expect(service.registrationCompleted()).toBe(false);
   });
 
   it('maps PASSWORD_TOO_SHORT backend error code for register flow', () => {
@@ -494,7 +508,7 @@ describe('AuthService', () => {
     );
 
     expect(service.registerError()).toBe('password_too_short');
-    expect(service.registrationCompleted()).toBeFalse();
+    expect(service.registrationCompleted()).toBe(false);
   });
 
   it('maps USER_ALREADY_EXISTS backend error code for register flow', () => {
@@ -509,21 +523,21 @@ describe('AuthService', () => {
     );
 
     expect(service.registerError()).toBe('user_already_exists');
-    expect(service.registrationCompleted()).toBeFalse();
+    expect(service.registrationCompleted()).toBe(false);
   });
 
   it('maps generic register request failures to request_failed', () => {
     const service = createService();
 
     service.register('Test User', 'user@example.com', 'new-password-1234');
-    expect(service.registerInProgress()).toBeTrue();
+    expect(service.registerInProgress()).toBe(true);
 
     const request = httpMock.expectOne((req) => req.url.endsWith('/auth/register'));
     request.flush({ detail: 'server error' }, { status: 500, statusText: 'Server Error' });
 
     expect(service.registerError()).toBe('request_failed');
-    expect(service.registerInProgress()).toBeFalse();
-    expect(service.registrationCompleted()).toBeFalse();
+    expect(service.registerInProgress()).toBe(false);
+    expect(service.registrationCompleted()).toBe(false);
   });
 
   it('clears register feedback state explicitly', () => {
@@ -533,26 +547,26 @@ describe('AuthService', () => {
 
     const request = httpMock.expectOne((req) => req.url.endsWith('/auth/register'));
     request.flush({ msg: 'User was created' }, { status: 201, statusText: 'Created' });
-    expect(service.registrationCompleted()).toBeTrue();
+    expect(service.registrationCompleted()).toBe(true);
 
     service.clearRegisterState();
     expect(service.registerError()).toBeNull();
-    expect(service.registrationCompleted()).toBeFalse();
+    expect(service.registrationCompleted()).toBe(false);
   });
 
   it('sets success state when forgot password request succeeds', () => {
     const service = createService();
 
     service.requestPasswordReset(' user@example.com ');
-    expect(service.forgotPasswordInProgress()).toBeTrue();
+    expect(service.forgotPasswordInProgress()).toBe(true);
 
     const request = httpMock.expectOne((req) => req.url.endsWith('/auth/forgot_password'));
     expect(request.request.body).toEqual({ email: 'user@example.com', language: 'en' });
     request.flush({ msg: 'Password reset email sent' });
 
     expect(service.forgotPasswordError()).toBeNull();
-    expect(service.forgotPasswordInProgress()).toBeFalse();
-    expect(service.passwordResetRequested()).toBeTrue();
+    expect(service.forgotPasswordInProgress()).toBe(false);
+    expect(service.passwordResetRequested()).toBe(true);
   });
 
   it('treats NO_CREDENTIALS backend error code as successful forgot password initiation', () => {
@@ -564,7 +578,7 @@ describe('AuthService', () => {
     request.flush({ msg: 'missing email', err: 'NO_CREDENTIALS' }, { status: 400, statusText: 'Bad Request' });
 
     expect(service.forgotPasswordError()).toBeNull();
-    expect(service.passwordResetRequested()).toBeTrue();
+    expect(service.passwordResetRequested()).toBe(true);
   });
 
   it('treats INVALID_CREDENTIALS backend error code as successful forgot password initiation', () => {
@@ -576,21 +590,21 @@ describe('AuthService', () => {
     request.flush({ msg: 'user not found', err: 'INVALID_CREDENTIALS' }, { status: 400, statusText: 'Bad Request' });
 
     expect(service.forgotPasswordError()).toBeNull();
-    expect(service.passwordResetRequested()).toBeTrue();
+    expect(service.passwordResetRequested()).toBe(true);
   });
 
   it('sets generic forgot password error code when request fails with non-400 status', () => {
     const service = createService();
 
     service.requestPasswordReset('user@example.com');
-    expect(service.forgotPasswordInProgress()).toBeTrue();
+    expect(service.forgotPasswordInProgress()).toBe(true);
 
     const request = httpMock.expectOne((req) => req.url.endsWith('/auth/forgot_password'));
     request.flush({ detail: 'server error' }, { status: 500, statusText: 'Server Error' });
 
     expect(service.forgotPasswordError()).toBe('request_failed');
-    expect(service.forgotPasswordInProgress()).toBeFalse();
-    expect(service.passwordResetRequested()).toBeFalse();
+    expect(service.forgotPasswordInProgress()).toBe(false);
+    expect(service.passwordResetRequested()).toBe(false);
   });
 
   it('clears forgot password feedback state explicitly', () => {
@@ -600,11 +614,11 @@ describe('AuthService', () => {
 
     const request = httpMock.expectOne((req) => req.url.endsWith('/auth/forgot_password'));
     request.flush({ msg: 'Password reset email sent' });
-    expect(service.passwordResetRequested()).toBeTrue();
+    expect(service.passwordResetRequested()).toBe(true);
 
     service.clearForgotPasswordState();
     expect(service.forgotPasswordError()).toBeNull();
-    expect(service.passwordResetRequested()).toBeFalse();
+    expect(service.passwordResetRequested()).toBe(false);
   });
 
   it('submits new password with jwt token, logs out, and marks reset as completed on success', () => {
@@ -618,16 +632,16 @@ describe('AuthService', () => {
     const request = httpMock.expectOne((req) => req.url.endsWith('/auth/reset_password'));
     expect(request.request.body).toEqual({ password: 'new-password-1234' });
     expect(request.request.headers.get('Authorization')).toBe('Bearer reset-token');
-    expect(service.passwordResetInProgress()).toBeTrue();
+    expect(service.passwordResetInProgress()).toBe(true);
     request.flush({ msg: 'New password set for user@example.com' });
 
     expect(service.resetPasswordError()).toBeNull();
-    expect(service.passwordResetInProgress()).toBeFalse();
-    expect(service.passwordResetCompleted()).toBeTrue();
-    expect(service.isAuthenticated()).toBeFalse();
-    expect(tokenMap.has('access_token')).toBeFalse();
-    expect(tokenMap.has('refresh_token')).toBeFalse();
-    expect(tokenMap.has('auth_email')).toBeFalse();
+    expect(service.passwordResetInProgress()).toBe(false);
+    expect(service.passwordResetCompleted()).toBe(true);
+    expect(service.isAuthenticated()).toBe(false);
+    expect(tokenMap.has('access_token')).toBe(false);
+    expect(tokenMap.has('refresh_token')).toBe(false);
+    expect(tokenMap.has('auth_email')).toBe(false);
     expect(redirectStorage.clearReturnUrl).toHaveBeenCalledTimes(1);
     expect(router.navigateByUrl).not.toHaveBeenCalled();
   });
@@ -639,8 +653,8 @@ describe('AuthService', () => {
 
     httpMock.expectNone((req) => req.url.includes('/auth/reset_password'));
     expect(service.resetPasswordError()).toBe('invalid_link');
-    expect(service.passwordResetInProgress()).toBeFalse();
-    expect(service.passwordResetCompleted()).toBeFalse();
+    expect(service.passwordResetInProgress()).toBe(false);
+    expect(service.passwordResetCompleted()).toBe(false);
   });
 
   it('maps NO_CREDENTIALS backend error code to no_credentials for reset password', () => {
@@ -653,8 +667,8 @@ describe('AuthService', () => {
     request.flush({ msg: 'missing password', err: 'NO_CREDENTIALS' }, { status: 400, statusText: 'Bad Request' });
 
     expect(service.resetPasswordError()).toBe('no_credentials');
-    expect(service.passwordResetInProgress()).toBeFalse();
-    expect(service.passwordResetCompleted()).toBeFalse();
+    expect(service.passwordResetInProgress()).toBe(false);
+    expect(service.passwordResetCompleted()).toBe(false);
   });
 
   it('maps PASSWORD_TOO_SHORT backend error code to password_too_short for reset password', () => {
@@ -670,8 +684,8 @@ describe('AuthService', () => {
     );
 
     expect(service.resetPasswordError()).toBe('password_too_short');
-    expect(service.passwordResetInProgress()).toBeFalse();
-    expect(service.passwordResetCompleted()).toBeFalse();
+    expect(service.passwordResetInProgress()).toBe(false);
+    expect(service.passwordResetCompleted()).toBe(false);
   });
 
   it('maps 401 status to invalid_link for reset password', () => {
@@ -684,8 +698,8 @@ describe('AuthService', () => {
     request.flush({ msg: 'token expired' }, { status: 401, statusText: 'Unauthorized' });
 
     expect(service.resetPasswordError()).toBe('invalid_link');
-    expect(service.passwordResetInProgress()).toBeFalse();
-    expect(service.passwordResetCompleted()).toBeFalse();
+    expect(service.passwordResetInProgress()).toBe(false);
+    expect(service.passwordResetCompleted()).toBe(false);
   });
 
   it('maps generic reset password failures to request_failed', () => {
@@ -698,8 +712,8 @@ describe('AuthService', () => {
     request.flush({ detail: 'server error' }, { status: 500, statusText: 'Server Error' });
 
     expect(service.resetPasswordError()).toBe('request_failed');
-    expect(service.passwordResetInProgress()).toBeFalse();
-    expect(service.passwordResetCompleted()).toBeFalse();
+    expect(service.passwordResetInProgress()).toBe(false);
+    expect(service.passwordResetCompleted()).toBe(false);
   });
 
   it('clears reset password feedback state explicitly', () => {
@@ -710,16 +724,17 @@ describe('AuthService', () => {
     const request = httpMock.expectOne((req) => req.url.endsWith('/auth/reset_password'));
     expect(request.request.headers.get('Authorization')).toBe('Bearer reset-token');
     request.flush({ msg: 'New password set for user@example.com' });
-    expect(service.passwordResetCompleted()).toBeTrue();
+    expect(service.passwordResetCompleted()).toBe(true);
 
     service.clearResetPasswordState();
     expect(service.resetPasswordError()).toBeNull();
-    expect(service.passwordResetInProgress()).toBeFalse();
-    expect(service.passwordResetCompleted()).toBeFalse();
+    expect(service.passwordResetInProgress()).toBe(false);
+    expect(service.passwordResetCompleted()).toBe(false);
   });
 
   it('verifies email with jwt token and marks verification as completed on success', () => {
-    jasmine.clock().withMock(() => {
+    vi.useFakeTimers();
+    try {
       const service = createService();
 
       service.verifyEmail(' verify-token ');
@@ -727,14 +742,16 @@ describe('AuthService', () => {
       const request = httpMock.expectOne((req) => req.url.endsWith('/auth/verify_email'));
       expect(request.request.body).toBeNull();
       expect(request.request.headers.get('Authorization')).toBe('Bearer verify-token');
-      expect(service.emailVerificationInProgress()).toBeTrue();
+      expect(service.emailVerificationInProgress()).toBe(true);
       request.flush({ msg: 'Email verified' });
-      jasmine.clock().tick(2000);
+      vi.advanceTimersByTime(2000);
 
       expect(service.verifyEmailError()).toBeNull();
-      expect(service.emailVerificationInProgress()).toBeFalse();
-      expect(service.emailVerificationCompleted()).toBeTrue();
-    });
+      expect(service.emailVerificationInProgress()).toBe(false);
+      expect(service.emailVerificationCompleted()).toBe(true);
+    } finally {
+      vi.useRealTimers();
+    }
   });
 
   it('does not call backend verify email endpoint when jwt token is missing', () => {
@@ -744,12 +761,13 @@ describe('AuthService', () => {
 
     httpMock.expectNone((req) => req.url.includes('/auth/verify_email'));
     expect(service.verifyEmailError()).toBe('invalid_link');
-    expect(service.emailVerificationInProgress()).toBeFalse();
-    expect(service.emailVerificationCompleted()).toBeFalse();
+    expect(service.emailVerificationInProgress()).toBe(false);
+    expect(service.emailVerificationCompleted()).toBe(false);
   });
 
   it('maps INVALID_CREDENTIALS backend error code to invalid_link for verify email', () => {
-    jasmine.clock().withMock(() => {
+    vi.useFakeTimers();
+    try {
       const service = createService();
 
       service.verifyEmail('verify-token');
@@ -760,16 +778,19 @@ describe('AuthService', () => {
         { msg: 'invalid token', err: 'INVALID_CREDENTIALS' },
         { status: 400, statusText: 'Bad Request' }
       );
-      jasmine.clock().tick(2000);
+      vi.advanceTimersByTime(2000);
 
       expect(service.verifyEmailError()).toBe('invalid_link');
-      expect(service.emailVerificationInProgress()).toBeFalse();
-      expect(service.emailVerificationCompleted()).toBeFalse();
-    });
+      expect(service.emailVerificationInProgress()).toBe(false);
+      expect(service.emailVerificationCompleted()).toBe(false);
+    } finally {
+      vi.useRealTimers();
+    }
   });
 
   it('maps generic verify email failures to request_failed', () => {
-    jasmine.clock().withMock(() => {
+    vi.useFakeTimers();
+    try {
       const service = createService();
 
       service.verifyEmail('verify-token');
@@ -777,30 +798,35 @@ describe('AuthService', () => {
       const request = httpMock.expectOne((req) => req.url.endsWith('/auth/verify_email'));
       expect(request.request.headers.get('Authorization')).toBe('Bearer verify-token');
       request.flush({ detail: 'server error' }, { status: 500, statusText: 'Server Error' });
-      jasmine.clock().tick(2000);
+      vi.advanceTimersByTime(2000);
 
       expect(service.verifyEmailError()).toBe('request_failed');
-      expect(service.emailVerificationInProgress()).toBeFalse();
-      expect(service.emailVerificationCompleted()).toBeFalse();
-    });
+      expect(service.emailVerificationInProgress()).toBe(false);
+      expect(service.emailVerificationCompleted()).toBe(false);
+    } finally {
+      vi.useRealTimers();
+    }
   });
 
   it('clears verify email feedback state explicitly', () => {
-    jasmine.clock().withMock(() => {
+    vi.useFakeTimers();
+    try {
       const service = createService();
 
       service.verifyEmail('verify-token');
 
       const request = httpMock.expectOne((req) => req.url.endsWith('/auth/verify_email'));
       request.flush({ msg: 'Email verified' });
-      jasmine.clock().tick(2000);
-      expect(service.emailVerificationCompleted()).toBeTrue();
+      vi.advanceTimersByTime(2000);
+      expect(service.emailVerificationCompleted()).toBe(true);
 
       service.clearVerifyEmailState();
       expect(service.verifyEmailError()).toBeNull();
-      expect(service.emailVerificationInProgress()).toBeFalse();
-      expect(service.emailVerificationCompleted()).toBeFalse();
-    });
+      expect(service.emailVerificationInProgress()).toBe(false);
+      expect(service.emailVerificationCompleted()).toBe(false);
+    } finally {
+      vi.useRealTimers();
+    }
   });
 
   it('clears stored marker return URL on logout when authenticated', () => {
@@ -813,7 +839,7 @@ describe('AuthService', () => {
     service.logout();
 
     expect(redirectStorage.clearReturnUrl).toHaveBeenCalledTimes(1);
-    expect(tokenMap.has('auth_email')).toBeFalse();
+    expect(tokenMap.has('auth_email')).toBe(false);
     expect(service.authenticatedEmail()).toBeNull();
   });
 
@@ -845,7 +871,7 @@ describe('AuthService', () => {
 
     expect(refreshedToken).toBeUndefined();
     expect(tokenMap.get('access_token')).toBe('access-token-1');
-    expect(service.isAuthenticated()).toBeFalse();
+    expect(service.isAuthenticated()).toBe(false);
 
     const validationRequest = httpMock.expectOne((req) => req.url.endsWith('/session/validate'));
     expect(validationRequest.request.headers.get('Authorization')).toBe('Bearer access-token-2');
@@ -853,7 +879,7 @@ describe('AuthService', () => {
 
     expect(refreshedToken).toBe('access-token-2');
     expect(tokenMap.get('access_token')).toBe('access-token-2');
-    expect(service.isAuthenticated()).toBeTrue();
+    expect(service.isAuthenticated()).toBe(true);
     expect(service.authenticatedEmail()).toBe('user@example.com');
   });
 
@@ -865,7 +891,7 @@ describe('AuthService', () => {
     let receivedError: any;
 
     service.refreshToken().subscribe({
-      next: () => fail('expected refreshToken() to error when refreshed token validation fails'),
+      next: () => expect.fail('expected refreshToken() to error when refreshed token validation fails'),
       error: (error) => {
         receivedError = error;
       }
@@ -881,13 +907,13 @@ describe('AuthService', () => {
     expect(validationRequest.request.headers.get('Authorization')).toBe('Bearer access-token-2');
     validationRequest.flush({ detail: 'backend unavailable' }, { status: 503, statusText: 'Server Error' });
 
-    expect(receivedError?.postRefreshSessionValidationFailed).toBeTrue();
+    expect(receivedError?.postRefreshSessionValidationFailed).toBe(true);
     expect(receivedError?.status).toBe(503);
-    expect(service.isAuthenticated()).toBeFalse();
+    expect(service.isAuthenticated()).toBe(false);
     expect(service.authenticatedEmail()).toBeNull();
-    expect(tokenMap.has('access_token')).toBeFalse();
-    expect(tokenMap.has('refresh_token')).toBeFalse();
-    expect(tokenMap.has('auth_email')).toBeFalse();
+    expect(tokenMap.has('access_token')).toBe(false);
+    expect(tokenMap.has('refresh_token')).toBe(false);
+    expect(tokenMap.has('auth_email')).toBe(false);
     expect(redirectStorage.clearReturnUrl).not.toHaveBeenCalled();
   });
 
@@ -897,17 +923,17 @@ describe('AuthService', () => {
     let receivedError: any;
 
     service.refreshToken().subscribe({
-      next: () => fail('expected refreshToken() to error when refresh token is missing'),
+      next: () => expect.fail('expected refreshToken() to error when refresh token is missing'),
       error: (error) => {
         receivedError = error;
       }
     });
 
     httpMock.expectNone((req) => req.url.endsWith('/auth/refresh'));
-    expect(receivedError).toEqual(jasmine.any(Error));
-    expect(service.isAuthenticated()).toBeFalse();
-    expect(tokenMap.has('access_token')).toBeFalse();
-    expect(tokenMap.has('refresh_token')).toBeFalse();
+    expect(receivedError).toEqual(expect.any(Error));
+    expect(service.isAuthenticated()).toBe(false);
+    expect(tokenMap.has('access_token')).toBe(false);
+    expect(tokenMap.has('refresh_token')).toBe(false);
     expect(redirectStorage.clearReturnUrl).not.toHaveBeenCalled();
   });
 
@@ -999,13 +1025,13 @@ describe('AuthService', () => {
     let secondError: any;
 
     service.refreshToken().subscribe({
-      next: () => fail('expected first refresh subscriber to error'),
+      next: () => expect.fail('expected first refresh subscriber to error'),
       error: (error) => {
         firstError = error;
       }
     });
     service.refreshToken().subscribe({
-      next: () => fail('expected second refresh subscriber to error'),
+      next: () => expect.fail('expected second refresh subscriber to error'),
       error: (error) => {
         secondError = error;
       }
@@ -1016,9 +1042,9 @@ describe('AuthService', () => {
 
     expect(firstError?.status).toBe(401);
     expect(secondError?.status).toBe(401);
-    expect(service.isAuthenticated()).toBeFalse();
-    expect(tokenMap.has('access_token')).toBeFalse();
-    expect(tokenMap.has('refresh_token')).toBeFalse();
+    expect(service.isAuthenticated()).toBe(false);
+    expect(tokenMap.has('access_token')).toBe(false);
+    expect(tokenMap.has('refresh_token')).toBe(false);
     expect(redirectStorage.clearReturnUrl).not.toHaveBeenCalled();
   });
 
@@ -1030,7 +1056,7 @@ describe('AuthService', () => {
     let receivedError: any;
 
     service.refreshToken().subscribe({
-      next: () => fail('expected refresh subscriber to error'),
+      next: () => expect.fail('expected refresh subscriber to error'),
       error: (error) => {
         receivedError = error;
       }
@@ -1040,7 +1066,7 @@ describe('AuthService', () => {
     request.flush({ detail: 'refresh failed' }, { status: 500, statusText: 'Server Error' });
 
     expect(receivedError?.status).toBe(500);
-    expect(service.isAuthenticated()).toBeTrue();
+    expect(service.isAuthenticated()).toBe(true);
     expect(tokenMap.get('access_token')).toBe('access-token-1');
     expect(tokenMap.get('refresh_token')).toBe('refresh-token-1');
     expect(redirectStorage.clearReturnUrl).not.toHaveBeenCalled();
@@ -1055,7 +1081,7 @@ describe('AuthService', () => {
     let receivedError: any;
 
     service.validateSessionIfStale(0).subscribe({
-      next: () => fail('expected validateSessionIfStale() to error'),
+      next: () => expect.fail('expected validateSessionIfStale() to error'),
       error: (error) => {
         receivedError = error;
       }
@@ -1065,10 +1091,10 @@ describe('AuthService', () => {
     request.flush({ msg: 'Not enough segments' }, { status: 422, statusText: 'Unprocessable Entity' });
 
     expect(receivedError?.status).toBe(422);
-    expect(service.isAuthenticated()).toBeFalse();
-    expect(tokenMap.has('access_token')).toBeFalse();
-    expect(tokenMap.has('refresh_token')).toBeFalse();
-    expect(tokenMap.has('auth_email')).toBeFalse();
+    expect(service.isAuthenticated()).toBe(false);
+    expect(tokenMap.has('access_token')).toBe(false);
+    expect(tokenMap.has('refresh_token')).toBe(false);
+    expect(tokenMap.has('auth_email')).toBe(false);
     expect(redirectStorage.clearReturnUrl).toHaveBeenCalledTimes(1);
   });
 
@@ -1083,7 +1109,7 @@ describe('AuthService', () => {
   });
 
   it('falls back to returnUrl when redirect storage is unavailable during forced re-authentication', () => {
-    redirectStorage.storeReturnUrl.and.returnValue(false);
+    redirectStorage.storeReturnUrl.mockReturnValue(false);
     const service = createService();
 
     const queryParams = service.preserveReturnUrlForReauthentication('/collection/123/text?tab=notes');
@@ -1109,10 +1135,10 @@ describe('AuthService', () => {
 
     service.expireSession();
 
-    expect(service.isAuthenticated()).toBeFalse();
-    expect(tokenMap.has('access_token')).toBeFalse();
-    expect(tokenMap.has('refresh_token')).toBeFalse();
-    expect(tokenMap.has('auth_email')).toBeFalse();
+    expect(service.isAuthenticated()).toBe(false);
+    expect(tokenMap.has('access_token')).toBe(false);
+    expect(tokenMap.has('refresh_token')).toBe(false);
+    expect(tokenMap.has('auth_email')).toBe(false);
     expect(redirectStorage.clearReturnUrl).not.toHaveBeenCalled();
   });
 });

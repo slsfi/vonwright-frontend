@@ -403,6 +403,15 @@
         <target>Inga kommentarer.</target>
       </segment>
     </unit>
+    <unit id="Content.Introduction">
+      <notes>
+        <note category="description">Optional HTML above the content grid. Leave empty to hide this block.</note>
+      </notes>
+      <segment state="initial">
+        <source/>
+        <target/>
+      </segment>
+    </unit>
     <unit id="DateHistogram.Clear">
       <segment state="initial">
         <source>Nollställ</source>
@@ -1201,6 +1210,12 @@
         <target>Sekundär meny</target>
       </segment>
     </unit>
+    <unit id="MainSideMenu.Articles">
+      <segment state="initial">
+        <source>Artiklar</source>
+        <target>Artiklar</target>
+      </segment>
+    </unit>
     <unit id="MainSideMenu.CollectionsGroup1">
       <segment state="initial">
         <source>Innehåll</source>
@@ -1271,6 +1286,12 @@
       <segment state="initial">
         <source>Verkregister</source>
         <target>Verkregister</target>
+      </segment>
+    </unit>
+    <unit id="MainSideMenu.Indices">
+      <segment state="initial">
+        <source>Register</source>
+        <target>Register</target>
       </segment>
     </unit>
     <unit id="MainSideMenu.Login">
@@ -1861,6 +1882,12 @@
         <target>Något gick fel. Vi kan inte hitta sidan du försökte nå. Du kan gå tillbaka till föregående sida med hjälp av webbläsarens tillbaka-knapp, eller försöka rätta adressen i webbläsarens adressfält.</target>
       </segment>
     </unit>
+    <unit id="PageNotFound.GoToHome">
+      <segment state="initial">
+        <source>Gå till <pc id="0" equivStart="START_LINK" equivEnd="CLOSE_LINK" type="link" dispStart="&lt;a [routerLink]=&quot;[&apos;/&apos;]&quot;&gt;" dispEnd="&lt;/a&gt;">startsidan</pc></source>
+        <target>Gå till <pc id="0" equivStart="START_LINK" equivEnd="CLOSE_LINK" type="link" dispStart="&lt;a [routerLink]=&quot;[&apos;/&apos;]&quot;&gt;" dispEnd="&lt;/a&gt;">startsidan</pc></target>
+      </segment>
+    </unit>
     <unit id="Password.DoesNotMatch">
       <segment state="initial">
         <source>Lösenorden matchar inte.</source>
@@ -1893,8 +1920,8 @@
     </unit>
     <unit id="PdfViewer.NoBrowserSupport">
       <segment state="initial">
-        <source>Din webbläsare stöder inte PDF-filer. Ladda ner PDF:en för att läsa den:</source>
-        <target>Din webbläsare stöder inte PDF-filer. Ladda ner PDF:en för att läsa den:</target>
+        <source>Ett fel hindrade PDF:en från att laddas, eller så stöder din webbläsare inte PDF-filer. Ladda ner PDF:en för att läsa den:</source>
+        <target>Ett fel hindrade PDF:en från att laddas, eller så stöder din webbläsare inte PDF-filer. Ladda ner PDF:en för att läsa den:</target>
       </segment>
     </unit>
     <unit id="PdfViewer.Page">

@@ -20,7 +20,7 @@ describe('PdfViewerComponent', () => {
           provide: ActivatedRoute,
           useValue: { queryParamMap: queryParamMap.asObservable() }
         },
-        { provide: ModalController, useValue: { create: jasmine.createSpy('create') } }
+        { provide: ModalController, useValue: { create: vi.fn().mockName('create') } }
       ]
     })
       .overrideComponent(PdfViewerComponent, {

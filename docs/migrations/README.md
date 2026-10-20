@@ -1,10 +1,17 @@
-# Angular modernization migrations
+# Migration plans
 
-These plans document a two-stage effort to bring the application from an Angular 20-era architecture that still used legacy and deprecated Angular APIs to a modern Angular 22 architecture. The work is split into stages so the application can remain runnable throughout the modernization and the higher-risk build, SSR, and test-runner changes can be handled separately.
+This directory contains implementation plans and records for migrations in the base app. Current architecture and operating guidance live in [development](../DEVELOPMENT.md) and [deployment](../DEPLOYMENT.md); release-specific instructions for fork maintainers live in [breaking changes and fork migration notes](../breaking-changes/).
 
-| Stage | Status | Scope | Plan |
-| --- | --- | --- | --- |
-| 1 | Completed for release 3.1.0 | Migrate the application and Ionic integration to standalone APIs and remove Zone.js-dependent change detection while retaining the existing build, SSR, test, and deployment architecture. | [Standalone and zoneless migration](STAGE-1-STANDALONE-ZONELESS.md) |
-| 2 | Planned; not yet implemented | Migrate from the legacy Webpack browser/server builders and `CommonEngine` to Angular's `application` builder and current SSR APIs, then replace Jasmine/Karma with Vitest. | [Application builder and Vitest migration](STAGE-2-APPLICATION-BUILDER.md) |
+## Active and planned migrations
 
-See the [application architecture](../DEVELOPMENT.md#application-architecture) for the current implemented state. Active deferred work remains tracked in the [cross-cutting TODOs](../TODO.md).
+No active or planned migration plans are currently recorded here. Deferred work is tracked in the [cross-cutting TODOs](../TODO.md).
+
+## Completed migrations
+
+| Migration | Scope | Release |
+| --- | --- | --- |
+| [Angular 22 modernization](completed/angular-22-modernization/README.md) | Standalone and zoneless application, integrated application builder and SSR, Vitest, and public asset layout. | Stage 1: 3.1.0. Stage 2: planned for 4.0.0. |
+
+## Organizing migration plans
+
+Give each migration its own named folder directly under `migrations/`, with a `README.md` overview and additional stage plans when needed. When implementation and verification are complete, move the whole folder under `completed/` and update this index and incoming links. Completion records implementation status; it does not mean the changes have been released.

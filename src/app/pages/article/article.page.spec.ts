@@ -1,3 +1,4 @@
+import type { MockedObject } from 'vitest';
 import { LOCALE_ID } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { ActivatedRoute, Params, Router } from '@angular/router';
@@ -16,8 +17,8 @@ describe('ArticlePage', () => {
   let routeParams$: BehaviorSubject<Params>;
   let routeFragment$: BehaviorSubject<string | null>;
   let route: Partial<ActivatedRoute>;
-  let router: jasmine.SpyObj<Pick<Router, 'navigate'>>;
-  let markdownService: jasmine.SpyObj<Pick<MarkdownService, 'getParsedMdContent'>>;
+  let router: MockedObject<Pick<Router, 'navigate'>>;
+  let markdownService: MockedObject<Pick<MarkdownService, 'getParsedMdContent'>>;
 
   const translatedArticles: Article[] = [
     {
@@ -55,13 +56,14 @@ describe('ArticlePage', () => {
       params: routeParams$.asObservable(),
       fragment: routeFragment$.asObservable()
     };
-    router = jasmine.createSpyObj<Pick<Router, 'navigate'>>('Router', ['navigate']);
-    router.navigate.and.resolveTo(true);
-    markdownService = jasmine.createSpyObj<Pick<MarkdownService, 'getParsedMdContent'>>(
-      'MarkdownService',
-      ['getParsedMdContent']
-    );
-    markdownService.getParsedMdContent.and.callFake(
+    router = {
+      navigate: vi.fn().mockName('Router.navigate')
+    };
+    router.navigate.mockResolvedValue(true);
+    markdownService = {
+      getParsedMdContent: vi.fn().mockName('MarkdownService.getParsedMdContent')
+    };
+    markdownService.getParsedMdContent.mockImplementation(
       (fileId: string) => of(`<p>${fileId}</p>`)
     );
 
@@ -75,7 +77,7 @@ describe('ArticlePage', () => {
         { provide: PlatformService, useValue: { isMobile: () => false } },
         { provide: PopoverController, useValue: {} },
         { provide: Router, useValue: router },
-        { provide: ScrollService, useValue: { scrollElementIntoView: jasmine.createSpy('scrollElementIntoView') } }
+        { provide: ScrollService, useValue: { scrollElementIntoView: vi.fn().mockName('scrollElementIntoView') } }
       ]
     })
       .overrideTemplate(ArticlePage, '')
@@ -97,9 +99,10 @@ describe('ArticlePage', () => {
     expect(component.article()?.id).toBe('04-01');
     expect(component.article()?.language).toBe('en');
     expect(router.navigate).not.toHaveBeenCalled();
-    expect(markdownService.getParsedMdContent).toHaveBeenCalledOnceWith(
+    expect(markdownService.getParsedMdContent).toHaveBeenCalledTimes(1);
+    expect(markdownService.getParsedMdContent).toHaveBeenCalledWith(
       'en-04-01',
-      jasmine.any(String)
+      expect.any(String)
     );
     expect(values).toEqual(['<p>en-04-01</p>']);
 
@@ -117,7 +120,8 @@ describe('ArticlePage', () => {
 
     expect(component.article()?.id).toBe('04-01');
     expect(component.article()?.language).toBe('en');
-    expect(router.navigate).toHaveBeenCalledOnceWith(['..', 'about-tove-jansson'], {
+    expect(router.navigate).toHaveBeenCalledTimes(1);
+    expect(router.navigate).toHaveBeenCalledWith(['..', 'about-tove-jansson'], {
       relativeTo: route as ActivatedRoute,
       queryParamsHandling: 'preserve',
       preserveFragment: true,
@@ -139,15 +143,15 @@ describe('ArticlePage', () => {
     routeParams$.next({ name: 'another-article' });
 
     expect(component.article()?.id).toBe('04-02');
-    expect(component.enableTOC()).toBeTrue();
-    expect(component.tocMenuOpen()).toBeTrue();
+    expect(component.enableTOC()).toBe(true);
+    expect(component.tocMenuOpen()).toBe(true);
     expect(values).toEqual(['<p>en-04-01</p>', '<p>en-04-02</p>']);
 
     subscription.unsubscribe();
   });
 
   it('removes its click listener and pending scroll retry when destroyed', () => {
-    const clearTimeoutSpy = spyOn(window, 'clearTimeout').and.callThrough();
+    const clearTimeoutSpy = vi.spyOn(window, 'clearTimeout');
     const fixture = TestBed.createComponent(ArticlePage);
     fixture.detectChanges();
     const anchor = document.createElement('a');
@@ -160,9 +164,9 @@ describe('ArticlePage', () => {
     };
 
     dispatchFragmentClick();
-    expect(router.navigate).toHaveBeenCalledWith([], jasmine.objectContaining({ fragment: 'section' }));
+    expect(router.navigate).toHaveBeenCalledWith([], expect.objectContaining({ fragment: 'section' }));
 
-    router.navigate.calls.reset();
+    router.navigate.mockClear();
     routeFragment$.next('missing-section');
     fixture.destroy();
     dispatchFragmentClick();

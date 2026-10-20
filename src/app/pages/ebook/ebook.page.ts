@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, inject, signal } from '@angular/core';
+import { Component, OnDestroy, OnInit, RESPONSE_INIT, inject, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { IonContent } from '@ionic/angular';
 import { Subscription } from 'rxjs';
@@ -18,6 +18,7 @@ import { splitFilename } from '@utility-functions';
 export class EbookPage implements OnDestroy, OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
+  private response = inject(RESPONSE_INIT, { optional: true });
 
   readonly ebookType = signal('');
   readonly filename = signal('');
@@ -32,6 +33,10 @@ export class EbookPage implements OnDestroy, OnInit {
         // Legacy route -> redirect to correct route
         const filenameparts = splitFilename(params.filename);
         if (filenameparts.extension) {
+          // Angular SSR turns the completed navigation into an HTTP redirect.
+          if (this.response) {
+            this.response.status = 301;
+          }
           this.router.navigate(
             ['/ebook', filenameparts.extension, filenameparts.name],
             { replaceUrl: true }

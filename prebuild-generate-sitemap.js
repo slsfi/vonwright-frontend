@@ -5,7 +5,7 @@ const {
   getAuthProtectedRoutePathsFromSourceFile
 } = require('./prebuild-generate-routes');
 
-const configFilepath = 'src/assets/config/config.ts';
+const configFilepath = 'src/project/config.ts';
 const routesFilepath = 'src/app/app.routes.ts';
 const sitemapFilename = 'sitemap.txt';
 const SITEMAP_EXCLUDED_ROUTE_PATH_KEYS = Object.freeze([
@@ -22,7 +22,8 @@ generateSitemap();
 
 
 /**
- * Generates a simple sitemap text file in the root folder `src/`.
+ * Generates a simple sitemap text file at `public/sitemap.txt`.
+ * nginx and Express serve it at the website root from the default locale's output.
  * The file contains one URL per line. The script uses the settings
  * in config.ts to fetch data about the project and generate the
  * URLs to all unique pages. The following page types are included:
@@ -62,7 +63,7 @@ async function generateSitemap() {
     process.exit(1); // Hard failure: something is wrong with core config
   }
 
-  const locale = config.app?.i18n?.defaultLanguage ?? 'sv';
+  const locale = config.app?.i18n?.defaultLanguage ?? config.app?.i18n?.languages?.[0]?.code ?? 'sv';
   const multilingualCollectionTOC = config.app?.i18n?.multilingualCollectionTableOfContents ?? false;
 
   const APIBase = API + '/' + projectName;
@@ -198,7 +199,7 @@ function getAuthProtectedRoutePathKeys(authEnabled) {
 
 function initializeSitemapFile(urlOrigin, locale) {
   try {
-    fs.writeFileSync(path.join(__dirname, 'src/' + sitemapFilename), urlOrigin + '/' + locale + '/\n');
+    fs.writeFileSync(path.join(__dirname, 'public/' + sitemapFilename), urlOrigin + '/' + locale + '/\n');
     return true;
   } catch (err) {
     console.error(err);
@@ -208,7 +209,7 @@ function initializeSitemapFile(urlOrigin, locale) {
 
 function appendToSitemapFile(content) {
   try {
-    fs.appendFileSync(path.join(__dirname, 'src/' + sitemapFilename), content);
+    fs.appendFileSync(path.join(__dirname, 'public/' + sitemapFilename), content);
   } catch (err) {
     console.error(err);
   }

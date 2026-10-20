@@ -82,7 +82,7 @@ describe('auth-redirect-url utils', () => {
     const router = createRouter();
     const authRedirectStorage: Pick<AuthRedirectStorageService, 'storeReturnUrl' | 'clearReturnUrl'> = {
       storeReturnUrl: () => true,
-      clearReturnUrl: jasmine.createSpy('clearReturnUrl')
+      clearReturnUrl: vi.fn().mockName('clearReturnUrl')
     };
 
     const result = createLoginRedirectQueryParams(router as Router, authRedirectStorage, '/collection/123/text');
@@ -97,7 +97,7 @@ describe('auth-redirect-url utils', () => {
     const router = createRouter();
     const authRedirectStorage: Pick<AuthRedirectStorageService, 'storeReturnUrl' | 'clearReturnUrl'> = {
       storeReturnUrl: () => false,
-      clearReturnUrl: jasmine.createSpy('clearReturnUrl')
+      clearReturnUrl: vi.fn().mockName('clearReturnUrl')
     };
 
     const result = createLoginRedirectQueryParams(router as Router, authRedirectStorage, '/collection/123/text');
@@ -108,8 +108,8 @@ describe('auth-redirect-url utils', () => {
   it('returns undefined redirect params for unsafe targets', () => {
     const router = createRouter();
     const authRedirectStorage: Pick<AuthRedirectStorageService, 'storeReturnUrl' | 'clearReturnUrl'> = {
-      storeReturnUrl: jasmine.createSpy('storeReturnUrl').and.returnValue(true),
-      clearReturnUrl: jasmine.createSpy('clearReturnUrl')
+      storeReturnUrl: vi.fn().mockName('storeReturnUrl').mockReturnValue(true),
+      clearReturnUrl: vi.fn().mockName('clearReturnUrl')
     };
 
     const result = createLoginRedirectQueryParams(router as Router, authRedirectStorage, '//evil.example');

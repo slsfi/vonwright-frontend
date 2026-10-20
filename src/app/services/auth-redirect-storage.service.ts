@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Service } from '@angular/core';
 
 const AUTH_REDIRECT_STORAGE_KEY = 'auth.returnUrl';
 
@@ -32,7 +32,7 @@ export abstract class AuthRedirectStorageService {
 /**
  * Browser implementation backed by sessionStorage.
  */
-@Injectable()
+@Service({ autoProvided: false })
 export class BrowserAuthRedirectStorageService extends AuthRedirectStorageService {
   storeReturnUrl(value: string): boolean {
     try {
@@ -67,7 +67,7 @@ export class BrowserAuthRedirectStorageService extends AuthRedirectStorageServic
  *
  * Redirect targets are not persisted across requests in this setup.
  */
-@Injectable()
+@Service({ autoProvided: false })
 export class ServerAuthRedirectStorageService extends AuthRedirectStorageService {
   storeReturnUrl(_value: string): boolean {
     return false;

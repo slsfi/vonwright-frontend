@@ -5,24 +5,25 @@ describe('ScrollService', () => {
   let service: ScrollService;
 
   beforeEach(() => {
-    jasmine.clock().install();
+    vi.useFakeTimers();
     service = new ScrollService();
   });
 
   afterEach(() => {
-    jasmine.clock().uninstall();
+    vi.useRealTimers();
   });
 
   describe('scrollToFirstSearchMatch', () => {
     it('returns a handle that can cancel the retry interval', () => {
       const container = document.createElement('div');
-      const querySelectorSpy = spyOn(container, 'querySelector').and.callThrough();
+      const querySelectorSpy = vi.spyOn(container, 'querySelector');
 
       const intervalTimerId = service.scrollToFirstSearchMatch(container);
       clearInterval(intervalTimerId);
-      jasmine.clock().tick(2000);
+      vi.advanceTimersByTime(2000);
 
-      expect(intervalTimerId).toEqual(jasmine.any(Number));
+      // Node fake timers return an object; browser timer handles are numbers.
+      expect(intervalTimerId).toBeDefined();
       expect(querySelectorSpy).not.toHaveBeenCalled();
     });
 
@@ -33,21 +34,23 @@ describe('ScrollService', () => {
         <p><mark id="content-match"></mark></p>
       `;
       const target = container.querySelector('#content-match') as HTMLElement;
-      const scrollSpy = spyOn(service, 'scrollToHTMLElement');
+      const scrollSpy = vi.spyOn(service, 'scrollToHTMLElement').mockReturnValue(undefined);
 
       service.scrollToFirstSearchMatch(container);
-      jasmine.clock().tick(1000);
-      jasmine.clock().tick(5000);
+      vi.advanceTimersByTime(1000);
+      vi.advanceTimersByTime(5000);
 
-      expect(scrollSpy).toHaveBeenCalledOnceWith(target);
+      expect(scrollSpy).toHaveBeenCalledTimes(1);
+
+      expect(scrollSpy).toHaveBeenCalledWith(target);
     });
 
     it('stops after ten unsuccessful attempts', () => {
       const container = document.createElement('div');
-      const querySelectorSpy = spyOn(container, 'querySelector').and.callThrough();
+      const querySelectorSpy = vi.spyOn(container, 'querySelector');
 
       service.scrollToFirstSearchMatch(container);
-      jasmine.clock().tick(11000);
+      vi.advanceTimersByTime(11000);
 
       expect(querySelectorSpy).toHaveBeenCalledTimes(10);
     });

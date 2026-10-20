@@ -1,3 +1,4 @@
+import type { MockedObject } from 'vitest';
 import { signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
@@ -8,16 +9,18 @@ import { LoginPage } from './login.page';
 describe('LoginPage', () => {
   const loginError = signal<LoginErrorCode | null>(null);
   const loginInProgress = signal(false);
-  let authService: jasmine.SpyObj<AuthService>;
+  let authService: MockedObject<Pick<AuthService, 'login' | 'clearLoginError'>>
+    & Pick<AuthService, 'loginError' | 'loginInProgress'>;
 
   beforeEach(async () => {
     loginError.set(null);
     loginInProgress.set(false);
-    authService = jasmine.createSpyObj<AuthService>(
-      'AuthService',
-      ['login', 'clearLoginError'],
-      { loginError, loginInProgress }
-    );
+    authService = {
+      login: vi.fn().mockName('AuthService.login'),
+      clearLoginError: vi.fn().mockName('AuthService.clearLoginError'),
+      loginError,
+      loginInProgress
+    };
 
     await TestBed.configureTestingModule({
       imports: [LoginPage],
@@ -34,18 +37,20 @@ describe('LoginPage', () => {
     fixture.detectChanges();
 
     component.attemptLogin();
-    expect(component.form.controls.email.touched).toBeTrue();
-    expect(component.form.controls.password.touched).toBeTrue();
+    expect(component.form.controls.email.touched).toBe(true);
+    expect(component.form.controls.password.touched).toBe(true);
     expect(authService.login).not.toHaveBeenCalled();
 
     component.form.setValue({ email: 'reader@example.org', password: 'secret' });
     await fixture.whenStable();
 
-    expect(fixture.nativeElement.querySelector('ion-button').disabled).toBeFalse();
+    expect(fixture.nativeElement.querySelector('ion-button').disabled).toBe(false);
 
     component.attemptLogin();
 
-    expect(authService.login).toHaveBeenCalledOnceWith('reader@example.org', 'secret');
+    expect(authService.login).toHaveBeenCalledTimes(1);
+
+    expect(authService.login).toHaveBeenCalledWith('reader@example.org', 'secret');
   });
 
   it('renders signal-driven feedback without a manual change-detection pass', async () => {

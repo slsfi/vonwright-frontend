@@ -1,3 +1,4 @@
+import type { MockedObject } from 'vitest';
 import { LOCALE_ID } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { ActivatedRoute, Params, Router } from '@angular/router';
@@ -14,51 +15,60 @@ import { MediaCollectionPage } from './media-collection.page';
 describe('MediaCollectionPage', () => {
   let params$: BehaviorSubject<Params>;
   let queryParams$: BehaviorSubject<Params>;
-  let facsimileImageService: jasmine.SpyObj<FacsimileImageService>;
-  let markdownService: jasmine.SpyObj<MarkdownService>;
-  let mediaCollectionService: jasmine.SpyObj<MediaCollectionService>;
-  let modalController: jasmine.SpyObj<ModalController>;
-  let router: jasmine.SpyObj<Router>;
-  let urlService: jasmine.SpyObj<UrlService>;
+  let facsimileImageService: MockedObject<Pick<FacsimileImageService, 'resolveImageSrc' | 'revokeObjectURL'>>;
+  let markdownService: MockedObject<Pick<MarkdownService, 'getParsedMdContent'>>;
+  let mediaCollectionService: MockedObject<Pick<
+    MediaCollectionService,
+    'getAllNamedEntityOccInMediaCollsByType'
+    | 'getMediaCollections'
+    | 'getNamedEntityOccInMediaColls'
+    | 'getSingleMediaCollection'
+  >>;
+  let modalController: MockedObject<Pick<ModalController, 'create'>>;
+  let router: MockedObject<Pick<Router, 'navigate'>>;
+  let urlService: MockedObject<Pick<UrlService, 'parse' | 'stringify'>>;
 
   beforeEach(async () => {
     params$ = new BehaviorSubject<Params>({});
     queryParams$ = new BehaviorSubject<Params>({});
-    facsimileImageService = jasmine.createSpyObj<FacsimileImageService>(
-      'FacsimileImageService',
-      ['resolveImageSrc', 'revokeObjectURL']
-    );
-    facsimileImageService.resolveImageSrc.and.callFake(
+    facsimileImageService = {
+      resolveImageSrc: vi.fn().mockName('FacsimileImageService.resolveImageSrc'),
+      revokeObjectURL: vi.fn().mockName('FacsimileImageService.revokeObjectURL')
+    };
+    facsimileImageService.resolveImageSrc.mockImplementation(
       (url: string | null) => of({ src: url ?? '', objectURL: null })
     );
-    markdownService = jasmine.createSpyObj<MarkdownService>(
-      'MarkdownService',
-      ['getParsedMdContent']
-    );
-    markdownService.getParsedMdContent.and.callFake(
+    markdownService = {
+      getParsedMdContent: vi.fn().mockName('MarkdownService.getParsedMdContent')
+    };
+    markdownService.getParsedMdContent.mockImplementation(
       (fileId: string) => of(`<p>${fileId}</p>`)
     );
-    mediaCollectionService = jasmine.createSpyObj<MediaCollectionService>(
-      'MediaCollectionService',
-      [
-        'getAllNamedEntityOccInMediaCollsByType',
-        'getMediaCollections',
-        'getNamedEntityOccInMediaColls',
-        'getSingleMediaCollection'
-      ]
-    );
-    mediaCollectionService.getAllNamedEntityOccInMediaCollsByType.and.returnValue(of([]));
-    mediaCollectionService.getMediaCollections.and.returnValue(of([
+    mediaCollectionService = {
+      getAllNamedEntityOccInMediaCollsByType: vi.fn().mockName('MediaCollectionService.getAllNamedEntityOccInMediaCollsByType'),
+      getMediaCollections: vi.fn().mockName('MediaCollectionService.getMediaCollections'),
+      getNamedEntityOccInMediaColls: vi.fn().mockName('MediaCollectionService.getNamedEntityOccInMediaColls'),
+      getSingleMediaCollection: vi.fn().mockName('MediaCollectionService.getSingleMediaCollection')
+    };
+    mediaCollectionService.getAllNamedEntityOccInMediaCollsByType.mockReturnValue(of([]));
+    mediaCollectionService.getMediaCollections.mockReturnValue(of([
       { id: 1, title: 'Portraits', description: 'Collection description', mediaCount: 2 }
     ]));
-    mediaCollectionService.getSingleMediaCollection.and.returnValue(of([]));
-    mediaCollectionService.getNamedEntityOccInMediaColls.and.returnValue(of([]));
-    modalController = jasmine.createSpyObj<ModalController>('ModalController', ['create']);
-    router = jasmine.createSpyObj<Router>('Router', ['navigate']);
-    router.navigate.and.resolveTo(true);
-    urlService = jasmine.createSpyObj<UrlService>('UrlService', ['parse', 'stringify']);
-    urlService.parse.and.returnValue([]);
-    urlService.stringify.and.returnValue('encoded-filters');
+    mediaCollectionService.getSingleMediaCollection.mockReturnValue(of([]));
+    mediaCollectionService.getNamedEntityOccInMediaColls.mockReturnValue(of([]));
+    modalController = {
+      create: vi.fn().mockName('ModalController.create')
+    };
+    router = {
+      navigate: vi.fn().mockName('Router.navigate')
+    };
+    router.navigate.mockResolvedValue(true);
+    urlService = {
+      parse: vi.fn().mockName('UrlService.parse'),
+      stringify: vi.fn().mockName('UrlService.stringify')
+    };
+    urlService.parse.mockReturnValue([]);
+    urlService.stringify.mockReturnValue('encoded-filters');
 
     await TestBed.configureTestingModule({
       imports: [MediaCollectionPage],
@@ -67,7 +77,9 @@ describe('MediaCollectionPage', () => {
         { provide: ActivatedRoute, useValue: { params: params$, queryParams: queryParams$ } },
         {
           provide: DocumentHeadService,
-          useValue: jasmine.createSpyObj<DocumentHeadService>('DocumentHeadService', ['setTitle'])
+          useValue: {
+            setTitle: vi.fn().mockName('DocumentHeadService.setTitle')
+          } satisfies MockedObject<Pick<DocumentHeadService, 'setTitle'>>
         },
         { provide: FacsimileImageService, useValue: facsimileImageService },
         { provide: MarkdownService, useValue: markdownService },
@@ -99,8 +111,8 @@ describe('MediaCollectionPage', () => {
   it('renders collection and thumbnail resolution updates without manual change detection', async () => {
     const collections$ = new Subject<any[]>();
     const resolvedImage$ = new Subject<ResolvedFacsimileImageSrc>();
-    mediaCollectionService.getMediaCollections.and.returnValue(collections$);
-    facsimileImageService.resolveImageSrc.and.returnValue(resolvedImage$);
+    mediaCollectionService.getMediaCollections.mockReturnValue(collections$);
+    facsimileImageService.resolveImageSrc.mockReturnValue(resolvedImage$);
 
     const fixture = TestBed.createComponent(MediaCollectionPage);
     fixture.detectChanges();
@@ -120,12 +132,12 @@ describe('MediaCollectionPage', () => {
   });
 
   it('applies query-parameter filters and updates filter URLs', async () => {
-    mediaCollectionService.getAllNamedEntityOccInMediaCollsByType.and.callFake(
+    mediaCollectionService.getAllNamedEntityOccInMediaCollsByType.mockImplementation(
       (type: string) => type === 'person'
         ? of([{ id: 7, name: 'Ada', media_collection_id: 1, filename: 'portrait.jpg' }])
         : of([])
     );
-    urlService.parse.and.returnValue([{ person: [7] }]);
+    urlService.parse.mockReturnValue([{ person: [7] }]);
 
     const fixture = TestBed.createComponent(MediaCollectionPage);
     fixture.detectChanges();
@@ -141,14 +153,14 @@ describe('MediaCollectionPage', () => {
       [{ person: [7] }, { place: [9] }],
       true
     );
-    expect(router.navigate).toHaveBeenCalledWith([], jasmine.objectContaining({
+    expect(router.navigate).toHaveBeenCalledWith([], expect.objectContaining({
       queryParams: { filters: 'encoded-filters' },
       replaceUrl: true
     }));
   });
 
   it('derives Markdown content directly from the collection route', async () => {
-    mediaCollectionService.getNamedEntityOccInMediaColls.and.returnValue(of([{
+    mediaCollectionService.getNamedEntityOccInMediaColls.mockReturnValue(of([{
       collection_id: 1,
       front: 'portrait.jpg',
       full_name: 'Ada Lovelace'
@@ -173,12 +185,12 @@ describe('MediaCollectionPage', () => {
   it('keeps the image-modal loading state zoneless-safe', async () => {
     let dismissModal: (value: { role: string }) => void = () => undefined;
     const modal = {
-      present: jasmine.createSpy('present'),
-      onWillDismiss: jasmine.createSpy('onWillDismiss').and.returnValue(
-        new Promise<{ role: string }>(resolve => dismissModal = resolve)
-      )
+      present: vi.fn().mockName('present'),
+      onWillDismiss: vi.fn().mockName('onWillDismiss').mockReturnValue(new Promise<{
+    role: string;
+}>(resolve => dismissModal = resolve))
     };
-    modalController.create.and.resolveTo(modal as any);
+    modalController.create.mockResolvedValue(modal as any);
 
     const fixture = TestBed.createComponent(MediaCollectionPage);
     fixture.detectChanges();

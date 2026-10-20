@@ -4,25 +4,29 @@ This app is intended to be themed in each project fork. Keep fork-specific
 changes concentrated in the files described below so that updates from the
 base repository remain easy to merge.
 
+For the overall fork configuration workflow and customization-file map, see the
+[project customization guide](PROJECT-CUSTOMIZATION.md). This guide covers the
+styling details.
+
 
 ## Where theming changes belong
 
 Use the following files for different kinds of customization:
 
-- [`src/assets/custom_css/custom.scss`](../src/assets/custom_css/custom.scss)
+- [`src/project/global-overrides.scss`](../src/project/global-overrides.scss)
   for colors, typography, spacing, component variables, and other
   project-specific CSS. This is the preferred place for most theming work.
-- [`src/global.scss`](../src/global.scss) for choosing which shared style and
+- [`src/styles.scss`](../src/styles.scss) for choosing which shared style and
   font bundles are included in the build.
-- [`src/assets/config/config.ts`](../src/assets/config/config.ts) for visual
+- [`src/project/config.ts`](../src/project/config.ts) for visual
   options represented by application configuration, such as the home-page
   banner.
 - [`src/index.html`](../src/index.html) for external font-provider snippets and
   other document-level resources.
-- `src/assets/images/` and `src/assets/icon/` for project images and icons.
+- `public/assets/images/` and `public/favicon.ico` for project images and the favicon.
 
-The Angular build loads `global.scss` first and `custom.scss` second. As a
-result, declarations in `custom.scss` can override the base styles without
+The Angular build loads `styles.scss` first and `project/global-overrides.scss` second. As a
+result, declarations in `global-overrides.scss` can override the base styles without
 editing them. Prefer this approach over changing styles in `src/theme/` or in
 individual components: it keeps the fork's theme in one place and reduces
 merge conflicts when the base app is updated.
@@ -30,7 +34,7 @@ merge conflicts when the base app is updated.
 
 ## Customize CSS variables
 
-[`custom.scss`](../src/assets/custom_css/custom.scss) starts with a commented
+[`global-overrides.scss`](../src/project/global-overrides.scss) starts with a commented
 reference containing the global and component-scoped CSS custom properties
 used by the app, their default values, and the selectors required to override
 them. Use that reference as the source of truth when building a theme.
@@ -73,10 +77,10 @@ page-introduction[class][class] {
 Some scoped defaults are declared in `src/theme/scoped-variables/` and need
 the `[class][class]` specificity shown above. Other variables use inline
 fallbacks and can be overridden with the element selector alone. Follow the
-selector listed in `custom.scss`; use `!important` only when a more specific
+selector listed in `global-overrides.scss`; use `!important` only when a more specific
 selector is not practical.
 
-You can also add ordinary SCSS rules to `custom.scss` when no custom property
+You can also add ordinary SCSS rules to `global-overrides.scss` when no custom property
 exists. Prefer a narrow page or component selector so that the rule does not
 unintentionally affect another feature. When a broadly useful design value is
 missing, consider adding a reusable custom property to the base app instead
@@ -85,7 +89,7 @@ of duplicating component overrides across forks.
 
 ## Select global style bundles
 
-[`global.scss`](../src/global.scss) is the entry point for the app's shared
+[`styles.scss`](../src/styles.scss) is the entry point for the app's shared
 styles. A fork can comment out optional `meta.load-css()` calls that it does
 not use. Do not remove Ionic's core, normalize, structure, or typography CSS;
 Ionic components depend on those styles.
@@ -102,7 +106,7 @@ Inter. Comment out the font-face includes for unused families:
 // @include meta.load-css("theme/font-face/inter");
 ```
 
-Before removing a bundle, check the font-stack variables in `custom.scss` and
+Before removing a bundle, check the font-stack variables in `global-overrides.scss` and
 any project-specific styles. A family that is still named in a stack will
 fall back to the next available font if its bundle is no longer loaded.
 
@@ -129,7 +133,7 @@ core TEI includes required by the features that remain.
 
 [`_inc-global-optional.scss`](../src/theme/_inc-global-optional.scss) provides
 info-overlay and tooltip styles used by collection introductions and
-collection texts. Its include in `global.scss` can be commented out when the
+collection texts. Its include in `styles.scss` can be commented out when the
 fork has no such content or tooltips.
 
 After changing imports, test all enabled page types. Removing an include saves
@@ -141,7 +145,7 @@ CSS only when no active component or content depends on it.
 Fonts from providers such as Google Fonts or Adobe Fonts can be used instead
 of, or alongside, the bundled fonts. Add the provider's HTML snippet to the
 `<head>` of [`src/index.html`](../src/index.html), then reference the supplied
-family name through variables in `custom.scss`:
+family name through variables in `global-overrides.scss`:
 
 ```html
 <!-- src/index.html -->
@@ -149,7 +153,7 @@ family name through variables in `custom.scss`:
 ```
 
 ```scss
-/* src/assets/custom_css/custom.scss */
+/* src/project/global-overrides.scss */
 :root {
   --font-stack-app-base: "Project Sans", var(--font-stack-system);
   --font-stack-home-banner: "Project Display", var(--font-stack-app-base);
@@ -157,21 +161,21 @@ family name through variables in `custom.scss`:
 ```
 
 Replace the example URL and family names with the provider's actual values.
-Remove unused local font includes from `global.scss` after the new stacks are
+Remove unused local font includes from `styles.scss` after the new stacks are
 in place. Also consider the provider's licensing, privacy implications,
 availability, and effect on page rendering. Self-hosting licensed font files
-under `src/assets/fonts/` is preferable when the edition must work without a
+under `public/assets/fonts/` is preferable when the edition must work without a
 third-party request.
 
 
 ## Configure images and project identity
 
 The home-page banner is configured under `config.page.home.bannerImage` in
-[`config.ts`](../src/assets/config/config.ts). The configuration supports the
+[`config.ts`](../src/project/config.ts). The configuration supports the
 image URL, localized alternative text, intrinsic dimensions, orientation, and
 alternate sources. Related portrait layout options live under
 `config.page.home.portraitOrientationSettings`. Store project images under
-`src/assets/images/` and use an `assets/images/...` URL in the configuration.
+`public/assets/images/` and use an `assets/images/...` URL in the configuration.
 
 Always provide meaningful alternative text in every enabled locale. When the
 image has known intrinsic dimensions, configure them to reduce layout shifts.
@@ -182,9 +186,9 @@ Other identity assets to review are:
 
 - `config.app.openGraphMetaTags.image`, which supplies localized social-share
   images and alternative text;
-- [`src/assets/icon/favicon.ico`](../src/assets/icon/favicon.ico), referenced
+- [`public/favicon.ico`](../public/favicon.ico), referenced
   by [`src/index.html`](../src/index.html);
-- project-specific logos or decorative images under `src/assets/images/`.
+- project-specific logos or decorative images under `public/assets/images/`.
 
 Keep presentational choices in CSS where possible and use `config.ts` only for
 options exposed by the application. Do not put secrets or environment

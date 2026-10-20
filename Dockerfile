@@ -5,7 +5,7 @@
 # 2) Fast rebuilds (dependency layers cached separately from source files).
 # 3) Secure runtime image (non-root user + production dependencies only).
 
-# Pin the Node base image by tag (set from CI workflow build arg).
+# Default Node base image tag for local and CI builds.
 ARG NODE_IMAGE_TAG=24-alpine
 
 
@@ -41,7 +41,7 @@ RUN npm run compress
 FROM base AS prod-deps
 # Copy dependency manifests for runtime install.
 COPY package.json package-lock.json ./
-# Install production dependencies only (needed by dist/app/proxy-server.js).
+# Install production dependencies only (needed by the SSR runtime).
 RUN npm ci --omit=dev
 
 
@@ -59,5 +59,5 @@ COPY --from=build /digital-edition-frontend-ng/dist ./dist
 ENV NODE_ENV=production
 # Drop privileges before launching the app.
 USER appuser
-# Start the Node SSR proxy server.
-CMD ["node", "dist/app/proxy-server.js"]
+# Start SSR through the canonical runtime script.
+CMD ["npm", "run", "serve:ssr"]

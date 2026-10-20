@@ -1,3 +1,4 @@
+import type { MockedObject } from 'vitest';
 import { LOCALE_ID } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { ActivatedRoute, Params } from '@angular/router';
@@ -19,14 +20,16 @@ describe('Collection front-matter pages', () => {
     let params$: BehaviorSubject<Params>;
     let firstCover$: Subject<string>;
     let secondCover$: Subject<string>;
-    let markdownService: jasmine.SpyObj<MarkdownService>;
+    let markdownService: MockedObject<Pick<MarkdownService, 'getMdContent'>>;
 
     beforeEach(async () => {
       params$ = new BehaviorSubject<Params>({ collectionID: '203' });
       firstCover$ = new Subject<string>();
       secondCover$ = new Subject<string>();
-      markdownService = jasmine.createSpyObj<MarkdownService>('MarkdownService', ['getMdContent']);
-      markdownService.getMdContent.and.callFake(fileID =>
+      markdownService = {
+        getMdContent: vi.fn().mockName('MarkdownService.getMdContent')
+      };
+      markdownService.getMdContent.mockImplementation(fileID =>
         fileID.endsWith('-203') ? firstCover$ : secondCover$
       );
 
@@ -83,35 +86,40 @@ describe('Collection front-matter pages', () => {
     let queryParams$: BehaviorSubject<Params>;
     let firstTitle$: Subject<any>;
     let secondTitle$: Subject<any>;
-    let collectionContentService: jasmine.SpyObj<CollectionContentService>;
-    let parserService: jasmine.SpyObj<HtmlParserService>;
-    let scrollService: jasmine.SpyObj<ScrollService>;
+    let collectionContentService: MockedObject<Pick<CollectionContentService, 'getTitle'>>;
+    let parserService: MockedObject<Pick<
+      HtmlParserService,
+      'getSearchMatchesFromQueryParams'
+      | 'insertSearchMatchTags'
+    >>;
+    let scrollService: MockedObject<Pick<ScrollService, 'scrollToFirstSearchMatch'>>;
 
     beforeEach(async () => {
       params$ = new BehaviorSubject<Params>({ collectionID: '203' });
       queryParams$ = new BehaviorSubject<Params>({ q: 'match' });
       firstTitle$ = new Subject<any>();
       secondTitle$ = new Subject<any>();
-      collectionContentService = jasmine.createSpyObj<CollectionContentService>(
-        'CollectionContentService',
-        ['getTitle']
-      );
-      collectionContentService.getTitle.and.callFake(id =>
+      collectionContentService = {
+        getTitle: vi.fn().mockName('CollectionContentService.getTitle')
+      };
+      collectionContentService.getTitle.mockImplementation(id =>
         id === '203' ? firstTitle$ : secondTitle$
       );
-      parserService = jasmine.createSpyObj<HtmlParserService>(
-        'HtmlParserService',
-        ['getSearchMatchesFromQueryParams', 'insertSearchMatchTags']
-      );
-      parserService.getSearchMatchesFromQueryParams.and.returnValue(['match']);
-      parserService.insertSearchMatchTags.and.callFake(
+      parserService = {
+        getSearchMatchesFromQueryParams: vi.fn().mockName('HtmlParserService.getSearchMatchesFromQueryParams'),
+        insertSearchMatchTags: vi.fn().mockName('HtmlParserService.insertSearchMatchTags')
+      };
+      parserService.getSearchMatchesFromQueryParams.mockReturnValue(['match']);
+      parserService.insertSearchMatchTags.mockImplementation(
         (text, matches) => `${text}|${(matches ?? []).join(',')}`
       );
-      scrollService = jasmine.createSpyObj<ScrollService>(
-        'ScrollService',
-        ['scrollToFirstSearchMatch']
-      );
-      scrollService.scrollToFirstSearchMatch.and.returnValues(101, 102);
+      scrollService = {
+        scrollToFirstSearchMatch: vi.fn().mockName('ScrollService.scrollToFirstSearchMatch')
+      };
+      scrollService.scrollToFirstSearchMatch
+        .mockReset()
+        .mockReturnValueOnce(101)
+        .mockReturnValueOnce(102);
 
       await TestBed.configureTestingModule({
         imports: [CollectionTitlePage],
@@ -140,7 +148,7 @@ describe('Collection front-matter pages', () => {
     });
 
     it('renders searched content and replacement collection content after route reuse', async () => {
-      const clearIntervalSpy = spyOn(window, 'clearInterval').and.callThrough();
+      const clearIntervalSpy = vi.spyOn(window, 'clearInterval');
       const fixture = TestBed.createComponent(CollectionTitlePage);
       fixture.detectChanges();
 
@@ -174,25 +182,28 @@ describe('Collection front-matter pages', () => {
     let queryParams$: BehaviorSubject<Params>;
     let firstForeword$: Subject<any>;
     let secondForeword$: Subject<any>;
-    let collectionContentService: jasmine.SpyObj<CollectionContentService>;
+    let collectionContentService: MockedObject<Pick<CollectionContentService, 'getForeword'>>;
 
     beforeEach(async () => {
       params$ = new BehaviorSubject<Params>({ collectionID: '203' });
       queryParams$ = new BehaviorSubject<Params>({});
       firstForeword$ = new Subject<any>();
       secondForeword$ = new Subject<any>();
-      collectionContentService = jasmine.createSpyObj<CollectionContentService>(
-        'CollectionContentService',
-        ['getForeword']
-      );
-      collectionContentService.getForeword.and.callFake(id =>
+      collectionContentService = {
+        getForeword: vi.fn().mockName('CollectionContentService.getForeword')
+      };
+      collectionContentService.getForeword.mockImplementation(id =>
         id === '203' ? firstForeword$ : secondForeword$
       );
-      const parserService = jasmine.createSpyObj<HtmlParserService>(
-        'HtmlParserService',
-        ['getSearchMatchesFromQueryParams', 'insertSearchMatchTags']
-      );
-      parserService.insertSearchMatchTags.and.callFake(text => text);
+      const parserService: MockedObject<Pick<
+        HtmlParserService,
+        'getSearchMatchesFromQueryParams'
+        | 'insertSearchMatchTags'
+      >> = {
+        getSearchMatchesFromQueryParams: vi.fn().mockName('HtmlParserService.getSearchMatchesFromQueryParams'),
+        insertSearchMatchTags: vi.fn().mockName('HtmlParserService.insertSearchMatchTags')
+      };
+      parserService.insertSearchMatchTags.mockImplementation(text => text);
 
       await TestBed.configureTestingModule({
         imports: [CollectionForewordPage],

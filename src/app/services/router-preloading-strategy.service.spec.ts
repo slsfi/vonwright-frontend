@@ -9,7 +9,7 @@ import {
 describe('RouterPreloadingStrategyService', () => {
   it('preloads eager browser routes immediately', () => {
     const service = new BrowserRouterPreloadingStrategyService();
-    const load = jasmine.createSpy('load').and.returnValue(of('loaded'));
+    const load = vi.fn().mockName('load').mockReturnValue(of('loaded'));
     let result: string | undefined;
 
     service.preload({ data: { preload: 'eager' } } as Route, load)
@@ -21,7 +21,7 @@ describe('RouterPreloadingStrategyService', () => {
 
   it('does not preload browser routes configured as off', () => {
     const service = new BrowserRouterPreloadingStrategyService();
-    const load = jasmine.createSpy('load').and.returnValue(of('loaded'));
+    const load = vi.fn().mockName('load').mockReturnValue(of('loaded'));
 
     service.preload({ data: { preload: 'off' } } as Route, load).subscribe();
 
@@ -30,32 +30,32 @@ describe('RouterPreloadingStrategyService', () => {
 
   it('preloads idle browser routes after the fallback delay', () => {
     const service = new BrowserRouterPreloadingStrategyService();
-    const load = jasmine.createSpy('load').and.returnValue(of('loaded'));
+    const load = vi.fn().mockName('load').mockReturnValue(of('loaded'));
     const win = window as unknown as { requestIdleCallback?: unknown };
     const requestIdleCallback = win.requestIdleCallback;
     win.requestIdleCallback = undefined;
-    jasmine.clock().install();
+    vi.useFakeTimers();
 
     try {
       service.preload({ data: { preload: 'idle' } } as Route, load).subscribe();
-      jasmine.clock().tick(299);
+      vi.advanceTimersByTime(299);
       expect(load).not.toHaveBeenCalled();
 
-      jasmine.clock().tick(1);
+      vi.advanceTimersByTime(1);
       expect(load).toHaveBeenCalledTimes(1);
     } finally {
-      jasmine.clock().uninstall();
+      vi.useRealTimers();
       win.requestIdleCallback = requestIdleCallback;
     }
   });
 
   it('cancels deferred browser preloading when unsubscribed', () => {
     const service = new BrowserRouterPreloadingStrategyService();
-    const load = jasmine.createSpy('load').and.returnValue(of('loaded'));
+    const load = vi.fn().mockName('load').mockReturnValue(of('loaded'));
     const win = window as unknown as { requestIdleCallback?: unknown };
     const requestIdleCallback = win.requestIdleCallback;
     win.requestIdleCallback = undefined;
-    jasmine.clock().install();
+    vi.useFakeTimers();
 
     try {
       const subscription = service.preload(
@@ -63,18 +63,18 @@ describe('RouterPreloadingStrategyService', () => {
         load
       ).subscribe();
       subscription.unsubscribe();
-      jasmine.clock().tick(300);
+      vi.advanceTimersByTime(300);
 
       expect(load).not.toHaveBeenCalled();
     } finally {
-      jasmine.clock().uninstall();
+      vi.useRealTimers();
       win.requestIdleCallback = requestIdleCallback;
     }
   });
 
   it('never preloads routes on the server', () => {
     const service = new ServerRouterPreloadingStrategyService();
-    const load = jasmine.createSpy('load').and.returnValue(of('loaded'));
+    const load = vi.fn().mockName('load').mockReturnValue(of('loaded'));
 
     service.preload({ data: { preload: 'eager' } } as Route, load).subscribe();
 

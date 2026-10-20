@@ -1,3 +1,4 @@
+import type { MockedObject } from 'vitest';
 import { LOCALE_ID } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { ActivatedRoute, Params, Router } from '@angular/router';
@@ -14,10 +15,17 @@ describe('IndexPage', () => {
   let queryParams$: BehaviorSubject<Params>;
   let personsResult$: Subject<any>;
   let placesResult$: Subject<any>;
-  let markdownService: jasmine.SpyObj<MarkdownService>;
-  let modalController: jasmine.SpyObj<ModalController>;
-  let namedEntityService: jasmine.SpyObj<NamedEntityService>;
-  let router: jasmine.SpyObj<Router>;
+  let markdownService: MockedObject<Pick<MarkdownService, 'getParsedMdContent'>>;
+  let modalController: MockedObject<Pick<ModalController, 'create'>>;
+  let namedEntityService: MockedObject<Pick<
+    NamedEntityService,
+    'getKeywordsFromElastic'
+    | 'getPersons'
+    | 'getPersonsFromElastic'
+    | 'getPlacesFromElastic'
+    | 'getWorksFromElastic'
+  >>;
+  let router: MockedObject<Pick<Router, 'navigate'>>;
 
   beforeEach(async () => {
     params$ = new BehaviorSubject<Params>({ type: 'persons' });
@@ -25,28 +33,28 @@ describe('IndexPage', () => {
     personsResult$ = new Subject<any>();
     placesResult$ = new Subject<any>();
 
-    markdownService = jasmine.createSpyObj<MarkdownService>(
-      'MarkdownService',
-      ['getParsedMdContent']
-    );
-    markdownService.getParsedMdContent.and.callFake(
+    markdownService = {
+      getParsedMdContent: vi.fn().mockName('MarkdownService.getParsedMdContent')
+    };
+    markdownService.getParsedMdContent.mockImplementation(
       (fileId: string) => of(`<p>${fileId}</p>`)
     );
-    modalController = jasmine.createSpyObj<ModalController>('ModalController', ['create']);
-    namedEntityService = jasmine.createSpyObj<NamedEntityService>(
-      'NamedEntityService',
-      [
-        'getKeywordsFromElastic',
-        'getPersons',
-        'getPersonsFromElastic',
-        'getPlacesFromElastic',
-        'getWorksFromElastic'
-      ]
-    );
-    namedEntityService.getPersonsFromElastic.and.returnValue(personsResult$);
-    namedEntityService.getPlacesFromElastic.and.returnValue(placesResult$);
-    router = jasmine.createSpyObj<Router>('Router', ['navigate']);
-    router.navigate.and.resolveTo(true);
+    modalController = {
+      create: vi.fn().mockName('ModalController.create')
+    };
+    namedEntityService = {
+      getKeywordsFromElastic: vi.fn().mockName('NamedEntityService.getKeywordsFromElastic'),
+      getPersons: vi.fn().mockName('NamedEntityService.getPersons'),
+      getPersonsFromElastic: vi.fn().mockName('NamedEntityService.getPersonsFromElastic'),
+      getPlacesFromElastic: vi.fn().mockName('NamedEntityService.getPlacesFromElastic'),
+      getWorksFromElastic: vi.fn().mockName('NamedEntityService.getWorksFromElastic')
+    };
+    namedEntityService.getPersonsFromElastic.mockReturnValue(personsResult$);
+    namedEntityService.getPlacesFromElastic.mockReturnValue(placesResult$);
+    router = {
+      navigate: vi.fn().mockName('Router.navigate')
+    };
+    router.navigate.mockResolvedValue(true);
 
     await TestBed.configureTestingModule({
       imports: [IndexPage],
@@ -66,10 +74,9 @@ describe('IndexPage', () => {
         { provide: Router, useValue: router },
         {
           provide: TooltipService,
-          useValue: jasmine.createSpyObj<TooltipService>(
-            'TooltipService',
-            ['constructYearBornDeceasedString']
-          )
+          useValue: {
+            constructYearBornDeceasedString: vi.fn().mockName('TooltipService.constructYearBornDeceasedString')
+          } satisfies MockedObject<Pick<TooltipService, 'constructYearBornDeceasedString'>>
         }
       ]
     })
@@ -129,14 +136,17 @@ describe('IndexPage', () => {
   it('applies modal filters and renders the replacement results', async () => {
     const filterResult$ = new Subject<any>();
     const modal = {
-      present: jasmine.createSpy('present'),
-      onWillDismiss: jasmine.createSpy('onWillDismiss').and.resolveTo({
-        data: { isEmpty: false, filterYearMin: 1900 },
-        role: 'apply'
-      })
+      present: vi.fn().mockName('present'),
+      onWillDismiss: vi.fn().mockName('onWillDismiss').mockResolvedValue({
+    data: { isEmpty: false, filterYearMin: 1900 },
+    role: 'apply'
+})
     };
-    modalController.create.and.resolveTo(modal as any);
-    namedEntityService.getPersonsFromElastic.and.returnValues(personsResult$, filterResult$);
+    modalController.create.mockResolvedValue(modal as any);
+    namedEntityService.getPersonsFromElastic
+      .mockReset()
+      .mockReturnValueOnce(personsResult$)
+      .mockReturnValueOnce(filterResult$);
 
     const fixture = TestBed.createComponent(IndexPage);
     fixture.detectChanges();
@@ -144,7 +154,7 @@ describe('IndexPage', () => {
     await fixture.componentInstance.openFilterModal();
     expect(modal.present).toHaveBeenCalled();
     expect(fixture.componentInstance.filters()).toEqual({ isEmpty: false, filterYearMin: 1900 });
-    expect(fixture.componentInstance.showLoading()).toBeTrue();
+    expect(fixture.componentInstance.showLoading()).toBe(true);
 
     filterResult$.next({ aggregations: { unique_subjects: { buckets: [] } } });
     await fixture.whenStable();
@@ -159,10 +169,10 @@ describe('IndexPage', () => {
         author_data: [{ id, first_name: firstName, last_name: lastName }]
       }
     });
-    namedEntityService.getWorksFromElastic.and.returnValues(
-      of({ hits: { hits: [workHit(1, 'Zelda', 'Zeta', 'Second work')] } }),
-      of({ hits: { hits: [workHit(2, 'Anna', 'Alpha', 'First work')] } })
-    );
+    namedEntityService.getWorksFromElastic
+      .mockReset()
+      .mockReturnValueOnce(of({ hits: { hits: [workHit(1, 'Zelda', 'Zeta', 'Second work')] } }))
+      .mockReturnValueOnce(of({ hits: { hits: [workHit(2, 'Anna', 'Alpha', 'First work')] } }));
     params$.next({ type: 'works' });
 
     const fixture = TestBed.createComponent(IndexPage);
@@ -179,10 +189,10 @@ describe('IndexPage', () => {
 
   it('opens a named-entity modal from query parameters and clears the parameter on close', async () => {
     const modal = {
-      present: jasmine.createSpy('present'),
-      onWillDismiss: jasmine.createSpy('onWillDismiss').and.resolveTo({ role: 'close' })
+      present: vi.fn().mockName('present'),
+      onWillDismiss: vi.fn().mockName('onWillDismiss').mockResolvedValue({ role: 'close' })
     };
-    modalController.create.and.resolveTo(modal as any);
+    modalController.create.mockResolvedValue(modal as any);
 
     const fixture = TestBed.createComponent(IndexPage);
     fixture.detectChanges();
@@ -191,10 +201,10 @@ describe('IndexPage', () => {
     await Promise.resolve();
     await fixture.whenStable();
 
-    expect(modalController.create).toHaveBeenCalledWith(jasmine.objectContaining({
+    expect(modalController.create).toHaveBeenCalledWith(expect.objectContaining({
       componentProps: { id: '42', type: 'person' }
     }));
-    expect(router.navigate).toHaveBeenCalledWith([], jasmine.objectContaining({
+    expect(router.navigate).toHaveBeenCalledWith([], expect.objectContaining({
       queryParams: { id: null },
       replaceUrl: true
     }));

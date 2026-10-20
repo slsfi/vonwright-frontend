@@ -108,7 +108,7 @@
   @if (pdfURL) {
     <object [data]="pdfURL" type="application/pdf">
       <p class="no-support">
-        <ng-container i18n="@@PdfViewer.NoBrowserSupport">Din webbläsare stöder inte PDF-filer. Ladda ner PDF:en för att läsa den:</ng-container>&nbsp;<a [href]="pdfURL" i18n="@@PdfViewer.DownloadPdf" [download]="pdfFileName">ladda ner PDF</a>.
+        <ng-container i18n="@@PdfViewer.NoBrowserSupport">Ett fel hindrade PDF:en från att laddas, eller så stöder din webbläsare inte PDF-filer. Ladda ner PDF:en för att läsa den:</ng-container>&nbsp;<a [href]="pdfURL" i18n="@@PdfViewer.DownloadPdf" [download]="pdfFileName">ladda ner PDF</a>.
       </p>
     </object>
   }

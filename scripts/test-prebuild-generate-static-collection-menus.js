@@ -1,3 +1,25 @@
+/*
+ * Regression tests for static collection-menu generation and shared fetch retries.
+ *
+ * Usage (from the repository root):
+ *   npm run test:static-collection-menus
+ *   node scripts/test-prebuild-generate-static-collection-menus.js
+ *
+ * Coverage:
+ *   - Shared non-multilingual TOCs are fetched once per collection across languages.
+ *   - Menu output files are initialized for each collection and language.
+ *   - TOC requests use the configured retry count and incremental cooldowns.
+ *   - Exhausted retries report failure after the expected number of attempts.
+ *
+ * Run after changing prebuild-generate-static-collection-menus.js or the fetch retry
+ * helpers in prebuild-common-fns.js. Uses mocked configuration, translations, HTTP
+ * responses, and file writes; no backend, generated output, or build is needed.
+ *
+ * Exit codes:
+ *   0: all checks passed.
+ *   1: an assertion or runtime error occurred.
+ */
+
 const assert = require('assert/strict');
 const fs = require('fs');
 const common = require('../prebuild-common-fns');

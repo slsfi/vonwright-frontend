@@ -36,7 +36,7 @@ export class PdfViewerComponent {
   readonly downloadOptionsPopover = viewChild<any>('downloadOptionsPopover');
 
   private readonly availableEbooks: Ebook[] = config.ebooks ?? [];
-  readonly showURNButton: boolean = config.component?.epub?.showURNButton ?? false;
+  readonly showURNButton: boolean = config.page?.ebook?.showURNButton ?? false;
 
   readonly downloadPopoverIsOpen = signal<boolean>(false);
   private readonly window = this.document.defaultView;

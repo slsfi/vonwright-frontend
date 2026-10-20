@@ -1,3 +1,5 @@
+import type { MockedObject } from 'vitest';
+import { RESPONSE_INIT } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { BehaviorSubject } from 'rxjs';
@@ -9,7 +11,7 @@ import { EbookPage } from './ebook.page';
 describe('EbookPage', () => {
   let originalEbooks: Ebook[];
   let routeParams$: BehaviorSubject<Params>;
-  let router: jasmine.SpyObj<Router>;
+  let router: MockedObject<Pick<Router, 'navigate'>>;
 
   beforeEach(async () => {
     originalEbooks = config.ebooks ?? [];
@@ -18,14 +20,17 @@ describe('EbookPage', () => {
       { title: 'Book two', filename: 'book-two.epub' }
     ];
     routeParams$ = new BehaviorSubject<Params>({ type: 'pdf', name: 'book-one' });
-    router = jasmine.createSpyObj<Router>('Router', ['navigate']);
-    router.navigate.and.resolveTo(true);
+    router = {
+      navigate: vi.fn().mockName('Router.navigate')
+    };
+    router.navigate.mockResolvedValue(true);
 
     await TestBed.configureTestingModule({
       imports: [EbookPage],
       providers: [
         { provide: ActivatedRoute, useValue: { params: routeParams$ } },
-        { provide: Router, useValue: router }
+        { provide: Router, useValue: router },
+        { provide: RESPONSE_INIT, useValue: null }
       ]
     })
       .overrideTemplate(
@@ -59,14 +64,47 @@ describe('EbookPage', () => {
     const fixture = TestBed.createComponent(EbookPage);
     fixture.detectChanges();
 
-    expect(router.navigate).toHaveBeenCalledOnceWith(
+    expect(router.navigate).toHaveBeenCalledTimes(1);
+
+    expect(router.navigate).toHaveBeenCalledWith(
       ['/ebook', 'pdf', 'book-one'],
       { replaceUrl: true }
     );
 
     fixture.destroy();
-    router.navigate.calls.reset();
+    router.navigate.mockClear();
     routeParams$.next({ filename: 'book-two.epub' });
+    expect(router.navigate).not.toHaveBeenCalled();
+  });
+
+  it('sets HTTP 301 for a legacy ebook redirect during SSR', () => {
+    const response: ResponseInit = { status: 200 };
+    TestBed.overrideProvider(RESPONSE_INIT, { useValue: response });
+    routeParams$.next({ filename: 'book-one.pdf' });
+
+    const fixture = TestBed.createComponent(EbookPage);
+    fixture.detectChanges();
+
+    expect(response.status).toBe(301);
+    expect(router.navigate).toHaveBeenCalledWith(
+      ['/ebook', 'pdf', 'book-one'],
+      { replaceUrl: true }
+    );
+  });
+
+  it.each([
+    { type: 'pdf', name: 'book-one' },
+    { filename: 'book-without-extension' },
+    { filename: 'book-with-empty-extension.' }
+  ])('keeps the server response unchanged when no redirect is needed: %j', params => {
+    const response: ResponseInit = { status: 200 };
+    TestBed.overrideProvider(RESPONSE_INIT, { useValue: response });
+    routeParams$.next(params);
+
+    const fixture = TestBed.createComponent(EbookPage);
+    fixture.detectChanges();
+
+    expect(response.status).toBe(200);
     expect(router.navigate).not.toHaveBeenCalled();
   });
 });

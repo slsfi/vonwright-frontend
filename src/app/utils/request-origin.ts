@@ -1,6 +1,4 @@
-import type { Request } from 'express';
-
-import { config } from '../../assets/config/config';
+import { config } from '../../project/config';
 
 
 /**
@@ -16,8 +14,14 @@ import { config } from '../../assets/config/config';
  * host matches the configured public host. This keeps canonical/Open Graph
  * URLs stable even if a proxy overwrites or omits `X-Forwarded-Proto`.
  */
-type OriginRequest = Pick<Request, 'headers' | 'protocol'>;
-type RenderRequest = OriginRequest & Pick<Request, 'originalUrl'>;
+export interface OriginRequest {
+  readonly headers: Readonly<Record<string, string | string[] | undefined>>;
+  readonly protocol: string;
+}
+
+export interface RenderRequest extends OriginRequest {
+  readonly originalUrl: string;
+}
 
 const URL_SCHEME_PATTERN = /^[a-zA-Z][a-zA-Z\d+\-.]*:\/\//;
 

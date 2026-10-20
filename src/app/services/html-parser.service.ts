@@ -1,4 +1,4 @@
-import { Injectable, inject } from '@angular/core';
+import { inject, Service } from '@angular/core';
 import { catchError, map, Observable, of } from 'rxjs';
 import { Parser } from 'htmlparser2';
 import { DomHandler, isTag } from 'domhandler';
@@ -14,16 +14,14 @@ import { CollectionContentService } from '@services/collection-content.service';
 import { isFileNotFoundHtml } from '@utility-functions';
 
 
-@Injectable({
-  providedIn: 'root',
-})
+@Service()
 export class HtmlParserService {
   private collectionContentService = inject(CollectionContentService);
 
-  private readonly addTEIClassNames: boolean = config.collections?.addTEIClassNames ?? true;
+  private readonly addTEIClassNames: boolean = config.collections?.addTEIClassNames ?? false;
   private readonly apiURL: string = `${config.app?.backendBaseURL ?? ''}/${config.app?.projectNameDB ?? ''}`;
   private readonly mediaCollectionMappings: any = config.collections?.mediaCollectionMappings ?? {};
-  private readonly replaceImageAssetsPaths: boolean = config.collections?.replaceImageAssetsPaths ?? true;
+  private readonly replaceImageAssetsPaths: boolean = config.collections?.replaceImageAssetsPaths ?? false;
 
   postprocessReadingText(text: string, collectionId: string): string {
     // Fix image paths if config option for this enabled

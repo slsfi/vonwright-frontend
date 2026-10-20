@@ -1,74 +1,41 @@
 # Repository Guidelines
 
-This repository contains the base frontend for SLS digital editions: an Angular web app with server-side rendering (SSR).  
-It is intended to be forked per edition/project, with most behavior controlled through configuration (primarily [`src/assets/config/config.ts`](src/assets/config/config.ts)).  
-When contributing, changes must be reusable and config-driven; project-specific hardcoding is not allowed in this base repository.
+This repository provides the shared Angular/Ionic frontend for SLS digital editions, with localization and SSR. Keep changes reusable and configuration-driven.
 
-## Project Structure & Module Organization
-- Browser and server entry points are `src/main.ts` and `src/main.server.ts`.
-- Shared application providers live in `src/app/app.config.ts`; server-specific providers and overrides live in `src/app/app.config.server.ts`.
-- `src/app/` contains application code:
-  - `components/` reusable UI components.
-  - `pages/` route entry pages and lazy standalone `Routes` arrays (`*.routes.ts`) where needed.
-  - `services/`, `guards/`, `interceptors/`, `tokens/`, `models/`.
-- `src/assets/config/config.ts` is the main feature/config switchboard (auth, SSR, prebuild flags, menus, etc.).
-- Route artifacts are generated at build time:
-  - canonical developer-edited routes: `src/app/app.routes.ts`
-  - generated production routes: `src/app/app.routes.generated.ts`
-  - generated auth-protected paths: `src/app/auth-protected-route-paths.generated.ts`
-- Build/helper scripts live in repo root (`prebuild-*.js`, `postbuild-copy-files.js`).
-- Operational and architecture notes are in `docs/` (especially `DEVELOPMENT.md`, `DEPLOYMENT.md`).
+## Documentation
 
-## Architecture Guardrails
-- Keep the application standalone. Do not introduce application, server, page, or routing NgModules.
-- Import Ionic components as standalone components rather than through `IonicModule`. `importProvidersFrom(IonicServerModule)` in the server configuration is the intentional application-level NgModule bridge.
-- Keep the application zoneless. Do not add Zone.js, `provideZoneChangeDetection()`, or another compatibility provider as a workaround; expose asynchronous template state through signals, inputs, the `async` pipe, or another Angular notification mechanism.
-- Preserve the current SSR architecture unless the task is explicitly a dedicated migration: `CommonEngine`, separate `browser`/`server` builders, and the `dist/app` output contract are intentional.
-- Do not enable client hydration or migrate to Angular's `application` builder as part of unrelated work.
-- Register application-owned Ionicons centrally in `src/ionicons-polyfill.ts`; do not add component-local `addIcons()` registrations.
-- See `docs/DEVELOPMENT.md` for the detailed architecture rationale and migration notes.
+Use [DEVELOPMENT.md](docs/DEVELOPMENT.md) for base-app architecture, implementation, and verification. Consult relevant sections for the task; start with [Application architecture](docs/DEVELOPMENT.md#application-architecture) when getting oriented. [PROJECT-CUSTOMIZATION.md](docs/PROJECT-CUSTOMIZATION.md) covers fork settings, [THEMING.md](docs/THEMING.md) styling, [AUTHENTICATION.md](docs/AUTHENTICATION.md) authentication, and [DEPLOYMENT.md](docs/DEPLOYMENT.md) building/deployment. Keep fork configuration instructions out of development notes.
 
-## Build, Test, and Development Commands
-- `npm ci` - clean dependency install from `package-lock.json`; supported Node/npm versions are declared in `package.json`.
-- `npm start` - local Angular dev server.
-- `npm test` - run Angular/Jasmine unit tests in Karma watch mode.
-- `npm run test:ci` - run the Angular/Jasmine unit test suite once in headless Chrome.
-- `npm run test:source-encoding` - validate source-file encoding and BOM usage.
-- `npm run test:routes-parser` - smoke tests for route parser/generator logic.
-- `npm run test:static-collection-menus` - verify static collection-menu generation and shared prebuild fetch retry behavior.
-- `npm run build:ssr` - generate routes + browser/server production build.
-- `npm run serve:ssr` - run built SSR app from `dist/`.
-- `npm run test:ssr:smoke` - verify key SSR responses against a running SSR app.
-- `npm run ssr-start` - build SSR and serve in one command.
-- `npm run generate-routes` - regenerate route artifacts from config.
-- `npm run bench:ssr:build` - build and benchmark SSR performance.
+## Project Structure
 
-## Coding Style & Naming Conventions
-- Use TypeScript + Angular templates/SCSS; follow existing style (2-space indentation, concise comments).
-- Keep files and selectors in kebab-case; classes/interfaces in PascalCase.
-- Use established suffixes (`*.service.ts`, `*.guard.ts`, `*.interceptor.ts`).
-- Prefer existing path aliases (for example `@services`, `@components`, `@config`).
-- Keep behavior config-driven; hardcoding fork-specific values is not allowed.
+- `src/app/`: components, route pages, services, guards, interceptors, models, and utilities; colocated `*.spec.ts` tests.
+- `src/project/`: edition configuration and styles; `src/theme/`: shared styles; `src/locale/`: translations.
+- `src/server.ts` and `src/ssr/`: Express SSR entry and request adapters.
+- `public/`: static assets; root `prebuild-*.js` and `scripts/`: generators/checks; `dist/app/`: build output.
 
-## Testing Guidelines
-- Angular unit tests use Jasmine + Karma and live in `src/**/*.spec.ts`. Add or update specs for changed components, pages, services, guards, interceptors, configuration, and routes as appropriate.
-- Use `npm test` while developing and `npm run test:ci` for a single-run verification before PRs.
-- Script-based checks complement the unit suite: use `test:source-encoding` for source encoding, `test:routes-parser` for route-generation/parser changes, and `test:ssr:smoke` for SSR behavior.
-- Run `test:static-collection-menus` after changing `prebuild-generate-static-collection-menus.js` or shared fetch retry behavior in `prebuild-common-fns.js`.
-- When changing `app.routes.ts` or lazy `*.routes.ts` files, update/run the Angular route-recognition specs; also run `test:routes-parser` when generator-facing route syntax changes.
-- For SSR changes, run `build:ssr`, start the built app with `serve:ssr`, then run `test:ssr:smoke` (or point the smoke test at another running environment with `--base-url`).
+## Architecture & Configuration
 
-## Commit & Pull Request Guidelines
-- Follow conventional commits seen in history (for example `feat(ssr): ...`, `fix(auth): ...`, `docs: ...`).
-- Keep commits focused to one logical change.
-- PRs should include:
-  - summary of behavior change and rationale,
-  - config/deployment impact (especially `src/assets/config/config.ts` and SSR/auth flags),
-  - verification steps and commands run,
-  - screenshots for UI changes when relevant.
-- Update `CHANGELOG.md` and docs for user-visible or operational changes.
+Preserve standalone, zoneless Angular, standalone Ionic imports, and the integrated `@angular/build:application`/`AngularNodeAppEngine` build. Register icons centrally in `src/ionicons-polyfill.ts`; keep client hydration disabled. Edit canonical `src/app/app.routes.ts`; regenerate ignored artifacts with `npm run generate-routes`. Keep secrets out of configuration and environment files.
 
-## Security & Configuration Tips
-- Do not commit secrets in config or environment files.
-- Auth is optional and disabled by default; forks enabling auth must validate SSR/auth behavior explicitly.
-- Edit `src/app/app.routes.ts` as the canonical route source. Do not manually edit `src/app/app.routes.generated.ts` or `src/app/auth-protected-route-paths.generated.ts`; regenerate them with the repository scripts.
+## Commands
+
+Use Node/npm versions declared in `package.json`.
+
+- `npm ci`: install locked dependencies.
+- `npm start`: generate routes and serve Swedish development SSR on port 4200; `npm run start:fi` serves Finnish.
+- `npm run build:ssr`: generate routes and build production browser/server bundles.
+- `npm run serve:ssr`: serve compiled SSR on port 4201.
+- `npm test`: watch unit tests; `npm run test:ci`: run once.
+- `npm run test:source-encoding`: check source encoding.
+
+## Coding Style
+
+Follow `.editorconfig`: UTF-8, two-space indentation, final newlines, and single quotes in TypeScript. Use braces for `if` blocks; one-line blocks are allowed only for `return` statements. Use kebab-case filenames, PascalCase classes/interfaces, established Angular suffixes, and existing path aliases.
+
+## Testing
+
+Angular CLI runs Vitest with jsdom. Add focused regression coverage for behavior changes and run `test:ci` before PRs. Run route-recognition specs for route changes, `test:routes-parser` for generator changes, and `test:static-collection-menus` for menu generation changes. For SSR changes, build, run `test:build-output`, start `serve:ssr`, then run `test:ssr:smoke`.
+
+## Commits & Pull Requests
+
+Prefer focused Conventional Commits. PRs should explain behavior, rationale, configuration/deployment impact, and verification; include screenshots for UI changes. Update relevant docs and `CHANGELOG.md` for user-visible or operational changes. Leave published changelog entries unchanged.

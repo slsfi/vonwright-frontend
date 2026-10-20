@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Service } from '@angular/core';
 
 /**
  * Platform-agnostic token storage contract used by AuthService.
@@ -28,7 +28,7 @@ export abstract class AuthTokenStorageService {
 /**
  * Browser implementation backed by localStorage.
  */
-@Injectable()
+@Service({ autoProvided: false })
 export class BrowserAuthTokenStorageService extends AuthTokenStorageService {
   setItem(key: string, value: string): void {
     localStorage.setItem(key, value);
@@ -49,7 +49,7 @@ export class BrowserAuthTokenStorageService extends AuthTokenStorageService {
  * Tokens are intentionally not persisted on the server in this setup.
  * Reads return null and writes/removes are no-ops.
  */
-@Injectable()
+@Service({ autoProvided: false })
 export class ServerAuthTokenStorageService extends AuthTokenStorageService {
   setItem(_key: string, _value: string): void {}
 

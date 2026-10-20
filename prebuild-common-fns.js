@@ -216,7 +216,7 @@ function getRouteIncludeByPath(config) {
       mainSideMenuItems.indexWorks
     ),
     'media-collection': !!mainSideMenuItems.mediaCollections,
-    'search': !!mainSideMenuItems.search || !!topMenu.showElasticSearchButton,
+    'search': !!mainSideMenuItems.search || !!(topMenu.showElasticSearchButton ?? true),
     '**': true
   };
 }

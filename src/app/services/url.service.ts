@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Service } from '@angular/core';
 
 
 /**
@@ -27,9 +27,7 @@ import { Injectable } from '@angular/core';
  *    in the parse() and stringify() functions below, and modify the
  *    return variables of these functions.
  */
-@Injectable({
-  providedIn: 'root',
-})
+@Service()
 export class UrlService {
   parse(text: string, impliedArray: boolean = false): any {
     /*

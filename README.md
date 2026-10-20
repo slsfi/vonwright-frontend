@@ -1,6 +1,6 @@
 # Production frontend of Den okände von Wright, vonwright.sls.fi
 
-This branch contains the production frontend app of the digital edition Den okände von Wright, [https://vonwright.sls.fi/][vonwright.sls.fi]. It is based on [`digital-edition-frontend-ng`][digital-edition-frontend-ng], the frontend app of the [SLS][SLS] platform for building digital edition web apps.
+This branch contains the production frontend app of the digital edition Den okände von Wright, <https://vonwright.sls.fi/>. It is based on [`digital-edition-frontend-ng`][digital-edition-frontend-ng], the frontend app of the [SLS][SLS] platform for building digital edition web apps.
 
 The app is built on [Angular][angular] and uses [Ionic][ionic] web components.
 
@@ -20,10 +20,10 @@ The app is built on [Angular][angular] and uses [Ionic][ionic] web components.
 
 ## Documentation
 
-- [Authentication](docs/AUTHENTICATION.md).
-- [Theming](docs/THEMING.md).
+- [Project customization](docs/PROJECT-CUSTOMIZATION.md).
 - [Updating, building and deployment](docs/DEPLOYMENT.md).
-- [Development notes](docs/DEVELOPMENT.md).
+- [Base-app development](docs/DEVELOPMENT.md).
+- [Breaking changes for project forks](docs/breaking-changes/README.md).
 
 
 ## Development Setup
@@ -51,29 +51,35 @@ The local Angular CLI from `node_modules` is used by the npm scripts.
 
 #### Development Server
 
-To build and serve the application on a development server as a client-side app only, run:
+To generate route metadata and serve the Swedish application with development SSR and automatic source updates, run:
 
 ```
 npm run start
 ```
 
-Open your browser on http://localhost:4200/. The app will automatically rebuild and reload if you change any of the source files.
+Open your browser on http://localhost:4200/. Use `npm run start:fi` for Finnish. Each development server serves one locale at `/`; production serves the configured locale prefixes. Template and component/global style edits use hot updates where supported, while other source edits reload the page. See [development-server behavior](docs/DEVELOPMENT.md#angular-development-server).
 
-#### Server-Side Rendered App
+#### Production Server-Side Rendered App
 
-To build the server-side rendered application, run:
+To generate route metadata and build the production browser and server bundles for the configured locales, run:
 
 ```
 npm run build:ssr
 ```
 
-Then, to serve the app, run:
+Then, to start the built production SSR server, run:
 
 ```
 npm run serve:ssr
 ```
 
-Open your browser on http://localhost:4201/. You need to manually run the build and serve commands again for changes in the source files to take effect.
+Open your browser on http://localhost:4201/. This server runs the compiled output from `dist/app/`. After changing source files, stop the server, rebuild, and start it again for the changes to take effect.
+
+See [building and deployment](docs/DEPLOYMENT.md#building) for the localized output layout and Docker/nginx workflow.
+
+### Testing
+
+Run `npm test` for unit tests in interactive watch mode, or `npm run test:ci` for a single run before a PR or in CI. Angular uses Vitest with jsdom; the unit suite does not require Chrome. See [testing](docs/DEVELOPMENT.md#testing) for script-based route, SSR, and output checks.
 
 
 ## About the SLS Digital Edition Platform
@@ -99,4 +105,3 @@ The platform consists of an [Angular frontend app][digital-edition-frontend-ng],
 [npm]: https://www.npmjs.com/get-npm
 [SLS]: https://www.sls.fi/en
 [TEI]: https://tei-c.org/
-[vonwright.sls.fi]: https://vonwright.sls.fi/

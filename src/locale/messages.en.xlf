@@ -403,6 +403,15 @@
         <target>No comments.</target>
       </segment>
     </unit>
+    <unit id="Content.Introduction">
+      <notes>
+        <note category="description">Optional HTML above the content grid. Leave empty to hide this block.</note>
+      </notes>
+      <segment state="initial">
+        <source/>
+        <target/>
+      </segment>
+    </unit>
     <unit id="DateHistogram.Clear">
       <segment state="initial">
         <source>Nollställ</source>
@@ -1201,6 +1210,12 @@
         <target>Secondary menu</target>
       </segment>
     </unit>
+    <unit id="MainSideMenu.Articles">
+      <segment state="initial">
+        <source>Artiklar</source>
+        <target>Articles</target>
+      </segment>
+    </unit>
     <unit id="MainSideMenu.CollectionsGroup1">
       <segment state="initial">
         <source>Innehåll</source>
@@ -1271,6 +1286,12 @@
       <segment state="initial">
         <source>Verkregister</source>
         <target>Index of works</target>
+      </segment>
+    </unit>
+    <unit id="MainSideMenu.Indices">
+      <segment state="initial">
+        <source>Register</source>
+        <target>Indices</target>
       </segment>
     </unit>
     <unit id="MainSideMenu.Login">
@@ -1861,6 +1882,12 @@
         <target>Something went wrong. We can’t find the page you tried to access. You can go back to the previous page using the browser’s back-button, or you can try to correct the web address in the browser’s address bar.</target>
       </segment>
     </unit>
+    <unit id="PageNotFound.GoToHome">
+      <segment state="initial">
+        <source>Gå till <pc id="0" equivStart="START_LINK" equivEnd="CLOSE_LINK" type="link" dispStart="&lt;a [routerLink]=&quot;[&apos;/&apos;]&quot;&gt;" dispEnd="&lt;/a&gt;">startsidan</pc></source>
+        <target>Go to the <pc id="0" equivStart="START_LINK" equivEnd="CLOSE_LINK" type="link" dispStart="&lt;a [routerLink]=&quot;[&apos;/&apos;]&quot;&gt;" dispEnd="&lt;/a&gt;">home page</pc></target>
+      </segment>
+    </unit>
     <unit id="Password.DoesNotMatch">
       <segment state="initial">
         <source>Lösenorden matchar inte.</source>
@@ -1893,8 +1920,8 @@
     </unit>
     <unit id="PdfViewer.NoBrowserSupport">
       <segment state="initial">
-        <source>Din webbläsare stöder inte PDF-filer. Ladda ner PDF:en för att läsa den:</source>
-        <target>Your browser does not support PDFs. Please download the PDF to view it:</target>
+        <source>Ett fel hindrade PDF:en från att laddas, eller så stöder din webbläsare inte PDF-filer. Ladda ner PDF:en för att läsa den:</source>
+        <target>An error prevented the PDF from loading, or your browser does not support PDFs. Please download the PDF to view it:</target>
       </segment>
     </unit>
     <unit id="PdfViewer.Page">

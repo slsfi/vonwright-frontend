@@ -1,3 +1,4 @@
+import type { MockedObject } from 'vitest';
 import { LOCALE_ID } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { ActivatedRoute, Data, Params, Router } from '@angular/router';
@@ -12,23 +13,24 @@ describe('AboutPage', () => {
   let routeData$: BehaviorSubject<Data>;
   let parentRouteData$: BehaviorSubject<Data>;
   let fragment$: BehaviorSubject<string | null>;
-  let markdownService: jasmine.SpyObj<MarkdownService>;
-  let router: jasmine.SpyObj<Router>;
+  let markdownService: MockedObject<Pick<MarkdownService, 'getParsedMdContent'>>;
+  let router: MockedObject<Pick<Router, 'navigate'>>;
 
   beforeEach(async () => {
     params$ = new BehaviorSubject<Params>({});
     routeData$ = new BehaviorSubject<Data>({});
     parentRouteData$ = new BehaviorSubject<Data>({ backendPageId: '05-01' });
     fragment$ = new BehaviorSubject<string | null>(null);
-    markdownService = jasmine.createSpyObj<MarkdownService>(
-      'MarkdownService',
-      ['getParsedMdContent']
-    );
-    markdownService.getParsedMdContent.and.callFake(
+    markdownService = {
+      getParsedMdContent: vi.fn().mockName('MarkdownService.getParsedMdContent')
+    };
+    markdownService.getParsedMdContent.mockImplementation(
       (fileId: string) => of(`<p>${fileId}</p>`)
     );
-    router = jasmine.createSpyObj<Router>('Router', ['navigate']);
-    router.navigate.and.resolveTo(true);
+    router = {
+      navigate: vi.fn().mockName('Router.navigate')
+    };
+    router.navigate.mockResolvedValue(true);
 
     await TestBed.configureTestingModule({
       imports: [AboutPage],
@@ -47,7 +49,9 @@ describe('AboutPage', () => {
         { provide: MarkdownService, useValue: markdownService },
         {
           provide: ScrollService,
-          useValue: jasmine.createSpyObj<ScrollService>('ScrollService', ['scrollElementIntoView'])
+          useValue: {
+            scrollElementIntoView: vi.fn().mockName('ScrollService.scrollElementIntoView')
+          } satisfies MockedObject<Pick<ScrollService, 'scrollElementIntoView'>>
         }
       ]
     }).compileComponents();
@@ -59,7 +63,7 @@ describe('AboutPage', () => {
 
     expect(markdownService.getParsedMdContent).toHaveBeenCalledWith(
       'sv-05-01',
-      jasmine.any(String)
+      expect.any(String)
     );
     expect(fixture.nativeElement.textContent).toContain('sv-05-01');
 
@@ -67,7 +71,7 @@ describe('AboutPage', () => {
     await fixture.whenStable();
     expect(markdownService.getParsedMdContent).toHaveBeenCalledWith(
       'sv-05-02',
-      jasmine.any(String)
+      expect.any(String)
     );
     expect(fixture.nativeElement.textContent).toContain('sv-05-02');
 
@@ -75,13 +79,13 @@ describe('AboutPage', () => {
     await fixture.whenStable();
     expect(markdownService.getParsedMdContent).toHaveBeenCalledWith(
       'sv-03-01',
-      jasmine.any(String)
+      expect.any(String)
     );
     expect(fixture.nativeElement.textContent).toContain('sv-03-01');
   });
 
   it('removes its click listener and pending scroll retry when destroyed', () => {
-    const clearTimeoutSpy = spyOn(window, 'clearTimeout').and.callThrough();
+    const clearTimeoutSpy = vi.spyOn(window, 'clearTimeout');
     const fixture = TestBed.createComponent(AboutPage);
     fixture.detectChanges();
     const anchor = document.createElement('a');
@@ -94,9 +98,9 @@ describe('AboutPage', () => {
     };
 
     dispatchFragmentClick();
-    expect(router.navigate).toHaveBeenCalledWith([], jasmine.objectContaining({ fragment: 'section' }));
+    expect(router.navigate).toHaveBeenCalledWith([], expect.objectContaining({ fragment: 'section' }));
 
-    router.navigate.calls.reset();
+    router.navigate.mockClear();
     fragment$.next('missing-section');
     fixture.destroy();
     dispatchFragmentClick();
