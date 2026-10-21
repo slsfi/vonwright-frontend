@@ -1,5 +1,7 @@
 const fs = require('fs');
 const path = require('path');
+const http = require('node:http');
+const https = require('node:https');
 
 /**
  * Get the config object used by the app.
@@ -63,27 +65,81 @@ async function fetchFromAPI(endpoint) {
 }
 
 /**
- * Fetch JSON from an API, retrying failed requests with an optional linear cooldown.
+ * Fetch JSON from an API, retrying failed requests with a configurable cooldown.
  * @param {string} url
  * @param {number} retries Number of retries after the initial request.
- * @param {number} delay Delay before the first retry in milliseconds.
+ * @param {number|function(number): number} delay First retry delay in milliseconds,
+ *   or a function receiving the retry number (starting at 1).
  * @param {number} delayIncrement Milliseconds added before each subsequent retry.
+ * @param {function(string): Promise<object|null>} fetchJson JSON request function.
  */
-async function fetchWithRetry(url, retries = 2, delay = 2000, delayIncrement = 0) {
+async function fetchWithRetry(url, retries = 2, delay = 2000, delayIncrement = 0, fetchJson = fetchFromAPI) {
   const attempts = retries + 1;
 
   for (let attempt = 1; attempt <= attempts; attempt++) {
-    const result = await fetchFromAPI(url);
+    const result = await fetchJson(url);
     if (result) return result;
     if (attempt < attempts) {
       const retry = attempt;
-      const retryDelay = delay + ((retry - 1) * delayIncrement);
+      const retryDelay = typeof delay === 'function'
+        ? delay(retry)
+        : delay + ((retry - 1) * delayIncrement);
       console.warn(`Fetch failed for ${url}. Retrying (${retry}/${retries}) in ${retryDelay}ms...`);
       await sleep(retryDelay);
     }
   }
   console.error(`Fetch failed for ${url} after ${attempts} attempts (${retries} retries).`);
   return null;
+}
+
+/**
+ * Fetch a collection TOC with five retries, waiting 4, 9, 16, 25 and 36 seconds.
+ * Use Node's HTTP clients without request timeouts for slow or large responses.
+ */
+async function fetchCollectionToc(url) {
+  return fetchWithRetry(url, 5, retry => 1000 * (retry + 1) ** 2, 0, fetchJsonWithoutTimeout);
+}
+
+/**
+ * Fetch JSON with Node's built-in HTTP/HTTPS clients, which do not impose fetch's
+ * connection, header or body deadlines. Use a one-off connection to avoid the
+ * global agents' socket timeouts, and follow up to 20 redirects as fetch does.
+ */
+async function fetchJsonWithoutTimeout(endpoint, redirects = 0) {
+  try {
+    const url = new URL(endpoint);
+    const client = url.protocol === 'https:' ? https : http;
+    const response = await new Promise((resolve, reject) => {
+      client.get(url, {
+        agent: false,
+        timeout: 0,
+        headers: { Accept: 'application/json', 'Accept-Encoding': 'identity' }
+      }, resolve).on('error', reject);
+    });
+
+    if ([301, 302, 303, 307, 308].includes(response.statusCode) && response.headers.location) {
+      response.destroy();
+      if (redirects >= 20) {
+        return null;
+      }
+      return fetchJsonWithoutTimeout(new URL(response.headers.location, url), redirects + 1);
+    }
+    if (response.statusCode < 200 || response.statusCode >= 300) {
+      response.destroy();
+      if (response.statusCode !== 404) {
+        console.warn(`Warning: API returned status ${response.statusCode} for ${endpoint}`);
+      }
+      return null;
+    }
+
+    const chunks = [];
+    for await (const chunk of response) {
+      chunks.push(chunk);
+    }
+    return JSON.parse(Buffer.concat(chunks).toString('utf8'));
+  } catch (err) {
+    return null;
+  }
 }
 
 /**
@@ -228,6 +284,7 @@ module.exports = {
   getConfig,
   fetchFromAPI,
   fetchWithRetry,
+  fetchCollectionToc,
   flattenObjectTree,
   getTranslation,
   sleep,

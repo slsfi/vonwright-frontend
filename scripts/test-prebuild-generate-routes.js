@@ -430,7 +430,8 @@ test('sitemap URLs use the first configured language when defaultLanguage is omi
       component: { topMenu: { showElasticSearchButton: false } }
     };
     let sitemap = '';
-    vm.runInNewContext(source, {
+    vm.runInNewContext(source + '\nmodule.exports.generateSitemap();', {
+      module: { exports: {} },
       __dirname: path.resolve(__dirname, '..'),
       console: { log() {}, error(message) { throw new Error(message); } },
       require: name => {

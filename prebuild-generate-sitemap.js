@@ -18,7 +18,9 @@ const SITEMAP_EXCLUDED_ROUTE_PATH_KEYS = Object.freeze([
   'verify-email'
 ]);
 
-generateSitemap();
+if (require.main === module) {
+  generateSitemap();
+}
 
 
 /**
@@ -297,7 +299,7 @@ async function generateCollectionTextURLs(collection_id, urlOrigin, locale, API,
     endpoint += '/' + locale;
   }
 
-  const tocJSON = await common.fetchWithRetry(endpoint);
+  const tocJSON = await common.fetchCollectionToc(endpoint);
 
   // Handle failed fetch
   if (!tocJSON) {
@@ -353,3 +355,7 @@ async function generateMediaCollectionURLs(mediaCollections, urlOrigin, locale) 
 
   return counter;
 }
+
+module.exports = {
+  generateSitemap
+};

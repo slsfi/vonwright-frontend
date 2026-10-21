@@ -13,6 +13,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 - Docker/GitHub Actions: add [release image rebuilds](docs/DEPLOYMENT.md#rebuild-an-existing-release-image) and update Alpine packages at build time. Build releases and prereleases on publication instead of tag pushes, and align Docker's `latest` tag with GitHub's designated latest release.
 - Docker: show Node.js and npm versions in separate build-log steps.
 - SSR benchmark: add configurable request delays, defaulting to two seconds, to reduce server load.
+- Prebuild: increase collection ToC retries and disable request timeouts in sitemap and static collection-menu generation.
 
 ### Fixed
 
