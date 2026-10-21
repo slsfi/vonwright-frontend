@@ -11,6 +11,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 ### Changed
 
 - Docker/GitHub Actions: add [release image rebuilds](docs/DEPLOYMENT.md#rebuild-an-existing-release-image) and update Alpine packages at build time. Build releases and prereleases on publication instead of tag pushes, and align Docker's `latest` tag with GitHub's designated latest release.
+- Docker: show Node.js and npm versions in separate build-log steps.
 
 
 

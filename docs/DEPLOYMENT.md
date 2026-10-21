@@ -44,7 +44,7 @@ The integrated application build emits browser files under `dist/app/browser/<lo
 
 The [`Dockerfile`][dockerfile] installs from the lockfile with `npm ci`, generates the sitemap/static menus, builds both applications, and compresses browser output. The final image contains production dependencies and runs the SSR entry as a non-root user. Local `build:ssr` does not run the sitemap/menu generators or compression; invoke those commands separately when validating the complete deployment output locally.
 
-The shared Docker base stage runs `apk upgrade --no-cache` to apply available package updates from the configured Alpine release repositories before installing npm dependencies. These updates reach both the build stages and the final runtime image. Node.js itself is supplied by the Node base image and is refreshed by pulling a newer base image. The same step prints `node --version` and `npm --version`; expand **Build and push Docker image** in the GitHub Actions job log to find the versions used by every stage.
+The shared Docker base stage runs `apk upgrade --no-cache` to apply available package updates from the configured Alpine release repositories before installing npm dependencies. These updates reach both the build stages and the final runtime image. Node.js itself is supplied by the Node base image and is refreshed by pulling a newer base image.
 
 The supplied GitHub Actions workflow uses `pull: true` and does not configure a persistent Docker build cache, so each job refreshes the base image and executes the package-upgrade step. For a local security rebuild, use `docker build --pull --no-cache -t <image>:<tag> .` to refresh the base image and force all build steps to execute; APK's `--no-cache` option only controls its package cache.
 
