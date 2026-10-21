@@ -14,6 +14,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 - Docker: show Node.js and npm versions in separate build-log steps.
 - SSR benchmark: add configurable request delays, defaulting to two seconds, to reduce server load.
 
+### Fixed
+
+- v4 breaking changes documentation on content-page introductions and `src/assets` subfolders that are not automatically relocated.
+
 
 
 ## [4.0.0] – 2026-10-16
