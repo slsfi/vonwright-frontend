@@ -2,6 +2,10 @@ const fs = require('fs');
 const path = require('path');
 const http = require('node:http');
 const https = require('node:https');
+const zlib = require('node:zlib');
+
+const tocHttpAgent = new http.Agent({ keepAlive: true, timeout: 0 });
+const tocHttpsAgent = new https.Agent({ keepAlive: true, timeout: 0 });
 
 /**
  * Get the config object used by the app.
@@ -102,8 +106,9 @@ async function fetchCollectionToc(url) {
 
 /**
  * Fetch JSON with Node's built-in HTTP/HTTPS clients, which do not impose fetch's
- * connection, header or body deadlines. Use a one-off connection to avoid the
- * global agents' socket timeouts, and follow up to 20 redirects as fetch does.
+ * connection, header or body deadlines. Dedicated agents keep connections reusable
+ * without the global agents' socket timeouts. Support compressed responses and
+ * follow up to 20 redirects as fetch does.
  */
 async function fetchJsonWithoutTimeout(endpoint, redirects = 0) {
   try {
@@ -111,9 +116,9 @@ async function fetchJsonWithoutTimeout(endpoint, redirects = 0) {
     const client = url.protocol === 'https:' ? https : http;
     const response = await new Promise((resolve, reject) => {
       client.get(url, {
-        agent: false,
+        agent: url.protocol === 'https:' ? tocHttpsAgent : tocHttpAgent,
         timeout: 0,
-        headers: { Accept: 'application/json', 'Accept-Encoding': 'identity' }
+        headers: { Accept: 'application/json', 'Accept-Encoding': 'gzip, deflate, br' }
       }, resolve).on('error', reject);
     });
 
@@ -136,7 +141,16 @@ async function fetchJsonWithoutTimeout(endpoint, redirects = 0) {
     for await (const chunk of response) {
       chunks.push(chunk);
     }
-    return JSON.parse(Buffer.concat(chunks).toString('utf8'));
+    let body = Buffer.concat(chunks);
+    const encoding = response.headers['content-encoding'];
+    if (encoding === 'gzip') {
+      body = zlib.gunzipSync(body);
+    } else if (encoding === 'deflate') {
+      body = zlib.inflateSync(body);
+    } else if (encoding === 'br') {
+      body = zlib.brotliDecompressSync(body);
+    }
+    return JSON.parse(body.toString('utf8'));
   } catch (err) {
     return null;
   }

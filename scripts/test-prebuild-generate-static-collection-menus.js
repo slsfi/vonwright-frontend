@@ -11,6 +11,7 @@
  *   - Both generators use the shared collection TOC fetch policy.
  *   - TOC requests use five retries with quadratic cooldowns and no client timeouts.
  *   - Slow, streamed TOC responses larger than 1 MB are read completely.
+ *   - Connections are reused and gzip, deflate and Brotli responses are decoded.
  *   - Exhausted retries report failure after the expected number of attempts.
  *
  * Run after changing either generator or the fetch helpers in prebuild-common-fns.js.
@@ -28,6 +29,7 @@ const http = require('node:http');
 const https = require('node:https');
 const { EventEmitter } = require('node:events');
 const { Readable } = require('node:stream');
+const zlib = require('node:zlib');
 const common = require('../prebuild-common-fns');
 const { generateStaticCollectionMenus } = require('../prebuild-generate-static-collection-menus');
 const { generateSitemap } = require('../prebuild-generate-sitemap');
@@ -286,8 +288,12 @@ async function testTocTimeoutsAreDisabled() {
     assert.equal(requests[1].client, https);
     for (const { options } of requests) {
       assert.equal(options.timeout, 0);
-      assert.equal(options.agent, false);
+      assert.equal(options.agent.options.keepAlive, true);
+      assert.equal(options.agent.options.timeout, 0);
     }
+    assert.ok(requests[0].options.agent instanceof http.Agent);
+    assert.ok(requests[1].options.agent instanceof https.Agent);
+    assert.notEqual(requests[0].options.agent, requests[1].options.agent);
   } finally {
     http.get = originalHttpGet;
     https.get = originalHttpsGet;
@@ -310,7 +316,7 @@ async function testLargeStreamedTocResponse() {
   let requestCount = 0;
   const server = http.createServer(async (req, res) => {
     requestCount++;
-    assert.equal(req.headers['accept-encoding'], 'identity');
+    assert.equal(req.headers['accept-encoding'], 'gzip, deflate, br');
     if (req.url === '/redirect') {
       res.writeHead(302, { Location: '/toc/1' });
       res.end();
@@ -338,6 +344,46 @@ async function testLargeStreamedTocResponse() {
 }
 
 
+async function testTocConnectionReuseAndCompression() {
+  const toc = { children: [{ itemId: '1_100', text: 'åäö'.repeat(180000) }] };
+  const body = Buffer.from(JSON.stringify(toc));
+  const encodedBodies = {
+    gzip: zlib.gzipSync(body),
+    deflate: zlib.deflateSync(body),
+    br: zlib.brotliCompressSync(body)
+  };
+  const sockets = new Set();
+  let requestCount = 0;
+  const server = http.createServer((req, res) => {
+    requestCount++;
+    sockets.add(req.socket);
+    const encoding = req.url.slice(1);
+    const encodedBody = encodedBodies[encoding];
+    assert.ok(req.headers['accept-encoding'].includes(encoding));
+    assert.equal(req.headers.connection, 'keep-alive');
+    res.writeHead(200, {
+      'Content-Type': 'application/json',
+      'Content-Encoding': encoding,
+      'Content-Length': encodedBody.length
+    });
+    res.end(encodedBody);
+  });
+
+  try {
+    await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
+    for (const [encoding, encodedBody] of Object.entries(encodedBodies)) {
+      assert.ok(encodedBody.length < body.length);
+      const result = await common.fetchCollectionToc(`http://127.0.0.1:${server.address().port}/${encoding}`);
+      assert.deepEqual(result, toc);
+    }
+    assert.equal(requestCount, 3);
+    assert.equal(sockets.size, 1);
+  } finally {
+    await new Promise(resolve => server.close(resolve));
+  }
+}
+
+
 async function run() {
   await testSharedTocDataIsFetchedOnce();
   await testSitemapUsesCollectionTocFetcher();
@@ -346,6 +392,7 @@ async function run() {
   await testTocRetryPolicy(true);
   await testTocTimeoutsAreDisabled();
   await testLargeStreamedTocResponse();
+  await testTocConnectionReuseAndCompression();
   console.log('Static collection menu and sitemap prebuild tests passed.');
 }
 
