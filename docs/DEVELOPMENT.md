@@ -174,7 +174,7 @@ Use the Angular/Vitest unit suite as the primary automated check, with the scrip
 - `npm run test:ssr:smoke`: verify selected SSR/CSR responses, SEO/default-language URLs, and missing-static-file behavior against a running SSR app; build and start the app first, or pass `--base-url` to target another running environment.
 - `npm run test:ssr:server`: build SSR, import the middleware from the emitted server entry, and exercise it with a spy in place of Angular. Verify static/probe short-circuits, cache policies, dynamic limiting, locale paths, and trusted-proxy behavior without rendering Angular. The imported entry starts no listener; fixture apps use temporary local HTTP servers.
 - `npm run test:ssr:checks`: verify that the smoke runner rejects incorrect render modes and redirects, and sends explicit proxy Host headers, using local fixtures without a running app.
-- `npm run test:ssr:benchmark`: verify benchmark auto-start through `serve:ssr`, including an alternate runtime entry, failed startup, interruption, and child-process cleanup, using local fixtures without building the app.
+- `npm run test:ssr:benchmark`: verify benchmark request pacing and argument validation, response timings, and auto-start through `serve:ssr`, including an alternate runtime entry, failed startup, interruption, and child-process cleanup, using local fixtures without building the app.
 - `npm run test:ssr:docker`: build/run the local production Docker image and record memory across repeated SSR load/idle cycles; see the [Docker memory check](#repeatable-docker-ssr-memory-check). `npm run test:ssr:docker:checks` verifies argument/URL/sample handling and response validation with local fixtures, without Docker or a build.
 - `npm run test:build-output`: verify browser output for the production locales configured in `angular.json` and the runtime entry from `serve:ssr`; run after `npm run build:ssr`. Supports `--dist-root`, `--locales` (comma-separated), and `--server-entry` (relative to the output root) for custom output.
 
@@ -237,7 +237,7 @@ Updating checks:
 
 
 
-## SSR benchmark (localhost)
+## SSR benchmark
 
 Use the SSR benchmark to measure response-time performance of server-rendered routes (cold and warm runs).
 
@@ -248,6 +248,12 @@ Use the SSR benchmark to measure response-time performance of server-rendered ro
 Auto-start uses `npm run serve:ssr`, the same launcher used by the Docker runtime. The benchmark stops its launcher and SSR child processes when it finishes, is interrupted, or cannot start the server.
 
 The first request per route is labeled cold, but readiness has already rendered the first route before measurement. It is not a process-start measurement. Requests can include live API and rendering costs; check response status, size, and completeness before interpreting latency changes. Keep critical CSS inlining disabled for comparable measurements.
+
+Requests run sequentially with a two-second pause after each response before the next request starts. The pause also applies between routes, after failed requests, and between successful readiness and the first measured request; failed readiness probes wait at least this long before retrying within the startup timeout. Pauses are excluded from response timings, and there is no pause before the first request to an existing server or after the final request.
+
+Use `--request-delay-ms=<number>` to adjust pacing for the backend's capacity and request limits. Increase it when content retrieval fails or the backend is rate limited; an HTTP 200 page can still contain a content-loading error. Use the same delay, routes, and request counts when comparing app versions. Set the delay to `0` only when deliberately benchmarking a dedicated local server without pacing.
+
+When auto-starting with a long pause, increase `--startup-timeout-ms` as needed so the startup budget leaves time for readiness retries with that pause.
 
 Recommended workflow:
 
@@ -277,6 +283,7 @@ Optional arguments:
 - `--base-url=<url>` to target another host/port.
 - `--startup-timeout-ms=<number>` to adjust server startup wait time.
 - `--request-timeout-ms=<number>` to adjust per-request timeout.
+- `--request-delay-ms=<integer>` to set the pause between requests in milliseconds (default: `2000`; `0` disables pacing).
 - `--skip-start` to benchmark an existing server without invoking `npm run serve:ssr`.
 
 Example:
@@ -285,9 +292,16 @@ Example:
 npm run bench:ssr -- --warm-runs=8 --routes=/sv/,/sv/collection/216/text/20280
 ```
 
+For a live site, for example with a five-second pause:
+
+```bash
+npm run bench:ssr -- --skip-start --base-url=https://topelius.sls.fi --request-delay-ms=5000
+```
+
 What the benchmark reports:
 
 - Per-request timing table with status, elapsed milliseconds, and response size.
+- Configured request delay, excluded from the reported response times.
 - Cold run summary (run 1 per route).
 - Warm run summary with `avg`, `median`, `p95`, `min`, and `max`.
 

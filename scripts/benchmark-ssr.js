@@ -54,6 +54,10 @@ const DEFAULT_ROUTES = [
  *   --request-timeout-ms <n> | --request-timeout-ms=<n>
  *     Per-request timeout in milliseconds (default: 120000).
  *
+ *   --request-delay-ms <n> | --request-delay-ms=<n>
+ *     Pause between requests in milliseconds, outside measured time (default: 2000).
+ *     Set to 0 to disable pacing on a dedicated local server.
+ *
  *   --help | -h
  *     Show help text.
  *
@@ -82,6 +86,7 @@ Options:
   --base-url <url> | --base-url=<url>        Base URL (default: http://127.0.0.1:<port>)
   --startup-timeout-ms <n>                   Startup wait timeout in ms (default: 30000)
   --request-timeout-ms <n>                   Request timeout in ms (default: 120000)
+  --request-delay-ms <n>                     Pause between requests in ms (default: 2000; 0 disables)
   --help, -h                                 Show this help
 
 Output:
@@ -105,6 +110,7 @@ function parseArgs(argv) {
     port: 4201,
     startupTimeoutMs: 30000,
     requestTimeoutMs: 120000,
+    requestDelayMs: 2000,
     routes: [...DEFAULT_ROUTES],
     skipStart: false,
     baseUrl: '',
@@ -172,6 +178,14 @@ function parseArgs(argv) {
       continue;
     }
 
+    if (arg === '--request-delay-ms' || arg.startsWith('--request-delay-ms=')) {
+      const value = arg === '--request-delay-ms'
+        ? argv[++i]
+        : arg.slice('--request-delay-ms='.length);
+      opts.requestDelayMs = value?.trim() ? Number(value) : NaN;
+      continue;
+    }
+
     if (arg.startsWith('--route=')) {
       routes.push(arg.slice('--route='.length));
       continue;
@@ -229,6 +243,10 @@ function parseArgs(argv) {
   if (!Number.isFinite(opts.requestTimeoutMs) || opts.requestTimeoutMs < 1000) {
     throw new Error('Invalid --request-timeout-ms value');
   }
+  // Node timers overflow above this limit and would silently remove the pause.
+  if (!Number.isInteger(opts.requestDelayMs) || opts.requestDelayMs < 0 || opts.requestDelayMs > 2147483647) {
+    throw new Error('Invalid --request-delay-ms value: expected an integer from 0 to 2147483647');
+  }
 
   return opts;
 }
@@ -270,7 +288,7 @@ async function fetchWithTiming(url, timeoutMs) {
   }
 }
 
-async function waitForServer(baseUrl, readyRoute, startupTimeoutMs, requestTimeoutMs, getStartupError) {
+async function waitForServer(baseUrl, readyRoute, startupTimeoutMs, requestTimeoutMs, requestDelayMs, getStartupError) {
   const started = performance.now();
 
   while (performance.now() - started < startupTimeoutMs) {
@@ -283,7 +301,11 @@ async function waitForServer(baseUrl, readyRoute, startupTimeoutMs, requestTimeo
     if (result.status !== 'ERR') {
       return;
     }
-    await delay(300);
+    // Failed readiness probes also leave the configured recovery time.
+    const remainingMs = startupTimeoutMs - (performance.now() - started);
+    if (remainingMs > 0) {
+      await delay(Math.min(Math.max(300, requestDelayMs), remainingMs));
+    }
   }
 
   throw new Error(`SSR server did not start within ${startupTimeoutMs} ms`);
@@ -399,15 +421,22 @@ async function main() {
         routes[0] || '/sv/',
         opts.startupTimeoutMs,
         opts.requestTimeoutMs,
+        opts.requestDelayMs,
         () => startupError,
       );
     }
 
     const results = [];
     const totalRequestsPerRoute = opts.warmRuns + 1;
+    let hasPreviousRequest = !opts.skipStart;
 
     for (const route of routes) {
       for (let run = 1; run <= totalRequestsPerRoute; run++) {
+        // Start timing only after the previous response's recovery pause,
+        // including after readiness, failures, and transitions between routes.
+        if (hasPreviousRequest && opts.requestDelayMs > 0) {
+          await delay(opts.requestDelayMs);
+        }
         const result = await fetchWithTiming(
           getUrl(baseUrl, route),
           opts.requestTimeoutMs,
@@ -420,11 +449,13 @@ async function main() {
           bytes: result.bytes,
           error: result.error,
         });
+        hasPreviousRequest = true;
       }
     }
 
     console.log(`Base URL: ${baseUrl}`);
     console.log(`Warm runs per route: ${opts.warmRuns}`);
+    console.log(`Request delay: ${opts.requestDelayMs} ms (excluded from response timings)`);
     console.log(`Total requests per route (cold + warm): ${totalRequestsPerRoute}`);
     console.table(
       results.map((r) => ({
