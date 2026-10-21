@@ -6,13 +6,13 @@ The [base-app development notes](DEVELOPMENT.md) cover architecture, implementat
 
 ## Set up the fork on GitHub
 
-After creating the fork and its branches using the [README steps](../README.md#setting-up-a-project), configure the forked repository on GitHub. The examples below use `base` for the upstream mirror and `production` for the edition branch; substitute the names chosen for the fork. Make edition-specific file changes on the production branch through pull requests, keeping the base branch available only for upstream syncing.
+After creating the fork and its branches using the [README steps](../README.md#setting-up-a-project), configure the forked repository on GitHub. The examples below use `base` for the upstream mirror and `production` for the public edition branch; substitute the names chosen for the fork. A fork can also maintain `development` or `staging` branches for internal versions of the edition. Apply the customization and build guidance to each maintained edition branch, making edition-specific changes through pull requests and keeping the base branch available only for upstream syncing.
 
 ### Default branch
 
 In repository **Settings**, change **Default branch** to `production`. Both branches should still share the same unmodified upstream starting point at this stage. Set the default before adding the rulesets below so **Include default branch** protects the edition branch. This makes the edition branch the default view of the repository and the usual target for pull requests. See [GitHub's default-branch instructions](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-branches-in-your-repository/changing-the-default-branch).
 
-For later upstream updates, select `base` explicitly when syncing the fork, then merge the updated base into `production` through a pull request. Making `production` the default does not change the upstream mirror's role.
+For later upstream updates, select `base` explicitly when syncing the fork, then merge the updated base into each maintained edition branch through a pull request. Making `production` the default does not change the upstream mirror's role or restrict builds to that branch.
 
 ### Branch rulesets
 
@@ -54,7 +54,11 @@ On the repository home page, edit **About** using its settings button. Set an ed
 
 Open the fork's **Actions** tab and enable workflow runs when GitHub prompts for confirmation. If an individual workflow is disabled, select it and choose **Enable workflow**; see [GitHub's workflow instructions](https://docs.github.com/en/actions/how-tos/manage-workflow-runs/disable-and-enable-workflows).
 
-Review [`.github/workflows/docker-build-and-push.yml`](../.github/workflows/docker-build-and-push.yml) in the production branch. The supplied workflow builds on pushes to `main`, pushed tags, and manual dispatch. Changing the default branch does not change its explicit `main` push filter: use the edition branch if automatic production-branch builds are wanted. Its image name is derived from the GitHub repository, so align the image/tag in `compose.yml` with the fork's published image. Release/build procedures are documented in [deployment](DEPLOYMENT.md#building).
+Review [`.github/workflows/docker-build-and-push.yml`](../.github/workflows/docker-build-and-push.yml) in every branch used to build or release the edition, including `production`, `development`, or `staging`. The supplied workflow builds on pushes to `main`, published GitHub Releases, and manual dispatch. Release builds use the workflow and application source at the release's tagged commit, so keep the workflow current in each branch before creating its release tags. Releases from internal branches build in the same way as public releases.
+
+Keep the workflow in the repository's default branch as well so GitHub offers the **Run workflow** form. Its optional **Release tag to rebuild** field can select a source tag from any edition branch. Changing the default branch does not change the explicit `main` push filter; configure the desired branch names under `push.branches` only if automatic builds on branch pushes are wanted. Release builds require no branch-filter changes.
+
+The image name is derived from the GitHub repository. Use distinct release tags for each edition branch and align each branch's `compose.yml` with its intended image/tag. The Docker `latest` alias is shared across the repository and follows GitHub's latest-release designation; deployments for internal branches can use their own release tags. Release/build procedures are documented in [deployment](DEPLOYMENT.md#building).
 
 ## Project customization files
 

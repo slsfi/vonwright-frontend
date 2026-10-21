@@ -8,6 +8,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ## [Unreleased]
 
+### Changed
+
+- Docker/GitHub Actions: add [release image rebuilds](docs/DEPLOYMENT.md#rebuild-an-existing-release-image) and update Alpine packages at build time. Build releases and prereleases on publication instead of tag pushes, and align Docker's `latest` tag with GitHub's designated latest release.
+
 
 
 ## [4.0.0] – 2026-10-16

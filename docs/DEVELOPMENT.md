@@ -151,6 +151,8 @@ The Node.js Docker-image tag is defined by the default `NODE_IMAGE_TAG` build ar
 
 The supplied GitHub Actions build workflow is defined in [`.github/workflows/docker-build-and-push.yml`](../.github/workflows/docker-build-and-push.yml). It sets up a Docker Buildx builder using `docker/setup-buildx-action` and then runs the build with `docker/build-push-action` (BuildKit). The workflow uses `pull: true` so the builder refreshes base images using the tag defined in `Dockerfile`.
 
+Run `npm run test:docker-workflow` after changing source selection, image metadata, or latest-release publishing. The check executes the workflow's inline scripts with GitHub and Docker fixtures, covering manual source-tag overrides, invalid tags, the reserved `latest` alias, release designation, and API failures. It requires neither Docker nor network access. Fork operation and the manual rebuild form are documented in [deployment](DEPLOYMENT.md#rebuild-an-existing-release-image).
+
 When updating the supported Node.js version, keep all version declarations and developer-facing guidance aligned:
 
 - update the default `NODE_IMAGE_TAG` in [`Dockerfile`](../Dockerfile),

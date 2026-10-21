@@ -32,6 +32,7 @@
     "serve:ssr": "node dist/app/server/server.mjs",
     "ssr-start": "npm run build:ssr && npm run serve:ssr",
     "test:source-encoding": "node ./scripts/test-source-encoding.js",
+    "test:docker-workflow": "node --test ./scripts/test-docker-build-workflow.js",
     "fix:source-bom": "node ./scripts/test-source-encoding.js --fix-bom",
     "test:routes-parser": "node ./scripts/test-prebuild-generate-routes.js",
     "test:build-output": "node ./scripts/test-build-output.js",

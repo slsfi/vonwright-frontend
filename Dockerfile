@@ -11,6 +11,10 @@ ARG NODE_IMAGE_TAG=24-alpine
 
 # 1) Shared base image used by all stages.
 FROM node:${NODE_IMAGE_TAG} AS base
+# Apply available Alpine package updates and log tool versions used by all stages.
+RUN apk upgrade --no-cache \
+    && node --version \
+    && npm --version
 # Keep one stable working directory in every stage.
 WORKDIR /digital-edition-frontend-ng
 
