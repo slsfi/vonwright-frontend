@@ -13,7 +13,8 @@ ARG NODE_IMAGE_TAG=24-alpine
 FROM node:${NODE_IMAGE_TAG} AS base
 # Apply available package updates from the configured Alpine release repositories.
 RUN apk upgrade --no-cache
-# Log tool versions used by all stages in separate build-log steps.
+# Log Alpine and tool versions used by all stages in separate build-log steps.
+RUN cat /etc/alpine-release
 RUN node --version
 RUN npm --version
 # Keep one stable working directory in every stage.
