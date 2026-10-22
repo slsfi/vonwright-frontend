@@ -16,6 +16,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 - SSR benchmark: add configurable request delays, defaulting to two seconds, to reduce server load.
 - Prebuild: increase collection ToC retries, support compressed responses, and disable request timeouts in sitemap and static collection-menu generation.
 - Update `nginx` to 1.30.6.
+- Deps (dev): update `ng-extract-i18n-merge` to 3.5.0.
 
 ### Fixed
 
