@@ -8,26 +8,29 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ## [Unreleased]
 
+
+
+## [4.1.0] – 2026-10-23
+
 ### Added
 
-- Optional static, localized collection cover metadata for the content grid and collection cover pages. Enable `collections.useStaticCoverData` in `src/project/config.ts`; populate `src/project/data/collection-covers.ts` with `npm run generate-collection-covers` (Topelius sample included). See the [setup and migration instructions](docs/PROJECT-CUSTOMIZATION.md#static-collection-covers). Backend fetching remains the default; it and the flag will be removed in a future major version.
+- Optional static, localized collection cover metadata for the content grid and collection cover pages. Enable `collections.useStaticCoverData` in `src/project/config.ts`; populate `src/project/data/collection-covers.ts` with `npm run generate-collection-covers` (Topelius sample included). See the [setup and migration instructions](docs/PROJECT-CUSTOMIZATION.md#static-collection-covers). Backend fetching remains the default; it and the flag will be removed in a future major version. ([58f30cb](https://github.com/slsfi/digital-edition-frontend-ng/commit/58f30cbe74758b9154357c5b29ba5c8a68cd8c9f))
 
 ### Changed
 
-- Docker/GitHub Actions: add [release image rebuilds](docs/DEPLOYMENT.md#rebuild-an-existing-release-image) and update Alpine packages at build time. Build releases and prereleases on publication instead of tag pushes, and align Docker's `latest` tag with GitHub's designated latest release.
-- Docker: show Node.js and npm versions in separate build-log steps.
-- Docker: show the Alpine version in a separate build-log step.
-- SSR benchmark: add configurable request delays, defaulting to two seconds, to reduce server load.
-- Prebuild: increase collection ToC retries, support compressed responses, and disable request timeouts in sitemap and static collection-menu generation.
-- Update `nginx` to 1.30.6.
-- Deps: update `@angular/cli` to 22.2.4.
-- Deps: update `@ionic/angular` and `@ionic/angular-server` to 9.0.9.
-- Deps (dev): update `ng-extract-i18n-merge` to 3.5.0.
-- Deps: update transitive dependencies.
+- Docker/GitHub Actions: add [release image rebuilds](docs/DEPLOYMENT.md#rebuild-an-existing-release-image) and update Alpine packages at build time. Build releases and prereleases on publication instead of tag pushes, and align Docker's `latest` tag with GitHub's designated latest release. ([f1f47f3](https://github.com/slsfi/digital-edition-frontend-ng/commit/f1f47f362b15876bdcf5dff8d3838701e8c6d665))
+- Docker: show Alpine, Node.js, and npm versions in separate build-log steps. ([6c62b88](https://github.com/slsfi/digital-edition-frontend-ng/commit/6c62b88b76706f67ef635799678bc6800ea8f7d5), [fbd69c6](https://github.com/slsfi/digital-edition-frontend-ng/commit/fbd69c69851117ba5e8d4dabc5fbd8fb2fa16985))
+- SSR benchmark: add configurable request delays, defaulting to two seconds, to reduce server load. ([5258e6d](https://github.com/slsfi/digital-edition-frontend-ng/commit/5258e6d7830237182a0f133e5010970d0fc03e57))
+- Prebuild: increase collection ToC retries, support compressed responses, and disable request timeouts in sitemap and static collection-menu generation. ([0efa241](https://github.com/slsfi/digital-edition-frontend-ng/commit/0efa2413ddf8b05fe33a1885e4caa7aab0636304), [51d49d9](https://github.com/slsfi/digital-edition-frontend-ng/commit/51d49d9ce4e379b694cbd6f6a50f91cceb034497))
+- Update `nginx` to 1.30.6. ([33f7eeb](https://github.com/slsfi/digital-edition-frontend-ng/commit/33f7eebfdef25c111cd8b4e79a95281f3e59087d))
+- Deps: update `@angular/cli` to 22.2.4. ([8bc5a82](https://github.com/slsfi/digital-edition-frontend-ng/commit/8bc5a82325885360077eb16ea6ade2af120ea0fb))
+- Deps: update `@ionic/angular` and `@ionic/angular-server` to 9.0.9. ([80ee4fb](https://github.com/slsfi/digital-edition-frontend-ng/commit/80ee4fbed2928dd0e2e1884128088c164ade78e5))
+- Deps (dev): update `ng-extract-i18n-merge` to 3.5.0. ([9a7df02](https://github.com/slsfi/digital-edition-frontend-ng/commit/9a7df02548536f7e7a8e0f7abf1a7b9f8ca65e39))
+- Deps: update transitive dependencies. ([cad6e2a](https://github.com/slsfi/digital-edition-frontend-ng/commit/cad6e2ad30f16440f94ac173d84950d8924f0a64))
 
 ### Fixed
 
-- v4 breaking changes documentation on content-page introductions and `src/assets` subfolders that are not automatically relocated.
+- v4 breaking changes documentation on content-page introductions and `src/assets` subfolders that are not automatically relocated. ([197ace9](https://github.com/slsfi/digital-edition-frontend-ng/commit/197ace975c10b6b0dbe0a511a844a1ece50630d2))
 
 
 
@@ -1693,7 +1696,8 @@ siteLogoDimensions: {
 
 
 
-[unreleased]: https://github.com/slsfi/digital-edition-frontend-ng/compare/4.0.0...HEAD
+[unreleased]: https://github.com/slsfi/digital-edition-frontend-ng/compare/4.1.0...HEAD
+[4.1.0]: https://github.com/slsfi/digital-edition-frontend-ng/compare/4.0.0...4.1.0
 [4.0.0]: https://github.com/slsfi/digital-edition-frontend-ng/compare/3.1.1...4.0.0
 [3.1.1]: https://github.com/slsfi/digital-edition-frontend-ng/compare/3.1.0...3.1.1
 [3.1.0]: https://github.com/slsfi/digital-edition-frontend-ng/compare/3.0.1...3.1.0
