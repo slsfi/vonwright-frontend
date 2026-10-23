@@ -1,14 +1,20 @@
 name: "Build and push Docker image"
 
-# Trigger on commits to main, on pushed tags (releases), and manually.
+# Build main, published releases, and manually selected source tags.
 on:
   push:
     branches:
       - main
-    tags:
-      - '*'
+
+  release:
+    types: [published]
 
   workflow_dispatch:
+    inputs:
+      release_tag:
+        description: 'Release tag to rebuild (optional; leave empty to build selected branch)'
+        required: false
+        type: string
 
 # Grant least privileges needed by this workflow:
 # - read repository contents
@@ -22,9 +28,42 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Select source and image tag
+        id: source
+        uses: actions/github-script@v8
+        env:
+          RELEASE_TAG: ${{ inputs.release_tag }}
+        with:
+          script: |
+            const requestedTag = (process.env.RELEASE_TAG || '').trim();
+            const eventTag = context.ref.startsWith('refs/tags/')
+              ? context.ref.slice('refs/tags/'.length)
+              : '';
+            const releaseTag = requestedTag || eventTag;
+            if (requestedTag) {
+              const { data } = await github.rest.git.getRef({
+                ...context.repo,
+                ref: `tags/${requestedTag}`
+              });
+              if (data.ref !== `refs/tags/${requestedTag}`) {
+                throw new Error('The requested release tag must match an existing Git tag exactly.');
+              }
+            }
+            const imageTag = (releaseTag || context.ref.replace(/^refs\/heads\//, ''))
+              .replace(/[^a-zA-Z0-9_.-]+/g, '-');
+            if (!/^[a-zA-Z0-9_][a-zA-Z0-9_.-]{0,127}$/.test(imageTag) || imageTag === 'latest') {
+              throw new Error('The source must produce a valid image tag other than the reserved latest alias.');
+            }
+            core.setOutput('ref', requestedTag ? `refs/tags/${requestedTag}` : context.ref);
+            core.setOutput('release-tag', releaseTag);
+            core.setOutput('image-tag', imageTag);
+
       # 1) Check out source code used for docker build context.
       - name: Check out repository
+        id: checkout
         uses: actions/checkout@v7
+        with:
+          ref: ${{ steps.source.outputs.ref }}
 
       # 2) Create a Buildx builder. Buildx uses BuildKit under the hood.
       - name: Set up Docker Buildx
@@ -38,17 +77,23 @@ jobs:
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      # 4) Compute Docker tags and OCI labels from GitHub event metadata.
+      # 4) Use the selected source tag and its checked-out commit in metadata.
+      # The latest alias is handled separately after checking GitHub Releases.
       - name: Pull metadata from GitHub
         id: meta
         uses: docker/metadata-action@v6
         with:
           images: ghcr.io/${{ github.repository }}
+          flavor: latest=false
+          tags: type=raw,value=${{ steps.source.outputs.image-tag }}
+          labels: |
+            org.opencontainers.image.revision=${{ steps.checkout.outputs.commit }}
 
       # 5) Build and push image using BuildKit/Buildx.
       # `pull: true` ensures base layers are refreshed by the builder itself,
       # which is the key setting for avoiding stale base images in buildx builds.
       - name: Build and push Docker image
+        id: build
         uses: docker/build-push-action@v7
         with:
           context: .
@@ -57,3 +102,43 @@ jobs:
           pull: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+
+      # Recheck after building so older releases cannot overwrite latest just
+      # because their builds finish after a newer release's build.
+      - name: Publish latest for the current GitHub latest release
+        uses: actions/github-script@v8
+        env:
+          RELEASE_TAG: ${{ steps.source.outputs.release-tag }}
+          IMAGE_NAME: ghcr.io/${{ github.repository }}
+          IMAGE_DIGEST: ${{ steps.build.outputs.digest }}
+        with:
+          script: |
+            const releaseTag = process.env.RELEASE_TAG;
+            if (!releaseTag) {
+              core.info('Branch build: leaving latest unchanged.');
+              return;
+            }
+            let latest;
+            try {
+              ({ data: latest } = await github.rest.repos.getLatestRelease(context.repo));
+            } catch (error) {
+              if (error.status === 404) {
+                core.info('No published latest release: leaving latest unchanged.');
+                return;
+              }
+              throw error;
+            }
+            if (latest.draft || latest.prerelease || latest.tag_name !== releaseTag) {
+              core.info('This tag is not the current GitHub latest release: leaving latest unchanged.');
+              return;
+            }
+            const digest = process.env.IMAGE_DIGEST || '';
+            if (!/^sha256:[a-f0-9]{64}$/.test(digest)) {
+              throw new Error('Cannot publish latest without a valid built image digest.');
+            }
+            const imageName = process.env.IMAGE_NAME.toLowerCase();
+            await exec.exec('docker', [
+              'buildx', 'imagetools', 'create',
+              '--tag', `${imageName}:latest`,
+              `${imageName}@${digest}`
+            ]);

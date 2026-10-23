@@ -1,5 +1,5 @@
 /*
- * Regression tests for benchmark-ssr.js runtime startup and cleanup.
+ * Regression tests for benchmark-ssr.js request pacing, startup, and cleanup.
  *
  * Usage (from the repository root):
  *   npm run test:ssr:benchmark
@@ -8,6 +8,8 @@
  * Coverage:
  *   - Auto-start through npm run serve:ssr with an alternate runtime entry and PORT.
  *   - Cold-run and warm-run output from successful HTTP requests.
+ *   - Default and configurable pauses after responses, across routes and failures.
+ *   - Delay argument validation and exclusion of pauses from response timings.
  *   - Runtime launch failures, startup timeouts, and SIGINT interruption.
  *   - Cleanup of the npm launcher and runtime processes after each scenario.
  *
@@ -23,9 +25,11 @@
 const assert = require('node:assert/strict');
 const { execFile } = require('node:child_process');
 const fs = require('node:fs');
+const http = require('node:http');
 const net = require('node:net');
 const os = require('node:os');
 const path = require('node:path');
+const { performance } = require('node:perf_hooks');
 const { setTimeout: delay } = require('node:timers/promises');
 const { promisify } = require('node:util');
 
@@ -58,6 +62,49 @@ async function assertStopped(pid, port) {
   assert.fail(`SSR process ${pid} survived benchmark cleanup`);
 }
 
+function assertRequestGaps(requests, delayMs) {
+  for (let index = 1; index < requests.length; index++) {
+    const gapMs = requests[index].startedAt - requests[index - 1].completedAt;
+    assert.ok(gapMs >= delayMs - 20,
+      `Only ${gapMs.toFixed(1)} ms recovery before ${requests[index].route}; expected ${delayMs} ms`);
+  }
+}
+
+async function checkExistingServerPacing(benchmark) {
+  const requests = [];
+  const server = http.createServer((req, res) => {
+    const request = { route: req.url, startedAt: performance.now() };
+    requests.push(request);
+    res.statusCode = req.url === '/failed/' ? 503 : 200;
+    res.write('fixture');
+    setTimeout(() => {
+      request.completedAt = performance.now();
+      res.end(' SSR');
+    }, 50);
+  });
+  await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
+  try {
+    for (const [args, delayMs] of [
+      [['--request-delay-ms', '100'], 100],
+      [['--request-delay-ms=120'], 120],
+      [['--request-delay-ms=0'], 0],
+    ]) {
+      requests.length = 0;
+      const completed = await execFileAsync(process.execPath, [benchmark,
+        '--skip-start', `--base-url=http://127.0.0.1:${server.address().port}`,
+        '--warm-runs=1', '--routes=/failed/,/sv/', ...args,
+      ], { timeout: 15000 });
+      assert.deepEqual(requests.map(request => request.route), ['/failed/', '/failed/', '/sv/', '/sv/']);
+      assertRequestGaps(requests, delayMs);
+      assert.match(completed.stdout, new RegExp(`Request delay: ${delayMs} ms`));
+    }
+    console.log('PASS: both delay argument forms and zero work for an existing server, including after HTTP failures and between routes');
+  } finally {
+    server.closeAllConnections();
+    await new Promise(resolve => server.close(resolve));
+  }
+}
+
 async function main() {
   const tempRoot = path.resolve(os.tmpdir());
   const fixtureRoot = fs.mkdtempSync(path.join(tempRoot, 'ssr-benchmark-'));
@@ -74,22 +121,62 @@ async function main() {
   const recordPid = "require('node:fs').writeFileSync('runtime.pid', String(process.pid));";
 
   try {
+    for (const args of [
+      ['--request-delay-ms'], ['--request-delay-ms='], ['--request-delay-ms', '--warm-runs=0'],
+      ['--request-delay-ms=-1'], ['--request-delay-ms=1.5'], ['--request-delay-ms=NaN'],
+      ['--request-delay-ms=Infinity'], ['--request-delay-ms=2147483648'],
+    ]) {
+      await assert.rejects(execFileAsync(process.execPath, [benchmark, ...args], { timeout: 5000 }),
+        error => error.code === 1 && /Invalid --request-delay-ms value/.test(error.stderr));
+    }
+    const help = await execFileAsync(process.execPath, [benchmark, '--help', '--request-delay-ms=2147483647']);
+    assert.match(help.stdout, /--request-delay-ms/);
+    console.log('PASS: missing, malformed, negative, fractional, and overflowing delays fail before launching a server');
+
+    await checkExistingServerPacing(benchmark);
+
     // No dist/proxy file exists: the canonical script alone selects the entry.
     writeManifest('alternate-entry.cjs');
+    const requestLog = path.join(fixtureRoot, 'requests.jsonl');
     fs.writeFileSync(runtime, recordPid + `
-      require('node:http').createServer((req, res) => res.end('fixture SSR'))
-        .listen(Number(process.env.PORT), '127.0.0.1');
+      const fs = require('node:fs');
+      require('node:http').createServer((req, res) => {
+        const startedAt = performance.now();
+        res.write('fixture');
+        setTimeout(() => {
+          fs.appendFileSync('requests.jsonl', JSON.stringify({
+            route: req.url, startedAt, completedAt: performance.now(),
+          }) + '\\n');
+          res.end(' SSR');
+        }, 50);
+      }).listen(Number(process.env.PORT), '127.0.0.1');
+    `);
+    const tableCapture = path.join(fixtureRoot, 'capture-tables.cjs');
+    fs.writeFileSync(tableCapture, `
+      const table = console.table.bind(console);
+      console.table = rows => {
+        console.log('BENCHMARK_TABLE ' + JSON.stringify(rows));
+        table(rows);
+      };
     `);
     const port = await getFreePort();
-    const completed = await execFileAsync(process.execPath, [benchmark,
+    const completed = await execFileAsync(process.execPath, ['--require', tableCapture, benchmark,
       '--port', String(port), '--warm-runs=1', '--routes=/sv/,/fi/',
-    ], { timeout: 15000 });
+    ], { timeout: 30000 });
     assert.match(completed.stdout, /Cold runs/);
     assert.match(completed.stdout, /Warm summary/);
     assert.equal((completed.stdout.match(/│\s+200\s+│/g) || []).length, 6);
+    assert.match(completed.stdout, /Request delay: 2000 ms/);
+    const requests = fs.readFileSync(requestLog, 'utf8').trim().split('\n').map(line => JSON.parse(line));
+    assert.deepEqual(requests.map(request => request.route), ['/sv/', '/sv/', '/sv/', '/fi/', '/fi/']);
+    assertRequestGaps(requests, 2000);
+    const samples = JSON.parse(completed.stdout.split('\n')
+      .find(line => line.startsWith('BENCHMARK_TABLE ')).slice('BENCHMARK_TABLE '.length));
+    assert.ok(samples.every(row => row.ms < 1500), 'Two-second pauses must not count toward response timings');
     await assertStopped(Number(fs.readFileSync(pidFile, 'utf8')), port);
     fs.unlinkSync(pidFile);
     console.log('PASS: benchmark uses serve:ssr with an alternate entry, inherits PORT, and stops its runtime');
+    console.log('PASS: default two-second recovery follows readiness and full responses, across warm runs and routes, outside measured times');
 
     writeManifest('missing-entry.cjs');
     await assert.rejects(execFileAsync(process.execPath, [benchmark,
@@ -111,19 +198,28 @@ async function main() {
     fs.unlinkSync(pidFile);
     console.log('PASS: startup timeout also stops the npm launcher and stalled runtime');
 
-    // Emit SIGINT after the fixture child starts, including on Windows where
+    // Emit SIGINT during the pause after readiness, including on Windows where
     // ChildProcess.kill() terminates rather than delivering POSIX signals.
+    fs.writeFileSync(runtime, recordPid + `
+      require('node:http').createServer((req, res) => {
+        require('node:fs').writeFileSync('ready.requested', String(Date.now()));
+        res.end('fixture SSR');
+      }).listen(Number(process.env.PORT), '127.0.0.1');
+    `);
     const interrupter = path.join(fixtureRoot, 'interrupt.cjs');
     fs.writeFileSync(interrupter, `setInterval(() => {
-      if (require('node:fs').existsSync('runtime.pid')) process.emit('SIGINT');
+      const fs = require('node:fs');
+      if (fs.existsSync('ready.requested') && Date.now() - Number(fs.readFileSync('ready.requested', 'utf8')) > 150) {
+        process.emit('SIGINT');
+      }
     }, 50);`);
     const interruptedPort = await getFreePort();
     await assert.rejects(execFileAsync(process.execPath, ['--require', interrupter, benchmark,
-      '--port', String(interruptedPort), '--startup-timeout-ms=8000',
+      '--port', String(interruptedPort), '--startup-timeout-ms=8000', '--request-delay-ms=2000',
     ], { cwd: fixtureRoot, timeout: 12000 }), error => error.code === 130);
     await assertStopped(Number(fs.readFileSync(pidFile, 'utf8')), interruptedPort);
     fs.unlinkSync(pidFile);
-    console.log('PASS: interruption stops the launcher and runtime before exiting with SIGINT status');
+    console.log('PASS: interruption during a request pause stops the launcher and runtime before exiting with SIGINT status');
   } finally {
     // Also release a fixture child when an assertion fails, so failures cannot
     // keep inherited pipes or the temporary Windows working directory open.

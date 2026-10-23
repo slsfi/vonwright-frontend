@@ -22,7 +22,7 @@
   @if ((coverData$ | async); as data) {
     <h1 class="screen-reader-only" i18n="@@CollectionCover.Cover">Omslag</h1>
     <div class="cover-image-wrapper" [class.mobile-mode-content]="mobileMode">
-      <img class="cover-image" [src]="data.image_src" [alt]="data.image_alt" loading="lazy">
+      <img class="cover-image" [src]="data.imageURL" [alt]="data.imageAltText">
     </div>
   } @else {
     <ion-spinner class="loading" name="crescent"></ion-spinner>

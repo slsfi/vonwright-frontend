@@ -5,9 +5,6 @@ const common = require('./prebuild-common-fns');
 const configFilepath = 'src/project/config.ts';
 const translationsPath = 'src/locale/';
 const outputPath = 'public/static-html/collection-toc/';
-const tocFetchRetries = 3;
-const tocFetchRetryDelay = 2000;
-const tocFetchRetryDelayIncrement = 1000;
 
 if (require.main === module) {
   generateStaticCollectionMenus();
@@ -105,12 +102,7 @@ async function generateStaticCollectionMenus() {
         tocEndpoint += '/' + dataLocale;
       }
 
-      const tocJSON = await common.fetchWithRetry(
-        tocEndpoint,
-        tocFetchRetries,
-        tocFetchRetryDelay,
-        tocFetchRetryDelayIncrement
-      );
+      const tocJSON = await common.fetchCollectionToc(tocEndpoint);
       if (!tocJSON) {
         const affectedLocales = dataLocale ? dataLocale : outputLocales.join(', ');
         console.warn(`Skipping collection ${collectionId} (${affectedLocales}): could not fetch TOC from ${tocEndpoint}`);

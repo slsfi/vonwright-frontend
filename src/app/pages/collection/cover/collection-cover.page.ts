@@ -1,12 +1,13 @@
 import { AsyncPipe } from '@angular/common';
-import { Component, LOCALE_ID, inject, signal } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { toObservable } from '@angular/core/rxjs-interop';
 import { ActivatedRoute } from '@angular/router';
 import { IonContent, IonHeader, IonSpinner, IonToolbar } from '@ionic/angular';
 import { catchError, combineLatest, filter, map, Observable, of, switchMap } from 'rxjs';
 
 import { TextChangerComponent } from '@components/text-changer/text-changer.component';
-import { MarkdownService } from '@services/markdown.service';
+import { CollectionCover } from '@models/collection.models';
+import { CollectionCoverService } from '@services/collection-cover.service';
 import { PlatformService } from '@services/platform.service';
 
 
@@ -17,22 +18,17 @@ import { PlatformService } from '@services/platform.service';
   imports: [AsyncPipe, IonContent, IonHeader, IonSpinner, IonToolbar, TextChangerComponent]
 })
 export class CollectionCoverPage {
-  private mdService = inject(MarkdownService);
+  private collectionCoverService = inject(CollectionCoverService);
   private platformService = inject(PlatformService);
   private route = inject(ActivatedRoute);
-  private activeLocale = inject(LOCALE_ID);
 
   readonly activeComponent = signal(true);
   readonly mobileMode = this.platformService.isMobile();
   private readonly active$ = toObservable(this.activeComponent);
 
-  readonly coverData$: Observable<any> = combineLatest([this.route.params, this.active$]).pipe(
+  readonly coverData$: Observable<CollectionCover> = combineLatest([this.route.params, this.active$]).pipe(
     filter(([, active]) => active),
-    switchMap(([{collectionID}]) => {
-      return this.getCoverDataFromMdContent(
-        `${this.activeLocale}-08-${collectionID}`
-      );
-    })
+    switchMap(([{collectionID}]) => this.getCoverData(collectionID))
   );
 
   ionViewWillEnter() {
@@ -43,21 +39,17 @@ export class CollectionCoverPage {
     this.activeComponent.set(false);
   }
 
-  private getCoverDataFromMdContent(fileID: string): Observable<any> {
-    return this.mdService.getMdContent(fileID).pipe(
-      map((md: string) => {
-        // Extract image url and alt-text from markdown content.
-        const m = md.match(/!\[(.*?)\]\((.*?)\)/);
-        const image_alt = m?.[1] || 'Collection cover image';
-        const image_src = m?.[2] || 'assets/images/collection-cover-placeholder.jpg';
-
-        return { image_alt, image_src };
-      }),
+  private getCoverData(collectionID: number | string): Observable<CollectionCover> {
+    return this.collectionCoverService.getCoverData(collectionID).pipe(
+      map(cover => ({
+        imageAltText: cover.imageAltText || 'Collection cover image',
+        imageURL: cover.imageURL || 'assets/images/collection-cover-placeholder.jpg'
+      })),
       catchError((e: any) => {
         console.error('Error loading markdown content for cover image', e);
         return of({
-          image_alt: 'Cover image',
-          image_src: 'assets/images/collection-cover-placeholder.jpg'
+          imageAltText: 'Cover image',
+          imageURL: 'assets/images/collection-cover-placeholder.jpg'
         });
       })
     );

@@ -17,7 +17,7 @@ The app is a standalone, zoneless Angular application with server-side rendering
 - **Application request context:** Application services optionally inject [`APPLICATION_REQUEST_CONTEXT`](../src/app/tokens/request-context.token.ts) for the app-relative request URL, resolved public origin, and user agent. The [server adapter](../src/ssr/server-request-context.ts) reads Angular's nullable Web `REQUEST` and strips the rendered document's base path, preserving query parameters and escaped characters. Proxy headers are resolved at the Express boundary, not reinterpreted in application services. Browser services retain their router, document-location, and navigator fallbacks. Keep adapters under `src/ssr/`. `PageNotFoundPage` sets HTTP 404 through Angular's nullable `RESPONSE_INIT`.
 - **Integrated application builder and `dist/app` contract:** [`angular.json`](../angular.json) uses `@angular/build:application` for one browser/server build, `@angular/build:dev-server` for development, and `@angular/build:unit-test` for Vitest unit tests with jsdom. Production emits `dist/app/browser/<subPath>/index.csr.html`, localized server bundles, and `dist/app/server/server.mjs`; `npm run serve:ssr` starts that ESM entry on port 4201 (or `PORT`). Production retains `inlineCritical: false`.
 - **Generated server-rendering modes:** [`app.config.server.ts`](../src/app/app.config.server.ts) registers generated routes through `provideServerRendering(withRoutes(serverRoutes))`. With auth enabled, protected routes and their lazy descendants use `RenderMode.Client`; public routes use `RenderMode.Server`. With auth disabled, normal application routes use SSR and auth-only routes return application 404s. The final `**` server route uses `RenderMode.Server`. Angular prerendering is not configured; generated collection-menu HTML remains a separate prebuild step. See [route generation](#feature-based-route-generation).
-- **Public files and compiled project inputs:** [`public/`](../public/) is copied into each emitted locale's browser output. Configuration and global overrides remain compiled inputs under `src/project/`, with shared style inclusions in [`src/styles.scss`](../src/styles.scss). Sass font references produce hashed files under `media/`; copied `assets/...` URLs and root crawler-document URLs remain stable. See [theming](THEMING.md) and the [production output layout](DEPLOYMENT.md#building).
+- **Public files and compiled project inputs:** [`public/`](../public/) is copied into each emitted locale's browser output. Configuration, TypeScript content data under `src/project/data/`, and global overrides remain compiled inputs under `src/project/`, with shared style inclusions in [`src/styles.scss`](../src/styles.scss). Sass font references produce hashed files under `media/`; copied `assets/...` URLs and root crawler-document URLs remain stable. See [theming](THEMING.md) and the [production output layout](DEPLOYMENT.md#building).
 - **TypeScript configuration:** [`tsconfig.json`](../tsconfig.json) shares TypeScript and Angular compiler settings, with an empty `files` list and references to the application and test configurations. [`tsconfig.app.json`](../tsconfig.app.json) includes browser and server sources, excludes specs and the Vitest cleanup setup, and supplies Node/localization types. [`tsconfig.spec.json`](../tsconfig.spec.json) supplies Vitest globals and localization types. Shared settings rely on TypeScript 6 defaults for strict checks, including property initialization, and consistent filename casing. They retain the `ES2022` target and enable `isolatedModules` for Angular's per-file transpilation. The `module: preserve` setting implicitly enables `bundler` resolution and JSON-module support. The explicit `skipLibCheck: false` setting retains declaration-file checking, differing from the Angular CLI-generated configuration. Angular strict template checking uses its default enabled setting, and extended diagnostics use their default warning level. In Angular 22.2.1, the redundant `??` and `?.` checks still require an explicit `strict` or `strictNullChecks` setting and do not emit with only implicit TypeScript strictness. Keep nullable types and template guards aligned. Prefer `readonly` field initializers for observable pipelines whose dependencies are available during construction, with dependent fields declared after their dependencies. Standard ES2022 class-field semantics are enabled through the target default: field declarations create own properties, including `undefined` for fields without initializers. Use `inject()` fields declared before their consumers; constructor parameter properties are assigned after native field initialization. Reserve lifecycle initialization for work that needs initialized inputs or lifecycle state; fields that can remain absent should model that in their types. The `server.ts` import of locale settings from `angular.json` uses this implicit JSON-module support; these settings are included in the compiled server bundle. Angular builders control output paths and source maps. For direct TypeScript checks, use `npx tsc --noEmit -p tsconfig.app.json` or `npx tsc --noEmit -p tsconfig.spec.json`; the root configuration has no source files of its own. Root helper scripts remain CommonJS.
 - **Hydration intentionally not enabled:** Client hydration is deliberately not configured because Ionic's underlying Stencil components do not currently support SSR hydration with Angular ([ionic-team/ionic-framework#30490](https://github.com/ionic-team/ionic-framework/issues/30490)). Hydration must be handled and tested as a dedicated SSR/deployment migration rather than folded into ordinary component work.
 
@@ -151,6 +151,8 @@ The Node.js Docker-image tag is defined by the default `NODE_IMAGE_TAG` build ar
 
 The supplied GitHub Actions build workflow is defined in [`.github/workflows/docker-build-and-push.yml`](../.github/workflows/docker-build-and-push.yml). It sets up a Docker Buildx builder using `docker/setup-buildx-action` and then runs the build with `docker/build-push-action` (BuildKit). The workflow uses `pull: true` so the builder refreshes base images using the tag defined in `Dockerfile`.
 
+Run `npm run test:docker-workflow` after changing source selection, image metadata, or latest-release publishing. The check executes the workflow's inline scripts with GitHub and Docker fixtures, covering manual source-tag overrides, invalid tags, the reserved `latest` alias, release designation, and API failures. It requires neither Docker nor network access. Fork operation and the manual rebuild form are documented in [deployment](DEPLOYMENT.md#rebuild-an-existing-release-image).
+
 When updating the supported Node.js version, keep all version declarations and developer-facing guidance aligned:
 
 - update the default `NODE_IMAGE_TAG` in [`Dockerfile`](../Dockerfile),
@@ -168,11 +170,11 @@ Use the Angular/Vitest unit suite as the primary automated check, with the scrip
 - `npm run test:ci`: run the full Angular/Vitest unit suite once with jsdom; use this for pre-PR verification.
 - `npm run test:source-encoding`: validate source-file encoding and BOM usage.
 - `npm run test:routes-parser`: verify route parser/generator behavior; run it after changes to `prebuild-generate-routes.js` or generator-facing route syntax in `src/app/app.routes.ts`.
-- `npm run test:static-collection-menus`: verify that shared non-multilingual TOCs are fetched once, per-locale menu files are generated, and fetch retries back off as expected; run it after changes to `prebuild-generate-static-collection-menus.js` or shared fetch retry behavior in `prebuild-common-fns.js`.
+- `npm run test:static-collection-menus`: verify that shared non-multilingual TOCs are fetched once, per-locale menu files and sitemap collection URLs are generated, and TOC requests handle retries, large responses, connection reuse and compression; run it after changes to `prebuild-generate-static-collection-menus.js`, `prebuild-generate-sitemap.js`, or shared fetch behavior in `prebuild-common-fns.js`.
 - `npm run test:ssr:smoke`: verify selected SSR/CSR responses, SEO/default-language URLs, and missing-static-file behavior against a running SSR app; build and start the app first, or pass `--base-url` to target another running environment.
 - `npm run test:ssr:server`: build SSR, import the middleware from the emitted server entry, and exercise it with a spy in place of Angular. Verify static/probe short-circuits, cache policies, dynamic limiting, locale paths, and trusted-proxy behavior without rendering Angular. The imported entry starts no listener; fixture apps use temporary local HTTP servers.
 - `npm run test:ssr:checks`: verify that the smoke runner rejects incorrect render modes and redirects, and sends explicit proxy Host headers, using local fixtures without a running app.
-- `npm run test:ssr:benchmark`: verify benchmark auto-start through `serve:ssr`, including an alternate runtime entry, failed startup, interruption, and child-process cleanup, using local fixtures without building the app.
+- `npm run test:ssr:benchmark`: verify benchmark request pacing and argument validation, response timings, and auto-start through `serve:ssr`, including an alternate runtime entry, failed startup, interruption, and child-process cleanup, using local fixtures without building the app.
 - `npm run test:ssr:docker`: build/run the local production Docker image and record memory across repeated SSR load/idle cycles; see the [Docker memory check](#repeatable-docker-ssr-memory-check). `npm run test:ssr:docker:checks` verifies argument/URL/sample handling and response validation with local fixtures, without Docker or a build.
 - `npm run test:build-output`: verify browser output for the production locales configured in `angular.json` and the runtime entry from `serve:ssr`; run after `npm run build:ssr`. Supports `--dist-root`, `--locales` (comma-separated), and `--server-entry` (relative to the output root) for custom output.
 
@@ -235,7 +237,7 @@ Updating checks:
 
 
 
-## SSR benchmark (localhost)
+## SSR benchmark
 
 Use the SSR benchmark to measure response-time performance of server-rendered routes (cold and warm runs).
 
@@ -246,6 +248,12 @@ Use the SSR benchmark to measure response-time performance of server-rendered ro
 Auto-start uses `npm run serve:ssr`, the same launcher used by the Docker runtime. The benchmark stops its launcher and SSR child processes when it finishes, is interrupted, or cannot start the server.
 
 The first request per route is labeled cold, but readiness has already rendered the first route before measurement. It is not a process-start measurement. Requests can include live API and rendering costs; check response status, size, and completeness before interpreting latency changes. Keep critical CSS inlining disabled for comparable measurements.
+
+Requests run sequentially with a two-second pause after each response before the next request starts. The pause also applies between routes, after failed requests, and between successful readiness and the first measured request; failed readiness probes wait at least this long before retrying within the startup timeout. Pauses are excluded from response timings, and there is no pause before the first request to an existing server or after the final request.
+
+Use `--request-delay-ms=<number>` to adjust pacing for the backend's capacity and request limits. Increase it when content retrieval fails or the backend is rate limited; an HTTP 200 page can still contain a content-loading error. Use the same delay, routes, and request counts when comparing app versions. Set the delay to `0` only when deliberately benchmarking a dedicated local server without pacing.
+
+When auto-starting with a long pause, increase `--startup-timeout-ms` as needed so the startup budget leaves time for readiness retries with that pause.
 
 Recommended workflow:
 
@@ -275,6 +283,7 @@ Optional arguments:
 - `--base-url=<url>` to target another host/port.
 - `--startup-timeout-ms=<number>` to adjust server startup wait time.
 - `--request-timeout-ms=<number>` to adjust per-request timeout.
+- `--request-delay-ms=<integer>` to set the pause between requests in milliseconds (default: `2000`; `0` disables pacing).
 - `--skip-start` to benchmark an existing server without invoking `npm run serve:ssr`.
 
 Example:
@@ -283,9 +292,16 @@ Example:
 npm run bench:ssr -- --warm-runs=8 --routes=/sv/,/sv/collection/216/text/20280
 ```
 
+For a live site, for example with a five-second pause:
+
+```bash
+npm run bench:ssr -- --skip-start --base-url=https://topelius.sls.fi --request-delay-ms=5000
+```
+
 What the benchmark reports:
 
 - Per-request timing table with status, elapsed milliseconds, and response size.
+- Configured request delay, excluded from the reported response times.
 - Cold run summary (run 1 per route).
 - Warm run summary with `avg`, `median`, `p95`, `min`, and `max`.
 
