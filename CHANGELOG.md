@@ -23,6 +23,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 - Deps: update `@angular/cli` to 22.2.4.
 - Deps: update `@ionic/angular` and `@ionic/angular-server` to 9.0.9.
 - Deps (dev): update `ng-extract-i18n-merge` to 3.5.0.
+- Deps: update transitive dependencies.
 
 ### Fixed
 
