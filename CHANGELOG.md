@@ -8,10 +8,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ## Unreleased
 
+
+
+## [4.1.0-production.1] – 2026-10-23
+
 ### Changed
 
-- Update to base version [`4.1.0`](https://github.com/slsfi/digital-edition-frontend-ng/releases/tag/4.1.0) from upstream, original repository.
-- Enable static, localized collection cover metadata.
+- Update to base version [`4.1.0`](https://github.com/slsfi/digital-edition-frontend-ng/releases/tag/4.1.0) from upstream, original repository. ([bf04039](https://github.com/slsfi/vonwright-frontend/commit/bf04039d4cd55a0aad8689791e068005ab88f44e))
+- Enable static, localized collection cover metadata. ([d8c379c](https://github.com/slsfi/vonwright-frontend/commit/d8c379c1a14bd127163dba7cb17da710a228281e))
 
 
 
@@ -2016,6 +2020,7 @@ siteLogoDimensions: {
 [1.0.1]: https://github.com/slsfi/digital-edition-frontend-ng/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/slsfi/digital-edition-frontend-ng/releases/tag/v1.0.0
 
+[4.1.0-production.1]: https://github.com/slsfi/vonwright-frontend/compare/4.0.0-production.1...4.1.0-production.1
 [4.0.0-production.1]: https://github.com/slsfi/vonwright-frontend/compare/3.1.1-production.1...4.0.0-production.1
 [3.1.1-production.1]: https://github.com/slsfi/vonwright-frontend/compare/3.0.1-production.1...3.1.1-production.1
 [3.0.1-production.1]: https://github.com/slsfi/vonwright-frontend/compare/2.7.9-production.1...3.0.1-production.1
