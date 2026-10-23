@@ -23,6 +23,17 @@ export interface CollectionWithCover extends Collection {
   imageURL?: string;
 }
 
+export interface CollectionCover {
+  imageAltText: string;
+  imageURL: string;
+}
+
+/** Cover metadata keyed by locale; each locale supplies its own path and alt text. */
+export type LocalizedCollectionCover = Readonly<Partial<Record<string, Readonly<CollectionCover>>>>;
+
+/** Project-owned cover metadata keyed by collection ID. */
+export type CollectionCovers = Readonly<Partial<Record<string, LocalizedCollectionCover>>>;
+
 export const toCollection = (c: CollectionApiResponse): Collection => ({
   id: c.id,
   title: c.title ?? ''

@@ -8,6 +8,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ## [Unreleased]
 
+### Added
+
+- Optional static, localized collection cover metadata for the content grid and collection cover pages. Enable `collections.useStaticCoverData` in `src/project/config.ts`; populate `src/project/data/collection-covers.ts` with `npm run generate-collection-covers` (Topelius sample included). See the [setup and migration instructions](docs/PROJECT-CUSTOMIZATION.md#static-collection-covers). Backend fetching remains the default; it and the flag will be removed in a future major version.
+
 ### Changed
 
 - Docker/GitHub Actions: add [release image rebuilds](docs/DEPLOYMENT.md#rebuild-an-existing-release-image) and update Alpine packages at build time. Build releases and prereleases on publication instead of tag pushes, and align Docker's `latest` tag with GitHub's designated latest release.

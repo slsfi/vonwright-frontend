@@ -77,6 +77,7 @@ Keep a fork's settings and styles in `src/project/`, and its static files in `pu
 | [`src/index.html`](../src/index.html) | Document-level resources, such as external font-provider snippets. |
 | [`src/locale/`](../src/locale/) (`messages.<locale>.xlf`) | Edit translations for enabled locales, including `Site.Title`, `Site.Subtitle`, and `Site.MetaDescription.Home`. |
 | [`src/project/config.ts`](../src/project/config.ts) | Edition settings, enabled features, menus, authentication, SSR options, and public/backend origins. Application imports continue to use `@config`; see the [configuration reference](CONFIGURATION.md). |
+| [`src/project/data/collection-covers.ts`](../src/project/data/collection-covers.ts) | Localized collection cover paths and alt texts when `collections.useStaticCoverData` is enabled; see [static collection covers](#static-collection-covers). |
 | [`src/project/global-overrides.scss`](../src/project/global-overrides.scss) | Additional global styles and overrides to base CSS variables and page/component styles. Loaded after the base styles; see the [theming guide](THEMING.md). |
 | [`src/styles.scss`](../src/styles.scss) | Comment out unused shared style/font bundles. |
 | [`src/theme/_inc-global-tei.scss`](../src/theme/_inc-global-tei.scss) | Select the TEI feature styles required by the edition; see [theming](THEMING.md#tei-styles) for the alternate v2 entry. |
@@ -98,7 +99,48 @@ Review [`src/project/config.ts`](../src/project/config.ts) before running the ed
 | `page`, `component`, and `modal` | Page behavior, navigation, content views, search options, and dialogs. |
 | `app.openGraphMetaTags` and `page.home` | Social-share images, the home-page banner, and localized image descriptions. |
 
-Configuration is compiled into the app; rebuild the production output after changing it. It is not a runtime environment file. Do not put secrets or credentials in it. Backend content, search indices, and file endpoints must correspond to the configured edition; a frontend setting does not provision those services.
+Configuration and TypeScript data under `src/project/data/` are compiled into the app; rebuild the production output after changing them. They are not runtime environment files. Do not put secrets or credentials in them. Backend content, search indices, and file endpoints must correspond to the configured edition; a frontend setting does not provision those services.
+
+### Static collection covers
+
+By default, the content grid and collection cover pages fetch cover metadata from backend Markdown nodes named `<locale>-08-<collectionId>`. Set `collections.useStaticCoverData` to `true` to read both views' cover paths and alt texts from [`src/project/data/collection-covers.ts`](../src/project/data/collection-covers.ts) instead. Omit the setting or set it to `false` to retain backend fetching. The grid still fetches its collection list and titles from the backend.
+
+To migrate a fork's current backend metadata, run this once with the fork's own `src/project/config.ts` settings and dependencies installed:
+
+```bash
+npm run generate-collection-covers
+```
+
+The [migration script](../scripts/migrations/generate-collection-covers.js) reads `app.backendBaseURL`, `app.projectNameDB`, `app.i18n.languages`, and `collections.order`. It fetches each selected collection's cover Markdown for every configured locale, then replaces `src/project/data/collection-covers.ts` with the first image's path and alt text. It uses the shared fetch retry policy and leaves the existing file unchanged if a request fails. Markdown without an image is reported and omitted, so that locale uses the app's placeholder. Repeated IDs or locale codes are fetched only once.
+
+Review the generated file, supply the referenced images and thumbnails, then enable `collections.useStaticCoverData` and rebuild. The script does not download images or change the configuration flag, and it is not part of the build. To review output in a separate file, use `npm run generate-collection-covers -- --output tmp/collection-covers.ts`; output paths are relative to the repository root, or absolute. `--help` shows usage. Rerun the command explicitly to refresh metadata from the backend; doing so replaces manual edits in the selected output file.
+
+You can also replace the sample manually. Data is keyed by collection ID and then locale. Each localized entry requires both `imageURL` and `imageAltText`, checked against the `CollectionCovers` type:
+
+```ts
+import type { CollectionCovers } from '@models/collection.models';
+
+export const collectionCovers: CollectionCovers = {
+  216: {
+    sv: {
+      imageURL: 'assets/images/collection-covers/academica-sv.jpg',
+      imageAltText: 'Omslaget till Academica'
+    },
+    fi: {
+      imageURL: 'assets/images/collection-covers/academica-fi.jpg',
+      imageAltText: 'Teoksen Academica kansikuva'
+    }
+  }
+};
+```
+
+Use the exact locale codes configured for the app. Paths can differ between languages; repeat the same path when they share an image. Supply full-size public asset paths without `public/` in the URL. The cover page uses that path directly, while the grid inserts `_thumb` before the extension: `academica-sv.jpg` requires `academica-sv_thumb.jpg` alongside it. Place both files under `public/assets/images/collection-covers/` for this example.
+
+Missing collection or locale entries display the shared placeholder. Static mode does not fall back to backend requests or another language's metadata. Every entry should contain a usable image path and alt text; TypeScript checks the fields, but does not verify that referenced images exist.
+
+The supplied sample contains the 23 collections selected by the base Topelius configuration, with Swedish and Finnish metadata copied from the backend on 2026-10-22. The Topelius cover originals and thumbnails are project assets and are not bundled in this base repository; supply them before using the sample. Cover-data changes require a rebuild and deployment. Backend Markdown edits do not update the static file automatically.
+
+`src/project/data/` is the location for project-owned compiled content data. Article and ebook entries remain in `config.ts` for now.
 
 ### Internationalization
 

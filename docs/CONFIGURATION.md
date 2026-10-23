@@ -149,6 +149,7 @@ articles: [
 | Option | Type / possible values | Default / fallback | Description |
 | --- | --- | --- | --- |
 | `collections.addTEIClassNames` | `boolean` | `false` | Add shared TEI CSS classes to processed reading texts, manuscripts, and variants so the shared TEI styles apply. |
+| `collections.useStaticCoverData` | `boolean` | `false` | Use localized cover image paths and alt texts from `src/project/data/collection-covers.ts` in both the content grid and collection cover pages. False or omitted retains backend Markdown fetching. See [static collection covers](PROJECT-CUSTOMIZATION.md#static-collection-covers). |
 | `collections.replaceImageAssetsPaths` | `boolean` | `false` | Rewrite `src="images/..."` references in processed content to `src="assets/images/..."`. |
 | `collections.enableLegacyIDs` | `boolean` | `false` | Resolve legacy collection/publication IDs through the backend for legacy links and references. |
 | `collections.enableMathJax` | `boolean` | `false` | Enable browser MathJax typesetting for text content. Requires a compatible MathJax script exposing `MathJax.Hub` in `src/index.html`. |
@@ -483,6 +484,8 @@ Unlike numeric collection-selection/exclusion lists, the sorting lists below use
 ### Content grid
 
 The grid is displayed when `page.home.showContentGrid` is enabled. Collection cards use `collections.order`; these options add other content or change presentation.
+
+Collection cover metadata uses the source selected by `collections.useStaticCoverData`, shared with collection cover pages. The collection list and titles still come from the backend. Cover paths identify full-size images; the grid inserts `_thumb` before the extension.
 
 | Option | Type / possible values | Default / fallback | Description |
 | --- | --- | --- | --- |

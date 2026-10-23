@@ -10,8 +10,8 @@ import { Ebook } from '@models/ebook.models';
 import { Collection, CollectionWithCover } from '@models/collection.models';
 import { ContentItem } from '@models/content-item.models';
 import { ParentChildPagePathPipe } from '@pipes/parent-child-page-path.pipe';
+import { CollectionCoverService } from '@services/collection-cover.service';
 import { CollectionsService } from '@services/collections.service';
-import { MarkdownService } from '@services/markdown.service';
 
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -29,7 +29,7 @@ export class ContentGridComponent {
   // -----------------------------------------------------------------------------
   private collectionsService = inject(CollectionsService);
   private destroyRef = inject(DestroyRef);
-  private mdService = inject(MarkdownService);
+  private collectionCoverService = inject(CollectionCoverService);
   private activeLocale = inject(LOCALE_ID);
 
   readonly availableArticles: Article[] = config.articles ?? [];
@@ -99,8 +99,8 @@ export class ContentGridComponent {
   }
 
   private getCollections(): Observable<ContentItem[]> {
-    // First get list of collections, then for each filtered collection
-    // fetch cover image URL and alt text from markdown content.
+    // First get the collection list, then resolve each selected collection's
+    // cover image URL and alt text from the configured source.
     return this.collectionsService.getCollections().pipe(
       switchMap((collectionsList: Collection[]) => {
         const filteredCollections = collectionsList.filter((collection: Collection) =>
@@ -139,17 +139,8 @@ export class ContentGridComponent {
   }
 
   private getCollectionWithCover(collection: Collection): Observable<CollectionWithCover> {
-    return this.mdService.getMdContent(
-      `${this.activeLocale}-08-${collection.id}`
-    ).pipe(
-      map((md: string) => {
-        const { imageAltText, imageURL } = this.extractFirstMarkdownImage(md);
-        return {
-          ...collection,
-          imageAltText,
-          imageURL,
-        };
-      }),
+    return this.collectionCoverService.getCoverData(collection.id).pipe(
+      map(cover => ({ ...collection, ...cover })),
       catchError(() => {
         // Error getting collection cover data: use placeholder cover image.
         return of({
@@ -159,14 +150,6 @@ export class ContentGridComponent {
         });
       })
     );
-  }
-
-  private extractFirstMarkdownImage(md: string): { imageAltText?: string; imageURL?: string } {
-    const m = md.match(/!\[(.*?)\]\((.*?)\)/);
-    return {
-      imageAltText: m?.[1] || undefined,
-      imageURL: m?.[2] || undefined
-    };
   }
 
   private getMediaCollection(): Observable<ContentItem[]> {

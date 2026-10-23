@@ -48,7 +48,7 @@ describe('Collection front-matter pages', () => {
             @let activeComponent = this.activeComponent();
             <span class="active">{{ activeComponent }}</span>
             @if ((coverData$ | async); as coverData) {
-              <span class="cover">{{ coverData.image_src }}|{{ coverData.image_alt }}</span>
+              <span class="cover">{{ coverData.imageURL }}|{{ coverData.imageAltText }}</span>
             }
           `
         )
