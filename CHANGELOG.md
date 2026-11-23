@@ -8,6 +8,60 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ## Unreleased
 
+### Changed
+
+- Update to base version [`4.2.1`](https://github.com/slsfi/digital-edition-frontend-ng/releases/tag/4.2.1) from upstream, original repository.
+
+
+
+## [4.2.1] – 2026-11-20
+
+### Changed
+
+- Update `nginx` to 1.30.7. ([6cc2999](https://github.com/slsfi/digital-edition-frontend-ng/commit/6cc2999ce819c0c9defefea1a06f5161c9bc50e2))
+- Upgrade `actions/github-script` to v9 in the Docker build and push workflow. ([60be1dd](https://github.com/slsfi/digital-edition-frontend-ng/commit/60be1ddcaed472e11048f526a5ffdb62d09b27b8))
+- Deps: update `@angular/cli` and `@angular/core` to 22.3.0. ([ac88fe4](https://github.com/slsfi/digital-edition-frontend-ng/commit/ac88fe4b07902d04430525ee0a0ab5786fe16e14))
+- Deps: update `@ionic/angular` and `@ionic/angular-server` to 9.0.12. ([2c0315f](https://github.com/slsfi/digital-edition-frontend-ng/commit/2c0315f5b6d11709160c595ab90954b6f2c31a8f), [9b8b236](https://github.com/slsfi/digital-edition-frontend-ng/commit/9b8b2368c7736e52b47dc401ef8972e566aa7e07))
+- Deps: update `express-rate-limit` to 8.7.5. ([17efcb2](https://github.com/slsfi/digital-edition-frontend-ng/commit/17efcb272dfdd9ab2e577c235e97b5a472a70388))
+- Deps: update `ionicons` to 8.1.1. ([c96e80b](https://github.com/slsfi/digital-edition-frontend-ng/commit/c96e80b10f747a28c53218c1a89f92adb5a53948))
+- Deps: update `marked` to 18.2.1. ([2a97121](https://github.com/slsfi/digital-edition-frontend-ng/commit/2a971212733a7812c629c1c511c232d6553cc909))
+- Deps (dev): update `jsdom` to 31.0.1. ([442a7e5](https://github.com/slsfi/digital-edition-frontend-ng/commit/442a7e5a4049f1b2e749b9a8e3723f4e5357f6bb))
+- Deps (dev): update `vitest` to 5.1.1. ([66a9f7b](https://github.com/slsfi/digital-edition-frontend-ng/commit/66a9f7b88c9800492e953f9fa55959a1ee57ce00))
+- Deps: update transitive dependencies. ([f80e060](https://github.com/slsfi/digital-edition-frontend-ng/commit/f80e060a35f4aed0f14ebb999dc80b64c33ebbe1))
+
+
+
+## [4.2.0] – 2026-11-07
+
+### Added
+
+- CSS variable `--article-blockquote-accent-rgb` to adjust the left border colour of blockquotes on article pages. ([60d736f](https://github.com/slsfi/digital-edition-frontend-ng/commit/60d736f12cd446c72dfdb73aa5d84cf1f68357ee))
+
+### Changed
+
+- Improve styling of headings, blockquotes and TOC of Markdown-based text, especially on article pages. ([60d736f](https://github.com/slsfi/digital-edition-frontend-ng/commit/60d736f12cd446c72dfdb73aa5d84cf1f68357ee))
+- Deps: update `@angular/cli` to 22.2.6 and `@angular/core` to 22.2.5. ([da66ff0](https://github.com/slsfi/digital-edition-frontend-ng/commit/da66ff009bbe8b9fc63c4155675de86dae21a05e))
+- Deps (dev): update `jsdom` to 31.0.0. ([c1c9f5d](https://github.com/slsfi/digital-edition-frontend-ng/commit/c1c9f5d96a58be07468c43133bb0a8be4999ca99))
+- Deps: update transitive dependencies. ([3519eaf](https://github.com/slsfi/digital-edition-frontend-ng/commit/3519eaf69eace5ffc4d82f33ab09731f913e090d))
+
+### Fixed
+
+- Image aspect ratio in Markdown-based text when image height and width are defined. ([559257f](https://github.com/slsfi/digital-edition-frontend-ng/commit/559257fb8cc599a048fd3181055e7c4fd65fd1ef))
+
+
+
+## [4.1.1] – 2026-11-03
+
+### Changed
+
+- Deps: update `@angular/cli` to 22.2.5 and `@angular/core` to 22.2.4. ([a97f0e9](https://github.com/slsfi/digital-edition-frontend-ng/commit/a97f0e9044a281533f6252427b3ed62b1c50a714))
+- Deps: update `@ionic/angular` and `@ionic/angular-server` to 9.0.10. ([e33dd2d](https://github.com/slsfi/digital-edition-frontend-ng/commit/e33dd2d76cb53e597ec52648ec0b69c2ef3f67b7))
+- Deps: update `express-rate-limit` to 8.7.3. ([ffc9dab](https://github.com/slsfi/digital-edition-frontend-ng/commit/ffc9dab35c60922d8b5abb8dd0bf1f2ff8d0310d))
+- Deps: update `marked` to 18.1.3. ([059b12f](https://github.com/slsfi/digital-edition-frontend-ng/commit/059b12f192396c2dcbefe20295e3dd151575d08f))
+- Deps: update `tslib` to 2.9.1. ([187f1eb](https://github.com/slsfi/digital-edition-frontend-ng/commit/187f1eb1a90d172a1d028744e9dcc4da214e5105))
+- Deps (dev): update `vitest` to 5.1.0. ([faf0201](https://github.com/slsfi/digital-edition-frontend-ng/commit/faf0201e521953c67df48f7813a1e4dbfb05a53c))
+- Deps: update transitive dependencies. ([f8187a3](https://github.com/slsfi/digital-edition-frontend-ng/commit/f8187a3a8dcd42a4283e43dd94b13b3c7711ae1f))
+
 
 
 ## [4.1.0-production.1] – 2026-10-23
@@ -1938,7 +1992,10 @@ siteLogoDimensions: {
 
 
 
-[unreleased]: https://github.com/slsfi/digital-edition-frontend-ng/compare/4.1.0...HEAD
+[unreleased]: https://github.com/slsfi/digital-edition-frontend-ng/compare/4.2.1...HEAD
+[4.2.1]: https://github.com/slsfi/digital-edition-frontend-ng/compare/4.2.0...4.2.1
+[4.2.0]: https://github.com/slsfi/digital-edition-frontend-ng/compare/4.1.1...4.2.0
+[4.1.1]: https://github.com/slsfi/digital-edition-frontend-ng/compare/4.1.0...4.1.1
 [4.1.0]: https://github.com/slsfi/digital-edition-frontend-ng/compare/4.0.0...4.1.0
 [4.0.0]: https://github.com/slsfi/digital-edition-frontend-ng/compare/3.1.1...4.0.0
 [3.1.1]: https://github.com/slsfi/digital-edition-frontend-ng/compare/3.1.0...3.1.1

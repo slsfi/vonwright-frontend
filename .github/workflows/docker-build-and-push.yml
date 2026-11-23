@@ -30,7 +30,7 @@ jobs:
     steps:
       - name: Select source and image tag
         id: source
-        uses: actions/github-script@v8
+        uses: actions/github-script@v9
         env:
           RELEASE_TAG: ${{ inputs.release_tag }}
         with:
@@ -106,7 +106,7 @@ jobs:
       # Recheck after building so older releases cannot overwrite latest just
       # because their builds finish after a newer release's build.
       - name: Publish latest for the current GitHub latest release
-        uses: actions/github-script@v8
+        uses: actions/github-script@v9
         env:
           RELEASE_TAG: ${{ steps.source.outputs.release-tag }}
           IMAGE_NAME: ghcr.io/${{ github.repository }}

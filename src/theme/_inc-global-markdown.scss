@@ -32,16 +32,13 @@
     font-size: vars.$text-fontsize-xlarge;
   }
 
-  h1, h2, h3, h4, h5, h6 {
-    font-weight: 700;
-  }
-
-  h1, h2, h3, h4 {
-    margin-bottom: 0.4444em;
+  h2, h3, h4, h5, h6 {
+    margin-bottom: 0.5em;
   }
 
   h1 {
     font-size: 1.4444em;
+    font-weight: 700;
     margin-top: 1.7778em;
     margin-bottom: 1.3333em;
     text-transform: uppercase;
@@ -52,13 +49,16 @@
   }
 
   h2 {
-    font-size: 1.2778em;
-    margin-top: 1.6em;
+    font-size: 1.33em;
+    font-weight: 700;
+    margin-top: 1.8135em;
   }
 
   h3 {
-    font-size: 1.1111em;
-    margin-top: 1.3333em;
+    font-size: 1.17em;
+    font-style: italic;
+    font-weight: 400;
+    margin-top: 1.76em;
   }
 
   h2 + h3 {
@@ -67,9 +67,22 @@
 
   h4 {
     font-size: 1.0556em;
-    font-weight: normal;
+    font-weight: 600;
+    margin-top: 1.34em;
+  }
+
+  h5 {
+    font-size: 1.0556em;
     font-style: italic;
-    margin-top: 1.1111em;
+    font-weight: 400;
+    margin-top: 0.75em;
+  }
+
+  h6 {
+    font-size: 1em;
+    font-variant-caps: small-caps;
+    font-weight: 400;
+    margin-top: 0.75em;
   }
 
   p {
@@ -93,6 +106,11 @@
 
   figure {
     margin: 1.75em 0;
+  }
+
+  img {
+    height: auto;
+    max-width: 100%;
   }
 
   img[src$="#align-left"] {
@@ -130,6 +148,7 @@
   h4 {
     font-size: 1.125em;
     font-style: italic;
+    font-variant-caps: normal;
     margin: 2em 0 0.5em;
   }
 
@@ -142,6 +161,7 @@
   h6 {
     font-size: 1em;
     font-style: italic;
+    font-weight: 700;
     margin: 2em 0 0.5em;
   }
 
@@ -199,18 +219,12 @@ modal-download-texts .markdown {
 /* --- */
 
 page-article .markdown {
-  h2 {
-    margin-top: 4em;
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-stack-app-base);
   }
-
-  h3 {
-    margin-top: 2em;
+  h1 {
+    text-transform: none;
   }
-
-  h2 + h3 {
-    margin-top: 1.25em;
-  }
-
   p {
     line-height: 1.6em;
     margin: 0;
@@ -221,13 +235,18 @@ page-article .markdown {
   }
 
   blockquote {
-    font-size: .9412em;
+    background: #f3f3f3;
+    border-left: 4px solid rgba(var(--article-blockquote-accent-rgb, var(--primary-color-rgb, 130, 130, 130)), 0.5);
+    font-size: 0.9412em;
+    margin: 1.5em 0;
+    padding: 1em 1.25em;
   }
 
   hgroup {
-    margin: 3em 0 4em 0;
+    margin: 4em 0 5em 0;
 
     h1 {
+      font-size: 1.5883em;
       letter-spacing: .02em;
       line-height: 1.35;
       margin: 0;
@@ -235,15 +254,16 @@ page-article .markdown {
     }
 
     p {
+      font-family: var(--font-stack-app-base);
       line-height: 1.35;
       margin: 1em 0;
       text-align: center;
       text-indent: 0;
 
       &[role="doc-subtitle"] {
-        font-size: 1.375em;
+        font-size: 1.25em;
         font-weight: normal;
-        margin: 0.75em 0 1.25em 0;
+        margin: 0.75em 0 1.5em 0;
       }
 
       &.noIndent {
